@@ -66,8 +66,10 @@
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
   #spGrid{grid-template-columns:repeat(2,1fr)}
   @media (min-width:900px){#spGrid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr))}}
-  #featGrid{grid-template-columns:repeat(2,1fr)}
-  @media (min-width:900px){#featGrid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
+  #featGrid{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:2px 2px 10px}
+  #featGrid::-webkit-scrollbar{display:none}
+  #featGrid .card{flex:0 0 168px;scroll-snap-align:start}
+  @media (min-width:900px){#featGrid .card{flex-basis:212px}}
   .card{background:linear-gradient(180deg,#1d1d21,#17171a);border:1px solid #202025;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(0,0,0,.42)}
   .card:hover{border-color:var(--border2)}
   .thumbwrap{position:relative;aspect-ratio:1/1;background:#131316;overflow:hidden}
