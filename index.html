@@ -190,8 +190,9 @@
   @media (min-width:900px){
     .hslide{flex-direction:row}
     .hslide .himg{flex:1.55;aspect-ratio:auto;min-height:330px}
-    .hslide .hbody{flex:1;flex-direction:column;align-items:stretch;padding:18px 20px}
+    .hslide .hbody{flex:1;flex-direction:column;align-items:stretch;padding:18px 20px;height:auto}
     .hslide .hprice2{margin-top:auto;align-self:flex-end}
+    .hslide .hname{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:21px}
   }
   .nprice,.rprice{flex:none;text-align:right}
   .nprice .was,.rprice .was{display:block;font-size:11.5px}
@@ -229,13 +230,16 @@
   .hslide .himg img{position:absolute;inset:0;width:100%;height:100%}
   .hslide .himg .hbg{object-fit:cover;filter:blur(26px) brightness(.5);transform:scale(1.3)}
   .hslide .himg .hfg{object-fit:contain}
-  .hslide .hbody{padding:12px 16px 14px;display:flex;align-items:center;gap:14px}
-  .hslide .hmain{flex:1;min-width:0}
-  .hslide .hprice2{display:flex;align-items:center;gap:8px;flex:none}
+  .hslide .hbody{padding:10px 14px 12px;display:flex;flex-direction:column;height:98px;box-sizing:border-box}
+  .hslide .hprice2{display:flex;align-items:center;gap:7px;flex:none;margin-top:auto;align-self:flex-end}
   .hslide .hprice2 .disc{position:static}
-  .hslide .hprice2 .was{display:block;font-size:12px;text-align:right}
-  .hslide .hprice2 .price{font-size:19px;text-align:right}
-  .hslide .hname{font-size:19px;font-weight:800;line-height:1.4}
+  .hslide .hprice2 .was{display:inline;font-size:12.5px;color:var(--faint);text-decoration:line-through}
+  .hslide .hprice2 .price{font-size:17px}
+  .hslide .hprice2 .price.free{color:#e8b400}
+  .hslide .hname{font-size:17px;font-weight:800;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hsub{display:flex;gap:8px;align-items:baseline;margin-top:3px;min-width:0}
+  .hsub .hstatus{margin-top:0;white-space:nowrap}
+  .hshop{font-size:12.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .hslide .hprice{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap}
   .rib{position:absolute;left:10px;bottom:10px;color:#fff;font-weight:800;font-size:12.5px;padding:3px 12px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.45);z-index:2}
   .rib.sale{background:#e04347}
@@ -795,14 +799,9 @@ track.innerHTML = heroItems.map(x => `
   <div class="hslide">
     <a class="himg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img class="hbg" src="${x.image}" alt="" aria-hidden="true" referrerpolicy="no-referrer" onerror="const w = this.closest('.himg'); if (w) w.querySelectorAll('img').forEach(i => i.remove())"><img class="hfg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="const w = this.closest('.himg'); if (w) w.querySelectorAll('img').forEach(i => i.remove())">` : ""}<span class="rib ${x._rib[0]}">${x._rib[1]}</span>${bmFlag(x.id)}</a>
     <div class="hbody">
-      <div class="hmain">
-        <div class="hname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
-        <div class="hmeta">${esc(x.shop || "")}</div>
-        <div class="htags2">${x._tags.map(t => `<span class="htag">${esc(t)}</span>`).join("")}</div>
-        <div class="hstatus">${x._status}</div>
-        <div class="hreason">${x._reason}</div>
-      </div>
-      <div class="hprice2">${x.base > x.cur ? `${x._disc > 0 ? `<span class="disc">-${x._disc}%</span>` : ""}<span><span class="was">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</div>
+      <div class="hname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
+      <div class="hsub"><span class="hstatus">${x._status}</span>${x.shop ? `<span class="hshop">${esc(x.shop)}</span>` : ""}</div>
+      <div class="hprice2">${x._disc > 0 ? `<span class="disc">-${x._disc}%</span>` : ""}${x.base > x.cur ? `<span class="was">${yen(x.base)}</span>` : ""}<span class="price${x.cur === 0 ? " free" : ""}">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
     </div>
   </div>`).join("");
 (function heroClones(){
