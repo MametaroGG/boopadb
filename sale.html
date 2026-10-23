@@ -243,7 +243,20 @@
   .chg .cp{margin-left:auto;font-variant-numeric:tabular-nums}
   .down{color:#a4d007;font-weight:700}
   .up{color:#fc4d50;font-weight:700}
-  .prow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
+  .prow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+  .prow::-webkit-scrollbar{height:6px}
+  .prow::-webkit-scrollbar-track{background:transparent}
+  .prow::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
+  .prow::-webkit-scrollbar-thumb:hover{background:#4b4b53}
+  .prow::-webkit-scrollbar-button{display:none;width:0;height:0}
+  html{scrollbar-width:thin;scrollbar-color:#3d3d44 #101012}
+  body::-webkit-scrollbar{width:10px}
+  body::-webkit-scrollbar-track{background:#101012}
+  body::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px;border:2px solid #101012}
+  .spage{scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+  .spage::-webkit-scrollbar{width:8px}
+  .spage::-webkit-scrollbar-track{background:transparent}
+  .spage::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
   .pcard{flex:0 0 138px;background:#17171a;border:1px solid var(--border);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--text)}
   .pcard img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#131316}
   .pcard .pb{display:block;padding:8px 9px}
