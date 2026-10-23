@@ -17,6 +17,16 @@
   .hwrap{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .logo{font-size:23px;font-weight:800;letter-spacing:.3px}
   .logo span{color:var(--accent)}
+  .langsw{position:relative;margin-left:auto;flex:none}
+  #langBtn{display:inline-flex;align-items:center;gap:6px;background:#1b1b1f;border:1px solid var(--border2);color:var(--text);font-size:12.5px;font-weight:700;padding:6px 10px;border-radius:99px;cursor:pointer;font-family:inherit}
+  #langBtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  #langBtn .lchev{width:12px;height:12px}
+  .langmenu{position:absolute;right:0;top:calc(100% + 8px);background:#1b1b1f;border:1px solid var(--border2);border-radius:12px;padding:5px;min-width:158px;display:none;box-shadow:0 14px 34px rgba(0,0,0,.5);z-index:300}
+  .langmenu.open{display:block}
+  .langmenu button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;background:none;border:none;color:var(--sub);font-size:13.5px;font-weight:600;padding:8px 10px;border-radius:8px;cursor:pointer;font-family:inherit;text-align:left}
+  .langmenu button:hover{background:#26262c;color:var(--text)}
+  .langmenu button.on{color:#fff}
+  .langmenu button.on::after{content:"\2713";color:#c8ec6e;font-weight:800}
   .badge{font-size:10.5px;background:#26262c;color:var(--amber);border:1px solid var(--border2);padding:2px 8px;border-radius:99px;font-weight:700;letter-spacing:.08em}
   .unofficial{font-size:12px;color:var(--faint)}
   main{max-width:1080px;margin:0 auto;padding:22px 20px}
@@ -243,7 +253,20 @@
   .chg .cp{margin-left:auto;font-variant-numeric:tabular-nums}
   .down{color:#a4d007;font-weight:700}
   .up{color:#fc4d50;font-weight:700}
-  .prow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
+  .prow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+  .prow::-webkit-scrollbar{height:6px}
+  .prow::-webkit-scrollbar-track{background:transparent}
+  .prow::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
+  .prow::-webkit-scrollbar-thumb:hover{background:#4b4b53}
+  .prow::-webkit-scrollbar-button{display:none;width:0;height:0}
+  html{scrollbar-width:thin;scrollbar-color:#3d3d44 #101012}
+  body::-webkit-scrollbar{width:10px}
+  body::-webkit-scrollbar-track{background:#101012}
+  body::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px;border:2px solid #101012}
+  .spage{scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+  .spage::-webkit-scrollbar{width:8px}
+  .spage::-webkit-scrollbar-track{background:transparent}
+  .spage::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
   .pcard{flex:0 0 138px;background:#17171a;border:1px solid var(--border);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--text)}
   .pcard img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#131316}
   .pcard .pb{display:block;padding:8px 9px}
@@ -269,6 +292,7 @@
   .bnote{display:block;font-size:12px;color:var(--faint);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .bsub{display:block;font-size:12px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .bprice{display:inline-flex;align-items:stretch;text-align:right;flex:none}
+  .bprice .discst{height:auto;align-items:center;justify-content:center;text-align:center}
   .bprice .bstack{display:inline-flex;flex-direction:column;justify-content:center;background:#26262c;padding:3px 8px 3px 2px}
   .bprice .bstack .was{display:block;height:auto;background:none;padding:0;font-size:10.5px;color:var(--faint);text-align:right;line-height:1.3}
   .bprice .bstack .price{display:block;height:auto;background:none;padding:0;font-size:14.5px;text-align:right;line-height:1.3}
@@ -370,14 +394,15 @@
 <header>
   <div class="hwrap">
   <a class="logo" href="index.html" style="text-decoration:none;color:inherit">Booth<span>DB</span> <span style="color:#a2a2ab;font-size:15px;font-weight:600">for VRChat</span></a>
-  <nav><a href="index.html#sale">セール中の商品</a><a href="index.html#feat">注目の商品</a><a href="index.html#browse2">新着・値下げ</a></nav>
+  <nav><a href="index.html#sale" data-i="nav_sale">セール中の商品</a><a href="index.html#feat" data-i="nav_feat">注目の商品</a><a href="index.html#browse2" data-i="nav_browse">新着・値下げ</a></nav>
+  <div class="langsw"><button id="langBtn" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg><span id="langCur">日本語</span><svg class="lchev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="langmenu" id="langMenu"></div></div>
   <div class="badge">PROTOTYPE</div>
   </div>
 </header>
 <main>
-  <div class="crumb"><a href="index.html">ホーム</a> › プライバシー</div>
+  <div class="crumb"><a href="index.html" data-i="tab_home">ホーム</a> › <span id="crumbHere">プライバシー</span></div>
   <div class="ptitle">
-    <h1>プライバシーポリシー</h1>
+    <h1 id="pgH1">プライバシーポリシー</h1>
     <p id="subStats"></p>
   </div>
 
@@ -402,20 +427,164 @@
 
 </main>
 <footer>
-  <div>データは Boopa（BOOTH Price Tracker for VRChat）の収集基盤による実データです。価格は観測時点のもので、現在のBOOTH上の価格と異なる場合があります。</div>
+  <div data-i="ft_data">データは Boopa（BOOTH Price Tracker for VRChat）の収集基盤による実データです。価格は観測時点のもので、現在のBOOTH上の価格と異なる場合があります。</div>
   <div class="flegal">
-    BoothDB for VRChat は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。<a class="flink" href="terms.html">利用規約</a> · <a class="flink" href="privacy.html">プライバシー</a><br>
-    BOOTH は pixiv株式会社の商標です。その他の商標および著作物は、各権利者に帰属します。
+    <span data-i="ft_legal">BoothDB for VRChat は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。</span><a class="flink" href="terms.html" data-i="ft_terms">利用規約</a> · <a class="flink" href="privacy.html" data-i="ft_priv">プライバシー</a><br>
+    <span data-i="ft_tm">BOOTH は pixiv株式会社の商標です。その他の商標および著作物は、各権利者に帰属します。</span>
   </div>
 </footer>
 <script>
 const P = {};
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const yen = n => n === 0 ? "無料" : "¥" + Number(n).toLocaleString("ja-JP");
-const itemLink = id => `index.html#item-${id}`;
-const num = n => Number(n).toLocaleString("ja-JP");
+// ==== i18n (sub-pages): BOOTH locales ja / en / ko / zh-Hans / zh-Hant ====
+const LANGS = [["ja", "日本語"], ["en", "English"], ["ko", "한국어"], ["zh-Hans", "简体中文"], ["zh-Hant", "繁體中文"]];
+const I18N = {
+ja: {
+  nav_sale: "セール中の商品", nav_feat: "注目の商品", nav_browse: "新着・値下げ", tab_home: "ホーム",
+  chip_all: "すべて", chip_lowest: "過去最安値", chip_half: "50%OFF以上", chip_onsale: "セール中",
+  sort_pct: "割引率順", sort_amount: "割引額順", sort_cheap: "安い順",
+  empty_none: "該当する商品がありません", free: "無料",
+  bt_new: "新着", bt_drop: "値下げ", tab_news: "ニュース", tab_ranking: "ランキング",
+  ft_data: "データは Boopa（BOOTH Price Tracker for VRChat）の収集基盤による実データです。価格は観測時点のもので、現在のBOOTH上の価格と異なる場合があります。",
+  ft_legal: "BoothDB for VRChat は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。",
+  ft_terms: "利用規約", ft_priv: "プライバシー",
+  ft_tm: "BOOTH は pixiv株式会社の商標です。その他の商標および著作物は、各権利者に帰属します。",
+  sale_all: "すべてのセール", sale_big: "割引額の大きなセール",
+  sale_sub: "現在セール中（推定）<b>{a} 件</b> · 現在無料（推定） <b>{b} 件</b> · 収録期間 {d1} 〜 {d2}",
+  sale_count: "セール中 {n} 件（全 {m} 件）",
+  news_sub: "収録期間 {d1} 〜 {d2} · 価格が動いた商品の履歴",
+  news_empty: "該当する履歴がありません",
+  rk_sub: "現在セール中（推定）<b>{n} 件</b> から集計 · {d} 時点",
+  rk_amount_title: "割引額ランキング", rk_pct_title: "割引率ランキング", rk_lowest_title: "過去最安値の商品",
+  rk_tab_amount: "割引額", rk_tab_pct: "割引率",
+  priv_title: "プライバシーポリシー", priv_sub: "BoothDB for VRChat のプライバシーポリシー",
+  terms_sub: "BoothDB for VRChat の利用規約",
+  legal_note: "",
+},
+en: {
+  nav_sale: "On Sale", nav_feat: "Featured", nav_browse: "New & Price Drops", tab_home: "Home",
+  chip_all: "All", chip_lowest: "Lowest ever", chip_half: "50% off or more", chip_onsale: "On sale",
+  sort_pct: "By discount %", sort_amount: "By amount saved", sort_cheap: "Price: low to high",
+  empty_none: "No matching products", free: "Free",
+  bt_new: "New", bt_drop: "Price drops", tab_news: "News", tab_ranking: "Rankings",
+  ft_data: "Data is real, collected by Boopa (BOOTH Price Tracker for VRChat). Prices are as observed and may differ from current BOOTH prices.",
+  ft_legal: "BoothDB for VRChat is an unofficial project, not affiliated with BOOTH or pixiv Inc. All times are Japan Standard Time (JST).",
+  ft_terms: "Terms", ft_priv: "Privacy",
+  ft_tm: "BOOTH is a trademark of pixiv Inc. All other trademarks and works belong to their respective owners.",
+  sale_all: "All sales", sale_big: "Biggest savings",
+  sale_sub: "On sale now (est.) <b>{a} items</b> · Free now (est.) <b>{b} items</b> · Data from {d1} to {d2}",
+  sale_count: "{n} on sale (of {m})",
+  news_sub: "Data from {d1} to {d2} · History of products whose price moved",
+  news_empty: "No matching history",
+  rk_sub: "Aggregated from <b>{n} items</b> on sale now (est.) · as of {d}",
+  rk_amount_title: "Biggest savings ranking", rk_pct_title: "Discount rate ranking", rk_lowest_title: "At their lowest price ever",
+  rk_tab_amount: "Amount saved", rk_tab_pct: "Discount %",
+  priv_title: "Privacy Policy", priv_sub: "Privacy policy of BoothDB for VRChat",
+  terms_sub: "Terms of use of BoothDB for VRChat",
+  legal_note: "This document is provided in Japanese only; the Japanese version is authoritative.",
+},
+ko: {
+  nav_sale: "할인 중인 상품", nav_feat: "주목 상품", nav_browse: "신착·가격 인하", tab_home: "홈",
+  chip_all: "전체", chip_lowest: "역대 최저가", chip_half: "50% 이상 할인", chip_onsale: "할인 중",
+  sort_pct: "할인율순", sort_amount: "할인액순", sort_cheap: "가격 낮은순",
+  empty_none: "해당하는 상품이 없습니다", free: "무료",
+  bt_new: "신착", bt_drop: "가격 인하", tab_news: "뉴스", tab_ranking: "랭킹",
+  ft_data: "데이터는 Boopa(BOOTH Price Tracker for VRChat)의 수집 인프라로 모은 실제 데이터입니다. 가격은 관측 시점 기준이며 현재 BOOTH 가격과 다를 수 있습니다.",
+  ft_legal: "BoothDB for VRChat는 BOOTH 및 pixiv 주식회사와 관계없는 비공식 프로젝트입니다. 모든 시간은 일본 시간(JST)입니다.",
+  ft_terms: "이용약관", ft_priv: "개인정보",
+  ft_tm: "BOOTH는 pixiv 주식회사의 상표입니다. 그 밖의 상표 및 저작물은 각 권리자에게 귀속합니다.",
+  sale_all: "모든 할인", sale_big: "할인액이 큰 상품",
+  sale_sub: "현재 할인 중(추정) <b>{a}건</b> · 현재 무료(추정) <b>{b}건</b> · 수집 기간 {d1} 〜 {d2}",
+  sale_count: "할인 중 {n}건(전체 {m}건)",
+  news_sub: "수집 기간 {d1} 〜 {d2} · 가격이 변동한 상품 이력",
+  news_empty: "해당하는 이력이 없습니다",
+  rk_sub: "현재 할인 중(추정) <b>{n}건</b>에서 집계 · {d} 기준",
+  rk_amount_title: "할인액 랭킹", rk_pct_title: "할인율 랭킹", rk_lowest_title: "역대 최저가 상품",
+  rk_tab_amount: "할인액", rk_tab_pct: "할인율",
+  priv_title: "개인정보 처리방침", priv_sub: "BoothDB for VRChat의 개인정보 처리방침",
+  terms_sub: "BoothDB for VRChat의 이용약관",
+  legal_note: "이 문서는 일본어로만 제공되며, 일본어 버전이 정본입니다.",
+},
+"zh-Hans": {
+  nav_sale: "促销中的商品", nav_feat: "精选商品", nav_browse: "新品·降价", tab_home: "首页",
+  chip_all: "全部", chip_lowest: "历史最低", chip_half: "5折及以上", chip_onsale: "促销中",
+  sort_pct: "按折扣率", sort_amount: "按优惠金额", sort_cheap: "价格从低到高",
+  empty_none: "没有符合条件的商品", free: "免费",
+  bt_new: "新品", bt_drop: "降价", tab_news: "动态", tab_ranking: "排行榜",
+  ft_data: "数据为 Boopa（BOOTH Price Tracker for VRChat）采集的真实数据。价格为观测时点的价格，可能与 BOOTH 当前价格不同。",
+  ft_legal: "BoothDB for VRChat 是与 BOOTH 及 pixiv 株式会社无关的非官方项目。所有时间均为日本时间（JST）。",
+  ft_terms: "使用条款", ft_priv: "隐私",
+  ft_tm: "BOOTH 是 pixiv 株式会社的商标。其他商标及作品归各权利方所有。",
+  sale_all: "全部促销", sale_big: "优惠金额大的促销",
+  sale_sub: "当前促销中（估计）<b>{a} 件</b> · 当前免费（估计）<b>{b} 件</b> · 收录期间 {d1} 〜 {d2}",
+  sale_count: "促销中 {n} 件（共 {m} 件）",
+  news_sub: "收录期间 {d1} 〜 {d2} · 价格有变动的商品记录",
+  news_empty: "没有符合条件的记录",
+  rk_sub: "从当前促销中（估计）的 <b>{n} 件</b>汇总 · 截至 {d}",
+  rk_amount_title: "优惠金额排行", rk_pct_title: "折扣率排行", rk_lowest_title: "历史最低价商品",
+  rk_tab_amount: "优惠金额", rk_tab_pct: "折扣率",
+  priv_title: "隐私政策", priv_sub: "BoothDB for VRChat 的隐私政策",
+  terms_sub: "BoothDB for VRChat 的使用条款",
+  legal_note: "本文档仅提供日文版，以日文版为准。",
+},
+"zh-Hant": {
+  nav_sale: "促銷中的商品", nav_feat: "精選商品", nav_browse: "新品·降價", tab_home: "首頁",
+  chip_all: "全部", chip_lowest: "歷史最低", chip_half: "5折及以上", chip_onsale: "促銷中",
+  sort_pct: "按折扣率", sort_amount: "按優惠金額", sort_cheap: "價格從低到高",
+  empty_none: "沒有符合條件的商品", free: "免費",
+  bt_new: "新品", bt_drop: "降價", tab_news: "動態", tab_ranking: "排行榜",
+  ft_data: "數據為 Boopa（BOOTH Price Tracker for VRChat）採集的真實數據。價格為觀測時點的價格，可能與 BOOTH 當前價格不同。",
+  ft_legal: "BoothDB for VRChat 是與 BOOTH 及 pixiv 株式會社無關的非官方項目。所有時間均為日本時間（JST）。",
+  ft_terms: "使用條款", ft_priv: "隱私",
+  ft_tm: "BOOTH 是 pixiv 株式會社的商標。其他商標及作品歸各權利方所有。",
+  sale_all: "全部促銷", sale_big: "優惠金額大的促銷",
+  sale_sub: "當前促銷中（估計）<b>{a} 件</b> · 當前免費（估計）<b>{b} 件</b> · 收錄期間 {d1} 〜 {d2}",
+  sale_count: "促銷中 {n} 件（共 {m} 件）",
+  news_sub: "收錄期間 {d1} 〜 {d2} · 價格有變動的商品記錄",
+  news_empty: "沒有符合條件的記錄",
+  rk_sub: "從當前促銷中（估計）的 <b>{n} 件</b>彙總 · 截至 {d}",
+  rk_amount_title: "優惠金額排行", rk_pct_title: "折扣率排行", rk_lowest_title: "歷史最低價商品",
+  rk_tab_amount: "優惠金額", rk_tab_pct: "折扣率",
+  priv_title: "隱私政策", priv_sub: "BoothDB for VRChat 的隱私政策",
+  terms_sub: "BoothDB for VRChat 的使用條款",
+  legal_note: "本文件僅提供日文版，以日文版為準。",
+},
+};
+let LANG = "ja";
+try { const s = localStorage.getItem("boothdb_lang"); if (s && I18N[s]) LANG = s; } catch {}
+const LOCALES = { ja: "ja-JP", en: "en-US", ko: "ko-KR", "zh-Hans": "zh-CN", "zh-Hant": "zh-TW" };
+const LOCALE = LOCALES[LANG];
+function tr(k, v){
+  let s = (I18N[LANG] && I18N[LANG][k]) ?? I18N.ja[k] ?? k;
+  if (v) for (const key in v) s = s.split("{" + key + "}").join(String(v[key]));
+  return s;
+}
+document.documentElement.lang = LANG;
+document.querySelectorAll("[data-i]").forEach(el => { el.textContent = tr(el.dataset.i); });
+{
+  const menu = document.getElementById("langMenu");
+  const cur = document.getElementById("langCur");
+  if (menu && cur) {
+    cur.textContent = LANGS.find(l => l[0] === LANG)[1];
+    menu.innerHTML = LANGS.map(([c, n]) => `<button type="button" data-lang="${c}" class="${c === LANG ? "on" : ""}">${n}</button>`).join("");
+    menu.querySelectorAll("button").forEach(b => b.onclick = () => {
+      try { localStorage.setItem("boothdb_lang", b.dataset.lang); } catch {}
+      location.reload();
+    });
+    document.getElementById("langBtn").onclick = e => { e.stopPropagation(); menu.classList.toggle("open"); };
+    document.addEventListener("click", e => { if (!e.target.closest(".langsw")) menu.classList.remove("open"); });
+  }
+}
 
-document.getElementById("subStats").textContent = "BoothDB for VRChat のプライバシーポリシー";
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const yen = n => n === 0 ? tr("free") : "¥" + Number(n).toLocaleString(LOCALE);
+const itemLink = id => `index.html#item-${id}`;
+const num = n => Number(n).toLocaleString(LOCALE);
+
+document.title = tr("priv_title") + " | BoothDB for VRChat";
+document.getElementById("pgH1").textContent = tr("priv_title");
+document.getElementById("crumbHere").textContent = tr("ft_priv");
+document.getElementById("subStats").textContent = tr("priv_sub");
+{ const ln = tr("legal_note"); if (ln) { const d = document.createElement("p"); d.className = "note"; d.textContent = ln; const doc = document.querySelector(".doc"); if (doc) doc.prepend(d); } }
 
 </script>
 </body>
