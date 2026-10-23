@@ -760,7 +760,13 @@ function renderSale(){
   else if (sortMode === "cheap") arr.sort((a,b) => a.cur - b.cur);
   else arr.sort((a,b) => b.pct - a.pct || (b.base - b.cur) - (a.base - a.cur));
   arr = arr.filter(saleHit);
-  const mos = arr.slice(0, 4), rest = arr.slice(4);
+  // Featured mosaic skips gag listings (joke base prices like ¥9,999,999):
+  // plausible prices first, preferring all-time-low deals. The grid keeps
+  // the full filtered list in the chosen sort order, minus the featured four.
+  const sane = arr.filter(s => s.base > 0 && s.base <= 100000)
+    .sort((a, b) => (b.at_lowest - a.at_lowest) || (b.pct - a.pct) || ((b.base - b.cur) - (a.base - a.cur)));
+  const mos = [...sane, ...arr.filter(s => !sane.includes(s))].slice(0, 4);
+  const rest = arr.filter(s => !mos.includes(s));
   document.getElementById("saleMosaic").innerHTML = mos.map(mosaicCell).join("");
   document.getElementById("saleGrid").innerHTML = rest.slice(0, saleRestShown).map(steamCap).join("");
   document.getElementById("saleEmpty").style.display = arr.length ? "none" : "block";

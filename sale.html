@@ -407,7 +407,16 @@ function capCard(s){
 }
 
 const byPct = (a, b) => b.pct - a.pct || (b.base - b.cur) - (a.base - a.cur);
-document.getElementById("spMosaic").innerHTML = [...P.on_sale].sort(byPct).slice(0, 4).map(mosaicCell).join("");
+// Featured picks skip gag listings (joke base prices like ¥9,999,999): only
+// plausible prices, preferring all-time-low deals. Fill from the full list
+// if too few qualify so the mosaic never breaks.
+const featPick = arr => {
+  const sane = arr.filter(s => s.base > 0 && s.base <= 100000)
+    .sort((a, b) => (b.at_lowest - a.at_lowest) || byPct(a, b));
+  const rest = arr.filter(s => !sane.includes(s)).sort(byPct);
+  return [...sane, ...rest].slice(0, 4);
+};
+document.getElementById("spMosaic").innerHTML = featPick(P.on_sale).map(mosaicCell).join("");
 
 let spSf = "all", spSort = "pct";
 function spHit(s){
