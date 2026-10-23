@@ -687,14 +687,20 @@ function htagsArr(x){
 function htags(x){
   return htagsArr(x).map(t => "#" + t.replace(/[\s　]+/g, "")).join(" ");
 }
+function htagsPlain(x){
+  const t = [];
+  if (x.at_lowest) t.push(tr("chip_lowest"));
+  if (x.shop) t.push(x.shop);
+  return t.map(t => "#" + t.replace(/[\s　]+/g, "")).join(" ");
+}
 function heroNormSale(x){
-  return {...x, _pct: x.pct, _rib: ribOf(x), _tags: htagsArr(x),
+  return {...x, _pct: x.pct, _disc: x.pct, _rib: ribOf(x), _tags: htagsArr(x),
     _status: x.at_lowest ? tr("status_lowest") : tr("save_note", {v: yen(x.base - x.cur)}),
     _reason: x.at_lowest ? tr("reason_lowest") : tr("reason_sale")};
 }
 function heroNormActive(x){
   const pct = x.base > x.cur ? Math.round((1 - x.cur / x.base) * 100) : 0;
-  return {...x, _pct: pct, _rib: ["act", tr("bt_active")], _tags: [tr("bt_active"), tr("recent3w_short", {n: x.changes_recent})],
+  return {...x, _pct: pct, _disc: x.on_sale ? pct : 0, _rib: ["act", tr("bt_active")], _tags: [tr("bt_active"), tr("recent3w_short", {n: x.changes_recent})],
     _status: tr("recent3w", {n: x.changes_recent}),
     _reason: tr("reason_active")};
 }
@@ -717,7 +723,7 @@ track.innerHTML = heroItems.map(x => `
         <div class="hstatus">${x._status}</div>
         <div class="hreason">${x._reason}</div>
       </div>
-      <div class="hprice2">${x._pct > 0 ? `<span class="disc">-${x._pct}%</span><span><span class="was">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</div>
+      <div class="hprice2">${x.base > x.cur ? `${x._disc > 0 ? `<span class="disc">-${x._disc}%</span>` : ""}<span><span class="was">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</div>
     </div>
   </div>`).join("");
 (function heroClones(){
@@ -855,10 +861,10 @@ document.getElementById("spBack").onclick = closeSearch;
 
 const spIndex = (() => {
   const map = new Map();
-  P.on_sale.forEach(s => map.set(s.id, {...s, kind: "sale"}));
+  P.on_sale.forEach(s => map.set(s.id, {...s, kind: "sale", sale: true}));
   P.drops.forEach(d => {
-    if (!map.has(d.id)) map.set(d.id, {id: d.id, name: d.name, shop: d.shop, image: d.image, base: d.from, cur: d.to, pct: d.from ? Math.round((1 - d.to / d.from) * 100) : 0, at_lowest: d.at_lowest, kind: "drop"});
-    else map.get(d.id).kind = "sale";
+    if (!map.has(d.id)) map.set(d.id, {id: d.id, name: d.name, shop: d.shop, image: d.image, base: d.from, cur: d.to, pct: d.from ? Math.round((1 - d.to / d.from) * 100) : 0, at_lowest: d.at_lowest, kind: "drop", sale: false});
+    else { const mm = map.get(d.id); mm.kind = "sale"; mm.sale = true; }
   });
   P.charts.forEach(p => {
     if (map.has(p.id)) return;
@@ -868,15 +874,15 @@ const spIndex = (() => {
     if (!ser.length) return;
     const prices = ser.map(r => r[1]);
     const cur = prices[prices.length - 1], base = Math.max(...prices);
-    map.set(p.id, {id: p.id, name: p.name, shop: p.shop, image: p.image, base, cur, pct: base ? Math.round((1 - cur / base) * 100) : 0, at_lowest: cur === Math.min(...prices), kind: "item"});
+    map.set(p.id, {id: p.id, name: p.name, shop: p.shop, image: p.image, base, cur, pct: base ? Math.round((1 - cur / base) * 100) : 0, at_lowest: cur === Math.min(...prices), kind: "item", sale: false});
   });
   (P.active || []).forEach(a => {
-    const e = {id: a.id, name: a.name, shop: a.shop, image: a.image, base: a.base, cur: a.cur, pct: a.base > a.cur ? Math.round((1 - a.cur / a.base) * 100) : 0, at_lowest: a.at_lowest, first_date: a.first_date, changes_recent: a.changes_recent, kind: "active"};
+    const e = {id: a.id, name: a.name, shop: a.shop, image: a.image, base: a.base, cur: a.cur, pct: a.base > a.cur ? Math.round((1 - a.cur / a.base) * 100) : 0, at_lowest: a.at_lowest, first_date: a.first_date, changes_recent: a.changes_recent, kind: "active", sale: !!a.on_sale};
     if (map.has(a.id)) { const m = map.get(a.id); m.first_date = a.first_date; m.changes_recent = a.changes_recent; }
     else map.set(a.id, e);
   });
   (P.newest || []).forEach(a => {
-    const e = {id: a.id, name: a.name, shop: a.shop, image: a.image, base: a.base, cur: a.cur, pct: a.base > a.cur ? Math.round((1 - a.cur / a.base) * 100) : 0, at_lowest: a.at_lowest, first_date: a.first_date, changes_recent: a.changes_recent, kind: "new"};
+    const e = {id: a.id, name: a.name, shop: a.shop, image: a.image, base: a.base, cur: a.cur, pct: a.base > a.cur ? Math.round((1 - a.cur / a.base) * 100) : 0, at_lowest: a.at_lowest, first_date: a.first_date, changes_recent: a.changes_recent, kind: "new", sale: !!a.on_sale};
     if (map.has(a.id)) { const m = map.get(a.id); m.first_date = a.first_date; if (m.kind === "item") m.kind = "new"; }
     else map.set(a.id, e);
   });
@@ -969,13 +975,13 @@ function saleCard(s, i){
   <div class="card" style="animation-delay:${(i || 0) * 45}ms" data-pct="${s.pct}" data-free="${s.cur === 0 ? 1 : 0}" data-lowest="${s.at_lowest ? 1 : 0}" data-text="${esc((s.name + " " + (s.shop || "")).toLowerCase())}">
     <a class="thumbwrap" href="${itemUrl(s.id)}" target="_blank" rel="noopener">
       ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}
-      <span class="disc">-${s.pct}%</span>
+      ${s.sale === false ? "" : `<span class="disc">-${s.pct}%</span>`}
       <span class="rib ${ribOf(s)[0]}">${ribOf(s)[1]}</span>
     </a>
     <div class="cbody">
       <div class="cname"><a href="${itemUrl(s.id)}" target="_blank" rel="noopener">${esc(s.name)}</a></div>
       <div class="cshop">${esc(s.shop || "")}</div>
-      <div class="htags">${esc(htags(s))}</div>
+      <div class="htags">${esc(s.sale === false ? htagsPlain(s) : htags(s))}</div>
       <div class="crow"><span class="was">${yen(s.base)}</span><span class="price" style="font-size:16px">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span>${s.at_lowest ? '<span class="lowest">' + tr("chip_lowest") + '</span>' : ""}</div>
     </div>
   </div>`;
@@ -1046,11 +1052,11 @@ document.getElementById("chips").querySelectorAll(".chip").forEach(ch => {
 });
 
 // ---- Steam-style tabbed browse module (list + side preview) ----
-function bNormSale(s){ return {id: s.id, name: s.name, shop: s.shop, image: s.image, cur: s.cur, base: s.base, pct: s.pct, at_lowest: s.at_lowest, spark: s.spark, note: tr("chip_onsale"), chips: [tr("chip_onsale"), ...(s.at_lowest ? [tr("chip_lowest")] : [])]}; }
-function bNormDrop(d){ return {id: d.id, name: d.name, shop: d.shop, image: d.image, cur: d.to, base: d.from, pct: d.from ? Math.round((1 - d.to / d.from) * 100) : 0, at_lowest: d.at_lowest, spark: d.spark, drop: true, note: tr("note_dropped", {d: d.date}), chips: [tr("bt_drop"), ...(d.at_lowest ? [tr("chip_lowest")] : [])]}; }
+function bNormSale(s){ return {id: s.id, name: s.name, shop: s.shop, image: s.image, cur: s.cur, base: s.base, pct: s.pct, at_lowest: s.at_lowest, spark: s.spark, sale: true, note: tr("chip_onsale"), chips: [tr("chip_onsale"), ...(s.at_lowest ? [tr("chip_lowest")] : [])]}; }
+function bNormDrop(d){ return {id: d.id, name: d.name, shop: d.shop, image: d.image, cur: d.to, base: d.from, pct: d.from ? Math.round((1 - d.to / d.from) * 100) : 0, at_lowest: d.at_lowest, spark: d.spark, drop: true, sale: false, note: tr("note_dropped", {d: d.date}), chips: [tr("bt_drop"), ...(d.at_lowest ? [tr("chip_lowest")] : [])]}; }
 function bNormFeat(x, kind){
   const pct = x.base > x.cur ? Math.round((1 - x.cur / x.base) * 100) : 0;
-  return {id: x.id, name: x.name, shop: x.shop, image: x.image, cur: x.cur, base: x.base, pct, at_lowest: x.at_lowest, spark: x.spark,
+  return {id: x.id, name: x.name, shop: x.shop, image: x.image, cur: x.cur, base: x.base, pct, at_lowest: x.at_lowest, spark: x.spark, sale: !!x.on_sale,
     note: kind === "new" ? tr("added_on", {d: x.first_date}) : tr("recent3w_short", {n: x.changes_recent}),
     chips: kind === "new" ? [tr("bt_new")] : [tr("bt_active"), tr("alltime_changes", {n: x.changes_total})]};
 }
@@ -1076,7 +1082,7 @@ function browHTML(x, i){
   return `<a class="brow${i === 0 ? " sel" : ""}" data-i="${i}" href="${itemUrl(x.id)}" target="_blank" rel="noopener">
     ${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}
     <span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bshop">${esc(x.shop || "")}</span><span class="bnote">${x.note || ""}</span></span>
-    <span class="bprice">${x.pct > 0 && !x.drop ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="bstack"><span class="was">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</span>
+    <span class="bprice">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="bstack"><span class="was">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</span>
   </a>`;
 }
 function bPrevHTML(x){
@@ -1086,7 +1092,7 @@ function bPrevHTML(x){
     <div class="bpchips">${(x.chips || []).map(c => `<span class="bpchip">${esc(c)}</span>`).join("")}</div>
     ${x.image ? `<img class="bpimg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}
     ${x.spark ? `<div class="bpspark"><div class="cap">${tr("pp_chart")}</div>${sparkSVG(x.spark)}</div>` : ""}
-    <div class="bprow">${x.pct > 0 && !x.drop ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="was">${yen(x.base)}</span>` : ""}<span class="price">${yen(x.cur)}</span>${x.at_lowest ? '<span class="lowest">' + tr("chip_lowest") + '</span>' : ""}</div>`;
+    <div class="bprow">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="was">${yen(x.base)}</span>` : ""}<span class="price">${yen(x.cur)}</span>${x.at_lowest ? '<span class="lowest">' + tr("chip_lowest") + '</span>' : ""}</div>`;
 }
 function renderBList(){
   const list = document.getElementById("bList");
@@ -1126,7 +1132,7 @@ function featCap(x, tag, meta){
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
       <div class="spark">${sparkSVG(x.spark)}</div>
-      <div class="caprow"><span class="price">${yen(x.cur)}</span>${pct > 0 ? `<span class="discst">-${pct}%</span>` : ""}<span class="fmeta">${meta}</span></div>
+      <div class="caprow"><span class="price">${yen(x.cur)}</span>${pct > 0 && x.on_sale ? `<span class="discst">-${pct}%</span>` : ""}<span class="fmeta">${meta}</span></div>
     </div>
   </div>`;
 }
@@ -1159,10 +1165,10 @@ function featCap(x, tag, meta){
 // ---- product registry ----
 const PROD = new Map();
 function regP(x){ if (x && x.id != null && !PROD.has(String(x.id))) PROD.set(String(x.id), x); }
-P.on_sale.forEach(s => regP({id: s.id, name: s.name, shop: s.shop, image: s.image, cur: s.cur, base: s.base, pct: s.pct, at_lowest: s.at_lowest, lowest: s.lowest, spark: s.spark, variations: s.vars}));
-P.drops.forEach(d => regP({id: d.id, name: d.name, shop: d.shop, image: d.image, cur: d.to, base: d.from, pct: d.from ? Math.round((1 - d.to / d.from) * 100) : 0, at_lowest: d.at_lowest, lowest: d.lowest, spark: d.spark, variations: d.vars}));
-(P.active || []).forEach(a => regP({id: a.id, name: a.name, shop: a.shop, image: a.image, cur: a.cur, base: a.base, pct: a.base > a.cur ? Math.round((1 - a.cur / a.base) * 100) : 0, at_lowest: a.at_lowest, lowest: a.lowest, spark: a.spark, variations: a.vars}));
-(P.newest || []).forEach(a => regP({id: a.id, name: a.name, shop: a.shop, image: a.image, cur: a.cur, base: a.base, pct: a.base > a.cur ? Math.round((1 - a.cur / a.base) * 100) : 0, at_lowest: a.at_lowest, lowest: a.lowest, spark: a.spark, variations: a.vars}));
+P.on_sale.forEach(s => regP({id: s.id, name: s.name, shop: s.shop, image: s.image, cur: s.cur, base: s.base, pct: s.pct, at_lowest: s.at_lowest, lowest: s.lowest, spark: s.spark, sale: true, variations: s.vars}));
+P.drops.forEach(d => regP({id: d.id, name: d.name, shop: d.shop, image: d.image, cur: d.to, base: d.from, pct: d.from ? Math.round((1 - d.to / d.from) * 100) : 0, at_lowest: d.at_lowest, lowest: d.lowest, spark: d.spark, sale: false, variations: d.vars}));
+(P.active || []).forEach(a => regP({id: a.id, name: a.name, shop: a.shop, image: a.image, cur: a.cur, base: a.base, pct: a.base > a.cur ? Math.round((1 - a.cur / a.base) * 100) : 0, at_lowest: a.at_lowest, lowest: a.lowest, spark: a.spark, sale: !!a.on_sale, variations: a.vars}));
+(P.newest || []).forEach(a => regP({id: a.id, name: a.name, shop: a.shop, image: a.image, cur: a.cur, base: a.base, pct: a.base > a.cur ? Math.round((1 - a.cur / a.base) * 100) : 0, at_lowest: a.at_lowest, lowest: a.lowest, spark: a.spark, sale: !!a.on_sale, variations: a.vars}));
 P.charts.forEach(p => {
   const ex = PROD.get(String(p.id)) || {id: p.id, name: p.name, shop: p.shop, image: p.image};
   ex.variations = p.variations;
@@ -1282,7 +1288,7 @@ function renderProdPage(x){
     <div style="flex:1;min-width:0">
       <div class="pp-name">${esc(x.name)}</div>
       <div class="pp-shop">${esc(x.shop || "")}</div>
-      <div class="bpchips">${x.cur === 0 ? `<span class="bpchip">${tr("free")}</span>` : ""}${x.pct > 0 ? `<span class="bpchip">${tr("chip_onsale")} -${x.pct}%</span>` : ""}${x.at_lowest ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}</div>
+      <div class="bpchips">${x.cur === 0 ? `<span class="bpchip">${tr("free")}</span>` : ""}${x.pct > 0 && x.sale ? `<span class="bpchip">${tr("chip_onsale")} -${x.pct}%</span>` : ""}${x.at_lowest ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}</div>
       <div class="pstats" id="ppStats"></div>
       <div class="pp-actions">
         <a class="pp-booth" data-ext href="${itemUrl(x.id)}" target="_blank" rel="noopener">${tr("pp_booth")}</a>
