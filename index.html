@@ -120,6 +120,9 @@
   .btn:active{transform:scale(.94)}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
   .chip{border:1px solid var(--border2);background:var(--panel);color:var(--sub);border-radius:99px;padding:6px 14px;font-size:12.5px;cursor:pointer;transition:all .18s cubic-bezier(.34,1.4,.64,1);font-family:inherit}
+  #chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  #chips::-webkit-scrollbar{display:none}
+  #chips .chip{white-space:nowrap;flex:none;padding:6px 11px;font-size:12px}
   .chip:hover{color:var(--text);border-color:var(--faint)}
   .chip:active{transform:scale(.93)}
   .chip.on{background:var(--text);color:#111214;font-weight:700;border-color:var(--text)}
