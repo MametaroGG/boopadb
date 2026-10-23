@@ -917,7 +917,7 @@ async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
   try {
-    const rs = await Promise.all([fetch("search_index_0.json"), fetch("search_index_1.json"), fetch("search_index_2.json")]);
+    const rs = await Promise.all([fetch("search_index_0.json"), fetch("search_index_1.json"), fetch("search_index_2.json"), fetch("search_index_3.json")]);
     if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name]) => [String(id), name, String(name).toLowerCase()]); }
   } catch {}
   fullIndexLoading = false;
