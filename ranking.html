@@ -127,6 +127,12 @@
   .pill-ind{display:none}
   .salepanel{background:linear-gradient(180deg,#1f1f23,#17171a);border:1px solid var(--border);border-radius:0;padding:12px;margin-top:10px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
   #saleGrid .card{border-radius:0}
+  .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 10px;scrollbar-width:none}
+  .hscroll::-webkit-scrollbar{display:none}
+  .hscroll .card{flex:0 0 72%;scroll-snap-align:start;border-radius:0}
+  @media (min-width:900px){.hscroll .card{flex-basis:262px}}
+  .railend{flex:0 0 36%;display:flex;align-items:center;justify-content:center;background:#17171a;border:1px solid var(--border);color:var(--sub);text-decoration:none;font-size:13.5px;font-weight:700;scroll-snap-align:start}
+  .railend:hover{color:var(--text)}
   .mosaic{display:grid;gap:10px;grid-template-columns:1fr 1fr}
   .mosaic .card{background:none;border:none;border-radius:0}
   .mcell{position:relative;overflow:hidden;display:block;min-height:150px;border-radius:0}
