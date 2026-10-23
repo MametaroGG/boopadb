@@ -129,8 +129,12 @@
   #saleGrid .card{border-radius:0}
   .saleRail{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;align-items:flex-start}
   .saleRail::-webkit-scrollbar{display:none}
-  .rtile{flex:0 0 46%;scroll-snap-align:start;display:flex;flex-direction:column;background:#131316;text-decoration:none}
-  @media (min-width:900px){.rtile{flex-basis:212px}}
+  .rtile{flex:0 0 168px;scroll-snap-align:start;display:flex;flex-direction:column;background:#131316;text-decoration:none}
+  .rstack{flex:0 0 98px;display:grid;grid-template-rows:98px 98px;gap:8px;scroll-snap-align:start}
+  @media (min-width:900px){.rtile{flex-basis:212px}.rstack{flex-basis:120px;grid-template-rows:120px 120px}}
+  .rtile.sm .pstrip{position:absolute;left:0;right:0;bottom:0;background:rgba(12,12,14,.85);padding:4px 6px;gap:5px}
+  .rtile.sm .pstrip .discst{height:20px;font-size:11px;padding:0 5px}
+  .rtile.sm .pprice{font-size:12.5px}
   .rtile .rimg{position:relative;aspect-ratio:1/1;width:100%;overflow:hidden;display:block;flex:none}
   .rtile .rimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .rtile .pstrip{display:flex;align-items:center;gap:6px;flex:none;padding:6px;background:#1b1b1f}
@@ -1252,13 +1256,21 @@ function renderSale(){
   // Gag listings (joke base prices like ¥9,999,999) never headline the rail:
   // plausible prices first, both groups keep the chosen sort order.
   const ordered = [...arr.filter(s => s.base <= 100000), ...arr.filter(s => s.base > 100000)];
-  document.getElementById("saleRail").innerHTML = ordered.slice(0, 20).map(s => railTile(s)).join("");
+  const items = ordered.slice(0, 21);
+  let html = "", i = 0;
+  while (i < items.length) {
+    html += railTile(items[i], false); i++;
+    if (i + 1 < items.length) { html += `<div class="rstack">${railTile(items[i], true)}${railTile(items[i + 1], true)}</div>`; i += 2; }
+    else if (i < items.length) { html += railTile(items[i], false); i++; }
+  }
+  document.getElementById("saleRail").innerHTML = html;
   document.getElementById("saleEmpty").style.display = arr.length ? "none" : "block";
   document.getElementById("saleMore").style.display = arr.length ? "" : "none";
 }
 document.getElementById("saleMore").onclick = () => { location.href = "sale.html"; };
-function railTile(s){
-  return `<a class="rtile" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, "r")}</span><span class="pstrip"><span class="discst">-${s.pct}%</span>${s.base > s.cur ? `<span class="pwas">${yen(s.base)}</span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span></a>`;
+function railTile(s, sm){
+  const strip = `<span class="pstrip"><span class="discst">-${s.pct}%</span>${!sm && s.base > s.cur ? `<span class="pwas">${yen(s.base)}</span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span>`;
+  return `<a class="rtile${sm ? " sm" : ""}" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, "r")}${sm ? strip : ""}</span>${sm ? "" : strip}</a>`;
 }
 const tabsEl = document.getElementById("sortTabs");
 const ind = tabsEl.querySelector(".pill-ind");
