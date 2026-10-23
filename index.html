@@ -338,7 +338,7 @@
   <div class="stats" id="stats"></div>
 
   <h2 id="feat">注目の商品</h2>
-  <p class="fnote2">セール中かどうかではなく、価格の動きの活発さと新着から選んでいます。</p>
+  <p class="fnote2">過去最安値や割引額の大きいセール商品から選んでいます。</p>
   <div class="capgrid" id="featGrid"></div>
   <div id="personal"></div>
 
@@ -760,7 +760,9 @@ function steamCap(s){
   </div>`;
 }
 function renderSale(){
-  let arr = [...P.on_sale];
+  // This section shows plausible sale items only: gag listings with joke
+  // base prices (¥9,999,999 etc.) are excluded from the whole section.
+  let arr = [...P.on_sale].filter(s => s.base > 0 && s.base <= 100000);
   if (sortMode === "amount") arr.sort((a,b) => (b.base - b.cur) - (a.base - a.cur));
   else if (sortMode === "cheap") arr.sort((a,b) => a.cur - b.cur);
   else arr.sort((a,b) => b.pct - a.pct || (b.base - b.cur) - (a.base - a.cur));
@@ -888,19 +890,20 @@ function featCap(x, tag, meta){
   </div>`;
 }
 {
+  // 注目の商品: notable deals — plausible sale items only (no gag listings
+  // with joke base prices), all-time-low first, then by discount amount,
+  // at most two per shop.
   const items = [];
-  (P.active || []).slice(0, 5).forEach(x => items.push(featCap(x, "価格変更が活発", `直近3週間で${x.changes_recent}回変更`)));
-  {
-    const seen = {};
-    const picked = [];
-    for (const x of (P.newest || [])) {
-      const s = x.shop || "";
-      if (s && (seen[s] || 0) >= 2) continue;
-      seen[s] = (seen[s] || 0) + 1;
-      picked.push(x);
-      if (picked.length >= 5) break;
-    }
-    picked.forEach(x => items.push(featCap(x, "新着", `${x.first_date} 収録`)));
+  const seen = {};
+  const deals = [...(P.on_sale || [])]
+    .filter(s => s.base > 0 && s.base <= 100000)
+    .sort((a, b) => (b.at_lowest - a.at_lowest) || ((b.base - b.cur) - (a.base - a.cur)) || (b.pct - a.pct));
+  for (const x of deals) {
+    const s = x.shop || "";
+    if (s && (seen[s] || 0) >= 2) continue;
+    seen[s] = (seen[s] || 0) + 1;
+    items.push(featCap(x, x.at_lowest ? "過去最安値" : "セール中", `${x.date} 時点の価格`));
+    if (items.length >= 10) break;
   }
   document.getElementById("featGrid").innerHTML = items.join("");
   if (!items.length){
