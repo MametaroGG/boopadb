@@ -309,7 +309,8 @@
   .bmflag.r{left:auto;right:6px}
   .bmflag.u{top:32px;left:8px}
   .bmflag.u2{top:24px;left:0}
-  .brow .bmflag{top:5px;left:15px;background:none;width:auto;height:auto;display:block;color:#f5c542;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
+  .bthw{position:relative;flex:none;display:block}
+  .brow .bmflag{top:0;left:0;background:none;width:auto;height:auto;display:block;color:#f5c542;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
   .brow .bmflag svg{width:20px;height:20px}
   .pcard .bmflag{top:5px;left:5px}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
@@ -1333,8 +1334,7 @@ const BTABS = {
 let bTab = "new", bItems = [], bShown = 7;
 function browHTML(x, i){
   return `<a class="brow${i === 0 ? " sel" : ""}" data-i="${i}" href="${itemUrl(x.id)}" target="_blank" rel="noopener">
-    ${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}
-    ${bmFlag(x.id)}
+    <span class="bthw">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(x.id)}</span>
     <span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bshop">${esc(x.shop || "")}</span><span class="bnote">${x.note || ""}</span></span>
     <span class="bprice">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="bstack"><span class="was">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</span>
   </a>`;

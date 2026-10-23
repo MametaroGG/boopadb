@@ -308,7 +308,8 @@
   .bmflag.r{left:auto;right:6px}
   .bmflag.u{top:32px;left:8px}
   .bmflag.u2{top:24px;left:0}
-  .brow .bmflag{top:5px;left:15px;background:none;width:auto;height:auto;display:block;color:#f5c542;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
+  .bthw{position:relative;flex:none;display:block}
+  .brow .bmflag{top:0;left:0;background:none;width:auto;height:auto;display:block;color:#f5c542;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
   .brow .bmflag svg{width:20px;height:20px}
   .pcard .bmflag{top:5px;left:5px}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
@@ -680,7 +681,7 @@ function rkBuild(){
 }
 rkBuild();
 function rkRow(s, i){
-  return `<a class="brow" href="${itemLink(s.id)}"><span class="rankno${i < 3 ? " top" : ""}">${i + 1}</span>${s.image ? `<img class="bth" src="${esc(s.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(s.id)}<span class="bmain"><span class="bname">${esc(s.name)}</span><span class="bsub">${esc(s.shop || "")}${s.at_lowest ? " · " + tr("chip_lowest") : ""}</span></span><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span></span></a>`;
+  return `<a class="brow" href="${itemLink(s.id)}"><span class="rankno${i < 3 ? " top" : ""}">${i + 1}</span><span class="bthw">${s.image ? `<img class="bth" src="${esc(s.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(s.id)}</span><span class="bmain"><span class="bname">${esc(s.name)}</span><span class="bsub">${esc(s.shop || "")}${s.at_lowest ? " · " + tr("chip_lowest") : ""}</span></span><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span></span></a>`;
 }
 let rk = "amount", rkShown = 60;
 function renderRk(){

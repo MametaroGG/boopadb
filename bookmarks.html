@@ -308,7 +308,8 @@
   .bmflag.r{left:auto;right:6px}
   .bmflag.u{top:32px;left:8px}
   .bmflag.u2{top:24px;left:0}
-  .brow .bmflag{top:5px;left:15px;background:none;width:auto;height:auto;display:block;color:#f5c542;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
+  .bthw{position:relative;flex:none;display:block}
+  .brow .bmflag{top:0;left:0;background:none;width:auto;height:auto;display:block;color:#f5c542;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
   .brow .bmflag svg{width:20px;height:20px}
   .pcard .bmflag{top:5px;left:5px}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
@@ -703,7 +704,7 @@ function clusterCB(cur, base, sale, atLowest){
 }
 function listRow(x, note, cluster){
   const sub = [x.shop || "", note || ""].filter(Boolean).map(esc).join(" · ");
-  return `<a class="brow" href="${itemLink(x.id)}">${x.image ? `<img class="bth" src="${esc(x.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(x.id)}<span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bsub">${sub}</span></span>${cluster}</a>`;
+  return `<a class="brow" href="${itemLink(x.id)}"><span class="bthw">${x.image ? `<img class="bth" src="${esc(x.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(x.id)}</span><span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bsub">${sub}</span></span>${cluster}</a>`;
 }
 
 const lookup = new Map();
