@@ -127,19 +127,16 @@
   .pill-ind{display:none}
   .salepanel{background:linear-gradient(180deg,#1f1f23,#17171a);border:1px solid var(--border);border-radius:0;padding:12px;margin-top:10px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
   #saleGrid .card{border-radius:0}
-  .saleRail{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;height:254px;scrollbar-width:none}
+  .saleRail{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;align-items:flex-start}
   .saleRail::-webkit-scrollbar{display:none}
-  .rtile{display:flex;flex-direction:column;background:#131316;text-decoration:none;min-height:0}
-  .rtall{flex:0 0 46%;scroll-snap-align:start}
-  .rstack{flex:0 0 66%;display:grid;grid-template-rows:1fr 1fr;gap:8px;scroll-snap-align:start}
-  @media (min-width:900px){.saleRail{height:302px}.rtall{flex-basis:236px}.rstack{flex-basis:404px}}
-  .rtile .rimg{position:relative;flex:1;min-height:0;overflow:hidden;display:block}
-  .rtile .rimg .rbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(18px) brightness(.55);transform:scale(1.25)}
-  .rtile .rimg .rfg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .rtile{flex:0 0 46%;scroll-snap-align:start;display:flex;flex-direction:column;background:#131316;text-decoration:none}
+  @media (min-width:900px){.rtile{flex-basis:212px}}
+  .rtile .rimg{position:relative;aspect-ratio:1/1;width:100%;overflow:hidden;display:block;flex:none}
+  .rtile .rimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .rtile .pstrip{display:flex;align-items:center;gap:6px;flex:none;padding:6px;background:#1b1b1f}
   .rtile .pstrip>*{flex:none}
-  .rtile .pwas{color:var(--faint);text-decoration:line-through;font-size:12px;white-space:nowrap}
-  .rtile .pprice{font-size:14.5px;font-weight:700;color:var(--text);white-space:nowrap}
+  .rtile .pwas{color:var(--faint);text-decoration:line-through;font-size:11.5px;white-space:nowrap}
+  .rtile .pprice{font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap}
   .rtile .pprice.free{color:#e8b400}
   .mosaic{display:grid;gap:10px;grid-template-columns:1fr 1fr}
   .mosaic .card{background:none;border:none;border-radius:0}
