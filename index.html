@@ -368,7 +368,7 @@
       <button class="btab" data-bt="drop">値下げ</button>
       <button class="btab" data-bt="free">無料</button>
       <button class="btab" data-bt="active">価格変更が活発</button>
-      <button class="btab" data-bt="rank">割引額ランキング</button>
+
     </div>
     <div class="bwrap">
       <div>
@@ -826,14 +826,12 @@ function dedupeNewest(){
   }
   return out;
 }
-const rankArr = [...P.on_sale].sort((a,b) => (b.base - b.cur) - (a.base - a.cur)).slice(0, 10);
 const BTABS = {
   new: () => dedupeNewest().map(x => bNormFeat(x, "new")),
   sale: () => [...P.on_sale].sort((a,b) => b.pct - a.pct).map(bNormSale),
   drop: () => P.drops.map(bNormDrop),
   free: () => P.on_sale.filter(s => s.cur === 0).map(s => ({...bNormSale(s), note: "現在無料", chips: ["無料", ...(s.at_lowest ? ["過去最安値"] : [])]})),
   active: () => (P.active || []).map(x => bNormFeat(x, "active")),
-  rank: () => rankArr.map(s => ({...bNormSale(s), note: `${yen(s.base - s.cur)} お得`, chips: ["割引額ランキング"]})),
 };
 let bTab = "new", bItems = [], bShown = 7;
 function browHTML(x, i){
