@@ -1668,7 +1668,7 @@ function renderProdPage(x){
 }
 function toggleBm(x){
   if (isBm(x.id)) BMS = BMS.filter(b => String(b.id) !== String(x.id));
-  else BMS = [{id: x.id, name: x.name, shop: x.shop, image: x.image, cur: x.cur}, ...BMS].slice(0, 30);
+  else BMS = [{id: x.id, name: x.name, shop: x.shop, image: x.image, cur: x.cur}, ...BMS];
   store.set("boothdb_bm", BMS);
   renderProdPage(x);
   renderPersonal();
