@@ -1256,7 +1256,7 @@ function renderSale(){
   // Gag listings (joke base prices like ¥9,999,999) never headline the rail:
   // plausible prices first, both groups keep the chosen sort order.
   const ordered = [...arr.filter(s => s.base <= 100000), ...arr.filter(s => s.base > 100000)];
-  const items = ordered.slice(0, 16);
+  const items = ordered.slice(0, 18);
   const PATTERN = [1, 1, 2, 1, 1, 2, 1, 1, 2, 2, 2, 2];
   let html = "", i = 0;
   for (const col of PATTERN) {
