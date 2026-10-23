@@ -282,7 +282,12 @@
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
   .chg{display:flex;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--border);font-size:13px}
   .chg .cd{color:var(--faint);flex:0 0 88px}
-  .chg .cp{margin-left:auto;font-variant-numeric:tabular-nums}
+  .chg .cp{margin-left:auto;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .chg .up,.chg .down{white-space:nowrap;flex:none}
+  .pp-toggle{display:inline-flex;align-items:center;gap:7px;background:none;border:none;color:var(--sub);font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;padding:4px 2px}
+  .pp-toggle:hover{color:var(--text)}
+  .pp-toggle .car{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--sub);transition:transform .2s;flex:none}
+  .pp-toggle.open .car{transform:rotate(180deg)}
   .down{color:#a4d007;font-weight:700}
   .up{color:#fc4d50;font-weight:700}
   .prow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
@@ -534,7 +539,7 @@ ja: {
   note_dropped: "{d} に値下げ", note_nowfree: "現在無料",
   pp_cur: "現在価格", pp_high: "最高価格", pp_avg: "平均価格", pp_saledays: "セール観測日数", pp_days: "観測日数", days_fmt: "{n}日",
   pp_chart: "価格推移", pp_history: "価格変更履歴", pp_same: "同じショップの商品",
-  pp_booth: "BOOTHで見る", pp_bm: "ブックマーク", pp_bmed: "ブックマーク済み", pp_vars: "バリエーション（{n}件）", pp_compare: "価格推移を比較", cmp_others: "ほか{n}件", outlier: "規格外", outlier_n: "▲ 規格外{n}件",
+  pp_booth: "BOOTHで見る", pp_bm: "ブックマーク", pp_bmed: "ブックマーク済み", pp_vars: "バリエーション（{n}件）", pp_compare: "価格推移を比較", pp_changes: "価格変更履歴", cmp_others: "ほか{n}件", outlier: "規格外", outlier_n: "▲ 規格外{n}件",
   pp_nodata: "価格データが不足しています。", pp_nochg: "価格変更は観測されていません。",
   pp_salenote: "ピンクの帯はセール中と推定された期間です。", pp_down: "値下げ", pp_up: "値上げ",
   sp_count: "{n} 件", sp_total: "全{n}件から検索", sec_recent: "最近見た商品", seen_drop: "見た時より -{v}",
@@ -567,7 +572,7 @@ en: {
   note_dropped: "Price drop on {d}", note_nowfree: "Free now",
   pp_cur: "Current price", pp_high: "Highest price", pp_avg: "Average price", pp_saledays: "Days on sale (observed)", pp_days: "Days observed", days_fmt: "{n} days",
   pp_chart: "Price history", pp_history: "Price change history", pp_same: "More from this shop",
-  pp_booth: "View on BOOTH", pp_bm: "Bookmark", pp_bmed: "Bookmarked", pp_vars: "Variations ({n})", pp_compare: "Compare price histories", cmp_others: "+{n} more", outlier: "Outlier", outlier_n: "▲ Outliers: {n}",
+  pp_booth: "View on BOOTH", pp_bm: "Bookmark", pp_bmed: "Bookmarked", pp_vars: "Variations ({n})", pp_compare: "Compare price histories", pp_changes: "Price change history", cmp_others: "+{n} more", outlier: "Outlier", outlier_n: "▲ Outliers: {n}",
   pp_nodata: "Not enough price data yet.", pp_nochg: "No price changes observed.",
   pp_salenote: "Pink bands are periods estimated to be on sale.", pp_down: "Drop", pp_up: "Rise",
   sp_count: "{n} items", sp_total: "Search all {n} products", sec_recent: "Recently viewed", seen_drop: "Down {v} since viewed",
@@ -600,7 +605,7 @@ ko: {
   note_dropped: "{d} 가격 인하", note_nowfree: "현재 무료",
   pp_cur: "현재 가격", pp_high: "최고 가격", pp_avg: "평균 가격", pp_saledays: "할인 관측 일수", pp_days: "관측 일수", days_fmt: "{n}일",
   pp_chart: "가격 추이", pp_history: "가격 변동 이력", pp_same: "같은 샵의 상품",
-  pp_booth: "BOOTH에서 보기", pp_bm: "북마크", pp_bmed: "북마크됨", pp_vars: "바리에이션({n}종)", pp_compare: "가격 추이 비교", cmp_others: "외 {n}개", outlier: "이상치", outlier_n: "▲ 이상치 {n}건",
+  pp_booth: "BOOTH에서 보기", pp_bm: "북마크", pp_bmed: "북마크됨", pp_vars: "바리에이션({n}종)", pp_compare: "가격 추이 비교", pp_changes: "가격 변동 내역", cmp_others: "외 {n}개", outlier: "이상치", outlier_n: "▲ 이상치 {n}건",
   pp_nodata: "가격 데이터가 부족합니다.", pp_nochg: "가격 변동이 관측되지 않았습니다.",
   pp_salenote: "분홍색 띠는 할인 중으로 추정되는 기간입니다.", pp_down: "인하", pp_up: "인상",
   sp_count: "{n}건", sp_total: "전체 {n}건에서 검색", sec_recent: "최근 본 상품", seen_drop: "본 이후 -{v}",
@@ -633,7 +638,7 @@ ko: {
   note_dropped: "{d} 降价", note_nowfree: "当前免费",
   pp_cur: "当前价格", pp_high: "最高价格", pp_avg: "平均价格", pp_saledays: "促销观测天数", pp_days: "观测天数", days_fmt: "{n} 天",
   pp_chart: "价格走势", pp_history: "价格变动记录", pp_same: "同店铺的其他商品",
-  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "规格（{n}种）", pp_compare: "比较价格走势", cmp_others: "+{n} 个", outlier: "离群值", outlier_n: "▲ 离群值{n}条",
+  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "规格（{n}种）", pp_compare: "比较价格走势", pp_changes: "价格变更记录", cmp_others: "+{n} 个", outlier: "离群值", outlier_n: "▲ 离群值{n}条",
   pp_nodata: "价格数据不足。", pp_nochg: "尚未观测到价格变动。",
   pp_salenote: "粉色区间为推测的促销期间。", pp_down: "降价", pp_up: "涨价",
   sp_count: "{n} 件", sp_total: "从全部 {n} 件中搜索", sec_recent: "最近浏览", seen_drop: "浏览后降了 {v}",
@@ -666,7 +671,7 @@ ko: {
   note_dropped: "{d} 降價", note_nowfree: "當前免費",
   pp_cur: "當前價格", pp_high: "最高價格", pp_avg: "平均價格", pp_saledays: "促銷觀測天數", pp_days: "觀測天數", days_fmt: "{n} 天",
   pp_chart: "價格走勢", pp_history: "價格變動記錄", pp_same: "同店舖的其他商品",
-  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "規格（{n}種）", pp_compare: "比較價格走勢", cmp_others: "+{n} 個", outlier: "離群值", outlier_n: "▲ 離群值{n}筆",
+  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "規格（{n}種）", pp_compare: "比較價格走勢", pp_changes: "價格變更記錄", cmp_others: "+{n} 個", outlier: "離群值", outlier_n: "▲ 離群值{n}筆",
   pp_nodata: "價格數據不足。", pp_nochg: "尚未觀測到價格變動。",
   pp_salenote: "粉色區間為推測的促銷期間。", pp_down: "降價", pp_up: "漲價",
   sp_count: "{n} 件", sp_total: "從全部 {n} 件中搜尋", sec_recent: "最近瀏覽", seen_drop: "瀏覽後降了 {v}",
@@ -1484,10 +1489,11 @@ function chartSVG(ser, H){
 function changesHTML(ser){
   const s = ser.p, chgs = [];
   for (let i = 1; i < s.length; i++) if (s[i][1] !== s[i - 1][1]) chgs.push({date: s[i][0], from: s[i - 1][1], to: s[i][1], outl: !!(s[i][3] || s[i - 1][3])});
-  return chgs.length ? chgs.slice(-8).reverse().map(c => {
+  const html = chgs.length ? chgs.slice(-8).reverse().map(c => {
     const d = c.to - c.from, pc = c.from ? Math.round(d / c.from * 100) : 0;
     return `<div class="chg"><span class="cd">${c.date}</span><span class="${d < 0 ? "down" : "up"}">${d < 0 ? tr("pp_down") : tr("pp_up")}</span><span class="cp">${yen(c.from)} → ${yen(c.to)}（${d < 0 ? "" : "+"}${pc}%）</span>${c.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`;
   }).join("") : '<p class="note">' + tr("pp_nochg") + '</p>';
+  return {n: Math.min(chgs.length, 8), html};
 }
 function varBlockHTML(x, key){
   const ser = seriesOf(x, key);
@@ -1497,7 +1503,9 @@ function varBlockHTML(x, key){
   const curP = prices[prices.length - 1], low = Math.min(...prices);
   const onSaleNow = !!s[s.length - 1][2];
   const head = key ? `<div class="pp-varhead"><span class="pp-varname">${esc(key)}</span><span class="pp-varprice">${yen(curP)}</span>${s[s.length - 1][3] ? '<span class="outlb">' + tr("outlier") + '</span>' : ""}${onSaleNow ? `<span class="bpchip">${tr("chip_onsale")}</span>` : ""}${curP <= low ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}</div>` : "";
-  return `<div class="pp-varblock">${head}<div class="pstats">${statsHTML(ser)}</div><div class="chartbox">${chartSVG(ser, key ? 210 : 300)}<div class="hvTip charttip"></div></div><div class="pp-changes">${changesHTML(ser)}</div></div>`;
+  const chg = changesHTML(ser);
+  const chgSec = chg.n ? `<div class="pp-changes"><button type="button" class="pp-toggle" data-chgbtn>${tr("pp_changes")}（${chg.n}）<span class="car"></span></button><div class="pp-chgbody" hidden>${chg.html}</div></div>` : `<div class="pp-changes">${chg.html}</div>`;
+  return `<div class="pp-varblock">${head}<div class="pstats">${statsHTML(ser)}</div><div class="chartbox">${chartSVG(ser, key ? 210 : 300)}<div class="hvTip charttip"></div></div>${chgSec}</div>`;
 }
 function renderPPBody(x){
   const keys = x.variations ? Object.keys(x.variations) : [];
@@ -1513,9 +1521,16 @@ function renderPPBody(x){
     statsEl.innerHTML = ser.p && ser.p.length >= 2 ? statsHTML(ser) : "";
     chartEl.innerHTML = varBlockHTML(x, null);
   }
+  chartEl.querySelectorAll("[data-chgbtn]").forEach(b => b.onclick = () => {
+    const body = b.parentElement.querySelector(".pp-chgbody");
+    if (!body) return;
+    body.hidden = !body.hidden;
+    b.classList.toggle("open", !body.hidden);
+  });
 }
 const CMP_COLORS = ["#fc4d50", "#f2994a", "#e8c547", "#a4d007", "#2dcccd", "#b388ff", "#ff7eb6", "#8d9eec", "#c98f4e", "#7fd08a", "#e06c75", "#98c379"];
 let cmpOn = {};
+let cmpOpen = false;
 let CMP_GROUPS = [];
 function cmpSig(ser){ return ser.p.map(p => p[1] + (p[2] ? "s" : "")).join(","); }
 function cmpDefaults(x, keys){
@@ -1643,7 +1658,9 @@ function renderCompare(x){
     return `<button type="button" class="cmpchip ${on ? "on" : ""}" data-ck="${i}" style="${on ? `border-color:${col};background:${col}26` : ""}"><span class="cmpdot" style="background:${col}"></span>${esc(k)} — ${yen(cur)}</button>`;
   }).join("");
   const outlTotal = keys.reduce((n, k) => n + seriesOf(x, k).p.filter(p => p[3]).length, 0);
-  el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span></div><div class="cmplegend">${legend}</div>${outlTotal ? `<div class="cmpoutl">${tr("outlier_n", {n: outlTotal})}</div>` : ""}<div id="cmpChart">${compareSVG(x, keys)}<div id="cmpTip"></div></div></div>`;
+  el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span><button type="button" class="pp-toggle ${cmpOpen ? "open" : ""}" id="cmpTgl" style="margin-left:auto"><span class="car"></span></button></div><div id="cmpBody"${cmpOpen ? "" : " hidden"}><div class="cmplegend">${legend}</div>${outlTotal ? `<div class="cmpoutl">${tr("outlier_n", {n: outlTotal})}</div>` : ""}<div id="cmpChart">${compareSVG(x, keys)}<div id="cmpTip"></div></div></div></div>`;
+  const cmpTgl = el.querySelector("#cmpTgl"), cmpBody = el.querySelector("#cmpBody");
+  if (cmpTgl && cmpBody) cmpTgl.onclick = () => { cmpOpen = !cmpOpen; cmpBody.hidden = !cmpOpen; cmpTgl.classList.toggle("open", cmpOpen); };
   el.querySelectorAll("[data-ck]").forEach(b => b.onclick = () => {
     const k = keys[+b.dataset.ck];
     if (cmpOn[k] && keys.filter(kk => cmpOn[kk]).length <= 1) return;
