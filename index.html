@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BoothDB for VRChat — BOOTH価格データベース（プロトタイプ）</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
   :root{--bg:#101012;--panel:#17171a;--card:#1b1b1f;--border:#26262c;--border2:#34343c;--text:#ececee;--sub:#a2a2ab;--faint:#6f6f78;--accent:#fc4d50;--accent-dim:#e04347;--green:#a4d007;--green-bg:#4c6b22;--amber:#d9a521}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -393,8 +396,8 @@
   <button data-to="#hero" class="on"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/></svg><span class="tlabel">ホーム</span></button>
   <button data-to="#sale"><svg viewBox="0 0 24 24"><path d="M3.5 3.5H12L20.5 12 12 20.5 3.5 12z"/><circle cx="8" cy="8" r="1.4"/></svg><span class="tlabel">セール</span></button>
   <span class="tspacer"></span>
-  <button data-to="#browse2" data-btab="drop"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg><span class="tlabel">ニュース</span></button>
-  <button data-to="#browse2" data-btab="rank"><svg viewBox="0 0 24 24"><path d="M5 20v-7M11 20V5M17 20v-10M22 20H2"/></svg><span class="tlabel">ランキング</span></button>
+  <button data-href="news.html"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10"/></svg><span class="tlabel">ニュース</span></button>
+  <button data-href="ranking.html"><svg viewBox="0 0 24 24"><path d="M5 20v-7M11 20V5M17 20v-10M22 20H2"/></svg><span class="tlabel">ランキング</span></button>
   <button id="tabSearch" class="fab" aria-label="検索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg></button>
 </nav>
 <div class="spage" id="searchPage">
@@ -588,9 +591,13 @@ tabBtns.forEach(b => b.onclick = () => {
   const wasOpen = spage.classList.contains("open");
   if (wasOpen) closeSearch();
   setTimeout(() => {
-    document.querySelector(b.dataset.to).scrollIntoView({behavior: "smooth", block: "start"});
+    // ホーム goes to the very top of the page, not just the hero.
+    if (b.dataset.to === "#hero") window.scrollTo({top: 0, behavior: "smooth"});
+    else document.querySelector(b.dataset.to).scrollIntoView({behavior: "smooth", block: "start"});
   }, wasOpen ? 120 : 0);
 });
+// ニュース and ランキング live on their own pages now.
+document.querySelectorAll("#tabbar button[data-href]").forEach(b => b.onclick = () => { location.href = b.dataset.href; });
 const spage = document.getElementById("searchPage");
 function openSearch(){
   spage.classList.add("open");
