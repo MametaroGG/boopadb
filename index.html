@@ -307,6 +307,7 @@
   .bmflag svg{width:20px;height:20px;display:block;fill:currentColor}
   .bmflag[hidden]{display:none}
   .bmflag.r{left:auto;right:6px}
+  .bmflag.u{top:34px}
   .brow .bmflag{top:5px;left:15px}
   .pcard .bmflag{top:5px;left:5px}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
@@ -1236,7 +1237,7 @@ function mosaicCell(s, i){
   return `<a class="card mcell m${i + 1}" href="${itemUrl(s.id)}" target="_blank" rel="noopener">
     ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}
     ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : (s.cur === 0 ? '<span class="mlab">' + tr("free") + '</span>' : "")}
-    ${bmFlag(s.id, "r")}
+    ${bmFlag(s.id, (s.at_lowest || s.cur === 0) ? "u" : "")}
     <span class="scrim"><span class="discst">-${s.pct}%</span><span class="was">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span>
   </a>`;
 }
@@ -1277,7 +1278,7 @@ function renderSale(){
 document.getElementById("saleMore").onclick = () => { location.href = "sale.html"; };
 function railTile(s, sm){
   const strip = `<span class="pstrip"><span class="discst">-${s.pct}%</span>${!sm && s.base > s.cur ? `<span class="pwas">${yen(s.base)}</span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span>`;
-  return `<a class="rtile${sm ? " sm" : ""}" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, "r")}</span>${strip}</a>`;
+  return `<a class="rtile${sm ? " sm" : ""}" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, s.at_lowest ? "u" : "")}</span>${strip}</a>`;
 }
 const tabsEl = document.getElementById("sortTabs");
 const ind = tabsEl.querySelector(".pill-ind");
@@ -1392,7 +1393,7 @@ function sparkSVG(spark){
 function featCap(x, tag, meta){
   const pct = x.base > x.cur ? Math.round((1 - x.cur / x.base) * 100) : 0;
   return `<div class="card">
-    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}<span class="ftag">${tag}</span>${bmFlag(x.id, "r")}</a>
+    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}<span class="ftag">${tag}</span>${bmFlag(x.id, "u")}</a>
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>

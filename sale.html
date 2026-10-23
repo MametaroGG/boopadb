@@ -306,6 +306,7 @@
   .bmflag svg{width:20px;height:20px;display:block;fill:currentColor}
   .bmflag[hidden]{display:none}
   .bmflag.r{left:auto;right:6px}
+  .bmflag.u{top:34px}
   .brow .bmflag{top:5px;left:15px}
   .pcard .bmflag{top:5px;left:5px}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
@@ -675,7 +676,7 @@ function mosaicCell(s, i){
   return `<a class="card mcell m${i + 1}" href="${itemLink(s.id)}">
     ${s.image ? `<img src="${s.image}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}
     ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : (s.cur === 0 ? '<span class="mlab">' + tr("free") + '</span>' : "")}
-    ${bmFlag(s.id, "r")}
+    ${bmFlag(s.id, (s.at_lowest || s.cur === 0) ? "u" : "")}
     <span class="scrim"><span class="discst">-${s.pct}%</span><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span>
   </a>`;
 }
