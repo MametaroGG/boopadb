@@ -248,6 +248,12 @@
   .pp-varlabel{font-size:12px;color:var(--sub);font-weight:700;margin:10px 0 0}
   .varchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
   .varsel{width:100%;margin:8px 0 2px;background:#1b1b1f;color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:9px 10px;font-size:13.5px;font-family:inherit}
+  #cmpChart{position:relative}
+  #cmpTip{position:absolute;top:8px;display:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
+  .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
+  .cmtn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
+  .cmpchip:not(.on){opacity:.45}
   .pp-varblock{background:#17171a;border:1px solid #26262c;border-radius:12px;padding:14px 16px;margin:0 0 14px}
   .pp-varhead{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
   .pp-varname{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
@@ -507,7 +513,7 @@ ja: {
   note_dropped: "{d} に値下げ", note_nowfree: "現在無料",
   pp_cur: "現在価格", pp_high: "最高価格", pp_avg: "平均価格", pp_saledays: "セール観測日数", pp_days: "観測日数", days_fmt: "{n}日",
   pp_chart: "価格推移", pp_history: "価格変更履歴", pp_same: "同じショップの商品",
-  pp_booth: "BOOTHで見る", pp_bm: "ブックマーク", pp_bmed: "ブックマーク済み", pp_vars: "バリエーション（{n}件）", pp_compare: "価格推移を比較",
+  pp_booth: "BOOTHで見る", pp_bm: "ブックマーク", pp_bmed: "ブックマーク済み", pp_vars: "バリエーション（{n}件）", pp_compare: "価格推移を比較", cmp_others: "ほか{n}件",
   pp_nodata: "価格データが不足しています。", pp_nochg: "価格変更は観測されていません。",
   pp_salenote: "ピンクの帯はセール中と推定された期間です。", pp_down: "値下げ", pp_up: "値上げ",
   sp_count: "{n} 件", sec_recent: "最近見た商品", seen_drop: "見た時より -{v}",
@@ -540,7 +546,7 @@ en: {
   note_dropped: "Price drop on {d}", note_nowfree: "Free now",
   pp_cur: "Current price", pp_high: "Highest price", pp_avg: "Average price", pp_saledays: "Days on sale (observed)", pp_days: "Days observed", days_fmt: "{n} days",
   pp_chart: "Price history", pp_history: "Price change history", pp_same: "More from this shop",
-  pp_booth: "View on BOOTH", pp_bm: "Bookmark", pp_bmed: "Bookmarked", pp_vars: "Variations ({n})", pp_compare: "Compare price histories",
+  pp_booth: "View on BOOTH", pp_bm: "Bookmark", pp_bmed: "Bookmarked", pp_vars: "Variations ({n})", pp_compare: "Compare price histories", cmp_others: "+{n} more",
   pp_nodata: "Not enough price data yet.", pp_nochg: "No price changes observed.",
   pp_salenote: "Pink bands are periods estimated to be on sale.", pp_down: "Drop", pp_up: "Rise",
   sp_count: "{n} items", sec_recent: "Recently viewed", seen_drop: "Down {v} since viewed",
@@ -573,7 +579,7 @@ ko: {
   note_dropped: "{d} 가격 인하", note_nowfree: "현재 무료",
   pp_cur: "현재 가격", pp_high: "최고 가격", pp_avg: "평균 가격", pp_saledays: "할인 관측 일수", pp_days: "관측 일수", days_fmt: "{n}일",
   pp_chart: "가격 추이", pp_history: "가격 변동 이력", pp_same: "같은 샵의 상품",
-  pp_booth: "BOOTH에서 보기", pp_bm: "북마크", pp_bmed: "북마크됨", pp_vars: "바리에이션({n}종)", pp_compare: "가격 추이 비교",
+  pp_booth: "BOOTH에서 보기", pp_bm: "북마크", pp_bmed: "북마크됨", pp_vars: "바리에이션({n}종)", pp_compare: "가격 추이 비교", cmp_others: "외 {n}개",
   pp_nodata: "가격 데이터가 부족합니다.", pp_nochg: "가격 변동이 관측되지 않았습니다.",
   pp_salenote: "분홍색 띠는 할인 중으로 추정되는 기간입니다.", pp_down: "인하", pp_up: "인상",
   sp_count: "{n}건", sec_recent: "최근 본 상품", seen_drop: "본 이후 -{v}",
@@ -606,7 +612,7 @@ ko: {
   note_dropped: "{d} 降价", note_nowfree: "当前免费",
   pp_cur: "当前价格", pp_high: "最高价格", pp_avg: "平均价格", pp_saledays: "促销观测天数", pp_days: "观测天数", days_fmt: "{n} 天",
   pp_chart: "价格走势", pp_history: "价格变动记录", pp_same: "同店铺的其他商品",
-  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "规格（{n}种）", pp_compare: "比较价格走势",
+  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "规格（{n}种）", pp_compare: "比较价格走势", cmp_others: "+{n} 个",
   pp_nodata: "价格数据不足。", pp_nochg: "尚未观测到价格变动。",
   pp_salenote: "粉色区间为推测的促销期间。", pp_down: "降价", pp_up: "涨价",
   sp_count: "{n} 件", sec_recent: "最近浏览", seen_drop: "浏览后降了 {v}",
@@ -639,7 +645,7 @@ ko: {
   note_dropped: "{d} 降價", note_nowfree: "當前免費",
   pp_cur: "當前價格", pp_high: "最高價格", pp_avg: "平均價格", pp_saledays: "促銷觀測天數", pp_days: "觀測天數", days_fmt: "{n} 天",
   pp_chart: "價格走勢", pp_history: "價格變動記錄", pp_same: "同店舖的其他商品",
-  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "規格（{n}種）", pp_compare: "比較價格走勢",
+  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "規格（{n}種）", pp_compare: "比較價格走勢", cmp_others: "+{n} 個",
   pp_nodata: "價格數據不足。", pp_nochg: "尚未觀測到價格變動。",
   pp_salenote: "粉色區間為推測的促銷期間。", pp_down: "降價", pp_up: "漲價",
   sp_count: "{n} 件", sec_recent: "最近瀏覽", seen_drop: "瀏覽後降了 {v}",
@@ -1339,6 +1345,9 @@ function statsHTML(ser){
     [tr("pp_avg"), yen(avg)], [tr("pp_saledays"), tr("days_fmt", {n: ser.sd})], [tr("pp_days"), tr("days_fmt", {n: ser.d})],
   ].map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
 }
+const DAYMS = 86400000;
+const dnum = ds => Date.parse(ds + "T00:00:00Z") / DAYMS;
+const diso = t => new Date(Math.round(t) * DAYMS).toISOString().slice(0, 10);
 function chartSVG(ser, H){
   const s = ser.p;
   const prices = s.map(p => p[1]);
@@ -1346,7 +1355,8 @@ function chartSVG(ser, H){
   const W = 980, PL = 64, PR = 14, PT = 14, PB = 26;
   const iw = W - PL - PR, ih = H - PT - PB;
   const yMax = Math.ceil(high * 1.08 / 100) * 100 || 100;
-  const X = i => PL + iw * (s.length === 1 ? 0 : i / (s.length - 1));
+  const t0c = dnum(s[0][0]), t1c = Math.max(dnum(s[s.length - 1][0]), t0c + 1);
+  const X = i => PL + iw * ((dnum(s[i][0]) - t0c) / (t1c - t0c));
   const Y = v => PT + ih * (1 - v / yMax);
   let path = "", area = "";
   s.forEach((p, i) => {
@@ -1410,61 +1420,114 @@ function renderPPBody(x){
 }
 const CMP_COLORS = ["#fc4d50", "#f2994a", "#e8c547", "#a4d007", "#2dcccd", "#b388ff", "#ff7eb6", "#8d9eec", "#c98f4e", "#7fd08a", "#e06c75", "#98c379"];
 let cmpOn = {};
+let CMP_GROUPS = [];
+function cmpSig(ser){ return ser.p.map(p => p[1] + (p[2] ? "s" : "")).join(","); }
 function cmpDefaults(x, keys){
-  cmpOn = {};
-  const seen = new Set();
-  let on = 0;
+  // Variations that moved on the same price schedule are one line;
+  // the legend chip speaks for the whole group.
+  const groups = new Map();
   keys.forEach(k => {
-    const sig = JSON.stringify(seriesOf(x, k).p);
-    const distinct = !seen.has(sig);
-    seen.add(sig);
-    cmpOn[k] = distinct && on < 12;
-    if (cmpOn[k]) on++;
+    const ser = seriesOf(x, k);
+    const sig = cmpSig(ser);
+    if (!groups.has(sig)) groups.set(sig, {names: [], key: k, ser});
+    const g = groups.get(sig);
+    g.names.push(k);
+    if (ser.p.length > g.ser.p.length) { g.key = k; g.ser = ser; }
   });
-  if (!on && keys.length) cmpOn[keys[0]] = true;
+  CMP_GROUPS = [...groups.values()];
+  cmpOn = {};
+  CMP_GROUPS.forEach((g, i) => { cmpOn[i] = i < 12; });
+  if (!CMP_GROUPS.some((g, i) => cmpOn[i]) && CMP_GROUPS.length) cmpOn[0] = true;
+}
+function cmpDomain(){
+  let high = 0, t0 = Infinity, t1 = -Infinity;
+  CMP_GROUPS.forEach((g, i) => { if (!cmpOn[i]) return; g.ser.p.forEach(p => { if (p[1] > high) high = p[1]; const t = dnum(p[0]); if (t < t0) t0 = t; if (t > t1) t1 = t; }); });
+  if (!isFinite(t0)) { t0 = 0; t1 = 1; }
+  if (t1 <= t0) t1 = t0 + 1;
+  return {high, t0, t1};
 }
 function compareSVG(x, keys){
-  const act = keys.filter(k => cmpOn[k]);
+  const act = CMP_GROUPS.map((g, i) => ({g, i})).filter(({i}) => cmpOn[i]);
   const W = 980, H = 300, PL = 64, PR = 14, PT = 14, PB = 26;
   const iw = W - PL - PR, ih = H - PT - PB;
-  let high = 0, longest = null;
-  act.forEach(k => { const s = seriesOf(x, k).p; s.forEach(p => { if (p[1] > high) high = p[1]; }); if (!longest || s.length > longest.length) longest = s; });
+  const {high, t0, t1} = cmpDomain();
   const yMax = Math.ceil(high * 1.08 / 100) * 100 || 100;
+  const X = t => PL + iw * ((t - t0) / (t1 - t0));
   const Y = v => PT + ih * (1 - v / yMax);
   let grid = "";
-  for (let g = 0; g <= 4; g++) {
-    const v = yMax * g / 4, gy = Y(v);
+  for (let gI = 0; gI <= 4; gI++) {
+    const v = yMax * gI / 4, gy = Y(v);
     grid += `<line x1="${PL}" y1="${gy}" x2="${W - PR}" y2="${gy}" stroke="#26262c" stroke-width="1"/>` +
             `<text x="${PL - 6}" y="${gy + 4}" fill="#6f6f78" font-size="11" text-anchor="end">¥${Math.round(v).toLocaleString(LOCALE)}</text>`;
   }
   let lines = "";
-  act.forEach(k => {
-    const s = seriesOf(x, k).p, col = CMP_COLORS[keys.indexOf(k) % CMP_COLORS.length];
-    const X = i => PL + iw * (s.length === 1 ? 0 : i / (s.length - 1));
+  act.forEach(({g, i}) => {
+    const s = g.ser.p, col = CMP_COLORS[i % CMP_COLORS.length];
     let path = "";
-    s.forEach((p, i) => { const cx = X(i), cy = Y(p[1]); path += i === 0 ? `M${cx},${cy}` : ` H${cx} V${cy}`; });
+    s.forEach((p, j) => { const cx = X(dnum(p[0])), cy = Y(p[1]); path += j === 0 ? `M${cx},${cy}` : ` H${cx} V${cy}`; });
+    path += ` H${X(t1)}`;
     lines += `<path d="${path}" fill="none" stroke="${col}" stroke-width="2"/>`;
   });
-  const dates = longest && longest.length ? `<text x="${PL}" y="${H - 6}" fill="#6f6f78" font-size="11">${longest[0][0]}</text><text x="${W - PR}" y="${H - 6}" fill="#6f6f78" font-size="11" text-anchor="end">${longest[longest.length - 1][0]}</text>` : "";
-  return `<svg viewBox="0 0 ${W} ${H}">${grid}${lines}${dates}</svg>`;
+  const dates = `<text x="${PL}" y="${H - 6}" fill="#6f6f78" font-size="11">${diso(t0)}</text><text x="${W - PR}" y="${H - 6}" fill="#6f6f78" font-size="11" text-anchor="end">${diso(t1)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}">${grid}${lines}<line id="cmpGuide" y1="${PT}" y2="${PT + ih}" stroke="#a2a2ab" stroke-width="1" opacity="0"/>${dates}</svg>`;
+}
+function priceAt(ser, t){
+  let v = ser.p.length ? ser.p[0][1] : 0;
+  for (const p of ser.p) { if (dnum(p[0]) <= t) v = p[1]; else break; }
+  return v;
+}
+function wireCmpTip(x){
+  const wrap = document.getElementById("cmpChart");
+  const tip = document.getElementById("cmpTip");
+  const svg = wrap && wrap.querySelector("svg");
+  if (!wrap || !svg || !tip) return;
+  const hide = () => { tip.style.display = "none"; const gd = svg.querySelector("#cmpGuide"); if (gd) gd.setAttribute("opacity", "0"); };
+  const move = e => {
+    const r = svg.getBoundingClientRect();
+    const W = 980, PL = 64, PR = 14;
+    const fx = (e.clientX - r.left) / r.width;
+    const vx = fx * W;
+    if (vx < PL || vx > W - PR) { hide(); return; }
+    const {t0, t1} = cmpDomain();
+    const t = t0 + (vx - PL) / (W - PL - PR) * (t1 - t0);
+    const rows = CMP_GROUPS.map((g, i) => ({g, i})).filter(({i}) => cmpOn[i])
+      .map(({g, i}) => ({name: g.names[0], col: CMP_COLORS[i % CMP_COLORS.length], v: priceAt(g.ser, t)}))
+      .sort((p, q) => q.v - p.v)
+      .map(rw => `<div class="cmtr"><span class="cmpdot" style="background:${rw.col}"></span><span class="cmtn">${esc(rw.name)}</span><b>${yen(rw.v)}</b></div>`).join("");
+    tip.innerHTML = `<div class="cmtd">${diso(t)}</div>` + rows;
+    tip.style.display = "block";
+    const wrapW = wrap.clientWidth;
+    const px = fx * wrapW;
+    tip.style.left = Math.min(Math.max(px + 12, 4), Math.max(4, wrapW - tip.offsetWidth - 4)) + "px";
+    const gd = svg.querySelector("#cmpGuide");
+    if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
+  };
+  svg.addEventListener("pointermove", move);
+  svg.addEventListener("pointerdown", move);
+  svg.addEventListener("pointerleave", hide);
 }
 function renderCompare(x){
   const el = document.getElementById("ppCompare");
   if (!el) return;
   const keys = Object.keys(x.variations || {});
   if (keys.length < 2) { el.innerHTML = ""; return; }
-  const legend = keys.map((k, i) => {
-    const s = seriesOf(x, k).p;
+  if (!CMP_GROUPS.length) cmpDefaults(x, keys);
+  const legend = CMP_GROUPS.map((g, i) => {
+    const s = g.ser.p;
     const cur = s.length ? s[s.length - 1][1] : 0;
-    return `<button type="button" class="cmpchip ${cmpOn[k] ? "on" : ""}" data-ck="${i}"><span class="cmpdot" style="background:${CMP_COLORS[i % CMP_COLORS.length]}"></span>${esc(k)} — ${yen(cur)}</button>`;
+    const col = CMP_COLORS[i % CMP_COLORS.length];
+    const label = esc(g.names[0]) + (g.names.length > 1 ? " " + tr("cmp_others", {n: g.names.length - 1}) : "");
+    const on = !!cmpOn[i];
+    return `<button type="button" class="cmpchip ${on ? "on" : ""}" data-cg="${i}" style="${on ? `border-color:${col};background:${col}26` : ""}"><span class="cmpdot" style="background:${col}"></span>${label} — ${yen(cur)}</button>`;
   }).join("");
-  el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span></div><div class="cmplegend">${legend}</div><div id="cmpChart">${compareSVG(x, keys)}</div></div>`;
-  el.querySelectorAll("[data-ck]").forEach(b => b.onclick = () => {
-    const k = keys[+b.dataset.ck];
-    if (cmpOn[k] && keys.filter(kk => cmpOn[kk]).length <= 1) return;
-    cmpOn[k] = !cmpOn[k];
+  el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span></div><div class="cmplegend">${legend}</div><div id="cmpChart">${compareSVG(x, keys)}<div id="cmpTip"></div></div></div>`;
+  el.querySelectorAll("[data-cg]").forEach(b => b.onclick = () => {
+    const i = +b.dataset.cg;
+    if (cmpOn[i] && CMP_GROUPS.filter((g, j) => cmpOn[j]).length <= 1) return;
+    cmpOn[i] = !cmpOn[i];
     renderCompare(x);
   });
+  wireCmpTip(x);
 }
 function renderProdPage(x){
   const bm = isBm(x.id);
