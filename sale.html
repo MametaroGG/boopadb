@@ -276,6 +276,7 @@
   .bmflag{position:absolute;top:6px;left:6px;z-index:5;pointer-events:none;color:#f5c542;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
   .bmflag svg{width:20px;height:20px;display:block;fill:currentColor}
   .bmflag[hidden]{display:none}
+  .bmflag.r{left:auto;right:6px}
   .brow .bmflag{top:5px;left:15px}
   .pcard .bmflag{top:5px;left:5px}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
@@ -634,12 +635,12 @@ document.getElementById("subStats").innerHTML =
 
 const BM_SET = new Set((() => { try { return JSON.parse(localStorage.getItem("boothdb_bm") || "[]").map(b => String(b.id)); } catch { return []; } })());
 const BM_FLAG_SVG = '<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2z"/></svg>';
-const bmFlag = id => BM_SET.has(String(id)) ? `<span class="bmflag">${BM_FLAG_SVG}</span>` : "";
+const bmFlag = (id, cls) => BM_SET.has(String(id)) ? `<span class="bmflag${cls ? " " + cls : ""}">${BM_FLAG_SVG}</span>` : "";
 function mosaicCell(s, i){
   return `<a class="card mcell m${i + 1}" href="${itemLink(s.id)}">
     ${s.image ? `<img src="${s.image}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}
     ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : (s.cur === 0 ? '<span class="mlab">' + tr("free") + '</span>' : "")}
-    ${bmFlag(s.id)}
+    ${bmFlag(s.id, "r")}
     <span class="scrim"><span class="discst">-${s.pct}%</span><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span>
   </a>`;
 }

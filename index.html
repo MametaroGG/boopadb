@@ -276,6 +276,7 @@
   .bmflag{position:absolute;top:6px;left:6px;z-index:5;pointer-events:none;color:#f5c542;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
   .bmflag svg{width:20px;height:20px;display:block;fill:currentColor}
   .bmflag[hidden]{display:none}
+  .bmflag.r{left:auto;right:6px}
   .brow .bmflag{top:5px;left:15px}
   .pcard .bmflag{top:5px;left:5px}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
@@ -714,7 +715,7 @@ let HIST = store.get("boothdb_hist", []);
 let BMS = store.get("boothdb_bm", []);
 const isBm = id => BMS.some(b => String(b.id) === String(id));
 const BM_FLAG_SVG = '<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2z"/></svg>';
-const bmFlag = id => `<span class="bmflag" data-bmflag="${id}"${isBm(id) ? "" : " hidden"}>${BM_FLAG_SVG}</span>`;
+const bmFlag = (id, cls) => `<span class="bmflag${cls ? " " + cls : ""}" data-bmflag="${id}"${isBm(id) ? "" : " hidden"}>${BM_FLAG_SVG}</span>`;
 function syncBmFlags(){ document.querySelectorAll("[data-bmflag]").forEach(el => { el.hidden = !isBm(el.dataset.bmflag); }); }
 
 const st = P.stats;
@@ -1203,7 +1204,7 @@ function mosaicCell(s, i){
   return `<a class="card mcell m${i + 1}" href="${itemUrl(s.id)}" target="_blank" rel="noopener">
     ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}
     ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : (s.cur === 0 ? '<span class="mlab">' + tr("free") + '</span>' : "")}
-    ${bmFlag(s.id)}
+    ${bmFlag(s.id, "r")}
     <span class="scrim"><span class="discst">-${s.pct}%</span><span class="was">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span>
   </a>`;
 }
@@ -1352,7 +1353,7 @@ function sparkSVG(spark){
 function featCap(x, tag, meta){
   const pct = x.base > x.cur ? Math.round((1 - x.cur / x.base) * 100) : 0;
   return `<div class="card">
-    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}<span class="ftag">${tag}</span>${bmFlag(x.id)}</a>
+    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}<span class="ftag">${tag}</span>${bmFlag(x.id, "r")}</a>
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
@@ -1685,7 +1686,12 @@ function toggleBm(x){
   else BMS = [{id: x.id, name: x.name, shop: x.shop, image: x.image, cur: x.cur}, ...BMS];
   store.set("boothdb_bm", BMS);
   syncBmFlags();
-  renderProdPage(x);
+  const btn = document.getElementById("ppBmBtn");
+  if (btn) {
+    const on = isBm(x.id);
+    btn.classList.toggle("on", on);
+    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2z"/></svg>${on ? tr("pp_bmed") : tr("pp_bm")}`;
+  }
   renderPersonal();
 }
 function openProduct(id){
