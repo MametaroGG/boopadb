@@ -712,7 +712,8 @@ document.getElementById("stats").innerHTML = [
 function ribOf(x){
   if (x.cur === 0) return ["free", tr("free")];
   if (x.at_lowest) return ["low", tr("chip_lowest")];
-  return ["sale", tr("rib_sale")];
+  if (x.sale) return ["sale", tr("rib_sale")];
+  return null;
 }
 function htagsArr(x){
   const t = [tr("chip_onsale"), `${x.pct}%OFF`];
@@ -730,7 +731,7 @@ function htagsPlain(x){
   return t.map(t => "#" + t.replace(/[\s　]+/g, "")).join(" ");
 }
 function heroNormSale(x){
-  return {...x, _pct: x.pct, _disc: x.pct, _rib: ribOf(x), _tags: htagsArr(x),
+  return {...x, _pct: x.pct, _disc: x.pct, _rib: ribOf({...x, sale: true}), _tags: htagsArr(x),
     _status: x.at_lowest ? tr("status_lowest") : tr("save_note", {v: yen(x.base - x.cur)}),
     _reason: x.at_lowest ? tr("reason_lowest") : tr("reason_sale")};
 }
@@ -1157,12 +1158,13 @@ const spy = new IntersectionObserver(es => {
 ["hero", "feat", "sale", "browse2"].forEach(id => { const el = document.getElementById(id); if (el) spy.observe(el); });
 
 function saleCard(s, i){
+  const rb = ribOf(s);
   return `
   <div class="card" style="animation-delay:${(i || 0) * 45}ms" data-pct="${s.pct}" data-free="${s.cur === 0 ? 1 : 0}" data-lowest="${s.at_lowest ? 1 : 0}" data-text="${esc((s.name + " " + (s.shop || "")).toLowerCase())}">
     <a class="thumbwrap" href="${itemUrl(s.id)}" target="_blank" rel="noopener">
       ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}
       ${s.sale === false ? "" : `<span class="disc">-${s.pct}%</span>`}
-      <span class="rib ${ribOf(s)[0]}">${ribOf(s)[1]}</span>
+      ${rb ? `<span class="rib ${rb[0]}">${rb[1]}</span>` : ""}
     </a>
     <div class="cbody">
       <div class="cname"><a href="${itemUrl(s.id)}" target="_blank" rel="noopener">${esc(s.name)}</a></div>
