@@ -327,7 +327,7 @@
 <header>
   <div class="hwrap">
   <div class="logo">Booth<span>DB</span> <span style="color:#a2a2ab;font-size:15px;font-weight:600">for VRChat</span></div>
-  <nav><a href="#sale">セール中</a><a href="#feat">注目の商品</a><a href="#browse2">新着・値下げ</a></nav>
+  <nav><a href="#sale">セール中の商品</a><a href="#feat">注目の商品</a><a href="#browse2">新着・値下げ</a></nav>
   <div class="badge">PROTOTYPE</div>
   </div>
 </header>
@@ -338,11 +338,11 @@
   <div class="stats" id="stats"></div>
 
   <h2 id="feat">注目の商品</h2>
-  <p class="fnote2">過去最安値や割引額の大きいセール商品から選んでいます。</p>
+  <p class="fnote2">セール中かどうかではなく、価格の動きの活発さと新着から選んでいます。</p>
   <div class="capgrid" id="featGrid"></div>
   <div id="personal"></div>
 
-  <div class="shead" id="sale"><h2 style="border:none;margin:0;padding:0">セール中</h2>
+  <div class="shead" id="sale"><h2 style="border:none;margin:0;padding:0">セール中の商品</h2>
     <div class="pilltabs" id="sortTabs"><span class="pill-ind"></span><button data-mode="pct" class="on">割引率順</button><button data-mode="amount">割引額順</button><button data-mode="cheap">安い順</button></div></div>
   <div class="chips" id="chips">
     <button class="chip on" data-f="all">すべて</button>
@@ -760,9 +760,7 @@ function steamCap(s){
   </div>`;
 }
 function renderSale(){
-  // This section shows plausible sale items only: gag listings with joke
-  // base prices (¥9,999,999 etc.) are excluded from the whole section.
-  let arr = [...P.on_sale].filter(s => s.base > 0 && s.base <= 100000);
+  let arr = [...P.on_sale];
   if (sortMode === "amount") arr.sort((a,b) => (b.base - b.cur) - (a.base - a.cur));
   else if (sortMode === "cheap") arr.sort((a,b) => a.cur - b.cur);
   else arr.sort((a,b) => b.pct - a.pct || (b.base - b.cur) - (a.base - a.cur));
@@ -890,20 +888,19 @@ function featCap(x, tag, meta){
   </div>`;
 }
 {
-  // 注目の商品: notable deals — plausible sale items only (no gag listings
-  // with joke base prices), all-time-low first, then by discount amount,
-  // at most two per shop.
   const items = [];
-  const seen = {};
-  const deals = [...(P.on_sale || [])]
-    .filter(s => s.base > 0 && s.base <= 100000)
-    .sort((a, b) => (b.at_lowest - a.at_lowest) || ((b.base - b.cur) - (a.base - a.cur)) || (b.pct - a.pct));
-  for (const x of deals) {
-    const s = x.shop || "";
-    if (s && (seen[s] || 0) >= 2) continue;
-    seen[s] = (seen[s] || 0) + 1;
-    items.push(featCap(x, x.at_lowest ? "過去最安値" : "セール中", `${x.date} 時点の価格`));
-    if (items.length >= 10) break;
+  (P.active || []).slice(0, 5).forEach(x => items.push(featCap(x, "価格変更が活発", `直近3週間で${x.changes_recent}回変更`)));
+  {
+    const seen = {};
+    const picked = [];
+    for (const x of (P.newest || [])) {
+      const s = x.shop || "";
+      if (s && (seen[s] || 0) >= 2) continue;
+      seen[s] = (seen[s] || 0) + 1;
+      picked.push(x);
+      if (picked.length >= 5) break;
+    }
+    picked.forEach(x => items.push(featCap(x, "新着", `${x.first_date} 収録`)));
   }
   document.getElementById("featGrid").innerHTML = items.join("");
   if (!items.length){
