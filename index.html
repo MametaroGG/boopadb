@@ -911,8 +911,8 @@ async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
   try {
-    const [r0, r1] = await Promise.all([fetch("search_index_0.json"), fetch("search_index_1.json")]);
-    if (r0.ok && r1.ok) { const raw = [...(await r0.json()), ...(await r1.json())]; fullIndex = raw.map(([id, name]) => [String(id), name, String(name).toLowerCase()]); }
+    const rs = await Promise.all([fetch("search_index_0.json"), fetch("search_index_1.json"), fetch("search_index_2.json")]);
+    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name]) => [String(id), name, String(name).toLowerCase()]); }
   } catch {}
   fullIndexLoading = false;
   if (fullIndex && spage.classList.contains("open")) spRender(false);
