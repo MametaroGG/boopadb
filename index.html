@@ -248,8 +248,11 @@
   .pp-varlabel{font-size:12px;color:var(--sub);font-weight:700;margin:10px 0 0}
   .varchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
   .varsel{width:100%;margin:8px 0 2px;background:#1b1b1f;color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:9px 10px;font-size:13.5px;font-family:inherit}
+  .outlb{background:#ffdf00;color:#000;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;vertical-align:2px;white-space:nowrap}
+  .cmpoutl{color:#e8c547;font-size:12px;font-weight:700;margin:0 0 8px}
   #cmpChart{position:relative}
-  #cmpTip{position:absolute;top:8px;display:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  .chartbox{position:relative}
+  #cmpTip,.hvTip{position:absolute;top:8px;display:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
   .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
   .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
   .cmtn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
@@ -513,7 +516,7 @@ ja: {
   note_dropped: "{d} に値下げ", note_nowfree: "現在無料",
   pp_cur: "現在価格", pp_high: "最高価格", pp_avg: "平均価格", pp_saledays: "セール観測日数", pp_days: "観測日数", days_fmt: "{n}日",
   pp_chart: "価格推移", pp_history: "価格変更履歴", pp_same: "同じショップの商品",
-  pp_booth: "BOOTHで見る", pp_bm: "ブックマーク", pp_bmed: "ブックマーク済み", pp_vars: "バリエーション（{n}件）", pp_compare: "価格推移を比較", cmp_others: "ほか{n}件",
+  pp_booth: "BOOTHで見る", pp_bm: "ブックマーク", pp_bmed: "ブックマーク済み", pp_vars: "バリエーション（{n}件）", pp_compare: "価格推移を比較", cmp_others: "ほか{n}件", outlier: "規格外", outlier_n: "▲ 規格外{n}件",
   pp_nodata: "価格データが不足しています。", pp_nochg: "価格変更は観測されていません。",
   pp_salenote: "ピンクの帯はセール中と推定された期間です。", pp_down: "値下げ", pp_up: "値上げ",
   sp_count: "{n} 件", sec_recent: "最近見た商品", seen_drop: "見た時より -{v}",
@@ -546,7 +549,7 @@ en: {
   note_dropped: "Price drop on {d}", note_nowfree: "Free now",
   pp_cur: "Current price", pp_high: "Highest price", pp_avg: "Average price", pp_saledays: "Days on sale (observed)", pp_days: "Days observed", days_fmt: "{n} days",
   pp_chart: "Price history", pp_history: "Price change history", pp_same: "More from this shop",
-  pp_booth: "View on BOOTH", pp_bm: "Bookmark", pp_bmed: "Bookmarked", pp_vars: "Variations ({n})", pp_compare: "Compare price histories", cmp_others: "+{n} more",
+  pp_booth: "View on BOOTH", pp_bm: "Bookmark", pp_bmed: "Bookmarked", pp_vars: "Variations ({n})", pp_compare: "Compare price histories", cmp_others: "+{n} more", outlier: "Outlier", outlier_n: "▲ Outliers: {n}",
   pp_nodata: "Not enough price data yet.", pp_nochg: "No price changes observed.",
   pp_salenote: "Pink bands are periods estimated to be on sale.", pp_down: "Drop", pp_up: "Rise",
   sp_count: "{n} items", sec_recent: "Recently viewed", seen_drop: "Down {v} since viewed",
@@ -579,7 +582,7 @@ ko: {
   note_dropped: "{d} 가격 인하", note_nowfree: "현재 무료",
   pp_cur: "현재 가격", pp_high: "최고 가격", pp_avg: "평균 가격", pp_saledays: "할인 관측 일수", pp_days: "관측 일수", days_fmt: "{n}일",
   pp_chart: "가격 추이", pp_history: "가격 변동 이력", pp_same: "같은 샵의 상품",
-  pp_booth: "BOOTH에서 보기", pp_bm: "북마크", pp_bmed: "북마크됨", pp_vars: "바리에이션({n}종)", pp_compare: "가격 추이 비교", cmp_others: "외 {n}개",
+  pp_booth: "BOOTH에서 보기", pp_bm: "북마크", pp_bmed: "북마크됨", pp_vars: "바리에이션({n}종)", pp_compare: "가격 추이 비교", cmp_others: "외 {n}개", outlier: "이상치", outlier_n: "▲ 이상치 {n}건",
   pp_nodata: "가격 데이터가 부족합니다.", pp_nochg: "가격 변동이 관측되지 않았습니다.",
   pp_salenote: "분홍색 띠는 할인 중으로 추정되는 기간입니다.", pp_down: "인하", pp_up: "인상",
   sp_count: "{n}건", sec_recent: "최근 본 상품", seen_drop: "본 이후 -{v}",
@@ -612,7 +615,7 @@ ko: {
   note_dropped: "{d} 降价", note_nowfree: "当前免费",
   pp_cur: "当前价格", pp_high: "最高价格", pp_avg: "平均价格", pp_saledays: "促销观测天数", pp_days: "观测天数", days_fmt: "{n} 天",
   pp_chart: "价格走势", pp_history: "价格变动记录", pp_same: "同店铺的其他商品",
-  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "规格（{n}种）", pp_compare: "比较价格走势", cmp_others: "+{n} 个",
+  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "规格（{n}种）", pp_compare: "比较价格走势", cmp_others: "+{n} 个", outlier: "离群值", outlier_n: "▲ 离群值{n}条",
   pp_nodata: "价格数据不足。", pp_nochg: "尚未观测到价格变动。",
   pp_salenote: "粉色区间为推测的促销期间。", pp_down: "降价", pp_up: "涨价",
   sp_count: "{n} 件", sec_recent: "最近浏览", seen_drop: "浏览后降了 {v}",
@@ -645,7 +648,7 @@ ko: {
   note_dropped: "{d} 降價", note_nowfree: "當前免費",
   pp_cur: "當前價格", pp_high: "最高價格", pp_avg: "平均價格", pp_saledays: "促銷觀測天數", pp_days: "觀測天數", days_fmt: "{n} 天",
   pp_chart: "價格走勢", pp_history: "價格變動記錄", pp_same: "同店舖的其他商品",
-  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "規格（{n}種）", pp_compare: "比較價格走勢", cmp_others: "+{n} 個",
+  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "規格（{n}種）", pp_compare: "比較價格走勢", cmp_others: "+{n} 個", outlier: "離群值", outlier_n: "▲ 離群值{n}筆",
   pp_nodata: "價格數據不足。", pp_nochg: "尚未觀測到價格變動。",
   pp_salenote: "粉色區間為推測的促銷期間。", pp_down: "降價", pp_up: "漲價",
   sp_count: "{n} 件", sec_recent: "最近瀏覽", seen_drop: "瀏覽後降了 {v}",
@@ -930,6 +933,15 @@ function thinPointsJS(rows){
   out.push(rows[rows.length - 1]);
   return out;
 }
+function outlierIdxJS(rows){
+  const pos = rows.map((r, i) => i).filter(i => rows[i][1] > 0).sort((a, b) => rows[a][1] - rows[b][1]);
+  const n = pos.length;
+  for (let split = 5; split < n; split++) {
+    if (rows[pos[split]][1] / rows[pos[split - 1]][1] >= 20 &&
+        new Set(pos.slice(0, split).map(i => rows[i][0])).size >= 5) return new Set(pos.slice(split));
+  }
+  return new Set();
+}
 function thinVarsJS(d){
   const vars = d.variations || {}, entries = {};
   for (const k in vars) {
@@ -937,6 +949,8 @@ function thinVarsJS(d){
     if (!Array.isArray(series) || series.length < 2) continue;
     const s = [...series].sort((a, b) => a.date < b.date ? -1 : 1);
     const rows = s.map(p => [p.date, p.price, p.is_sale ? 1 : 0]);
+    const oi = outlierIdxJS(rows);
+    rows.forEach((r, i) => { if (oi.has(i)) r.push(1); });
     entries[k] = {p: thinPointsJS(rows), d: rows.length, sd: rows.filter(r => r[2]).length};
   }
   const keys = Object.keys(entries);
@@ -1139,8 +1153,10 @@ function steamCap(s){
     </div>
   </div>`;
 }
+let SALE_HOME = P.on_sale || [];
+let LISTS = { on_sale: P.on_sale || [], drops: P.drops || [], active: P.active || [], newest: P.newest || [], free: null };
 function renderSale(){
-  let arr = [...P.on_sale];
+  let arr = [...SALE_HOME];
   if (sortMode === "amount") arr.sort((a,b) => (b.base - b.cur) - (a.base - a.cur));
   else if (sortMode === "cheap") arr.sort((a,b) => a.cur - b.cur);
   else arr.sort((a,b) => b.pct - a.pct || (b.base - b.cur) - (a.base - a.cur));
@@ -1149,7 +1165,7 @@ function renderSale(){
   // plausible prices first, preferring all-time-low deals. The grid keeps
   // the full filtered list in the chosen sort order, minus the featured four.
   const sane = arr.filter(s => s.base > 0 && s.base <= 100000)
-    .sort((a, b) => (b.at_lowest - a.at_lowest) || (b.pct - a.pct) || ((b.base - b.cur) - (a.base - a.cur)));
+    .sort((a, b) => (b.at_lowest - a.at_lowest) || ((b.image ? 1 : 0) - (a.image ? 1 : 0)) || (b.pct - a.pct) || ((b.base - b.cur) - (a.base - a.cur)));
   const mos = [...sane, ...arr.filter(s => !sane.includes(s))].slice(0, 4);
   const rest = arr.filter(s => !mos.includes(s));
   document.getElementById("saleMosaic").innerHTML = mos.map(mosaicCell).join("");
@@ -1191,7 +1207,7 @@ function bNormFeat(x, kind){
 }
 function dedupeNewest(){
   const seen = {}; const out = [];
-  for (const x of (P.newest || [])) {
+  for (const x of (LISTS.newest || [])) {
     const s = x.shop || "";
     if (s && (seen[s] || 0) >= 2) continue;
     seen[s] = (seen[s] || 0) + 1;
@@ -1201,10 +1217,10 @@ function dedupeNewest(){
 }
 const BTABS = {
   new: () => dedupeNewest().map(x => bNormFeat(x, "new")),
-  sale: () => [...P.on_sale].sort((a,b) => b.pct - a.pct).map(bNormSale),
-  drop: () => P.drops.map(bNormDrop),
-  free: () => P.on_sale.filter(s => s.cur === 0).map(s => ({...bNormSale(s), note: tr("note_nowfree"), chips: [tr("free"), ...(s.at_lowest ? [tr("chip_lowest")] : [])]})),
-  active: () => (P.active || []).map(x => bNormFeat(x, "active")),
+  sale: () => [...LISTS.on_sale].sort((a,b) => b.pct - a.pct).map(bNormSale),
+  drop: () => LISTS.drops.map(bNormDrop),
+  free: () => (LISTS.free || LISTS.on_sale.filter(s => s.cur === 0)).map(s => ({...bNormSale(s), sale: s.on_sale !== false, note: tr("note_nowfree"), chips: [tr("free"), ...(s.at_lowest ? [tr("chip_lowest")] : [])]})),
+  active: () => (LISTS.active || []).map(x => bNormFeat(x, "active")),
 };
 let bTab = "new", bItems = [], bShown = 7;
 function browHTML(x, i){
@@ -1245,6 +1261,17 @@ document.querySelectorAll("#bTabs .btab").forEach(b => { b.onclick = () => setBT
 const BMORE = {new: "new.html", sale: "sale.html", drop: "drops.html", free: "free.html", active: "active.html"};
 document.getElementById("bMore").onclick = () => { location.href = BMORE[bTab] || "sale.html"; };
 setBTab("new");
+// Full lists swap-in: the home sale section and browse tabs run on the
+// whole catalog once lists_full.json arrives (the sample paints first).
+fetch("lists_full.json").then(r => r.ok ? r.json() : null).then(f => {
+  if (!f) return;
+  if (f.on_sale && f.on_sale.length) { SALE_HOME = f.on_sale; LISTS.on_sale = f.on_sale; renderSale(); }
+  if (f.drops) LISTS.drops = f.drops;
+  if (f.active) LISTS.active = f.active;
+  if (f.newest) LISTS.newest = f.newest;
+  if (f.free) LISTS.free = f.free;
+  setBTab(bTab);
+}).catch(() => {});
 
 function sparkSVG(spark){
   if (!spark || spark.length < 2) return "";
@@ -1338,10 +1365,14 @@ function seriesOf(x, key){
 }
 function statsHTML(ser){
   const s = ser.p, prices = s.map(p => p[1]);
-  const curP = prices[prices.length - 1], low = Math.min(...prices), high = Math.max(...prices);
-  const avg = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
+  const curP = prices[prices.length - 1], low = Math.min(...prices);
+  const ord = s.filter(p => !p[3]);
+  const ordPrices = (ord.length ? ord : s).map(p => p[1]);
+  const high = Math.max(...ordPrices);
+  const avg = Math.round(ordPrices.reduce((a, b) => a + b, 0) / ordPrices.length);
+  const curCell = yen(curP) + (s[s.length - 1][3] ? ' <span class="outlb">' + tr("outlier") + '</span>' : "");
   return [
-    [tr("pp_cur"), yen(curP)], [tr("chip_lowest"), yen(low)], [tr("pp_high"), yen(high)],
+    [tr("pp_cur"), curCell], [tr("chip_lowest"), yen(low)], [tr("pp_high"), yen(high)],
     [tr("pp_avg"), yen(avg)], [tr("pp_saledays"), tr("days_fmt", {n: ser.sd})], [tr("pp_days"), tr("days_fmt", {n: ser.d})],
   ].map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
 }
@@ -1351,7 +1382,9 @@ const diso = t => new Date(Math.round(t) * DAYMS).toISOString().slice(0, 10);
 function chartSVG(ser, H){
   const s = ser.p;
   const prices = s.map(p => p[1]);
-  const high = Math.max(...prices);
+  const ordS = s.filter(p => !p[3]);
+  const high = Math.max(...(ordS.length ? ordS : s).map(p => p[1]));
+  const outlN = s.length - ordS.length;
   const W = 980, PL = 64, PR = 14, PT = 14, PB = 26;
   const iw = W - PL - PR, ih = H - PT - PB;
   const yMax = Math.ceil(high * 1.08 / 100) * 100 || 100;
@@ -1380,17 +1413,17 @@ function chartSVG(ser, H){
     grid += `<line x1="${PL}" y1="${gy}" x2="${W - PR}" y2="${gy}" stroke="#26262c" stroke-width="1"/>` +
             `<text x="${PL - 6}" y="${gy + 4}" fill="#6f6f78" font-size="11" text-anchor="end">¥${Math.round(v).toLocaleString(LOCALE)}</text>`;
   }
-  return `<svg viewBox="0 0 ${W} ${H}">${saleRects}${grid}<path d="${area}" fill="#fc4d50" opacity="0.12"/><path d="${path}" fill="none" stroke="#fc4d50" stroke-width="2" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;animation:dash .9s ease forwards"/>` +
+  return `<svg viewBox="0 0 ${W} ${H}">${saleRects}${grid}<line class="hvGuide" y1="${PT}" y2="${PT + ih}" stroke="#a2a2ab" stroke-width="1" opacity="0"/>${outlN ? `<text x="${W - PR}" y="${PT + 3}" fill="#e8c547" font-size="11" font-weight="700" text-anchor="end">${tr("outlier_n", {n: outlN})}</text>` : ""}<path d="${area}" fill="#fc4d50" opacity="0.12"/><path d="${path}" fill="none" stroke="#fc4d50" stroke-width="2" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;animation:dash .9s ease forwards"/>` +
     `<text x="${PL}" y="${H - 6}" fill="#6f6f78" font-size="11">${s[0][0]}</text>` +
     `<text x="${W - PR}" y="${H - 6}" fill="#6f6f78" font-size="11" text-anchor="end">${s[s.length - 1][0]}</text></svg>` +
     (ser.sd ? `<p class="note">${tr("pp_salenote")}</p>` : "");
 }
 function changesHTML(ser){
   const s = ser.p, chgs = [];
-  for (let i = 1; i < s.length; i++) if (s[i][1] !== s[i - 1][1]) chgs.push({date: s[i][0], from: s[i - 1][1], to: s[i][1]});
+  for (let i = 1; i < s.length; i++) if (s[i][1] !== s[i - 1][1]) chgs.push({date: s[i][0], from: s[i - 1][1], to: s[i][1], outl: !!(s[i][3] || s[i - 1][3])});
   return chgs.length ? chgs.slice(-8).reverse().map(c => {
     const d = c.to - c.from, pc = c.from ? Math.round(d / c.from * 100) : 0;
-    return `<div class="chg"><span class="cd">${c.date}</span><span class="${d < 0 ? "down" : "up"}">${d < 0 ? tr("pp_down") : tr("pp_up")}</span><span class="cp">${yen(c.from)} → ${yen(c.to)}（${d < 0 ? "" : "+"}${pc}%）</span></div>`;
+    return `<div class="chg"><span class="cd">${c.date}</span><span class="${d < 0 ? "down" : "up"}">${d < 0 ? tr("pp_down") : tr("pp_up")}</span><span class="cp">${yen(c.from)} → ${yen(c.to)}（${d < 0 ? "" : "+"}${pc}%）</span>${c.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`;
   }).join("") : '<p class="note">' + tr("pp_nochg") + '</p>';
 }
 function varBlockHTML(x, key){
@@ -1400,8 +1433,8 @@ function varBlockHTML(x, key){
   const prices = s.map(p => p[1]);
   const curP = prices[prices.length - 1], low = Math.min(...prices);
   const onSaleNow = !!s[s.length - 1][2];
-  const head = key ? `<div class="pp-varhead"><span class="pp-varname">${esc(key)}</span><span class="pp-varprice">${yen(curP)}</span>${onSaleNow ? `<span class="bpchip">${tr("chip_onsale")}</span>` : ""}${curP <= low ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}</div>` : "";
-  return `<div class="pp-varblock">${head}<div class="pstats">${statsHTML(ser)}</div>${chartSVG(ser, key ? 210 : 300)}<div class="pp-changes">${changesHTML(ser)}</div></div>`;
+  const head = key ? `<div class="pp-varhead"><span class="pp-varname">${esc(key)}</span><span class="pp-varprice">${yen(curP)}</span>${s[s.length - 1][3] ? '<span class="outlb">' + tr("outlier") + '</span>' : ""}${onSaleNow ? `<span class="bpchip">${tr("chip_onsale")}</span>` : ""}${curP <= low ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}</div>` : "";
+  return `<div class="pp-varblock">${head}<div class="pstats">${statsHTML(ser)}</div><div class="chartbox">${chartSVG(ser, key ? 210 : 300)}<div class="hvTip charttip"></div></div><div class="pp-changes">${changesHTML(ser)}</div></div>`;
 }
 function renderPPBody(x){
   const keys = x.variations ? Object.keys(x.variations) : [];
@@ -1423,34 +1456,21 @@ let cmpOn = {};
 let CMP_GROUPS = [];
 function cmpSig(ser){ return ser.p.map(p => p[1] + (p[2] ? "s" : "")).join(","); }
 function cmpDefaults(x, keys){
-  // Variations that moved on the same price schedule are one line;
-  // the legend chip speaks for the whole group.
-  const groups = new Map();
-  keys.forEach(k => {
-    const ser = seriesOf(x, k);
-    const sig = cmpSig(ser);
-    if (!groups.has(sig)) groups.set(sig, {names: [], key: k, ser});
-    const g = groups.get(sig);
-    g.names.push(k);
-    if (ser.p.length > g.ser.p.length) { g.key = k; g.ser = ser; }
-  });
-  CMP_GROUPS = [...groups.values()];
   cmpOn = {};
-  CMP_GROUPS.forEach((g, i) => { cmpOn[i] = i < 12; });
-  if (!CMP_GROUPS.some((g, i) => cmpOn[i]) && CMP_GROUPS.length) cmpOn[0] = true;
+  keys.forEach(k => { cmpOn[k] = true; });
 }
-function cmpDomain(){
+function cmpDomain(x, keys){
   let high = 0, t0 = Infinity, t1 = -Infinity;
-  CMP_GROUPS.forEach((g, i) => { if (!cmpOn[i]) return; g.ser.p.forEach(p => { if (p[1] > high) high = p[1]; const t = dnum(p[0]); if (t < t0) t0 = t; if (t > t1) t1 = t; }); });
+  keys.forEach(k => { if (!cmpOn[k]) return; seriesOf(x, k).p.forEach(p => { if (!p[3] && p[1] > high) high = p[1]; const t = dnum(p[0]); if (t < t0) t0 = t; if (t > t1) t1 = t; }); });
   if (!isFinite(t0)) { t0 = 0; t1 = 1; }
   if (t1 <= t0) t1 = t0 + 1;
   return {high, t0, t1};
 }
 function compareSVG(x, keys){
-  const act = CMP_GROUPS.map((g, i) => ({g, i})).filter(({i}) => cmpOn[i]);
+  const act = keys.filter(k => cmpOn[k]);
   const W = 980, H = 300, PL = 64, PR = 14, PT = 14, PB = 26;
   const iw = W - PL - PR, ih = H - PT - PB;
-  const {high, t0, t1} = cmpDomain();
+  const {high, t0, t1} = cmpDomain(x, keys);
   const yMax = Math.ceil(high * 1.08 / 100) * 100 || 100;
   const X = t => PL + iw * ((t - t0) / (t1 - t0));
   const Y = v => PT + ih * (1 - v / yMax);
@@ -1461,8 +1481,8 @@ function compareSVG(x, keys){
             `<text x="${PL - 6}" y="${gy + 4}" fill="#6f6f78" font-size="11" text-anchor="end">¥${Math.round(v).toLocaleString(LOCALE)}</text>`;
   }
   let lines = "";
-  act.forEach(({g, i}) => {
-    const s = g.ser.p, col = CMP_COLORS[i % CMP_COLORS.length];
+  act.forEach(k => {
+    const s = seriesOf(x, k).p, col = CMP_COLORS[keys.indexOf(k) % CMP_COLORS.length];
     let path = "";
     s.forEach((p, j) => { const cx = X(dnum(p[0])), cy = Y(p[1]); path += j === 0 ? `M${cx},${cy}` : ` H${cx} V${cy}`; });
     path += ` H${X(t1)}`;
@@ -1476,6 +1496,46 @@ function priceAt(ser, t){
   for (const p of ser.p) { if (dnum(p[0]) <= t) v = p[1]; else break; }
   return v;
 }
+function pricePtAt(ser, t){
+  let pt = ser.p.length ? ser.p[0] : null;
+  for (const p of ser.p) { if (dnum(p[0]) <= t) pt = p; else break; }
+  return pt;
+}
+function wireHover(box, ser){
+  const tip = box.querySelector(".hvTip");
+  const svg = box.querySelector("svg");
+  if (!tip || !svg || !ser || !ser.p || !ser.p.length) return;
+  const pts = ser.p;
+  const t0 = dnum(pts[0][0]), t1 = Math.max(dnum(pts[pts.length - 1][0]), t0 + 1);
+  const hide = () => { tip.style.display = "none"; const gd = svg.querySelector(".hvGuide"); if (gd) gd.setAttribute("opacity", "0"); };
+  const move = e => {
+    const r = svg.getBoundingClientRect();
+    const W = 980, PL = 64, PR = 14;
+    const fx = (e.clientX - r.left) / r.width;
+    const vx = fx * W;
+    if (vx < PL || vx > W - PR) { hide(); return; }
+    const t = t0 + (vx - PL) / (W - PL - PR) * (t1 - t0);
+    const pt = pricePtAt(ser, t);
+    const v = pt ? pt[1] : 0;
+    const sale = !!(pt && pt[2]);
+    tip.innerHTML = `<div class="cmtd">${diso(t)}</div><div class="cmtr"><b>${yen(v)}</b>${pt && pt[3] ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}${sale ? '<span class="cmpdot" style="background:#fc4d50"></span><span>' + tr("chip_onsale") + '</span>' : ""}</div>`;
+    tip.style.display = "block";
+    const wrapW = box.clientWidth;
+    const px = fx * wrapW;
+    tip.style.left = Math.min(Math.max(px + 12, 4), Math.max(4, wrapW - tip.offsetWidth - 4)) + "px";
+    const gd = svg.querySelector(".hvGuide");
+    if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
+  };
+  svg.addEventListener("pointermove", move);
+  svg.addEventListener("pointerdown", move);
+  svg.addEventListener("pointerleave", hide);
+}
+function wireBlockHovers(x){
+  const keys = x.variations ? Object.keys(x.variations) : [];
+  const all = keys.length ? keys.map(k => seriesOf(x, k)) : [seriesOf(x, null)];
+  const sers = all.filter(ser => ser.p && ser.p.length >= 2);
+  document.querySelectorAll("#ppBody .chartbox").forEach((box, i) => { if (sers[i]) wireHover(box, sers[i]); });
+}
 function wireCmpTip(x){
   const wrap = document.getElementById("cmpChart");
   const tip = document.getElementById("cmpTip");
@@ -1488,12 +1548,13 @@ function wireCmpTip(x){
     const fx = (e.clientX - r.left) / r.width;
     const vx = fx * W;
     if (vx < PL || vx > W - PR) { hide(); return; }
-    const {t0, t1} = cmpDomain();
+    const keys = Object.keys(x.variations || {});
+    const {t0, t1} = cmpDomain(x, keys);
     const t = t0 + (vx - PL) / (W - PL - PR) * (t1 - t0);
-    const rows = CMP_GROUPS.map((g, i) => ({g, i})).filter(({i}) => cmpOn[i])
-      .map(({g, i}) => ({name: g.names[0], col: CMP_COLORS[i % CMP_COLORS.length], v: priceAt(g.ser, t)}))
+    const rows = keys.filter(k => cmpOn[k])
+      .map(k => { const pt = pricePtAt(seriesOf(x, k), t); return {name: k, col: CMP_COLORS[keys.indexOf(k) % CMP_COLORS.length], v: pt ? pt[1] : 0, outl: !!(pt && pt[3])}; })
       .sort((p, q) => q.v - p.v)
-      .map(rw => `<div class="cmtr"><span class="cmpdot" style="background:${rw.col}"></span><span class="cmtn">${esc(rw.name)}</span><b>${yen(rw.v)}</b></div>`).join("");
+      .map(rw => `<div class="cmtr"><span class="cmpdot" style="background:${rw.col}"></span><span class="cmtn">${esc(rw.name)}</span><b>${yen(rw.v)}</b>${rw.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`).join("");
     tip.innerHTML = `<div class="cmtd">${diso(t)}</div>` + rows;
     tip.style.display = "block";
     const wrapW = wrap.clientWidth;
@@ -1511,20 +1572,19 @@ function renderCompare(x){
   if (!el) return;
   const keys = Object.keys(x.variations || {});
   if (keys.length < 2) { el.innerHTML = ""; return; }
-  if (!CMP_GROUPS.length) cmpDefaults(x, keys);
-  const legend = CMP_GROUPS.map((g, i) => {
-    const s = g.ser.p;
+  const legend = keys.map((k, i) => {
+    const s = seriesOf(x, k).p;
     const cur = s.length ? s[s.length - 1][1] : 0;
     const col = CMP_COLORS[i % CMP_COLORS.length];
-    const label = esc(g.names[0]) + (g.names.length > 1 ? " " + tr("cmp_others", {n: g.names.length - 1}) : "");
-    const on = !!cmpOn[i];
-    return `<button type="button" class="cmpchip ${on ? "on" : ""}" data-cg="${i}" style="${on ? `border-color:${col};background:${col}26` : ""}"><span class="cmpdot" style="background:${col}"></span>${label} — ${yen(cur)}</button>`;
+    const on = !!cmpOn[k];
+    return `<button type="button" class="cmpchip ${on ? "on" : ""}" data-ck="${i}" style="${on ? `border-color:${col};background:${col}26` : ""}"><span class="cmpdot" style="background:${col}"></span>${esc(k)} — ${yen(cur)}</button>`;
   }).join("");
-  el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span></div><div class="cmplegend">${legend}</div><div id="cmpChart">${compareSVG(x, keys)}<div id="cmpTip"></div></div></div>`;
-  el.querySelectorAll("[data-cg]").forEach(b => b.onclick = () => {
-    const i = +b.dataset.cg;
-    if (cmpOn[i] && CMP_GROUPS.filter((g, j) => cmpOn[j]).length <= 1) return;
-    cmpOn[i] = !cmpOn[i];
+  const outlTotal = keys.reduce((n, k) => n + seriesOf(x, k).p.filter(p => p[3]).length, 0);
+  el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span></div><div class="cmplegend">${legend}</div>${outlTotal ? `<div class="cmpoutl">${tr("outlier_n", {n: outlTotal})}</div>` : ""}<div id="cmpChart">${compareSVG(x, keys)}<div id="cmpTip"></div></div></div>`;
+  el.querySelectorAll("[data-ck]").forEach(b => b.onclick = () => {
+    const k = keys[+b.dataset.ck];
+    if (cmpOn[k] && keys.filter(kk => cmpOn[kk]).length <= 1) return;
+    cmpOn[k] = !cmpOn[k];
     renderCompare(x);
   });
   wireCmpTip(x);
@@ -1552,6 +1612,7 @@ function renderProdPage(x){
   <div class="pp-sec" id="ppSameSec">${tr("pp_same")}</div>
   <div class="capgrid" id="ppSame"></div>`;
   renderPPBody(x);
+  wireBlockHovers(x);
   document.getElementById("ppBmBtn").onclick = () => toggleBm(x);
   const same = [...PROD.values()].filter(y => y.shop && y.shop === x.shop && String(y.id) !== String(x.id)).slice(0, 4);
   document.getElementById("ppSame").innerHTML = same.map(y => saleCard(y, 0)).join("");
