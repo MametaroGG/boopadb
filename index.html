@@ -127,12 +127,20 @@
   .pill-ind{display:none}
   .salepanel{background:linear-gradient(180deg,#1f1f23,#17171a);border:1px solid var(--border);border-radius:0;padding:12px;margin-top:10px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
   #saleGrid .card{border-radius:0}
-  .hscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 10px;scrollbar-width:none}
-  .hscroll::-webkit-scrollbar{display:none}
-  .hscroll .card{flex:0 0 72%;scroll-snap-align:start;border-radius:0}
-  @media (min-width:900px){.hscroll .card{flex-basis:262px}}
-  .railend{flex:0 0 36%;display:flex;align-items:center;justify-content:center;background:#17171a;border:1px solid var(--border);color:var(--sub);text-decoration:none;font-size:13.5px;font-weight:700;scroll-snap-align:start}
-  .railend:hover{color:var(--text)}
+  .saleRail{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;height:254px;scrollbar-width:none}
+  .saleRail::-webkit-scrollbar{display:none}
+  .rtile{display:flex;flex-direction:column;background:#131316;text-decoration:none;min-height:0}
+  .rtall{flex:0 0 46%;scroll-snap-align:start}
+  .rstack{flex:0 0 66%;display:grid;grid-template-rows:1fr 1fr;gap:8px;scroll-snap-align:start}
+  @media (min-width:900px){.saleRail{height:302px}.rtall{flex-basis:236px}.rstack{flex-basis:404px}}
+  .rtile .rimg{position:relative;flex:1;min-height:0;overflow:hidden;display:block}
+  .rtile .rimg .rbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(18px) brightness(.55);transform:scale(1.25)}
+  .rtile .rimg .rfg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+  .rtile .pstrip{display:flex;align-items:center;gap:6px;flex:none;padding:6px;background:#1b1b1f}
+  .rtile .pstrip>*{flex:none}
+  .rtile .pwas{color:var(--faint);text-decoration:line-through;font-size:12px;white-space:nowrap}
+  .rtile .pprice{font-size:14.5px;font-weight:700;color:var(--text);white-space:nowrap}
+  .rtile .pprice.free{color:#e8b400}
   .mosaic{display:grid;gap:10px;grid-template-columns:1fr 1fr}
   .mosaic .card{background:none;border:none;border-radius:0}
   .mcell{position:relative;overflow:hidden;display:block;min-height:150px;border-radius:0}
@@ -141,7 +149,7 @@
   .mcell .scrim .discst{flex:none;font-size:12px;padding:0 5px;height:22px}
   .mcell .scrim .was{font-size:11px;padding:0 2px 0 6px;height:22px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .mcell .scrim .price{font-size:13.5px;padding:0 6px 0 2px;height:22px;flex:none}
-  .mcell .mlab{position:absolute;top:8px;left:10px;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 5px rgba(0,0,0,.65);letter-spacing:.05em;z-index:2}
+  .mcell .mlab,.rtile .mlab{position:absolute;top:8px;left:10px;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 5px rgba(0,0,0,.65);letter-spacing:.05em;z-index:2}
   @media (min-width:900px){
     .mosaic{grid-template-columns:1.25fr 1.25fr 1fr;grid-template-rows:1fr 1fr;height:440px}
     .mosaic .m1{grid-row:1/3}
@@ -450,9 +458,10 @@
     <button class="chip" data-f="half" data-i="chip_half">50%OFF以上</button>
   </div>
   <div class="salepanel">
-    <div class="hscroll" id="saleRail"></div>
+    <div class="saleRail" id="saleRail"></div>
   </div>
   <div class="empty" id="saleEmpty" data-i="empty_none">該当する商品がありません</div>
+  <div class="smore"><button id="saleMore" type="button" data-i="more">もっと見る</button></div>
   <p class="note" data-i="sale_note">※ 通常価格は観測期間中の最高価格。セール判定はBoopaの収集データに基づく推定を含みます。</p>
 
   <div class="browse2" id="browse2">
@@ -1246,9 +1255,20 @@ function renderSale(){
   // Gag listings (joke base prices like ¥9,999,999) never headline the rail:
   // plausible prices first, both groups keep the chosen sort order.
   const ordered = [...arr.filter(s => s.base <= 100000), ...arr.filter(s => s.base > 100000)];
-  document.getElementById("saleRail").innerHTML = ordered.slice(0, 20).map(steamCap).join("") +
-    (arr.length ? `<a class="railend" href="sale.html">${tr("more")}</a>` : "");
+  const items = ordered.slice(0, 14);
+  let html = "", i = 0;
+  while (i < items.length) {
+    html += railTile(items[i], true); i++;
+    if (i + 1 < items.length) { html += `<div class="rstack">${railTile(items[i])}${railTile(items[i + 1])}</div>`; i += 2; }
+    else if (i < items.length) { html += railTile(items[i], true); i++; }
+  }
+  document.getElementById("saleRail").innerHTML = html;
   document.getElementById("saleEmpty").style.display = arr.length ? "none" : "block";
+  document.getElementById("saleMore").style.display = arr.length ? "" : "none";
+}
+document.getElementById("saleMore").onclick = () => { location.href = "sale.html"; };
+function railTile(s, tall){
+  return `<a class="rtile${tall ? " rtall" : ""}" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img class="rbg" src="${s.image}" alt="" aria-hidden="true" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.rimg').querySelectorAll('img').forEach(i => i.remove())"><img class="rfg" src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.rimg').querySelectorAll('img').forEach(i => i.remove())">` : `<span class="phcard">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, "r")}</span><span class="pstrip"><span class="discst">-${s.pct}%</span>${s.base > s.cur ? `<span class="pwas">${yen(s.base)}</span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span></a>`;
 }
 const tabsEl = document.getElementById("sortTabs");
 const ind = tabsEl.querySelector(".pill-ind");
