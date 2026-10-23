@@ -242,9 +242,32 @@
   .pp-booth{background:#e04347;color:#fff;font-weight:700;font-size:13.5px;padding:9px 18px;border-radius:8px;text-decoration:none}
   .pp-bmbtn{background:#232329;color:var(--text);border:1px solid var(--border2);font-weight:700;font-size:13.5px;line-height:1;padding:9px 16px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px}
   .pp-bmbtn svg{width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .newsbar{text-align:right;margin:8px 2px 0;font-size:13px}
+  .newsbar a{color:var(--sub);text-decoration:none}
+  .noimg{display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:110px;background:#1b1b1f}
+  .noimg svg{width:36px;height:36px;stroke:#2c2c33;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
   .pp-varlabel{font-size:12px;color:var(--sub);font-weight:700;margin:10px 0 0}
   .varchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
   .varsel{width:100%;margin:8px 0 2px;background:#1b1b1f;color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:9px 10px;font-size:13.5px;font-family:inherit}
+  .outlb{background:#ffdf00;color:#000;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;vertical-align:2px;white-space:nowrap}
+  .cmpoutl{color:#e8c547;font-size:12px;font-weight:700;margin:0 0 8px}
+  #cmpChart{position:relative}
+  .chartbox{position:relative}
+  #cmpTip,.hvTip{position:absolute;top:8px;display:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
+  .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
+  .cmtn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
+  .cmpchip:not(.on){opacity:.45}
+  .pp-varblock{background:#17171a;border:1px solid #26262c;border-radius:12px;padding:14px 16px;margin:0 0 14px}
+  .pp-varhead{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .pp-varname{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .pp-varprice{font-weight:700;font-size:15px}
+  .pp-varblock .pstats{margin:0 0 8px}
+  .pp-changes{margin-top:8px}
+  .cmplegend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .cmpchip{display:inline-flex;align-items:center;gap:6px;background:#1b1b1f;border:1px solid var(--border2);color:var(--sub);border-radius:999px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;opacity:.55}
+  .cmpchip.on{color:var(--text);border-color:#3d3d44;opacity:1}
+  .cmpdot{width:9px;height:9px;border-radius:50%;flex:none}
   .pp-bmbtn.on svg{fill:currentColor}
   .pp-bmbtn.on{background:#33302a;border-color:#8a6d1f;color:#f5c542}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
@@ -286,6 +309,10 @@
   .brow:nth-child(even){background:#17171a}
   .brow:hover,.brow.sel{background:#26262c}
   .brow img{width:86px;height:86px;object-fit:cover;border-radius:6px;background:#131316;flex:none}
+  .bthph{flex:none;width:86px;height:86px;border-radius:6px;background:#17171a;display:inline-flex;align-items:center;justify-content:center}
+  .bthph svg{width:27px;height:27px;stroke:#3d3d44;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .phcard{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .phcard svg{width:36px;height:36px;stroke:#2c2c33;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
   .bmain{flex:1;min-width:0}
   .bname{display:block;font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .bshop{display:block;font-size:12px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -293,12 +320,13 @@
   .bsub{display:block;font-size:12px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .bprice{display:inline-flex;align-items:stretch;text-align:right;flex:none}
   .bprice .discst{height:auto;align-items:center;justify-content:center;text-align:center}
-  .bprice .bstack{display:inline-flex;flex-direction:column;justify-content:center;background:#26262c;padding:3px 8px 3px 2px}
+  .bprice .bstack{display:inline-flex;flex-direction:column;justify-content:center;background:#26262c;padding:6px 8px 7px 2px}
   .bprice .bstack .was{display:block;height:auto;background:none;padding:0;font-size:10.5px;color:var(--faint);text-align:right;line-height:1.3}
   .bprice .bstack .price{display:block;height:auto;background:none;padding:0;font-size:14.5px;text-align:right;line-height:1.3}
   @media (max-width:560px){
     .brow{gap:9px;padding:8px 10px}
     .brow img{width:60px;height:60px;border-radius:5px}
+    .bthph{width:60px;height:60px;border-radius:5px}
     .bname{font-size:13.5px}
   }
   .bprev{background:linear-gradient(180deg,#202025,#1a1a1e);border:1px solid var(--border);border-radius:10px;padding:14px;position:sticky;top:14px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
@@ -467,6 +495,7 @@ ja: {
   rk_tab_amount: "割引額", rk_tab_pct: "割引率",
   priv_title: "プライバシーポリシー", priv_sub: "BoothDB for VRChat のプライバシーポリシー",
   terms_sub: "BoothDB for VRChat の利用規約",
+  bt_active: "価格変更が活発", pg_new_sub: "最近収録された商品 · {d} 時点", pg_free_sub: "現在無料の商品（元¥300以上） · {n} 件", pg_drops_sub: "直近3週間の値下げ · {n} 件", pg_active_sub: "直近3週間に価格変更があった商品 · {n} 件", bm_title: "ブックマーク", bm_sub: "このブラウザに保存されたブックマーク · {n} 件", bm_empty: "ブックマークはまだありません。商品ページのブックマークボタンから追加できます。", bm_remove: "解除", added_on: "{d} 収録", recent3w: "直近3週間で {n} 回の価格変更", dropped_on: "{d} に値下げ", more: "もっと見る", loading: "読み込み中…",
   legal_note: "",
 },
 en: {
@@ -489,6 +518,7 @@ en: {
   rk_tab_amount: "Amount saved", rk_tab_pct: "Discount %",
   priv_title: "Privacy Policy", priv_sub: "Privacy policy of BoothDB for VRChat",
   terms_sub: "Terms of use of BoothDB for VRChat",
+  bt_active: "Frequently repriced", pg_new_sub: "Recently tracked products · as of {d}", pg_free_sub: "Free now (originally ¥300+) · {n} items", pg_drops_sub: "Price drops in the last 3 weeks · {n} items", pg_active_sub: "Products with price changes in the last 3 weeks · {n} items", bm_title: "Bookmarks", bm_sub: "Bookmarks saved in this browser · {n} items", bm_empty: "No bookmarks yet. Add them from the bookmark button on a product page.", bm_remove: "Remove", added_on: "Tracked {d}", recent3w: "{n} price changes in the last 3 weeks", dropped_on: "Dropped on {d}", more: "Show more", loading: "Loading…",
   legal_note: "This document is provided in Japanese only; the Japanese version is authoritative.",
 },
 ko: {
@@ -511,6 +541,7 @@ ko: {
   rk_tab_amount: "할인액", rk_tab_pct: "할인율",
   priv_title: "개인정보 처리방침", priv_sub: "BoothDB for VRChat의 개인정보 처리방침",
   terms_sub: "BoothDB for VRChat의 이용약관",
+  bt_active: "가격 변동 활발", pg_new_sub: "최근 수집된 상품 · {d} 기준", pg_free_sub: "현재 무료 상품(기존 ¥300 이상) · {n}건", pg_drops_sub: "최근 3주간 가격 인하 · {n}건", pg_active_sub: "최근 3주간 가격 변동이 있던 상품 · {n}건", bm_title: "북마크", bm_sub: "이 브라우저에 저장된 북마크 · {n}건", bm_empty: "아직 북마크가 없습니다. 상품 페이지의 북마크 버튼으로 추가할 수 있습니다.", bm_remove: "해제", added_on: "{d} 수집", recent3w: "최근 3주간 가격 변경 {n}회", dropped_on: "{d} 가격 인하", more: "더 보기", loading: "로딩 중…",
   legal_note: "이 문서는 일본어로만 제공되며, 일본어 버전이 정본입니다.",
 },
 "zh-Hans": {
@@ -533,6 +564,7 @@ ko: {
   rk_tab_amount: "优惠金额", rk_tab_pct: "折扣率",
   priv_title: "隐私政策", priv_sub: "BoothDB for VRChat 的隐私政策",
   terms_sub: "BoothDB for VRChat 的使用条款",
+  bt_active: "价格变动频繁", pg_new_sub: "最近收录的商品 · 截至 {d}", pg_free_sub: "当前免费的商品（原价 ¥300 以上）· {n} 件", pg_drops_sub: "近 3 周的降价 · {n} 件", pg_active_sub: "近 3 周有价格变动的商品 · {n} 件", bm_title: "收藏", bm_sub: "保存在此浏览器中的收藏 · {n} 件", bm_empty: "还没有收藏。可在商品页面点击收藏按钮添加。", bm_remove: "取消", added_on: "{d} 收录", recent3w: "近 3 周价格变动 {n} 次", dropped_on: "{d} 降价", more: "查看更多", loading: "加载中…",
   legal_note: "本文档仅提供日文版，以日文版为准。",
 },
 "zh-Hant": {
@@ -555,6 +587,7 @@ ko: {
   rk_tab_amount: "優惠金額", rk_tab_pct: "折扣率",
   priv_title: "隱私政策", priv_sub: "BoothDB for VRChat 的隱私政策",
   terms_sub: "BoothDB for VRChat 的使用條款",
+  bt_active: "價格變動頻繁", pg_new_sub: "最近收錄的商品 · 截至 {d}", pg_free_sub: "目前免費的商品（原價 ¥300 以上）· {n} 件", pg_drops_sub: "近 3 週的降價 · {n} 件", pg_active_sub: "近 3 週有價格變動的商品 · {n} 件", bm_title: "收藏", bm_sub: "儲存在此瀏覽器中的收藏 · {n} 件", bm_empty: "還沒有收藏。可在商品頁面點擊收藏按鈕添加。", bm_remove: "取消", added_on: "{d} 收錄", recent3w: "近 3 週價格變動 {n} 次", dropped_on: "{d} 降價", more: "查看更多", loading: "載入中…",
   legal_note: "本文件僅提供日文版，以日文版為準。",
 },
 };
@@ -584,6 +617,13 @@ document.querySelectorAll("[data-i]").forEach(el => { el.textContent = tr(el.dat
   }
 }
 
+// ==== full (uncapped) lists: fetched lazily; pages fall back to the inlined sample ====
+async function loadFull(){
+  try { const r = await fetch("lists_full.json"); if (r.ok) return await r.json(); } catch {}
+  return null;
+}
+
+const PH_ICON = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M3 16l5-4 4 3 3-2 6 4"/></svg>';
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const yen = n => n === 0 ? tr("free") : "¥" + Number(n).toLocaleString(LOCALE);
 const itemLink = id => `index.html#item-${id}`;
