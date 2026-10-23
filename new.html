@@ -273,6 +273,11 @@
   .cmpdot{width:9px;height:9px;border-radius:50%;flex:none}
   .pp-bmbtn.on svg{fill:currentColor}
   .pp-bmbtn.on{background:#33302a;border-color:#8a6d1f;color:#f5c542}
+  .bmflag{position:absolute;top:6px;left:6px;z-index:5;pointer-events:none;color:#f5c542;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
+  .bmflag svg{width:20px;height:20px;display:block;fill:currentColor}
+  .bmflag[hidden]{display:none}
+  .brow .bmflag{top:5px;left:15px}
+  .pcard .bmflag{top:5px;left:5px}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
   .chg{display:flex;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--border);font-size:13px}
   .chg .cd{color:var(--faint);flex:0 0 88px}
@@ -293,7 +298,7 @@
   .spage::-webkit-scrollbar{width:8px}
   .spage::-webkit-scrollbar-track{background:transparent}
   .spage::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
-  .pcard{flex:0 0 138px;background:#17171a;border:1px solid var(--border);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--text)}
+  .pcard{flex:0 0 138px;background:#17171a;border:1px solid var(--border);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--text);position:relative}
   .pcard img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#131316}
   .pcard .pph{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1/1;background:#1b1b1f}
   .pcard .pph svg{width:34px;height:34px;stroke:#2c2c33;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
@@ -310,7 +315,7 @@
   .bwrap{display:grid;grid-template-columns:1fr 330px;gap:18px;margin-top:14px;align-items:start}
   .bwrap>*{min-width:0}
   @media (max-width:899px){.bwrap{grid-template-columns:1fr}.bprev{display:none}}
-  .brow{display:flex;gap:13px;align-items:center;background:#1b1b1f;padding:9px 12px;text-decoration:none;color:var(--text)}
+  .brow{display:flex;gap:13px;align-items:center;background:#1b1b1f;padding:9px 12px;text-decoration:none;color:var(--text);position:relative}
   .brow:nth-child(even){background:#17171a}
   .brow:hover,.brow.sel{background:#26262c}
   .brow img{width:86px;height:86px;object-fit:cover;border-radius:6px;background:#131316;flex:none}
@@ -610,6 +615,9 @@ document.getElementById("pgH1").textContent = tr("bt_new");
 document.getElementById("crumbHere").textContent = tr("bt_new");
 document.getElementById("subStats").textContent = tr("pg_new_sub", {d: P.stats.max_date});
 
+const BM_SET = new Set((() => { try { return JSON.parse(localStorage.getItem("boothdb_bm") || "[]").map(b => String(b.id)); } catch { return []; } })());
+const BM_FLAG_SVG = '<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2z"/></svg>';
+const bmFlag = id => BM_SET.has(String(id)) ? `<span class="bmflag">${BM_FLAG_SVG}</span>` : "";
 function clusterCB(cur, base, sale, atLowest){
   const pct = base > cur ? Math.round((1 - cur / base) * 100) : 0;
   const badge = sale && pct > 0 ? `<span class="discst">-${pct}%</span>` : "";
@@ -618,7 +626,7 @@ function clusterCB(cur, base, sale, atLowest){
 }
 function listRow(x, note, cluster){
   const sub = [x.shop || "", note || ""].filter(Boolean).map(esc).join(" · ");
-  return `<a class="brow" href="${itemLink(x.id)}">${x.image ? `<img class="bth" src="${esc(x.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}<span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bsub">${sub}</span></span>${cluster}</a>`;
+  return `<a class="brow" href="${itemLink(x.id)}">${x.image ? `<img class="bth" src="${esc(x.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(x.id)}<span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bsub">${sub}</span></span>${cluster}</a>`;
 }
 
 let pgShown = 60, pgItems = [], pgRowFn = null;
