@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101012"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <title>新着 | BoopaDB</title>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="favicon-192.png" sizes="192x192">
@@ -229,6 +229,48 @@
   .smore button{background:rgba(255,255,255,.07);color:#e8e8ea;border:1px solid rgba(255,255,255,.16);font-weight:700;font-size:12.5px;padding:7px 20px;border-radius:3px;cursor:pointer;font-family:inherit}
   .smore button:hover{background:rgba(255,255,255,.14)}
   .smore button:active{transform:scale(.96)}
+  #searchPage .smore{height:4px;margin:0}
+  .sp-price{padding:2px 2px 0}
+  .sp-price-val{text-align:center;color:var(--sub);font-size:13px;margin-top:2px}
+  #spPrice{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;cursor:pointer;margin:0}
+  #spPrice::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:#3a3a41}
+  #spPrice::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#e8e8ec;margin-top:-7px;box-shadow:0 1px 5px rgba(0,0,0,.5)}
+  #spPrice::-moz-range-track{height:4px;border-radius:2px;background:#3a3a41}
+  #spPrice::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:#e8e8ec}
+  .sp-sidehead,.sp-sidefoot,#spFilterBtn{display:none}
+  .sp-resbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .spsortdd{position:relative;display:inline-block;margin-left:auto;flex:none}
+  #spSortBtn{display:inline-flex;align-items:center;background:#17171a;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-weight:600;padding:8px 12px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .spcaret{display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;margin-left:7px}
+  .spsortmenu{position:absolute;right:0;top:calc(100% + 8px);background:#1b1b1f;border:1px solid var(--border2);border-radius:12px;padding:5px;box-shadow:0 14px 34px rgba(0,0,0,.5);min-width:196px;z-index:30}
+  .spsortmenu[hidden]{display:none}
+  .spsortmi{display:flex;align-items:center;width:100%;background:none;border:none;color:#a2a2ab;font-size:13.5px;font-weight:600;padding:9px 12px;border-radius:8px;cursor:pointer;font-family:inherit;text-align:left;white-space:nowrap}
+  .spsortmi:hover{background:#26262c;color:var(--text)}
+  .spsortmi.on{color:#fff}
+  .spsortmi.on::after{content:"✓";margin-left:auto;color:#c8ec6e;font-weight:800;padding-left:14px}
+  body.spfilter-open .tabbar{opacity:0;pointer-events:none}
+  @media (max-width:899px){
+    .sp-resbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    #spFilterBtn{display:inline-flex;align-items:center;background:#17171a;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-weight:600;padding:8px 14px;cursor:pointer;font-family:inherit;white-space:nowrap}
+    .sp-side{position:fixed;inset:0;background:var(--bg);z-index:65;overflow-y:auto;overscroll-behavior:contain;padding:14px 16px 110px;transform:translateY(103%);transition:transform .45s cubic-bezier(.32,1.18,.36,1);pointer-events:none}
+    .sp-side.open{transform:none;pointer-events:auto}
+    .sp-sidehead{display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:800;color:var(--text);margin:2px 0 4px}
+    .sp-sidehead + .sp-sec{display:none}
+    .sp-sidex{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#1b1b1f;border:1px solid var(--border2);color:var(--text);cursor:pointer;flex:none;position:relative}
+    .sp-sidex::after{content:"";position:absolute;inset:-7px;border-radius:50%}
+    .sp-sidex svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+    .sp-sidefoot{display:flex;gap:10px;position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(16,16,18,.97);border-top:1px solid var(--border);z-index:2}
+    .sp-freset{background:#1b1b1f;border:1px solid var(--border2);color:var(--text);border-radius:9px;padding:12px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+    .sp-fshow{flex:1;background:var(--accent);border:none;color:#fff;border-radius:9px;padding:12px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit}
+  }
+  @media (min-width:900px){
+    .sp-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:26px;align-items:start}
+    .sp-results{grid-column:1;grid-row:1;min-width:0}
+    .sp-side{grid-column:2;grid-row:1;position:sticky;top:0}
+    .sp-side .chips{flex-direction:column;align-items:stretch;flex-wrap:nowrap}
+    .sp-side .chip{text-align:left}
+    .sp-side .kwrap{flex-direction:column;align-items:stretch}
+  }
   .hmeta{font-size:12.5px;color:var(--sub);margin-top:3px}
   .hmain .htags2{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
   .htag{font-size:11px;background:#2a2a2f;color:var(--sub);padding:2.5px 9px;border-radius:4px}
@@ -412,7 +454,7 @@
   .prow::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
   .prow::-webkit-scrollbar-thumb:hover{background:#4b4b53}
   .prow::-webkit-scrollbar-button{display:none;width:0;height:0}
-  html{scrollbar-width:thin;scrollbar-color:#3d3d44 #101012}
+  html{background:#101012;scrollbar-width:thin;scrollbar-color:#3d3d44 #101012}
   body::-webkit-scrollbar{width:10px}
   body::-webkit-scrollbar-track{background:#101012}
   body::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px;border:2px solid #101012}
@@ -504,14 +546,18 @@
   .spage.open{transform:none;pointer-events:auto}
   #prodPage{z-index:45}
   .sp-head{display:flex;align-items:center;gap:12px;max-width:1080px;margin:0 auto}
-  .sp-back{background:var(--panel);border:1px solid var(--border2);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;flex:none;transition:transform .2s;display:flex;align-items:center;justify-content:center}
+  .sp-back{background:var(--panel);border:1px solid var(--border2);color:var(--text);width:44px;height:44px;border-radius:50%;cursor:pointer;flex:none;transition:transform .2s;display:flex;align-items:center;justify-content:center;position:relative}
+  .sp-back::after{content:"";position:absolute;inset:-7px;border-radius:50%}
   .sp-back svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   .sp-back:active{transform:scale(.88)}
   .sp-title{font-size:19px;font-weight:800}
   .sp-inner{max-width:1080px;margin:0 auto}
-  .sp-search{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--border2);border-radius:99px;padding:12px 18px;margin:16px 0 4px}
+  .sp-search{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--border2);border-radius:99px;padding:12px 18px;margin:16px 0 4px;position:relative}
+  .sp-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:none;border:none;color:var(--sub);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+  .sp-clear svg{width:19px;height:19px;stroke:currentColor}
+  .sp-clear[hidden]{display:none}
   .sp-search svg{width:20px;height:20px;fill:none;stroke:var(--faint);stroke-width:2;stroke-linecap:round;flex:none}
-  .sp-search input{background:none;border:none;outline:none;color:var(--text);font-size:16px;width:100%;font-family:inherit}
+  .sp-search input{background:none;border:none;outline:none;color:var(--text);font-size:16px;width:100%;font-family:inherit;padding-right:42px}
   .sp-sec{font-size:13px;font-weight:700;color:var(--sub);margin:18px 0 8px}
   .kwrap{display:flex;gap:8px;flex-wrap:wrap}
   .kw{background:#1e1e23;border:1px solid var(--border);color:var(--text);border-radius:99px;padding:6px 13px;font-size:12.5px;cursor:pointer;transition:transform .18s}

@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#101012"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <meta name="color-scheme" content="dark">
 <title>BoopaDB — BOOTHのVRChat向け価格データベース（プロトタイプ）</title>
 <link rel="icon" href="favicon.ico" sizes="any">
@@ -455,7 +455,7 @@
   .prow::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
   .prow::-webkit-scrollbar-thumb:hover{background:#4b4b53}
   .prow::-webkit-scrollbar-button{display:none;width:0;height:0}
-  html{scrollbar-width:thin;scrollbar-color:#3d3d44 #101012}
+  html{background:#101012;scrollbar-width:thin;scrollbar-color:#3d3d44 #101012}
   body::-webkit-scrollbar{width:10px}
   body::-webkit-scrollbar-track{background:#101012}
   body::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px;border:2px solid #101012}
@@ -553,9 +553,12 @@
   .sp-back:active{transform:scale(.88)}
   .sp-title{font-size:19px;font-weight:800}
   .sp-inner{max-width:1080px;margin:0 auto}
-  .sp-search{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--border2);border-radius:99px;padding:12px 18px;margin:16px 0 4px}
+  .sp-search{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--border2);border-radius:99px;padding:12px 18px;margin:16px 0 4px;position:relative}
+  .sp-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:none;border:none;color:var(--sub);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+  .sp-clear svg{width:19px;height:19px;stroke:currentColor}
+  .sp-clear[hidden]{display:none}
   .sp-search svg{width:20px;height:20px;fill:none;stroke:var(--faint);stroke-width:2;stroke-linecap:round;flex:none}
-  .sp-search input{background:none;border:none;outline:none;color:var(--text);font-size:16px;width:100%;font-family:inherit}
+  .sp-search input{background:none;border:none;outline:none;color:var(--text);font-size:16px;width:100%;font-family:inherit;padding-right:42px}
   .sp-sec{font-size:13px;font-weight:700;color:var(--sub);margin:18px 0 8px}
   .kwrap{display:flex;gap:8px;flex-wrap:wrap}
   .kw{background:#1e1e23;border:1px solid var(--border);color:var(--text);border-radius:99px;padding:6px 13px;font-size:12.5px;cursor:pointer;transition:transform .18s}
@@ -665,7 +668,7 @@
 <div class="spage" id="searchPage">
   <div class="sp-head"><button class="sp-back" id="spBack" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><div class="sp-title" data-i="sp_title">商品検索</div></div>
   <div class="sp-inner">
-    <div class="sp-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg><input id="spQ" type="search" data-i-ph="sp_ph" placeholder="商品名・ショップ名で検索" autocomplete="off"></div>
+    <div class="sp-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg><input id="spQ" type="text" data-i-ph="sp_ph" placeholder="商品名・ショップ名で検索" autocomplete="off"><button id="spClear" class="sp-clear" type="button" data-i-al="al_close" aria-label="閉じる" hidden><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
     <div class="sp-main"><div class="sp-side">
     <div class="sp-sidehead"><span data-i="sp_filter">絞り込み</span><button id="spSideX" class="sp-sidex" type="button" data-i-al="al_close" aria-label="閉じる"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
     <div class="sp-sec" data-i="sp_filter">絞り込み</div>
@@ -1144,7 +1147,7 @@ async function loadFullIndex(){
   fullIndexLoading = true;
   try {
     const rs = await Promise.all([0, 1, 2, 3, 4, 5].map(i => fetch("search_index_" + i + ".json")));
-    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow]) => [String(id), name, String(name).toLowerCase(), cur, base, lowest, sale, atlow]); }
+    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow]); }
   } catch {}
   fullIndexLoading = false;
   if (fullIndex && spage.classList.contains("open")) spRender(false);
@@ -1282,7 +1285,7 @@ let spMaxPrice = null, spPriceT = null;
 function spPriceLabel(){ document.getElementById("spPriceVal").textContent = spMaxPrice == null ? tr("sp_price_any") : tr("sp_price_upto", {n: spMaxPrice.toLocaleString(LOCALE)}); }
 function spRender(reset = true){
   if (reset) spShown = 30;
-  const q = document.getElementById("spQ").value.trim().toLowerCase();
+  const q = document.getElementById("spQ").value.trim().toLowerCase().normalize("NFKC");
   let hits, countOverride = null;
   if (spFilter !== "all") {
     const set = chipSet(spFilter);
@@ -1303,6 +1306,22 @@ function spRender(reset = true){
       else hits.push({id, name, shop: "", image: null, cur: icur, base: ibase, lowest: ilowest, sale: !!isale, pct: ibase > icur ? Math.round((1 - icur / ibase) * 100) : 0, at_lowest: !!iatlow, plain: icur === null || icur === undefined, _rank: pos === 0 ? 1 : 3});
     }
     hits.sort((a, b) => a._rank - b._rank);
+    if (hits.length < 50) {
+      const tokens = [...new Set(q.split(/[\s　]+/).filter(Boolean))];
+      if (tokens.length >= 2) {
+        const have = new Set(hits.map(h => String(h.id)));
+        const extra = [];
+        for (const [id, name, lower, cur, base, lowest, isale, atlow] of fullIndex) {
+          if (have.has(String(id))) continue;
+          let matched = 0;
+          for (const t of tokens) if (lower.includes(t)) matched++;
+          const r = rich.get(String(id));
+          if (matched === tokens.length) extra.push(r ? {...r, _rank: 4} : {id, name, shop: "", image: null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 4});
+          else if (tokens.length >= 3 && matched >= 3 && matched >= tokens.length - 1) extra.push(r ? {...r, _rank: 5} : {id, name, shop: "", image: null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 5});
+        }
+        if (extra.length) hits = [...hits, ...extra].sort((a, b) => a._rank - b._rank);
+      }
+    }
     if (spShopMapSrc !== FULL_LISTS) buildShopMap();
     const seenIds = new Set(hits.map(h => String(h.id)));
     const shopHits = [];
@@ -1347,6 +1366,7 @@ function spRender(reset = true){
   spPriceLabel();
   spFilterBtnLabel();
   spSortSync();
+  document.getElementById("spClear").hidden = !q;
   document.getElementById("spEmpty").style.display = hits.length ? "none" : "block";
   spTotal = hits.length;
   // Append-only: rebuilding the whole grid per batch repainted every card
@@ -1404,6 +1424,7 @@ spSortMenu.addEventListener("click", e => {
 });
 document.addEventListener("click", () => { spSortMenu.hidden = true; });
 document.addEventListener("keydown", e => { if (e.key === "Escape") spSortMenu.hidden = true; });
+document.getElementById("spClear").addEventListener("click", () => { const el = document.getElementById("spQ"); el.value = ""; spRender(); el.focus(); });
 const spPriceEl = document.getElementById("spPrice");
 spPriceEl.addEventListener("input", () => { const v = +spPriceEl.value; spMaxPrice = v >= SP_CAPS.length ? null : SP_CAPS[v]; spPriceLabel(); clearTimeout(spPriceT); spPriceT = setTimeout(() => spRender(), 180); });
 spPriceLabel();
