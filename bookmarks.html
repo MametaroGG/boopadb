@@ -556,15 +556,17 @@
   .bmctl{display:flex;gap:8px;align-items:center;margin:0 0 12px}
   .bmctlbtn{display:inline-flex;align-items:center;gap:8px;background:#17171a;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;padding:9px 14px;cursor:pointer;font-family:inherit;white-space:nowrap}
   .bmctlbtn .car{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--sub);flex:none}
-  .bmsort{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--sub)}
-  .bmsort select{background:#17171a;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;padding:9px 10px;font-family:inherit;outline:none;max-width:46vw}
+  .bmsortdd{margin-left:auto}
+  .bmsortlab{color:var(--sub);font-size:13px}
+  #bmSortVal{color:var(--text)}
+  @media (max-width:560px){.bmsortlab{display:none}}
   .bmdd{position:relative;display:inline-block}
   .bmmenu{position:absolute;right:0;top:calc(100% + 8px);background:#1b1b1f;border:1px solid var(--border2);border-radius:12px;padding:5px;width:218px;box-shadow:0 14px 34px rgba(0,0,0,.5);z-index:300}
   .bmmenu[hidden]{display:none}
   .bmmi{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;background:none;border:none;color:var(--sub);font-size:13.5px;font-weight:600;padding:8px 10px;border-radius:8px;cursor:pointer;font-family:inherit;text-align:left}
   .bmmi:hover{background:#26262c;color:var(--text)}
   .bmmi.on{color:#fff}
-  .bmmi.on::after{content:"¹3";color:#c8ec6e;font-weight:800}
+  .bmmi.on::after{content:"✓";color:#c8ec6e;font-weight:800}
   .bmsep{height:1px;background:var(--border);margin:5px 4px}
 
 </style>
@@ -595,14 +597,14 @@
       <span class="bmsep"></span>
       <button type="button" class="bmmi" id="bmFreeRow"><span data-i="bm_f_free"></span></button>
     </span></span>
-    <label class="bmsort"><span data-i="bm_sort_label"></span><select id="bmSort">
-      <option value="added_desc" data-i="bm_sort_added_desc"></option>
-      <option value="added_asc" data-i="bm_sort_added_asc"></option>
-      <option value="name" data-i="bm_sort_name"></option>
-      <option value="price_asc" data-i="bm_sort_price_asc"></option>
-      <option value="price_desc" data-i="bm_sort_price_desc"></option>
-      <option value="discount" data-i="bm_sort_discount"></option>
-    </select></label>
+    <span class="bmdd bmsortdd"><button id="bmSortBtn" class="bmctlbtn" type="button"><span class="bmsortlab" data-i="bm_sort_label"></span><span id="bmSortVal"></span><span class="car"></span></button><span id="bmSortMenu" class="bmmenu" hidden>
+      <button type="button" class="bmmi" data-sort="added_desc"><span data-i="bm_sort_added_desc"></span></button>
+      <button type="button" class="bmmi" data-sort="added_asc"><span data-i="bm_sort_added_asc"></span></button>
+      <button type="button" class="bmmi" data-sort="name"><span data-i="bm_sort_name"></span></button>
+      <button type="button" class="bmmi" data-sort="price_asc"><span data-i="bm_sort_price_asc"></span></button>
+      <button type="button" class="bmmi" data-sort="price_desc"><span data-i="bm_sort_price_desc"></span></button>
+      <button type="button" class="bmmi" data-sort="discount"><span data-i="bm_sort_discount"></span></button>
+    </span></span>
   </div>
   <div id="bmList"></div>
 
@@ -838,12 +840,24 @@ function bmMenuSync(){
   document.getElementById("bmFreeRow").classList.toggle("on", bmFreeOnly);
 }
 function bmOptSet(open){ bmOptPanel.hidden = !open; }
-bmOptBtn.addEventListener("click", e => { e.stopPropagation(); bmMenuSync(); bmOptSet(bmOptPanel.hidden); });
+bmOptBtn.addEventListener("click", e => { e.stopPropagation(); bmMenuSync(); if (typeof bmSortSet === "function") bmSortSet(false); bmOptSet(bmOptPanel.hidden); });
 document.addEventListener("click", e => { if (!bmOptPanel.hidden && !bmOptPanel.contains(e.target)) bmOptSet(false); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !bmOptPanel.hidden) bmOptSet(false); });
 bmOptPanel.querySelectorAll("[data-disc]").forEach(b => b.addEventListener("click", () => { bmDisc = b.dataset.disc; bmRender(); bmOptSet(false); }));
 document.getElementById("bmFreeRow").addEventListener("click", () => { bmFreeOnly = !bmFreeOnly; bmRender(); bmOptSet(false); });
-document.getElementById("bmSort").addEventListener("change", e => { bmSort = e.target.value; bmRender(); });
+const BM_SORT_KEYS = { added_desc: "bm_sort_added_desc", added_asc: "bm_sort_added_asc", name: "bm_sort_name", price_asc: "bm_sort_price_asc", price_desc: "bm_sort_price_desc", discount: "bm_sort_discount" };
+const bmSortMenu = document.getElementById("bmSortMenu"), bmSortBtn = document.getElementById("bmSortBtn"), bmSortVal = document.getElementById("bmSortVal");
+function bmSortSync(){
+  bmSortMenu.querySelectorAll("[data-sort]").forEach(b => b.classList.toggle("on", b.dataset.sort === bmSort));
+  bmSortVal.textContent = tr(BM_SORT_KEYS[bmSort]);
+  bmSortVal.setAttribute("data-i", BM_SORT_KEYS[bmSort]);
+}
+function bmSortSet(open){ bmSortMenu.hidden = !open; if (open) bmOptSet(false); }
+bmSortBtn.addEventListener("click", e => { e.stopPropagation(); bmSortSync(); bmSortSet(bmSortMenu.hidden); });
+document.addEventListener("click", e => { if (!bmSortMenu.hidden && !bmSortMenu.contains(e.target)) bmSortSet(false); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !bmSortMenu.hidden) bmSortSet(false); });
+bmSortMenu.querySelectorAll("[data-sort]").forEach(b => b.addEventListener("click", () => { bmSort = b.dataset.sort; bmSortSync(); bmRender(); bmSortSet(false); }));
+bmSortSync();
 bmRender();
 
 </script>

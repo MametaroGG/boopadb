@@ -1037,6 +1037,7 @@ function openSearch(){
   loadFullIndex();
   prodPage.classList.remove("open");
   spage.classList.add("open");
+  spRender();
   document.body.style.overflow = "hidden";
   searchBtn.classList.add("on");
   setTimeout(() => document.getElementById("spQ").focus(), 380);
@@ -1207,7 +1208,7 @@ function chipSet(filter){
   return [...seen.values()];
 }
 let FULL_LISTS = null;
-let spFilter = "all", spShown = 30, spTotal = 0;
+let spFilter = "all", spShown = 30, spTotal = 0, spRendered = 0, spKey = "";
 function spRender(reset = true){
   if (reset) spShown = 30;
   const q = document.getElementById("spQ").value.trim().toLowerCase();
@@ -1254,22 +1255,50 @@ function spRender(reset = true){
   if (!q && spFilter === "all" && fullIndex) countOverride = tr("sp_total", {n: fullIndex.length});
   document.getElementById("spCount").textContent = countOverride || tr("sp_count", {n: hits.length});
   document.getElementById("spEmpty").style.display = hits.length ? "none" : "block";
-  const slice = hits.slice(0, spShown);
-  document.getElementById("spGrid").innerHTML = slice.map((x, i) => x.plain ? plainCard(x, i) : saleCard({...x, pct: x.pct}, i)).join("");
   spTotal = hits.length;
+  // Append-only: rebuilding the whole grid per batch repainted every card
+  // and restarted every entrance animation, which is what turned fast
+  // scrolling dark and stalled paging. A changed query/filter/data
+  // generation still rebuilds from scratch.
+  const key = q + "|" + spFilter + "|" + (fullIndex ? "F" : "-") + "|" + (FULL_LISTS ? "L" : "-");
+  const grid = document.getElementById("spGrid");
+  const cardOf = (x, i) => x.plain ? plainCard(x, i) : saleCard({...x, pct: x.pct}, i);
+  let fillFrom = -1;
+  if (reset || key !== spKey || spRendered > spShown || spRendered > hits.length) {
+    grid.innerHTML = hits.slice(0, spShown).map(cardOf).join("");
+    spRendered = Math.min(spShown, hits.length);
+    fillFrom = 0;
+  } else if (spShown > spRendered) {
+    fillFrom = spRendered;
+    grid.insertAdjacentHTML("beforeend", hits.slice(fillFrom, spShown).map((x, j) => cardOf(x, fillFrom + j)).join(""));
+    spRendered = Math.min(spShown, hits.length);
+  }
+  spKey = key;
   document.getElementById("spMore").style.display = hits.length > spShown ? "" : "none";
-  slice.forEach(x => { if (x.plain) fillPriceLazy(x.id); });
+  if (fillFrom >= 0) hits.slice(fillFrom, spRendered).forEach(x => { if (x.plain) fillPriceLazy(x.id); });
 }
 document.getElementById("spMore").onclick = () => { spShown += 30; spRender(false); };
 // Auto-load the next batch as the list end approaches, so paging never
 // depends on the button alone (mobile taps on it proved unreliable).
-let spTick = 0;
+let spTick = 0, spRetryT = null, spScrollT = null;
 function spMaybeLoad(){
   if (spTotal <= spShown) return;
   const now = Date.now();
-  if (now - spTick < 350) return;
+  if (now - spTick < 350) {
+    // Never drop a load: a guarded call used to vanish, and at the bottom
+    // of a fast scroll no further events arrive to retry it.
+    if (!spRetryT) spRetryT = setTimeout(() => { spRetryT = null; spMaybeLoad(); }, 360);
+    return;
+  }
   spTick = now;
   spShown += 30; spRender(false);
+  requestAnimationFrame(spChainCheck);
+}
+function spChainCheck(){
+  const sp = document.getElementById("searchPage");
+  if (!sp.classList.contains("open") || spTotal <= spShown) return;
+  const r = document.querySelector("#searchPage .smore").getBoundingClientRect();
+  if (r.top < window.innerHeight + 700 && r.bottom > -700) spMaybeLoad();
 }
 const spIO = new IntersectionObserver(es => {
   if (es.some(e => e.isIntersecting)) spMaybeLoad();
@@ -1282,6 +1311,8 @@ spIO.observe(document.querySelector("#searchPage .smore"));
 document.getElementById("searchPage").addEventListener("scroll", () => {
   const sp = document.getElementById("searchPage");
   if (spTotal > spShown && sp.scrollHeight - sp.scrollTop - sp.clientHeight < 900) spMaybeLoad();
+  clearTimeout(spScrollT);
+  spScrollT = setTimeout(spChainCheck, 180);
 }, { passive: true });
 document.addEventListener("scroll", () => {
   const sp = document.getElementById("searchPage");
@@ -1354,7 +1385,7 @@ const spy = new IntersectionObserver(es => {
 
 function saleCard(s, i){
   return `
-  <div class="card" style="animation-delay:${(i || 0) * 45}ms" data-pct="${s.pct}" data-free="${s.cur === 0 ? 1 : 0}" data-lowest="${s.at_lowest ? 1 : 0}" data-text="${esc((s.name + " " + (s.shop || "")).toLowerCase())}">
+  <div class="card" style="animation-delay:${((i || 0) % 30) * 45}ms" data-pct="${s.pct}" data-free="${s.cur === 0 ? 1 : 0}" data-lowest="${s.at_lowest ? 1 : 0}" data-text="${esc((s.name + " " + (s.shop || "")).toLowerCase())}">
     <a class="thumbwrap" href="${itemUrl(s.id)}" target="_blank" rel="noopener">
       ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}
       ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + "</span>" : ""}
