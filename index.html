@@ -183,7 +183,7 @@
   .mcell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .mcell .scrim{position:absolute;left:0;right:0;bottom:0;padding:24px 8px 8px;background:linear-gradient(transparent,rgba(0,0,0,.75));display:flex;align-items:center;gap:0;flex-wrap:nowrap}
   .mcell .scrim .discst{flex:none;font-size:12px;padding:0 5px;height:22px}
-  .mcell .scrim .was{font-size:11px;padding:0 2px 0 6px;height:22px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mcell .scrim .was{font-size:11px;padding:0 2px 0 6px;height:22px;flex:none;color:#c2c2cb;white-space:nowrap}
   .mcell .scrim .price{font-size:13.5px;padding:0 6px 0 2px;height:22px;flex:none}
   .mcell .mlab,.rtile .mlab{position:absolute;top:0;left:0;font-size:11px;line-height:1.3;font-weight:800;color:#fff;background:#4c6b22;padding:3px 8px;letter-spacing:.05em;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.35)}
   @media (min-width:900px){
@@ -199,6 +199,7 @@
   /* Joined Steam-style price cluster: every segment is the same height and
      touches the next with no gap, so badge + prices read as one strip. */
   .discst{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:var(--green-bg);color:#c8ec6e;font-weight:800;font-size:13.5px;padding:0 7px;border-radius:0;line-height:1}
+  .newtag{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:var(--accent);color:#fff;font-weight:800;font-size:11px;letter-spacing:.05em;padding:0 8px;line-height:1}
   .caprow .was,.bprice .was,.bprow .was,.mcell .scrim .was{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:#26262c;padding:0 3px 0 8px;line-height:1}
   .caprow .was{font-size:12px}
   .caprow .price,.bprice .price,.bprow .price,.mcell .scrim .price{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:#26262c;padding:0 8px 0 3px;line-height:1}
@@ -1504,12 +1505,12 @@ function sparkSVG(spark){
 function featCap(x, tag, meta, cls){
   const pct = x.base > x.cur ? Math.round((1 - x.cur / x.base) * 100) : 0;
   return `<div class="card">
-    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}${bmFlag(x.id, "u2")}</a><span class="ftag${cls || ""}">${tag}</span>
+    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}${bmFlag(x.id, (cls || "").includes("new") ? "" : "u2")}</a>${(cls || "").includes("new") ? "" : `<span class="ftag${cls || ""}">${tag}</span>`}
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
       <div class="spark">${sparkSVG(x.spark)}</div>
-      <div class="caprow"><span class="price">${yen(x.cur)}</span>${pct > 0 && x.on_sale ? `<span class="discst">-${pct}%</span>` : ""}<span class="fmeta">${meta}</span></div>
+      <div class="caprow">${(cls || "").includes("new") ? `<span class="newtag">${tag}</span>` : ""}${pct > 0 && x.on_sale ? `<span class="discst">-${pct}%</span><span class="was">${yen(x.base)}</span>` : ""}<span class="price">${x.cur === 0 ? tr("free") : yen(x.cur)}</span><span class="fmeta">${meta}</span></div>
     </div>
   </div>`;
 }

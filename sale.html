@@ -182,7 +182,7 @@
   .mcell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .mcell .scrim{position:absolute;left:0;right:0;bottom:0;padding:24px 8px 8px;background:linear-gradient(transparent,rgba(0,0,0,.75));display:flex;align-items:center;gap:0;flex-wrap:nowrap}
   .mcell .scrim .discst{flex:none;font-size:12px;padding:0 5px;height:22px}
-  .mcell .scrim .was{font-size:11px;padding:0 2px 0 6px;height:22px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mcell .scrim .was{font-size:11px;padding:0 2px 0 6px;height:22px;flex:none;color:#c2c2cb;white-space:nowrap}
   .mcell .scrim .price{font-size:13.5px;padding:0 6px 0 2px;height:22px;flex:none}
   .mcell .mlab,.rtile .mlab{position:absolute;top:0;left:0;font-size:11px;line-height:1.3;font-weight:800;color:#fff;background:#4c6b22;padding:3px 8px;letter-spacing:.05em;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.35)}
   @media (min-width:900px){
@@ -198,6 +198,7 @@
   /* Joined Steam-style price cluster: every segment is the same height and
      touches the next with no gap, so badge + prices read as one strip. */
   .discst{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:var(--green-bg);color:#c8ec6e;font-weight:800;font-size:13.5px;padding:0 7px;border-radius:0;line-height:1}
+  .newtag{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:var(--accent);color:#fff;font-weight:800;font-size:11px;letter-spacing:.05em;padding:0 8px;line-height:1}
   .caprow .was,.bprice .was,.bprow .was,.mcell .scrim .was{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:#26262c;padding:0 3px 0 8px;line-height:1}
   .caprow .was{font-size:12px}
   .caprow .price,.bprice .price,.bprow .price,.mcell .scrim .price{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:#26262c;padding:0 8px 0 3px;line-height:1}
