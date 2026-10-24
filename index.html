@@ -341,6 +341,9 @@
   .cpchart{position:relative}
   .cpchart svg{width:100%;height:auto;display:block;-webkit-touch-callout:none;user-select:none;touch-action:pan-y}
   #cpRanges{margin-top:10px}
+  #cpReadout{display:none}
+  #cpReadout.on{display:block;height:76px;margin-bottom:6px}
+  #cpReadout .hvTip{position:static}
   #cmpTip,#cpCmpTip,.hvTip{position:absolute;top:8px;display:none;pointer-events:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
   .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
   .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
@@ -583,6 +586,7 @@
     <div class="cp-head"><span id="cpTitle"></span><button type="button" id="cpClose" data-i-al="al_close" aria-label="閉じる"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div id="cpLegend"></div>
     <div id="cpOutl"></div>
+    <div id="cpReadout"></div>
     <div class="cpchart" id="cpChart"></div>
     <div class="cmpranges" id="cpRanges"></div>
   </div>
@@ -1903,9 +1907,9 @@ function chartTouch(svg, move, hide){
   svg.addEventListener("pointercancel", () => { if (timer) { clearTimeout(timer); timer = null; } scrubbing = false; hide(); });
   svg.addEventListener("pointerleave", e => { if (e.pointerType !== "touch") hide(); });
 }
-function wireHover(box, ser){
+function wireHover(box, ser, tipEl){
   const host = box.closest(".pp-varblock") || box;
-  const tip = host.querySelector(".hvTip");
+  const tip = tipEl || host.querySelector(".hvTip");
   const svg = box.querySelector("svg");
   if (!tip || !svg || !ser || !ser.p || !ser.p.length) return;
   const pts = ser.p;
@@ -1923,16 +1927,14 @@ function wireHover(box, ser){
     const sale = !!(pt && pt[2]);
     tip.innerHTML = `<div class="cmtd">${diso(t)}</div><div class="cmtr"><b>${yen(v)}</b>${pt && pt[3] ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}${sale ? '<span class="cmpdot" style="background:#fc4d50"></span><span>' + tr("chip_onsale") + '</span>' : ""}</div>`;
     tip.style.display = "block";
-    if (box.classList.contains("cpchart")) {
-      const br = box.getBoundingClientRect();
-      tip.style.left = Math.min(Math.max(e.clientX - br.left + 12, 4), Math.max(4, br.width - tip.offsetWidth - 4)) + "px";
-      tip.style.top = "8px";
+    if (tipEl) {
+      tip.style.left = ""; tip.style.top = "";
     } else {
       const block = tip.offsetParent || host;
       const br = block.getBoundingClientRect();
       const cr = box.getBoundingClientRect();
       tip.style.left = Math.min(Math.max(e.clientX - br.left + 14, 4), Math.max(4, br.width - tip.offsetWidth - 4)) + "px";
-      tip.style.top = (window.innerWidth <= 700 ? Math.max(0, cr.top - br.top - tip.offsetHeight - 6) : cr.top - br.top + 8) + "px";
+      tip.style.top = (e.pointerType === "touch" ? Math.max(0, cr.top - br.top - tip.offsetHeight - 6) : cr.top - br.top + 8) + "px";
     }
     const gd = svg.querySelector(".hvGuide");
     if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
@@ -1974,7 +1976,7 @@ function wireCmpTip(x, wrap, tip){
     const cr = wrap.getBoundingClientRect();
     const px = e.clientX - br.left + 14;
     tip.style.left = Math.min(Math.max(px, 4), Math.max(4, br.width - tip.offsetWidth - 4)) + "px";
-    const above = block !== wrap && window.innerWidth <= 700;
+    const above = block !== wrap && e.pointerType === "touch";
     tip.style.top = (above ? Math.max(0, cr.top - br.top - tip.offsetHeight - 6) : Math.max(0, cr.top - br.top + 8)) + "px";
     const gd = svg.querySelector("#cmpGuide");
     if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
@@ -2030,6 +2032,7 @@ function openChartPop(kind, idx){
   const legend = document.getElementById("cpLegend");
   const outl = document.getElementById("cpOutl");
   legend.innerHTML = ""; outl.innerHTML = "";
+  const roEl = document.getElementById("cpReadout"); roEl.className = ""; roEl.innerHTML = "";
   if (kind === "cmp") {
     const keys = Object.keys(x.variations || {});
     title.textContent = tr("pp_compare");
@@ -2049,8 +2052,13 @@ function openChartPop(kind, idx){
     const key = ppKeys[idx] != null ? ppKeys[idx] : "";
     const ws = windowSeries(seriesOf(x, key));
     title.textContent = key || x.name;
-    chart.innerHTML = chartSVG(ws, 380) + '<div class="hvTip"></div>';
-    wireHover(chart, ws);
+    chart.innerHTML = chartSVG(ws, 380);
+    const ro = document.getElementById("cpReadout");
+    ro.className = "on"; ro.innerHTML = '<div class="hvTip"></div>';
+    const rtip = ro.querySelector(".hvTip");
+    wireHover(chart, ws, rtip);
+    const lp = ws.p[ws.p.length - 1];
+    if (lp) { rtip.innerHTML = `<div class="cmtd">${lp[0]}</div><div class="cmtr"><b>${yen(lp[1])}</b>${lp[3] ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`; rtip.style.display = "block"; }
   }
   document.getElementById("cpRanges").innerHTML = rangeBtnsHTML();
   pop.querySelectorAll("[data-cr]").forEach(b => b.onclick = () => { ppRange = b.dataset.cr; renderPPBody(ppX); wireBlockHovers(ppX); openChartPop(cpState.kind, cpState.idx); });
