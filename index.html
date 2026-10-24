@@ -1887,15 +1887,26 @@ document.addEventListener("click", e => {
 });
 
 // ---- personal strips (history / bookmarks) ----
+let _saleIds = null, _saleSrc = null;
+function saleIds(){
+  const src = LISTS.on_sale || [];
+  if (src !== _saleSrc) { _saleSrc = src; _saleIds = new Set(src.map(s => String(s.id))); }
+  return _saleIds;
+}
 function pcardHTML(h){
   const now = PROD.get(String(h.id));
   const cur = now ? now.cur : h.cur;
   const img = h.image || (now ? now.image : "") || "";
   const drop = cur != null && h.cur != null && cur < h.cur;
+  const onSale = !!(now && now.base > cur && (now.on_sale || now.sale || saleIds().has(String(h.id))));
+  const pct = onSale ? (now.pct != null ? now.pct : Math.round((1 - cur / now.base) * 100)) : 0;
+  const priceHTML = onSale
+    ? `<span class="bprice"><span class="discst">-${pct}%</span><span class="bstack"><span class="was">${yen(now.base)}</span><span class="price">${cur === 0 ? tr("free") : yen(cur)}</span></span></span>`
+    : `<span class="price" style="font-size:13px">${yen(cur)}</span>`;
   return `<a class="pcard" href="${itemUrl(h.id)}">
     <span class="pimgw">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="pph">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
     <span class="pb"><span class="pn">${esc(h.name)}</span>
-    <span class="pp2">${drop ? `<span class="vchip">${tr("seen_drop", {v: yen(h.cur - cur)})}</span>` : ""}<span class="price" style="font-size:13px">${yen(cur)}</span></span></span></a>`;
+    <span class="pp2">${!onSale && drop ? `<span class="vchip">${tr("seen_drop", {v: yen(h.cur - cur)})}</span>` : ""}${priceHTML}</span></span></a>`;
 }
 function renderPersonal(){
   const el = document.getElementById("personal");

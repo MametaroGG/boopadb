@@ -719,7 +719,7 @@ function capCard(s){
     <div class="capbody">
       <div class="capname"><a href="${itemLink(s.id)}">${esc(s.name)}</a></div>
       <div class="capshop">${esc(s.shop || "")}</div>
-      <div class="caprow">${s.at_lowest ? '<span class="lowtx">' + tr("chip_lowest") + '</span>' : ""}<span class="discst">-${s.pct}%</span><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></div>
+      <div class="caprow">${s.at_lowest ? '<span class="lowtx">' + tr("chip_lowest") + '</span>' : ""}<span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span></span></div>
     </div>
   </div>`;
 }
@@ -781,7 +781,7 @@ function renderSaleList(){
     .filter(s => s.base > 0 && s.base <= 100000)
     .sort((a, b) => (b.base - b.cur) - (a.base - a.cur) || b.pct - a.pct);
   document.getElementById("spSaleList").innerHTML = arr.slice(0, listShown).map(s =>
-  `<a class="brow" href="${itemLink(s.id)}">${s.image ? `<img class="bth" src="${esc(s.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(s.id)}<span class="bmain"><span class="bname">${esc(s.name)}</span><span class="bsub">${esc(s.shop || "")}${s.at_lowest ? " · " + tr("chip_lowest") : ""}</span></span><span class="bprice"><span class="discst">-${s.pct}%</span><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span></a>`
+  `<a class="brow" href="${itemLink(s.id)}">${s.image ? `<img class="bth" src="${esc(s.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(s.id)}<span class="bmain"><span class="bname">${esc(s.name)}</span><span class="bsub">${esc(s.shop || "")}${s.at_lowest ? " · " + tr("chip_lowest") : ""}</span></span><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span></span></a>`
   ).join("");
   document.getElementById("spListMore").style.display = arr.length > listShown ? "" : "none";
 }
