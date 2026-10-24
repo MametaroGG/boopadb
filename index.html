@@ -252,7 +252,7 @@
   .rib.sale{background:#e04347}
   .rib.act{background:#3a3a41}
   .fnote2{font-size:12px;color:var(--faint);margin:-8px 0 10px}
-  .ftag{position:absolute;top:8px;left:8px;background:rgba(23,23,26,.88);color:#fff;font-size:10.5px;font-weight:700;padding:2.5px 9px;border-radius:4px;z-index:2}
+  .ftag{position:absolute;top:0;left:0;background:rgba(23,23,26,.88);color:#fff;font-size:10.5px;line-height:1.3;font-weight:700;padding:2.5px 9px;z-index:2}
   .spark{margin-top:2px}
   .spark svg{display:block;width:100%;height:28px}
   .fmeta{font-size:11px;color:var(--faint);margin-left:auto}
@@ -312,7 +312,7 @@
   .bthw{position:relative;flex:none;display:block}
   .brow .bmflag{top:-3px;left:1px;background:none;width:auto;height:auto;display:block;color:#f5c542;filter:drop-shadow(0 1px 3px rgba(0,0,0,.65))}
   .brow .bmflag svg{width:24px;height:24px}
-  .pcard .bmflag{top:5px;left:5px}
+  .pcard .bmflag{top:0;left:0}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
   .chg{display:flex;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--border);font-size:13px}
   .chg .cd{color:var(--faint);flex:0 0 88px}
@@ -1395,7 +1395,7 @@ function sparkSVG(spark){
 function featCap(x, tag, meta){
   const pct = x.base > x.cur ? Math.round((1 - x.cur / x.base) * 100) : 0;
   return `<div class="card">
-    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}<span class="ftag">${tag}</span>${bmFlag(x.id, "u")}</a>
+    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}<span class="ftag">${tag}</span>${bmFlag(x.id, "u2")}</a>
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
