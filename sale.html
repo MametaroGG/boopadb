@@ -186,7 +186,7 @@
   .mcell .scrim .discst{flex:none;font-size:12px;padding:0 5px;height:22px}
   .mcell .scrim .was{font-size:11px;padding:0 2px 0 6px;height:22px;flex:none;color:#c2c2cb;white-space:nowrap}
   .mcell .scrim .price{font-size:13.5px;padding:0 6px 0 2px;height:22px;flex:none}
-  .mcell .mlab,.rtile .mlab{position:absolute;top:0;left:0;font-size:11px;line-height:1.3;font-weight:800;color:#fff;background:#4c6b22;padding:3px 8px;letter-spacing:.05em;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+  .mcell .mlab,.rtile .mlab,.card .thumbwrap .mlab{position:absolute;top:0;left:0;font-size:11px;line-height:1.3;font-weight:800;color:#fff;background:#4c6b22;padding:3px 8px;letter-spacing:.05em;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.35)}
   @media (min-width:900px){
     .mosaic{grid-template-columns:repeat(4,1fr)}
   }
@@ -316,9 +316,9 @@
   .outlb{background:#ffdf00;color:#000;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;vertical-align:2px;white-space:nowrap}
   .cmpoutl{color:#e8c547;font-size:12px;font-weight:700;margin:0 0 8px}
   #cmpChart{position:relative}
-  .cmpranges{display:flex;gap:4px;flex-wrap:wrap;margin-top:9px}
-  .cmprange{background:#26262c;color:var(--sub);border:1px solid var(--border);font-size:11.5px;padding:3.5px 10px;border-radius:4px;cursor:pointer;font-family:inherit}
-  .cmprange.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+  .cmpranges{display:flex;gap:2px;flex-wrap:wrap;margin-top:10px;border-bottom:1px solid var(--border)}
+  .cmprange{background:none;color:var(--sub);border:none;border-bottom:2px solid transparent;margin-bottom:-1px;font-size:13px;font-weight:400;padding:7px 13px;cursor:pointer;font-family:inherit}
+  .cmprange.on{color:#fff;font-weight:700;border-bottom-color:var(--accent)}
   .chartbox{position:relative}
   #cmpTip,.hvTip{position:absolute;top:8px;display:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
   .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
