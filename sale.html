@@ -363,6 +363,9 @@
   .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
   .cmtn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
   #cmpTip,#cpCmpTip{max-width:min(320px,calc(100% - 16px))}
+  #cmpTip.wide{max-width:min(560px,calc(100% - 16px))}
+  #cmpTip .cmtrows{display:grid;grid-template-columns:1fr;gap:0 14px}
+  #cmpTip.wide .cmtrows{grid-template-columns:1fr 1fr}
   .cmtr b{flex:none}
   .cmmore{color:var(--faint);font-size:11px}
   .cmpchip:not(.on){opacity:.45}

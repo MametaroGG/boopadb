@@ -364,6 +364,9 @@
   .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
   .cmtn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
   #cmpTip,#cpCmpTip{max-width:min(320px,calc(100% - 16px))}
+  #cmpTip.wide{max-width:min(560px,calc(100% - 16px))}
+  #cmpTip .cmtrows{display:grid;grid-template-columns:1fr;gap:0 14px}
+  #cmpTip.wide .cmtrows{grid-template-columns:1fr 1fr}
   .cmtr b{flex:none}
   .cmmore{color:var(--faint);font-size:11px}
   .cmpchip:not(.on){opacity:.45}
@@ -1984,7 +1987,7 @@ function wireHover(box, ser, tipEl){
       const br = block.getBoundingClientRect();
       const cr = box.getBoundingClientRect();
       tip.style.left = Math.min(Math.max(e.clientX - br.left + 14, 4), Math.max(4, br.width - tip.offsetWidth - 4)) + "px";
-      tip.style.top = (e.pointerType === "touch" ? Math.max(0, cr.top - br.top - tip.offsetHeight - 6) : cr.top - br.top + 8) + "px";
+      tip.style.top = Math.max(0, cr.top - br.top - tip.offsetHeight - 6) + "px";
     }
     const gd = svg.querySelector(".hvGuide");
     if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
@@ -2018,15 +2021,16 @@ function wireCmpTip(x, wrap, tip){
       .filter(Boolean)
       .sort((p, q) => q.v - p.v);
     const rows = allRows.slice(0, 10).map(rw => `<div class="cmtr"><span class="cmpdot" style="background:${rw.col}"></span><span class="cmtn">${esc(rw.name)}</span><b>${yen(rw.v)}</b>${rw.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`).join("")
-      + (allRows.length > 8 ? `<div class="cmtr cmmore">${tr("cmp_more", {n: allRows.length - 10})}</div>` : "");
-    tip.innerHTML = `<div class="cmtd">${diso(t)}</div>` + rows;
+      + (allRows.length > 10 ? `<div class="cmtr cmmore">${tr("cmp_more", {n: allRows.length - 10})}</div>` : "");
+    tip.innerHTML = `<div class="cmtd">${diso(t)}</div><div class="cmtrows">` + rows + `</div>`;
     tip.style.display = "block";
     const block = tip.parentElement;
     const br = block.getBoundingClientRect();
     const cr = wrap.getBoundingClientRect();
     const px = e.clientX - br.left + 14;
     tip.style.left = Math.min(Math.max(px, 4), Math.max(4, br.width - tip.offsetWidth - 4)) + "px";
-    const above = block !== wrap && e.pointerType === "touch";
+    const above = block !== wrap;
+    tip.classList.toggle("wide", above && allRows.length > 5);
     tip.style.top = (above ? Math.max(0, cr.top - br.top - tip.offsetHeight - 6) : Math.max(0, cr.top - br.top + 8)) + "px";
     const gd = svg.querySelector("#cmpGuide");
     if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
