@@ -344,6 +344,9 @@
   .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
   .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
   .cmtn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
+  #cmpTip,#cpCmpTip{max-width:min(320px,calc(100% - 16px))}
+  .cmtr b{flex:none}
+  .cmmore{color:var(--faint);font-size:11px}
   .cmpchip:not(.on){opacity:.45}
   .pp-varblock{background:#17171a;border:1px solid #26262c;border-radius:12px;padding:14px 16px;margin:0 0 14px}
   .pp-varhead{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
@@ -634,7 +637,7 @@ ja: {
   ft_tm: "BOOTH は pixiv株式会社の商標です。その他の商標および著作物は、各権利者に帰属します。",
   pp_title: "商品詳細", sp_title: "商品検索", sp_ph: "商品名・ショップ名で検索", sp_shops: "ショップから探す",
   tab_home: "ホーム", tab_sale: "セール", tab_news: "ニュース", tab_ranking: "ランキング", tab_bm: "ブックマーク",
-  al_back: "戻る", al_prev: "前へ", al_next: "次へ", al_expand: "拡大表示", al_close: "閉じる", al_search: "検索", al_slide: "スライド",
+  al_back: "戻る", al_prev: "前へ", al_next: "次へ", al_expand: "拡大表示", al_close: "閉じる", cmp_more: "ほか{n}件", al_search: "検索", al_slide: "スライド",
   st_total: "追跡中の商品", st_sale: "現在セール中（推定）", st_free: "現在無料の商品（元¥300以上）", st_changed: "価格変更のあった商品", st_period: "データ収集期間（最古の観測）",
   free: "無料", rib_sale: "セール",
   status_lowest: "過去最安値で販売中", save_note: "{v} お得",
@@ -667,7 +670,7 @@ en: {
   ft_tm: "BOOTH is a trademark of pixiv Inc. All other trademarks and works belong to their respective owners.",
   pp_title: "Product details", sp_title: "Search products", sp_ph: "Search by product or shop name", sp_shops: "Browse by shop",
   tab_home: "Home", tab_sale: "Sale", tab_news: "News", tab_ranking: "Rankings", tab_bm: "Bookmarks",
-  al_back: "Back", al_prev: "Previous", al_next: "Next", al_expand: "Expand", al_close: "Close", al_search: "Search", al_slide: "Slide",
+  al_back: "Back", al_prev: "Previous", al_next: "Next", al_expand: "Expand", al_close: "Close", cmp_more: "+{n} more", al_search: "Search", al_slide: "Slide",
   st_total: "Products tracked", st_sale: "On sale now (est.)", st_free: "Free now (was ¥300+)", st_changed: "Products with price changes", st_period: "Data collection period (oldest)",
   free: "Free", rib_sale: "Sale",
   status_lowest: "Now at its lowest price ever", save_note: "Save {v}",
@@ -700,7 +703,7 @@ ko: {
   ft_tm: "BOOTH는 pixiv 주식회사의 상표입니다. 그 밖의 상표 및 저작물은 각 권리자에게 귀속합니다.",
   pp_title: "상품 상세", sp_title: "상품 검색", sp_ph: "상품명·샵 이름으로 검색", sp_shops: "샵으로 찾기",
   tab_home: "홈", tab_sale: "세일", tab_news: "뉴스", tab_ranking: "랭킹", tab_bm: "북마크",
-  al_back: "뒤로", al_prev: "이전", al_next: "다음", al_expand: "확대", al_close: "닫기", al_search: "검색", al_slide: "슬라이드",
+  al_back: "뒤로", al_prev: "이전", al_next: "다음", al_expand: "확대", al_close: "닫기", cmp_more: "외 {n}개", al_search: "검색", al_slide: "슬라이드",
   st_total: "추적 중인 상품", st_sale: "현재 할인 중(추정)", st_free: "현재 무료 상품(기존 ¥300 이상)", st_changed: "가격 변동이 있었던 상품", st_period: "데이터 수집 기간(가장 오래된 관측)",
   free: "무료", rib_sale: "세일",
   status_lowest: "역대 최저가로 판매 중", save_note: "{v} 절약",
@@ -733,7 +736,7 @@ ko: {
   ft_tm: "BOOTH 是 pixiv 株式会社的商标。其他商标及作品归各权利方所有。",
   pp_title: "商品详情", sp_title: "搜索商品", sp_ph: "按商品名或店铺名搜索", sp_shops: "按店铺浏览",
   tab_home: "首页", tab_sale: "促销", tab_news: "动态", tab_ranking: "排行榜", tab_bm: "收藏",
-  al_back: "返回", al_prev: "上一个", al_next: "下一个", al_expand: "放大显示", al_close: "关闭", al_search: "搜索", al_slide: "幻灯片",
+  al_back: "返回", al_prev: "上一个", al_next: "下一个", al_expand: "放大显示", al_close: "关闭", cmp_more: "还有{n}个", al_search: "搜索", al_slide: "幻灯片",
   st_total: "追踪中的商品", st_sale: "当前促销中（估计）", st_free: "当前免费商品（原价 ¥300 以上）", st_changed: "有价格变动的商品", st_period: "数据采集期间（最早观测）",
   free: "免费", rib_sale: "促销",
   status_lowest: "正以历史最低价销售", save_note: "省 {v}",
@@ -766,7 +769,7 @@ ko: {
   ft_tm: "BOOTH 是 pixiv 株式會社的商標。其他商標及作品歸各權利方所有。",
   pp_title: "商品詳情", sp_title: "搜尋商品", sp_ph: "按商品名或店舖名搜尋", sp_shops: "按店舖瀏覽",
   tab_home: "首頁", tab_sale: "促銷", tab_news: "動態", tab_ranking: "排行榜", tab_bm: "收藏",
-  al_back: "返回", al_prev: "上一個", al_next: "下一個", al_expand: "放大顯示", al_close: "關閉", al_search: "搜尋", al_slide: "投影片",
+  al_back: "返回", al_prev: "上一個", al_next: "下一個", al_expand: "放大顯示", al_close: "關閉", cmp_more: "還有{n}個", al_search: "搜尋", al_slide: "投影片",
   st_total: "追蹤中的商品", st_sale: "當前促銷中（估計）", st_free: "當前免費商品（原價 ¥300 以上）", st_changed: "有價格變動的商品", st_period: "數據採集期間（最早觀測）",
   free: "免費", rib_sale: "促銷",
   status_lowest: "正以歷史最低價銷售", save_note: "省 {v}",
@@ -1947,11 +1950,12 @@ function wireCmpTip(x, wrap, tip){
     const keys = Object.keys(x.variations || {});
     const {t0, t1} = cmpDomain(x, keys);
     const t = t0 + (vx - PL) / (W - PL - PR) * (t1 - t0);
-    const rows = keys.filter(k => cmpOn[k])
+    const allRows = keys.filter(k => cmpOn[k])
       .map(k => { const pt = pricePtAt(seriesOf(x, k), t); return pt ? {name: k, col: CMP_COLORS[keys.indexOf(k) % CMP_COLORS.length], v: pt[1], outl: !!pt[3]} : null; })
       .filter(Boolean)
-      .sort((p, q) => q.v - p.v)
-      .map(rw => `<div class="cmtr"><span class="cmpdot" style="background:${rw.col}"></span><span class="cmtn">${esc(rw.name)}</span><b>${yen(rw.v)}</b>${rw.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`).join("");
+      .sort((p, q) => q.v - p.v);
+    const rows = allRows.slice(0, 8).map(rw => `<div class="cmtr"><span class="cmpdot" style="background:${rw.col}"></span><span class="cmtn">${esc(rw.name)}</span><b>${yen(rw.v)}</b>${rw.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`).join("")
+      + (allRows.length > 8 ? `<div class="cmtr cmmore">${tr("cmp_more", {n: allRows.length - 8})}</div>` : "");
     tip.innerHTML = `<div class="cmtd">${diso(t)}</div>` + rows;
     tip.style.display = "block";
     const wrapW = wrap.clientWidth, sl = wrap.scrollLeft || 0;
