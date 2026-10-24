@@ -1201,6 +1201,7 @@ function chipSet(filter){
   }
   return [...seen.values()];
 }
+let FULL_LISTS = null;
 let spFilter = "all", spShown = 30, spTotal = 0;
 function spRender(reset = true){
   if (reset) spShown = 30;
@@ -1225,6 +1226,11 @@ function spRender(reset = true){
       else hits.push({id, name, shop: "", image: null, cur: null, base: null, pct: 0, at_lowest: false, plain: true, _rank: pos === 0 ? 1 : 3});
     }
     hits.sort((a, b) => a._rank - b._rank);
+  } else if (!hits && !q && spFilter === "all" && FULL_LISTS && FULL_LISTS.newest && FULL_LISTS.newest.length) {
+    // Landing with no query: keep browsing past the curated sample into
+    // the full newest list, so scrolling does not dead-end at 41 items.
+    const seen = new Set(spIndex.map(x => String(x.id)));
+    hits = [...spIndex, ...(chipSet("new") || []).filter(x => !seen.has(String(x.id)))];
   } else if (!hits) {
     hits = spIndex.filter(x => {
       if (q && !(x.name + " " + (x.shop || "")).toLowerCase().includes(q)) return false;
@@ -1384,7 +1390,6 @@ function steamCap(s){
 }
 let SALE_HOME = P.on_sale || [];
 let LISTS = { on_sale: P.on_sale || [], drops: P.drops || [], active: P.active || [], newest: P.newest || [], free: null };
-let FULL_LISTS = null;
 function renderSale(){
   let arr = [...SALE_HOME];
   if (sortMode === "amount") arr.sort((a,b) => (b.base - b.cur) - (a.base - a.cur));
