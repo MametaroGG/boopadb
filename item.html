@@ -238,6 +238,32 @@
   #spPrice::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#e8e8ec;margin-top:-7px;box-shadow:0 1px 5px rgba(0,0,0,.5)}
   #spPrice::-moz-range-track{height:4px;border-radius:2px;background:#3a3a41}
   #spPrice::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:#e8e8ec}
+  .sp-sidehead,.sp-sidefoot,#spFilterBtn{display:none}
+  .sp-resbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .spsortdd{position:relative;display:inline-block;margin-left:auto;flex:none}
+  #spSortBtn{display:inline-flex;align-items:center;background:#17171a;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-weight:600;padding:8px 12px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .spcaret{display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid currentColor;margin-left:7px}
+  .spsortmenu{position:absolute;right:0;top:calc(100% + 8px);background:#1b1b1f;border:1px solid var(--border2);border-radius:12px;padding:5px;box-shadow:0 14px 34px rgba(0,0,0,.5);min-width:196px;z-index:30}
+  .spsortmenu[hidden]{display:none}
+  .spsortmi{display:flex;align-items:center;width:100%;background:none;border:none;color:#a2a2ab;font-size:13.5px;font-weight:600;padding:9px 12px;border-radius:8px;cursor:pointer;font-family:inherit;text-align:left;white-space:nowrap}
+  .spsortmi:hover{background:#26262c;color:var(--text)}
+  .spsortmi.on{color:#fff}
+  .spsortmi.on::after{content:"✓";margin-left:auto;color:#c8ec6e;font-weight:800;padding-left:14px}
+  body.spfilter-open .tabbar{opacity:0;pointer-events:none}
+  @media (max-width:899px){
+    .sp-resbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    #spFilterBtn{display:inline-flex;align-items:center;background:#17171a;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-weight:600;padding:8px 14px;cursor:pointer;font-family:inherit;white-space:nowrap}
+    .sp-side{position:fixed;inset:0;background:var(--bg);z-index:65;overflow-y:auto;overscroll-behavior:contain;padding:14px 16px 110px;transform:translateY(103%);transition:transform .45s cubic-bezier(.32,1.18,.36,1);pointer-events:none}
+    .sp-side.open{transform:none;pointer-events:auto}
+    .sp-sidehead{display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:800;color:var(--text);margin:2px 0 4px}
+    .sp-sidehead + .sp-sec{display:none}
+    .sp-sidex{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#1b1b1f;border:1px solid var(--border2);color:var(--text);cursor:pointer;flex:none;position:relative}
+    .sp-sidex::after{content:"";position:absolute;inset:-7px;border-radius:50%}
+    .sp-sidex svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+    .sp-sidefoot{display:flex;gap:10px;position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(16,16,18,.97);border-top:1px solid var(--border);z-index:2}
+    .sp-freset{background:#1b1b1f;border:1px solid var(--border2);color:var(--text);border-radius:9px;padding:12px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+    .sp-fshow{flex:1;background:var(--accent);border:none;color:#fff;border-radius:9px;padding:12px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit}
+  }
   @media (min-width:900px){
     .sp-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:26px;align-items:start}
     .sp-results{grid-column:1;grid-row:1;min-width:0}
@@ -521,7 +547,8 @@
   .spage.open{transform:none;pointer-events:auto}
   #prodPage{z-index:45}
   .sp-head{display:flex;align-items:center;gap:12px;max-width:1080px;margin:0 auto}
-  .sp-back{background:var(--panel);border:1px solid var(--border2);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;flex:none;transition:transform .2s;display:flex;align-items:center;justify-content:center}
+  .sp-back{background:var(--panel);border:1px solid var(--border2);color:var(--text);width:44px;height:44px;border-radius:50%;cursor:pointer;flex:none;transition:transform .2s;display:flex;align-items:center;justify-content:center;position:relative}
+  .sp-back::after{content:"";position:absolute;inset:-7px;border-radius:50%}
   .sp-back svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   .sp-back:active{transform:scale(.88)}
   .sp-title{font-size:19px;font-weight:800}
@@ -640,6 +667,7 @@
   <div class="sp-inner">
     <div class="sp-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg><input id="spQ" type="search" data-i-ph="sp_ph" placeholder="商品名・ショップ名で検索" autocomplete="off"></div>
     <div class="sp-main"><div class="sp-side">
+    <div class="sp-sidehead"><span data-i="sp_filter">絞り込み</span><button id="spSideX" class="sp-sidex" type="button" data-i-al="al_close" aria-label="閉じる"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
     <div class="sp-sec" data-i="sp_filter">絞り込み</div>
     <div class="chips" id="spChips">
       <button class="chip on" data-f="all" data-i="chip_all">すべて</button>
@@ -654,9 +682,10 @@
     <div class="sp-price"><input type="range" id="spPrice" min="0" max="12" step="1" value="12" data-i-al="sp_price_t" aria-label="価格で絞り込む"><div class="sp-price-val" id="spPriceVal"></div></div>
     <div class="sp-sec" data-i="sp_shops">ショップから探す</div>
     <div class="kwrap" id="spKw"></div>
+    <div class="sp-sidefoot"><button id="spFilterReset" class="sp-freset" type="button" data-i="sp_reset">リセット</button><button id="spFilterShow" class="sp-fshow" type="button" data-i="sp_show_results">結果を表示</button></div>
     </div>
     <div class="sp-results">
-    <div class="sp-count" id="spCount"></div>
+    <div class="sp-resbar"><div class="sp-count" id="spCount"></div><span class="spsortdd"><button id="spSortBtn" type="button"></button><span class="spsortmenu" id="spSortMenu" hidden></span></span><button id="spFilterBtn" type="button"></button></div>
     <div class="grid" id="spGrid"></div>
     <div class="smore" aria-hidden="true"></div>
     <div class="empty" id="spEmpty" data-i="empty_none">該当する商品がありません</div>
@@ -682,7 +711,7 @@ ja: {
   ft_legal: "BoopaDB は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。",
   ft_terms: "利用規約", ft_priv: "プライバシー",
   ft_tm: "BOOTH は pixiv株式会社の商標です。その他の商標および著作物は、各権利者に帰属します。",
-  pp_title: "商品詳細", sp_title: "商品検索", sp_ph: "商品名・ショップ名で検索", sp_shops: "ショップから探す", sp_filter: "絞り込み", sp_price_t: "価格で絞り込む", sp_price_any: "価格は問わない", sp_price_upto: "¥{n} 以下",
+  pp_title: "商品詳細", sp_title: "商品検索", sp_ph: "商品名・ショップ名で検索", sp_shops: "ショップから探す", sp_filter: "絞り込み", sp_price_t: "価格で絞り込む", sp_price_any: "価格は問わない", sp_reset: "リセット", sp_show_results: "結果を表示", sp_sort_rel: "適合性", sp_sort_new: "新着順", sp_sort_price_asc: "価格の安い順", sp_sort_price_desc: "価格の高い順", sp_sort_pct: "割引率の高い順", sp_sort_name: "名前順", sp_price_upto: "¥{n} 以下",
   tab_home: "ホーム", tab_sale: "セール", tab_news: "ニュース", tab_ranking: "ランキング", tab_bm: "ブックマーク",
   al_back: "戻る", al_prev: "前へ", al_next: "次へ", al_expand: "拡大表示", al_close: "閉じる", cmp_more: "ほか{n}件", al_search: "検索", al_slide: "スライド",
   st_total: "追跡中の商品", st_sale: "現在セール中（推定）", st_free: "現在無料の商品（元¥100以上）", st_changed: "価格変更のあった商品", st_period: "データ収集期間（最古の観測）",
@@ -715,7 +744,7 @@ en: {
   ft_legal: "BoopaDB is an unofficial project, not affiliated with BOOTH or pixiv Inc. All times are Japan Standard Time (JST).",
   ft_terms: "Terms", ft_priv: "Privacy",
   ft_tm: "BOOTH is a trademark of pixiv Inc. All other trademarks and works belong to their respective owners.",
-  pp_title: "Product details", sp_title: "Search products", sp_ph: "Search by product or shop name", sp_shops: "Browse by shop", sp_filter: "Filters", sp_price_t: "Filter by price", sp_price_any: "Any price", sp_price_upto: "Up to ¥{n}",
+  pp_title: "Product details", sp_title: "Search products", sp_ph: "Search by product or shop name", sp_shops: "Browse by shop", sp_filter: "Filters", sp_price_t: "Filter by price", sp_price_any: "Any price", sp_reset: "Reset", sp_show_results: "Show results", sp_sort_rel: "Relevance", sp_sort_new: "Newest", sp_sort_price_asc: "Price: low to high", sp_sort_price_desc: "Price: high to low", sp_sort_pct: "Biggest discount", sp_sort_name: "Name", sp_price_upto: "Up to ¥{n}",
   tab_home: "Home", tab_sale: "Sale", tab_news: "News", tab_ranking: "Rankings", tab_bm: "Bookmarks",
   al_back: "Back", al_prev: "Previous", al_next: "Next", al_expand: "Expand", al_close: "Close", cmp_more: "+{n} more", al_search: "Search", al_slide: "Slide",
   st_total: "Products tracked", st_sale: "On sale now (est.)", st_free: "Free now (was ¥100+)", st_changed: "Products with price changes", st_period: "Data collection period (oldest)",
@@ -748,7 +777,7 @@ ko: {
   ft_legal: "BoopaDB는 BOOTH 및 pixiv 주식회사와 관계없는 비공식 프로젝트입니다. 모든 시간은 일본 시간(JST)입니다.",
   ft_terms: "이용약관", ft_priv: "개인정보",
   ft_tm: "BOOTH는 pixiv 주식회사의 상표입니다. 그 밖의 상표 및 저작물은 각 권리자에게 귀속합니다.",
-  pp_title: "상품 상세", sp_title: "상품 검색", sp_ph: "상품명·샵 이름으로 검색", sp_shops: "샵으로 찾기", sp_filter: "필터", sp_price_t: "가격으로 좁히기", sp_price_any: "가격 무관", sp_price_upto: "¥{n} 이하",
+  pp_title: "상품 상세", sp_title: "상품 검색", sp_ph: "상품명·샵 이름으로 검색", sp_shops: "샵으로 찾기", sp_filter: "필터", sp_price_t: "가격으로 좁히기", sp_price_any: "가격 무관", sp_reset: "초기화", sp_show_results: "결과 표시", sp_sort_rel: "관련도", sp_sort_new: "최신순", sp_sort_price_asc: "가격 낮은 순", sp_sort_price_desc: "가격 높은 순", sp_sort_pct: "할인율 높은 순", sp_sort_name: "이름순", sp_price_upto: "¥{n} 이하",
   tab_home: "홈", tab_sale: "세일", tab_news: "뉴스", tab_ranking: "랭킹", tab_bm: "북마크",
   al_back: "뒤로", al_prev: "이전", al_next: "다음", al_expand: "확대", al_close: "닫기", cmp_more: "외 {n}개", al_search: "검색", al_slide: "슬라이드",
   st_total: "추적 중인 상품", st_sale: "현재 할인 중(추정)", st_free: "현재 무료 상품(기존 ¥100 이상)", st_changed: "가격 변동이 있었던 상품", st_period: "데이터 수집 기간(가장 오래된 관측)",
@@ -781,7 +810,7 @@ ko: {
   ft_legal: "BoopaDB 是与 BOOTH 及 pixiv 株式会社无关的非官方项目。所有时间均为日本时间（JST）。",
   ft_terms: "使用条款", ft_priv: "隐私",
   ft_tm: "BOOTH 是 pixiv 株式会社的商标。其他商标及作品归各权利方所有。",
-  pp_title: "商品详情", sp_title: "搜索商品", sp_ph: "按商品名或店铺名搜索", sp_shops: "按店铺浏览", sp_filter: "筛选", sp_price_t: "按价格筛选", sp_price_any: "不限价格", sp_price_upto: "¥{n} 以下",
+  pp_title: "商品详情", sp_title: "搜索商品", sp_ph: "按商品名或店铺名搜索", sp_shops: "按店铺浏览", sp_filter: "筛选", sp_price_t: "按价格筛选", sp_price_any: "不限价格", sp_reset: "重置", sp_show_results: "显示结果", sp_sort_rel: "相关性", sp_sort_new: "最新上架", sp_sort_price_asc: "价格从低到高", sp_sort_price_desc: "价格从高到低", sp_sort_pct: "折扣率最高", sp_sort_name: "名称", sp_price_upto: "¥{n} 以下",
   tab_home: "首页", tab_sale: "促销", tab_news: "动态", tab_ranking: "排行榜", tab_bm: "收藏",
   al_back: "返回", al_prev: "上一个", al_next: "下一个", al_expand: "放大显示", al_close: "关闭", cmp_more: "还有{n}个", al_search: "搜索", al_slide: "幻灯片",
   st_total: "追踪中的商品", st_sale: "当前促销中（估计）", st_free: "当前免费商品（原价 ¥100 以上）", st_changed: "有价格变动的商品", st_period: "数据采集期间（最早观测）",
@@ -814,7 +843,7 @@ ko: {
   ft_legal: "BoopaDB 是與 BOOTH 及 pixiv 株式會社無關的非官方項目。所有時間均為日本時間（JST）。",
   ft_terms: "使用條款", ft_priv: "隱私",
   ft_tm: "BOOTH 是 pixiv 株式會社的商標。其他商標及作品歸各權利方所有。",
-  pp_title: "商品詳情", sp_title: "搜尋商品", sp_ph: "按商品名或店舖名搜尋", sp_shops: "按店舖瀏覽", sp_filter: "篩選", sp_price_t: "按價格篩選", sp_price_any: "不限價格", sp_price_upto: "¥{n} 以下",
+  pp_title: "商品詳情", sp_title: "搜尋商品", sp_ph: "按商品名或店舖名搜尋", sp_shops: "按店舖瀏覽", sp_filter: "篩選", sp_price_t: "按價格篩選", sp_price_any: "不限價格", sp_reset: "重置", sp_show_results: "顯示結果", sp_sort_rel: "相關性", sp_sort_new: "最新上架", sp_sort_price_asc: "價格從低到高", sp_sort_price_desc: "價格從高到低", sp_sort_pct: "折扣率最高", sp_sort_name: "名稱", sp_price_upto: "¥{n} 以下",
   tab_home: "首頁", tab_sale: "促銷", tab_news: "動態", tab_ranking: "排行榜", tab_bm: "收藏",
   al_back: "返回", al_prev: "上一個", al_next: "下一個", al_expand: "放大顯示", al_close: "關閉", cmp_more: "還有{n}個", al_search: "搜尋", al_slide: "投影片",
   st_total: "追蹤中的商品", st_sale: "當前促銷中（估計）", st_free: "當前免費商品（原價 ¥100 以上）", st_changed: "有價格變動的商品", st_period: "數據採集期間（最早觀測）",
@@ -1066,6 +1095,7 @@ function openSearch(){
   setTimeout(() => document.getElementById("spQ").focus(), 380);
 }
 function closeSearch(){
+  spSideSet(false);
   spage.classList.remove("open");
   document.body.style.overflow = "";
   searchBtn.classList.remove("on");
@@ -1232,6 +1262,21 @@ function chipSet(filter){
 }
 let FULL_LISTS = null;
 let spFilter = "all", spShown = 30, spTotal = 0, spRendered = 0, spKey = "";
+let spShopMap = null, spShopMapSrc = undefined;
+function buildShopMap(){
+  spShopMap = new Map();
+  const seen = new Set();
+  const add = x => {
+    if (!x || !x.shop || seen.has(String(x.id))) return;
+    seen.add(String(x.id));
+    const k = x.shop.toLowerCase();
+    if (!spShopMap.has(k)) spShopMap.set(k, []);
+    spShopMap.get(k).push(x);
+  };
+  spIndex.forEach(add);
+  if (FULL_LISTS) ["sale", "free", "drop", "new", "active", "lowest"].forEach(f => { const set = chipSet(f); if (set) set.forEach(add); });
+  spShopMapSrc = FULL_LISTS;
+}
 const SP_CAPS = [500, 1000, 1500, 2000, 3000, 5000, 7000, 10000, 15000, 20000, 30000, 50000];
 let spMaxPrice = null, spPriceT = null;
 function spPriceLabel(){ document.getElementById("spPriceVal").textContent = spMaxPrice == null ? tr("sp_price_any") : tr("sp_price_upto", {n: spMaxPrice.toLocaleString(LOCALE)}); }
@@ -1258,6 +1303,14 @@ function spRender(reset = true){
       else hits.push({id, name, shop: "", image: null, cur: icur, base: ibase, lowest: ilowest, sale: !!isale, pct: ibase > icur ? Math.round((1 - icur / ibase) * 100) : 0, at_lowest: !!iatlow, plain: icur === null || icur === undefined, _rank: pos === 0 ? 1 : 3});
     }
     hits.sort((a, b) => a._rank - b._rank);
+    if (spShopMapSrc !== FULL_LISTS) buildShopMap();
+    const seenIds = new Set(hits.map(h => String(h.id)));
+    const shopHits = [];
+    for (const [shopLower, items] of spShopMap) {
+      if (!shopLower.includes(q)) continue;
+      for (const x of items) { const id = String(x.id); if (!seenIds.has(id)) { seenIds.add(id); shopHits.push({...x, _rank: 1.5}); } }
+    }
+    if (shopHits.length) hits = [...hits, ...shopHits].sort((a, b) => a._rank - b._rank);
   } else if (!hits && !q && spFilter === "all" && FULL_LISTS && FULL_LISTS.newest && FULL_LISTS.newest.length) {
     // Landing with no query: keep browsing past the curated sample into
     // the full newest list, so scrolling does not dead-end at 41 items.
@@ -1279,16 +1332,28 @@ function spRender(reset = true){
   }
   if (!hits) hits = spIndex;
   if (spMaxPrice != null) hits = hits.filter(x => x.cur != null && x.cur <= spMaxPrice);
+  if (spSort !== "rel") {
+    const by = {
+      price_asc: (a, b) => (a.cur == null ? Infinity : a.cur) - (b.cur == null ? Infinity : b.cur),
+      price_desc: (a, b) => (b.cur == null ? -Infinity : b.cur) - (a.cur == null ? -Infinity : a.cur),
+      pct: (a, b) => (b.pct || 0) - (a.pct || 0),
+      name: (a, b) => a.name.localeCompare(b.name, LOCALE),
+      new: (a, b) => (a.first_date || "") < (b.first_date || "") ? 1 : (a.first_date || "") > (b.first_date || "") ? -1 : 0
+    }[spSort];
+    if (by) hits = [...hits].sort(by);
+  }
   if (!q && spFilter === "all" && fullIndex && spMaxPrice == null) countOverride = tr("sp_total", {n: fullIndex.length});
   document.getElementById("spCount").textContent = countOverride || tr("sp_count", {n: hits.length});
   spPriceLabel();
+  spFilterBtnLabel();
+  spSortSync();
   document.getElementById("spEmpty").style.display = hits.length ? "none" : "block";
   spTotal = hits.length;
   // Append-only: rebuilding the whole grid per batch repainted every card
   // and restarted every entrance animation, which is what turned fast
   // scrolling dark and stalled paging. A changed query/filter/data
   // generation still rebuilds from scratch.
-  const key = q + "|" + spFilter + "|" + (fullIndex ? "F" : "-") + "|" + (FULL_LISTS ? "L" : "-") + "|" + (spMaxPrice == null ? "A" : spMaxPrice);
+  const key = q + "|" + spFilter + "|" + (fullIndex ? "F" : "-") + "|" + (FULL_LISTS ? "L" : "-") + "|" + (spMaxPrice == null ? "A" : spMaxPrice) + "|" + spSort;
   const grid = document.getElementById("spGrid");
   const cardOf = (x, i) => x.plain ? plainCard(x, i) : saleCard({...x, pct: x.pct}, i);
   let fillFrom = -1;
@@ -1304,6 +1369,41 @@ function spRender(reset = true){
   spKey = key;
   if (fillFrom >= 0) hits.slice(fillFrom, spRendered).forEach(x => { if (x.plain) fillPriceLazy(x.id); });
 }
+const spSide = document.querySelector(".sp-side");
+function spSideSet(open){ spSide.classList.toggle("open", open); document.body.classList.toggle("spfilter-open", open); }
+function spFilterBtnLabel(){ const n = (spFilter !== "all" ? 1 : 0) + (spMaxPrice != null ? 1 : 0); document.getElementById("spFilterBtn").textContent = tr("sp_filter") + (n ? " (" + n + ")" : ""); }
+document.getElementById("spFilterBtn").addEventListener("click", () => spSideSet(true));
+document.getElementById("spSideX").addEventListener("click", () => spSideSet(false));
+document.getElementById("spFilterShow").addEventListener("click", () => spSideSet(false));
+document.getElementById("spFilterReset").addEventListener("click", () => {
+  spFilter = "all";
+  document.querySelectorAll("#spChips .chip").forEach(y => y.classList.toggle("on", y.dataset.f === "all"));
+  spMaxPrice = null;
+  document.getElementById("spPrice").value = "12";
+  spPriceLabel();
+  spRender();
+});
+const SP_SORTS = [["rel", "sp_sort_rel"], ["new", "sp_sort_new"], ["price_asc", "sp_sort_price_asc"], ["price_desc", "sp_sort_price_desc"], ["pct", "sp_sort_pct"], ["name", "sp_sort_name"]];
+let spSort = "rel";
+const spSortMenu = document.getElementById("spSortMenu");
+function spSortSync(){
+  document.getElementById("spSortBtn").innerHTML = esc(tr("sp_sort_" + spSort)) + '<span class="spcaret"></span>';
+  spSortMenu.querySelectorAll(".spsortmi").forEach(b => b.classList.toggle("on", b.dataset.sort === spSort));
+}
+spSortMenu.innerHTML = SP_SORTS.map(([v, k]) => `<button type="button" class="spsortmi" data-sort="${v}" data-i="${k}">${tr(k)}</button>`).join("");
+spSortSync();
+document.getElementById("spSortBtn").addEventListener("click", e => { e.stopPropagation(); spSortMenu.hidden = !spSortMenu.hidden; });
+spSortMenu.addEventListener("click", e => {
+  e.stopPropagation();
+  const b = e.target.closest(".spsortmi");
+  if (!b) return;
+  spSort = b.dataset.sort;
+  spSortMenu.hidden = true;
+  spSortSync();
+  spRender();
+});
+document.addEventListener("click", () => { spSortMenu.hidden = true; });
+document.addEventListener("keydown", e => { if (e.key === "Escape") spSortMenu.hidden = true; });
 const spPriceEl = document.getElementById("spPrice");
 spPriceEl.addEventListener("input", () => { const v = +spPriceEl.value; spMaxPrice = v >= SP_CAPS.length ? null : SP_CAPS[v]; spPriceLabel(); clearTimeout(spPriceT); spPriceT = setTimeout(() => spRender(), 180); });
 spPriceLabel();
@@ -1366,7 +1466,7 @@ document.getElementById("spChips").querySelectorAll(".chip").forEach(ch => {
 document.getElementById("spKw").innerHTML = [...new Set(spIndex.map(x => x.shop).filter(Boolean))].slice(0, 8)
   .map(s => `<button class="kw">${esc(s)}</button>`).join("");
 document.getElementById("spKw").querySelectorAll(".kw").forEach(k => {
-  k.onclick = () => { document.getElementById("spQ").value = k.textContent; spRender(); };
+  k.onclick = () => { document.getElementById("spQ").value = k.textContent; spRender(); spSideSet(false); };
 });
 spRender();
 const tabbarEl = document.getElementById("tabbar");
