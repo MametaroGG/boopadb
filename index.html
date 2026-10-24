@@ -1256,6 +1256,16 @@ const spIO = new IntersectionObserver(es => {
   if (es.some(e => e.isIntersecting) && spTotal > spShown) { spShown += 30; spRender(false); }
 }, { root: document.getElementById("searchPage"), rootMargin: "700px 0px" });
 spIO.observe(document.querySelector("#searchPage .smore"));
+// Fallback: plain scroll-position detection, in case intersection
+// observation does not fire on the user's browser.
+let spScrollTick = 0;
+document.getElementById("searchPage").addEventListener("scroll", () => {
+  const sp = document.getElementById("searchPage");
+  if (!sp.classList.contains("open")) return;
+  const now = Date.now();
+  if (now - spScrollTick < 350) return;
+  if (spTotal > spShown && sp.scrollHeight - sp.scrollTop - sp.clientHeight < 900) { spScrollTick = now; spShown += 30; spRender(false); }
+}, { passive: true });
 function openSearchPreset(f){
   spFilter = f;
   document.getElementById("spChips").querySelectorAll(".chip").forEach(y => y.classList.toggle("on", y.dataset.f === f));
