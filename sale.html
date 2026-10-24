@@ -560,6 +560,7 @@
     .mosvp::-webkit-scrollbar{display:none}
     .mostrack{transition:none}
     .mpage{flex-basis:calc(100% - 22px);grid-template-columns:1fr 1fr}
+    .mpage.clone{display:none}
   }
   .scount{font-size:12.5px;color:var(--faint);margin:10px 0 2px}
   @media (max-width:899px){.ptitle h1{font-size:31px}}
@@ -844,33 +845,58 @@ function bindRailBar(railId, barId){
   window.addEventListener("resize", () => setTimeout(update, 160));
   return update;
 }
-let mosPage = 0;
+let mosPage = 0, mosPos = 1, mosJumpT = null;
 const mosBarUpdate = bindRailBar("spMosVp", "mosBar");
-function mosGo(p){
+function mosNPages(){ return document.getElementById("spMosaic").querySelectorAll(".mpage:not(.clone)").length; }
+function mosApply(anim){
   const track = document.getElementById("spMosaic");
-  const n = track.children.length;
-  mosPage = Math.max(0, Math.min(n - 1, p));
-  track.style.transform = window.innerWidth >= 900 ? `translateX(${-mosPage * 100}%)` : "";
+  track.style.transition = anim ? "" : "none";
+  track.style.transform = window.innerWidth >= 900 ? `translateX(${-mosPos * 100}%)` : "";
+  if (!anim) requestAnimationFrame(() => { track.style.transition = ""; });
+}
+function mosSync(){
+  const n = mosNPages();
+  if (!n) return;
+  mosPage = ((mosPos - 1) % n + n) % n;
   document.querySelectorAll("#mosDots span").forEach((d, i) => d.classList.toggle("on", i === mosPage));
-  const multi = n > 1, pv = document.getElementById("mosPrev"), nx = document.getElementById("mosNext"), dt = document.getElementById("mosDots");
-  if (pv) pv.style.display = multi ? "" : "none";
-  if (nx) nx.style.display = multi ? "" : "none";
-  if (dt) dt.style.display = multi ? "" : "none";
+}
+function mosSnap(){
+  const n = mosNPages();
+  if (mosPos === 0) { mosPos = n; mosApply(false); }
+  else if (mosPos === n + 1) { mosPos = 1; mosApply(false); }
+}
+function mosStep(dir){
+  const n = mosNPages();
+  if (n <= 1) return;
+  clearTimeout(mosJumpT);
+  mosSnap();
+  mosPos += dir;
+  mosApply(true);
+  mosSync();
+  mosJumpT = setTimeout(mosSnap, 480);
 }
 function renderMosaic(){
   const items = featPick(SALE);
   const pages = [];
   for (let i = 0; i < items.length; i += 4) pages.push(items.slice(i, i + 4));
-  document.getElementById("spMosaic").innerHTML = pages.map((pg, pi) => `<div class="mpage">${pg.map((x, i) => mosaicCell(x, pi * 4 + i)).join("")}</div>`).join("");
+  const pageHTML = (pg, pi, clone) => `<div class="mpage${clone ? " clone" : ""}">${pg.map((x, i) => mosaicCell(x, pi * 4 + i)).join("")}</div>`;
+  let html = pages.map((pg, pi) => pageHTML(pg, pi, false)).join("");
+  if (pages.length > 1) html = pageHTML(pages[pages.length - 1], pages.length - 1, true) + html + pageHTML(pages[0], 0, true);
+  document.getElementById("spMosaic").innerHTML = html;
   document.getElementById("mosDots").innerHTML = pages.map((_, i) => `<span data-p="${i}"></span>`).join("");
-  mosPage = 0;
-  mosGo(0);
+  const multi = pages.length > 1, pv = document.getElementById("mosPrev"), nx = document.getElementById("mosNext"), dt = document.getElementById("mosDots");
+  if (pv) pv.style.display = multi ? "" : "none";
+  if (nx) nx.style.display = multi ? "" : "none";
+  if (dt) dt.style.display = multi ? "" : "none";
+  mosPos = 1; mosPage = 0;
+  mosApply(false);
+  mosSync();
   mosBarUpdate();
 }
-document.getElementById("mosPrev").addEventListener("click", () => mosGo(mosPage - 1));
-document.getElementById("mosNext").addEventListener("click", () => mosGo(mosPage + 1));
-document.getElementById("mosDots").addEventListener("click", e => { const d = e.target.closest("[data-p]"); if (d) mosGo(+d.dataset.p); });
-window.addEventListener("resize", () => mosGo(mosPage));
+document.getElementById("mosPrev").addEventListener("click", () => mosStep(-1));
+document.getElementById("mosNext").addEventListener("click", () => mosStep(1));
+document.getElementById("mosDots").addEventListener("click", e => { const d = e.target.closest("[data-p]"); if (d) { clearTimeout(mosJumpT); mosSnap(); mosPos = +d.dataset.p + 1; mosApply(true); mosSync(); } });
+window.addEventListener("resize", () => mosApply(false));
 renderMosaic();
 
 let spSf = "all", spSort = "pct";

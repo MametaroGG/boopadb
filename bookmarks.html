@@ -555,21 +555,17 @@
   .bmsearch input:focus{border-color:#3d3d44}
   .bmctl{display:flex;gap:8px;align-items:center;margin:0 0 12px}
   .bmctlbtn{display:inline-flex;align-items:center;gap:8px;background:#17171a;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;padding:9px 14px;cursor:pointer;font-family:inherit;white-space:nowrap}
-  .bmpanel[hidden]{display:none}
   .bmctlbtn .car{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--sub);flex:none}
   .bmsort{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--sub)}
   .bmsort select{background:#17171a;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;padding:9px 10px;font-family:inherit;outline:none;max-width:46vw}
-  .bmovbg{position:fixed;inset:0;background:rgba(8,8,10,.62);z-index:70}
-  .bmovbg[hidden]{display:none}
-  .bmpanel{position:fixed;left:50%;top:10vh;transform:translateX(-50%);width:min(520px,calc(100vw - 32px));max-height:78vh;overflow-y:auto;z-index:71;background:#17171a;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;box-shadow:0 18px 50px rgba(0,0,0,.55)}
-  .bmphead{display:flex;align-items:center;justify-content:space-between;grid-column:1/-1}
-  .bmphtitle{font-size:14px;font-weight:700;color:var(--text)}
-  .bmpx{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#1b1b1f;border:1px solid var(--border2);color:var(--text);cursor:pointer;flex:none}
-  .bmpx svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-  @media (max-width:560px){.bmpanel{grid-template-columns:1fr;top:8vh}}
-  .bmftitle{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
-  .bmpanel label{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--sub);padding:4px 0;cursor:pointer}
-  .bmpanel input{accent-color:#fc4d50;width:16px;height:16px;flex:none}
+  .bmdd{position:relative;display:inline-block}
+  .bmmenu{position:absolute;right:0;top:calc(100% + 8px);background:#1b1b1f;border:1px solid var(--border2);border-radius:12px;padding:5px;width:218px;box-shadow:0 14px 34px rgba(0,0,0,.5);z-index:300}
+  .bmmenu[hidden]{display:none}
+  .bmmi{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;background:none;border:none;color:var(--sub);font-size:13.5px;font-weight:600;padding:8px 10px;border-radius:8px;cursor:pointer;font-family:inherit;text-align:left}
+  .bmmi:hover{background:#26262c;color:var(--text)}
+  .bmmi.on{color:#fff}
+  .bmmi.on::after{content:"¹3";color:#c8ec6e;font-weight:800}
+  .bmsep{height:1px;background:var(--border);margin:5px 4px}
 
 </style>
 </head>
@@ -591,7 +587,14 @@
 
   <div class="bmsearch"><input id="bmQ" type="search" data-i-ph="bm_search_ph" autocomplete="off"></div>
   <div class="bmctl">
-    <button id="bmOptBtn" class="bmctlbtn" type="button"><span data-i="bm_options"></span><span class="car"></span></button>
+    <span class="bmdd"><button id="bmOptBtn" class="bmctlbtn" type="button"><span data-i="bm_options"></span><span class="car"></span></button><span id="bmOptPanel" class="bmmenu" hidden>
+      <button type="button" class="bmmi" data-disc="all"><span data-i="bm_f_all"></span></button>
+      <button type="button" class="bmmi" data-disc="sale"><span data-i="bm_f_sale"></span></button>
+      <button type="button" class="bmmi" data-disc="50"><span data-i="bm_f_50"></span></button>
+      <button type="button" class="bmmi" data-disc="75"><span data-i="bm_f_75"></span></button>
+      <span class="bmsep"></span>
+      <button type="button" class="bmmi" id="bmFreeRow"><span data-i="bm_f_free"></span></button>
+    </span></span>
     <label class="bmsort"><span data-i="bm_sort_label"></span><select id="bmSort">
       <option value="added_desc" data-i="bm_sort_added_desc"></option>
       <option value="added_asc" data-i="bm_sort_added_asc"></option>
@@ -600,19 +603,6 @@
       <option value="price_desc" data-i="bm_sort_price_desc"></option>
       <option value="discount" data-i="bm_sort_discount"></option>
     </select></label>
-  </div>
-  <div id="bmOptBg" class="bmovbg" hidden></div>
-  <div id="bmOptPanel" class="bmpanel" hidden>
-    <div class="bmphead"><span class="bmphtitle" data-i="bm_options"></span><button id="bmOptX" class="bmpx" type="button" data-i-al="al_close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
-    <div class="bmfgroup"><div class="bmftitle" data-i="bm_f_discount"></div>
-      <label><input type="radio" name="bmDisc" value="all" checked><span data-i="bm_f_all"></span></label>
-      <label><input type="radio" name="bmDisc" value="sale"><span data-i="bm_f_sale"></span></label>
-      <label><input type="radio" name="bmDisc" value="50"><span data-i="bm_f_50"></span></label>
-      <label><input type="radio" name="bmDisc" value="75"><span data-i="bm_f_75"></span></label>
-    </div>
-    <div class="bmfgroup"><div class="bmftitle" data-i="bm_f_price_t"></div>
-      <label><input type="checkbox" id="bmFree"><span data-i="bm_f_free"></span></label>
-    </div>
   </div>
   <div id="bmList"></div>
 
@@ -842,15 +832,18 @@ function bmRender(){
   });
 }
 document.getElementById("bmQ").addEventListener("input", e => { bmQ = e.target.value.trim().toLowerCase(); bmRender(); });
-const bmOptPanel = document.getElementById("bmOptPanel"), bmOptBg = document.getElementById("bmOptBg");
-function bmOptSet(open){ bmOptPanel.hidden = !open; bmOptBg.hidden = !open; document.body.style.overflow = open ? "hidden" : ""; }
-document.getElementById("bmOptBtn").addEventListener("click", () => bmOptSet(bmOptPanel.hidden));
-document.getElementById("bmOptX").addEventListener("click", () => bmOptSet(false));
-bmOptBg.addEventListener("click", () => bmOptSet(false));
+const bmOptPanel = document.getElementById("bmOptPanel"), bmOptBtn = document.getElementById("bmOptBtn");
+function bmMenuSync(){
+  bmOptPanel.querySelectorAll("[data-disc]").forEach(b => b.classList.toggle("on", b.dataset.disc === bmDisc));
+  document.getElementById("bmFreeRow").classList.toggle("on", bmFreeOnly);
+}
+function bmOptSet(open){ bmOptPanel.hidden = !open; }
+bmOptBtn.addEventListener("click", e => { e.stopPropagation(); bmMenuSync(); bmOptSet(bmOptPanel.hidden); });
+document.addEventListener("click", e => { if (!bmOptPanel.hidden && !bmOptPanel.contains(e.target)) bmOptSet(false); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !bmOptPanel.hidden) bmOptSet(false); });
+bmOptPanel.querySelectorAll("[data-disc]").forEach(b => b.addEventListener("click", () => { bmDisc = b.dataset.disc; bmRender(); bmOptSet(false); }));
+document.getElementById("bmFreeRow").addEventListener("click", () => { bmFreeOnly = !bmFreeOnly; bmRender(); bmOptSet(false); });
 document.getElementById("bmSort").addEventListener("change", e => { bmSort = e.target.value; bmRender(); });
-document.querySelectorAll('input[name="bmDisc"]').forEach(r => r.addEventListener("change", e => { bmDisc = e.target.value; bmRender(); }));
-document.getElementById("bmFree").addEventListener("change", e => { bmFreeOnly = e.target.checked; bmRender(); });
 bmRender();
 
 </script>
