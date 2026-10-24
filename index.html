@@ -283,7 +283,7 @@
   .rib.act{background:#3a3a41}
   .hslide .rib{left:0;bottom:0;border-radius:0}
   .fnote2{font-size:12px;color:var(--faint);margin:-8px 0 10px}
-  .ftag{position:absolute;top:-1px;left:-1px;background:rgba(23,23,26,.88);color:#fff;font-size:11px;line-height:1.3;font-weight:800;letter-spacing:.05em;padding:4px 8px 2px;z-index:2;pointer-events:none}
+  .ftag{position:absolute;top:-1px;left:-1px;background:rgba(23,23,26,.88);color:#fff;font-size:11px;line-height:1.3;font-weight:800;letter-spacing:.05em;padding:4px 8px 4px;z-index:2;pointer-events:none}
   .ftag.new{background:#fc4d50}
   .spark{margin-top:2px}
   .spark svg{display:block;width:100%;height:28px}
@@ -422,6 +422,9 @@
   .bpspark{margin-top:11px}
   .bpspark .cap{font-size:11px;color:var(--faint);margin-bottom:3px}
   .bpspark svg{display:block;width:100%;height:44px;background:#131316;border-radius:6px}
+  .bpchart svg{height:auto}
+  .bpchart-load{aspect-ratio:340/118;background:#131316;border-radius:6px}
+  .spark.kp svg{height:auto;background:#131316;border-radius:5px}
   .bprow{display:flex;gap:0;align-items:stretch;margin-top:11px}
   .bprow .lowest{margin-left:8px;align-self:center}
   .rib.low{background:#4c6b22}
@@ -1456,24 +1459,69 @@ function browHTML(x, i){
     <span class="bprice">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="bstack"><span class="was">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</span>
   </a>`;
 }
+function repSeriesOf(x){
+  const vs = x && (x.variations || x.vars);
+  if (!vs) return null;
+  let best = null;
+  for (const k in vs) { const e = vs[k]; const p = Array.isArray(e) ? e : (e && e.p); if (p && p.length >= 2 && (!best || p.length > best.length)) best = p; }
+  return best ? {p: best} : null;
+}
+function bpChartSVG(ser, W, H){
+  const s = ser.p;
+  const ordS = s.filter(p => !p[3]);
+  const src = ordS.length ? ordS : s;
+  const high = Math.max(...src.map(p => p[1]));
+  const PL = 4, PR = 4, PT = 13, PB = 14;
+  const iw = W - PL - PR, ih = H - PT - PB;
+  const yMax = Math.ceil(high * 1.08 / 100) * 100 || 100;
+  const dn = d => Date.parse(d) / 864e5;
+  const t0 = dn(s[0][0]), t1 = Math.max(dn(s[s.length - 1][0]), t0 + 1);
+  const X = i => PL + iw * ((dn(s[i][0]) - t0) / (t1 - t0));
+  const Y = v => PT + ih * (1 - v / yMax);
+  let path = "", area = "";
+  s.forEach((p, i) => { const cx = X(i).toFixed(1), cy = Y(p[1]).toFixed(1); if (i === 0) { path = `M${cx},${cy}`; area = `M${cx},${PT + ih} L${cx},${cy}`; } else { path += ` H${cx} V${cy}`; area += ` H${cx} V${cy}`; } });
+  area += ` H${X(s.length - 1).toFixed(1)} V${PT + ih} Z`;
+  let saleRects = "", st = null;
+  s.forEach((p, i) => { if (p[2] && st === null) st = i; if ((!p[2] || i === s.length - 1) && st !== null) { const en = p[2] ? i : i - 1; saleRects += `<rect x="${X(st).toFixed(1)}" y="${PT}" width="${Math.max(1.5, X(en) - X(st)).toFixed(1)}" height="${ih}" fill="#fc4d50" opacity="0.07"/>`; st = null; } });
+  const outlN = s.length - ordS.length;
+  const fs = W >= 300 ? 9.5 : 10;
+  return `<svg viewBox="0 0 ${W} ${H}">${saleRects}<text x="${PL + 2}" y="10" fill="#6f6f78" font-size="${fs}">\u00a5${high.toLocaleString(LOCALE)}</text>${outlN ? `<text x="${W - PR - 2}" y="10" fill="#e8c547" font-size="${fs}" font-weight="700" text-anchor="end">${tr("outlier_n", {n: outlN})}</text>` : ""}<path d="${area}" fill="#fc4d50" opacity="0.12"/><path d="${path}" fill="none" stroke="#fc4d50" stroke-width="1.8"/><text x="${PL + 2}" y="${H - 3}" fill="#6f6f78" font-size="${fs}">${s[0][0]}</text><text x="${W - PR - 2}" y="${H - 3}" fill="#6f6f78" font-size="${fs}" text-anchor="end">${s[s.length - 1][0]}</text></svg>`;
+}
+const bpChartCache = new Map();
+async function fillBpChart(){
+  const ph = document.querySelector("#bPrev [data-bpchart]");
+  if (!ph) return;
+  const id = ph.getAttribute("data-bpchart");
+  if (!bpChartCache.has(id)) bpChartCache.set(id, (async () => {
+    if (PROD.has(id)) return PROD.get(id);
+    try { const r = await fetchItemRecord(id); if (r) regP(r); return r; } catch { return null; }
+  })());
+  const rec = await bpChartCache.get(id);
+  const cur = document.querySelector("#bPrev [data-bpchart]");
+  if (!cur || cur.getAttribute("data-bpchart") !== id) return;
+  const ser = rec ? repSeriesOf(rec) : null;
+  if (ser) cur.innerHTML = `<div class="cap">${tr("pp_chart")}</div>${bpChartSVG(ser, 340, 118)}`;
+  else cur.style.display = "none";
+  cur.removeAttribute("data-bpchart");
+}
 function bPrevHTML(x){
   if (!x) return "";
   return `<div class="bpname">${esc(x.name)}</div>
     <div class="bpmeta">${esc(x.shop || "")}</div>
     <div class="bpchips">${(x.chips || []).map(c => `<span class="bpchip">${esc(c)}</span>`).join("")}</div>
     ${x.image ? `<img class="bpimg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}
-    ${x.spark ? `<div class="bpspark"><div class="cap">${tr("pp_chart")}</div>${sparkSVG(x.spark)}</div>` : ""}
+    ${repSeriesOf(x) ? `<div class="bpspark bpchart"><div class="cap">${tr("pp_chart")}</div>${bpChartSVG(repSeriesOf(x), 340, 118)}</div>` : `<div class="bpspark bpchart" data-bpchart="${x.id}"><div class="cap">${tr("pp_chart")}</div><div class="bpchart-load"></div></div>`}
     <div class="bprow">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="was">${yen(x.base)}</span>` : ""}<span class="price">${yen(x.cur)}</span>${x.at_lowest ? '<span class="lowest">' + tr("chip_lowest") + '</span>' : ""}</div>`;
 }
 function renderBList(){
   const list = document.getElementById("bList");
   list.innerHTML = bItems.slice(0, bShown).map(browHTML).join("") || '<div class="empty" style="display:block">' + tr("empty_none") + '</div>';
   document.getElementById("bMore").style.display = "";
-  document.getElementById("bPrev").innerHTML = bPrevHTML(bItems[0]);
+  document.getElementById("bPrev").innerHTML = bPrevHTML(bItems[0]); setTimeout(fillBpChart, 0);
   list.querySelectorAll(".brow").forEach(r => {
     r.addEventListener("mouseenter", () => {
       list.querySelectorAll(".brow").forEach(y => y.classList.toggle("sel", y === r));
-      document.getElementById("bPrev").innerHTML = bPrevHTML(bItems[+r.dataset.i]);
+      document.getElementById("bPrev").innerHTML = bPrevHTML(bItems[+r.dataset.i]); setTimeout(fillBpChart, 0);
     });
   });
 }
@@ -1511,12 +1559,13 @@ function sparkSVG(spark){
 }
 function featCap(x, tag, meta, cls){
   const pct = x.base > x.cur ? Math.round((1 - x.cur / x.base) * 100) : 0;
+  const fser = repSeriesOf(x);
   return `<div class="card">
     <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}${bmFlag(x.id, (cls || "").includes("new") ? "" : "u2")}</a>${(cls || "").includes("new") ? "" : `<span class="ftag${cls || ""}">${tag}</span>`}
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
-      <div class="spark">${sparkSVG(x.spark)}</div>
+      <div class="spark${fser ? " kp" : ""}">${fser ? bpChartSVG(fser, 200, 64) : sparkSVG(x.spark)}</div>
       <div class="caprow">${(cls || "").includes("new") ? `<span class="newtag">${tag}</span>` : ""}${pct > 0 && x.on_sale ? `<span class="discst">-${pct}%</span><span class="was">${yen(x.base)}</span>` : ""}<span class="price">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
     </div>
   </div>`;
