@@ -142,6 +142,11 @@
   .saleTrack{display:contents}
   .sarrow{display:none}
   .saleDots{display:none}
+  .railbar{display:none}
+  @media (max-width:899px){
+    .railbar{display:block;height:4px;border-radius:2px;background:#232329;margin-top:10px;position:relative;overflow:hidden}
+    .railbar span{position:absolute;top:0;left:0;height:100%;border-radius:2px;background:#5b5b66}
+  }
   @media (min-width:900px){
     .salepanel{position:relative}
     .salepanel.hp{margin-left:54px;margin-right:54px}
@@ -499,6 +504,7 @@
     <button class="sarrow prev" id="salePrev" data-i-al="al_prev" aria-label="前へ">‹</button>
     <button class="sarrow next" id="saleNext" data-i-al="al_next" aria-label="次へ">›</button>
     <div class="saleDots" id="saleDots"></div>
+    <div class="railbar" id="saleBar"><span></span></div>
   </div>
   <div class="empty" id="saleEmpty" data-i="empty_none">該当する商品がありません</div>
   <div class="smore"><button id="saleMore" type="button" data-i="more">もっと見る</button></div>
@@ -506,7 +512,7 @@
 
   <h2 id="feat" data-i="nav_feat">注目の商品</h2>
   <p class="fnote2" data-i="feat_note">セール中かどうかではなく、価格の動きの活発さと新着から選んでいます。</p>
-  <div class="featwrap"><div class="capgrid" id="featGrid"><div id="featTrack"></div></div><button class="sarrow prev" id="featPrev" data-i-al="al_prev" aria-label="前へ">‹</button><button class="sarrow next" id="featNext" data-i-al="al_next" aria-label="次へ">›</button><div class="saleDots" id="featDots"></div></div>
+  <div class="featwrap"><div class="capgrid" id="featGrid"><div id="featTrack"></div></div><button class="sarrow prev" id="featPrev" data-i-al="al_prev" aria-label="前へ">‹</button><button class="sarrow next" id="featNext" data-i-al="al_next" aria-label="次へ">›</button><div class="saleDots" id="featDots"></div><div class="railbar" id="featBar"><span></span></div></div>
   <div id="personal"></div>
 
   <div class="browse2" id="browse2">
@@ -1305,6 +1311,7 @@ function renderSale(){
   }
   document.getElementById("saleTrack").innerHTML = html;
   salePager.reset();
+  requestAnimationFrame(saleBarUpdate);
   document.getElementById("saleEmpty").style.display = arr.length ? "none" : "block";
   document.getElementById("saleMore").style.display = arr.length ? "" : "none";
 }
@@ -1349,6 +1356,27 @@ function makePager(railId, trackId, prevId, nextId, dotsId){
 }
 const salePager = makePager("saleRail", "saleTrack", "salePrev", "saleNext", "saleDots");
 const featPager = makePager("featGrid", "featTrack", "featPrev", "featNext", "featDots");
+function bindRailBar(railId, barId){
+  const rail = document.getElementById(railId), bar = document.getElementById(barId);
+  if (!rail || !bar) return () => {};
+  const thumb = bar.querySelector("span");
+  function update(){
+    if (window.innerWidth >= 900) return;
+    const sw = rail.scrollWidth, cw = rail.clientWidth;
+    if (sw <= cw + 1) { bar.style.display = "none"; return; }
+    bar.style.display = "";
+    const bw = bar.clientWidth;
+    const tw = Math.max(28, bw * cw / sw);
+    const maxX = bw - tw;
+    thumb.style.width = tw + "px";
+    thumb.style.transform = `translateX(${maxX * (rail.scrollLeft / (sw - cw))}px)`;
+  }
+  rail.addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
+  window.addEventListener("resize", () => setTimeout(update, 160));
+  return update;
+}
+const saleBarUpdate = bindRailBar("saleRail", "saleBar");
+const featBarUpdate = bindRailBar("featGrid", "featBar");
 document.getElementById("saleMore").onclick = () => { location.href = "sale.html"; };
 function railTile(s, sm){
   const strip = `<span class="pstrip"><span class="discst">-${s.pct}%</span>${!sm && s.base > s.cur ? `<span class="pwas">${yen(s.base)}</span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span>`;
@@ -1492,6 +1520,7 @@ function featCap(x, tag, meta, cls){
   }
   document.getElementById("featTrack").innerHTML = items.join("");
   featPager.reset();
+  requestAnimationFrame(featBarUpdate);
   if (!items.length){
     document.getElementById("feat").style.display = "none";
     document.querySelector(".fnote2").style.display = "none";

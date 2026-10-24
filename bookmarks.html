@@ -141,6 +141,11 @@
   .saleTrack{display:contents}
   .sarrow{display:none}
   .saleDots{display:none}
+  .railbar{display:none}
+  @media (max-width:899px){
+    .railbar{display:block;height:4px;border-radius:2px;background:#232329;margin-top:10px;position:relative;overflow:hidden}
+    .railbar span{position:absolute;top:0;left:0;height:100%;border-radius:2px;background:#5b5b66}
+  }
   @media (min-width:900px){
     .salepanel{position:relative}
     .salepanel.hp{margin-left:54px;margin-right:54px}
