@@ -1,4 +1,4 @@
-# BoopaDB for VRChat
+# BoopaDB
 
 BOOTH（VRChat向けデジタルアイテム）の価格推移データベース。
 
