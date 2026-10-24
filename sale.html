@@ -215,6 +215,7 @@
   .caprow > .price{justify-content:center;padding:0 8px}
   .caprow > .was + .price{padding-left:3px}
   .lowtx{font-size:10.5px;color:#c8ec6e;font-weight:700;width:100%}
+  .capbtm{margin-top:auto}
   .smore{text-align:right;margin-top:2px}
   .smore button{background:rgba(255,255,255,.07);color:#e8e8ea;border:1px solid rgba(255,255,255,.16);font-weight:700;font-size:12.5px;padding:7px 20px;border-radius:3px;cursor:pointer;font-family:inherit}
   .smore button:hover{background:rgba(255,255,255,.14)}
@@ -762,7 +763,7 @@ function capCard(s){
     <div class="capbody">
       <div class="capname"><a href="${itemLink(s.id)}">${esc(s.name)}</a></div>
       <div class="capshop">${esc(s.shop || "")}</div>
-      <div class="caprow">${s.at_lowest ? '<span class="lowtx">' + tr("chip_lowest") + '</span>' : ""}<span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span></span></div>
+      <div class="capbtm">${s.at_lowest ? '<div class="lowtx">' + tr("chip_lowest") + '</div>' : ""}<div class="caprow"><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span></span></div></div>
     </div>
   </div>`;
 }
