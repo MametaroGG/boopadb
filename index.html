@@ -167,7 +167,9 @@
   .rtile{flex:0 0 280px;display:flex;flex-direction:column;background:#131316;text-decoration:none}
   .rstack{flex:0 0 118px;display:grid;grid-template-rows:154px 154px;gap:8px}
   @media (min-width:900px){.rtile{flex-basis:308px}.rstack{flex-basis:132px;grid-template-rows:168px 168px}}
-  .rtile.sm .pstrip{gap:5px;padding:6px 5px}
+  .rtile.sm .pstrip{gap:0;padding:0}
+  .rtile.sm .pstrip .bprice{flex:1}
+  .rtile.sm .pstrip .bstack{flex:1;padding:2px 6px}
   .rtile.sm .pstrip .discst{font-size:11.5px;padding:0 6px}
   .rtile.sm .pprice{font-size:12.5px}
   .rtile .rimg{position:relative;aspect-ratio:1/1;width:100%;overflow:hidden;display:block;flex:none}
@@ -1391,7 +1393,10 @@ const saleBarUpdate = bindRailBar("saleRail", "saleBar");
 const featBarUpdate = bindRailBar("featGrid", "featBar");
 document.getElementById("saleMore").onclick = () => { location.href = "sale.html"; };
 function railTile(s, sm){
-  const strip = `<span class="pstrip"><span class="discst">-${s.pct}%</span>${!sm && s.base > s.cur ? `<span class="pwas">${yen(s.base)}</span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span>`;
+  const priceIn = s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur);
+  const strip = sm
+    ? `<span class="pstrip"><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack">${s.base > s.cur ? `<span class="was">${yen(s.base)}</span>` : ""}<span class="price">${priceIn}</span></span></span></span>`
+    : `<span class="pstrip"><span class="discst">-${s.pct}%</span>${s.base > s.cur ? `<span class="pwas">${yen(s.base)}</span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${priceIn}</span></span>`;
   return `<a class="rtile${sm ? " sm" : ""}" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, s.at_lowest ? "u2" : "")}</span>${strip}</a>`;
 }
 const tabsEl = document.getElementById("sortTabs");
@@ -1511,7 +1516,7 @@ function featCap(x, tag, meta, cls){
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
       <div class="spark">${sparkSVG(x.spark)}</div>
-      <div class="caprow">${(cls || "").includes("new") ? `<span class="newtag">${tag}</span>` : ""}${pct > 0 && x.on_sale ? `<span class="discst">-${pct}%</span><span class="was">${yen(x.base)}</span>` : ""}<span class="price">${x.cur === 0 ? tr("free") : yen(x.cur)}</span><span class="fmeta">${meta}</span></div>
+      <div class="caprow">${(cls || "").includes("new") ? `<span class="newtag">${tag}</span>` : ""}${pct > 0 && x.on_sale ? `<span class="discst">-${pct}%</span><span class="was">${yen(x.base)}</span>` : ""}<span class="price">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
     </div>
   </div>`;
 }
