@@ -137,6 +137,21 @@
   #saleGrid .card{border-radius:0}
   .saleRail{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;align-items:flex-start}
   .saleRail::-webkit-scrollbar{display:none}
+  .saleTrack{display:contents}
+  .sarrow{display:none}
+  .saleDots{display:none}
+  @media (min-width:900px){
+    .salepanel{position:relative}
+    .saleRail{overflow:hidden}
+    .saleTrack{display:flex;gap:8px;position:relative;transition:transform .55s cubic-bezier(.22,.8,.3,1)}
+    .sarrow{display:block;position:absolute;top:50%;transform:translateY(-50%);z-index:5;background:none;border:none;color:rgba(255,255,255,.75);font-size:44px;line-height:1;cursor:pointer;padding:10px 8px;font-family:inherit}
+    .sarrow.prev{left:0}
+    .sarrow.next{right:0}
+    .sarrow:hover{color:#fff}
+    .saleDots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+    .saleDots span{width:22px;height:4px;border-radius:2px;background:#33333a}
+    .saleDots span.on{background:#e8e8ec}
+  }
   .rtile{flex:0 0 280px;scroll-snap-align:start;display:flex;flex-direction:column;background:#131316;text-decoration:none}
   .rstack{flex:0 0 118px;display:grid;grid-template-rows:154px 154px;gap:8px;scroll-snap-align:start}
   @media (min-width:900px){.rtile{flex-basis:308px}.rstack{flex-basis:132px;grid-template-rows:168px 168px}}
@@ -196,8 +211,8 @@
   .harrow.next{right:2px}
   .harrow:hover{color:#fff}
   @media (min-width:900px){
-    .hslide{flex-direction:row}
-    .hslide .himg{flex:1.55;aspect-ratio:auto;min-height:330px;border-radius:14px 0 0 14px}
+    .hslide{flex-direction:row;height:330px}
+    #hero .hslide .himg{flex:none;height:100%;aspect-ratio:1/1;min-height:0;border-radius:14px 0 0 14px}
     .hslide .hbody{flex:1;flex-direction:column;align-items:stretch;padding:18px 20px;height:auto}
     .hslide .hprice2{margin-top:auto;align-self:flex-end}
     .hslide .hname{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:21px}
@@ -473,7 +488,10 @@
     <button class="chip" data-f="half" data-i="chip_half">50%OFF以上</button>
   </div>
   <div class="salepanel">
-    <div class="saleRail" id="saleRail"></div>
+    <div class="saleRail" id="saleRail"><div class="saleTrack" id="saleTrack"></div></div>
+    <button class="sarrow prev" id="salePrev" data-i-al="al_prev" aria-label="前へ">‹</button>
+    <button class="sarrow next" id="saleNext" data-i-al="al_next" aria-label="次へ">›</button>
+    <div class="saleDots" id="saleDots"></div>
   </div>
   <div class="empty" id="saleEmpty" data-i="empty_none">該当する商品がありません</div>
   <div class="smore"><button id="saleMore" type="button" data-i="more">もっと見る</button></div>
@@ -1278,10 +1296,45 @@ function renderSale(){
     if (col === 2 && i + 1 < items.length) { html += `<div class="rstack">${railTile(items[i], true)}${railTile(items[i + 1], true)}</div>`; i += 2; }
     else { html += railTile(items[i], false); i++; }
   }
-  document.getElementById("saleRail").innerHTML = html;
+  document.getElementById("saleTrack").innerHTML = html;
+  salePage = 0;
+  requestAnimationFrame(layoutSalePager);
   document.getElementById("saleEmpty").style.display = arr.length ? "none" : "block";
   document.getElementById("saleMore").style.display = arr.length ? "" : "none";
 }
+let salePage = 0, salePages = [0], saleResizeT = null;
+function layoutSalePager(){
+  const rail = document.getElementById("saleRail"), track = document.getElementById("saleTrack");
+  const prev = document.getElementById("salePrev"), next = document.getElementById("saleNext"), dots = document.getElementById("saleDots");
+  if (window.innerWidth < 900) { track.style.transform = ""; return; }
+  const W = rail.clientWidth, cols = [...track.children];
+  if (!cols.length) { salePages = [0]; }
+  else {
+    const starts = [0];
+    let pageStartIdx = 0;
+    for (let k = 1; k < cols.length; k++) {
+      if (cols[k].offsetLeft + cols[k].offsetWidth - cols[pageStartIdx].offsetLeft > W) { starts.push(cols[k].offsetLeft); pageStartIdx = k; }
+    }
+    const maxShift = Math.max(0, track.scrollWidth - W);
+    salePages = [...new Set(starts.map(s => Math.min(s, maxShift)))];
+  }
+  if (salePage >= salePages.length) salePage = salePages.length - 1;
+  const multi = salePages.length > 1;
+  prev.style.display = next.style.display = multi ? "" : "none";
+  dots.style.display = multi ? "" : "none";
+  dots.innerHTML = salePages.map((_, i) => `<span class="${i === salePage ? "on" : ""}"></span>`).join("");
+  track.style.transform = `translateX(${-salePages[salePage]}px)`;
+}
+function goSalePage(d){
+  if (salePages.length < 2) return;
+  salePage = (salePage + d + salePages.length) % salePages.length;
+  const track = document.getElementById("saleTrack"), dots = document.getElementById("saleDots");
+  track.style.transform = `translateX(${-salePages[salePage]}px)`;
+  dots.innerHTML = salePages.map((_, i) => `<span class="${i === salePage ? "on" : ""}"></span>`).join("");
+}
+document.getElementById("salePrev").onclick = () => goSalePage(-1);
+document.getElementById("saleNext").onclick = () => goSalePage(1);
+window.addEventListener("resize", () => { clearTimeout(saleResizeT); saleResizeT = setTimeout(layoutSalePager, 150); });
 document.getElementById("saleMore").onclick = () => { location.href = "sale.html"; };
 function railTile(s, sm){
   const strip = `<span class="pstrip"><span class="discst">-${s.pct}%</span>${!sm && s.base > s.cur ? `<span class="pwas">${yen(s.base)}</span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span>`;
