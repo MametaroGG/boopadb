@@ -293,9 +293,9 @@
   @media (min-width:900px){
     .hslide{flex-direction:row;height:330px}
     #hero .hslide .himg{flex:none;height:100%;aspect-ratio:1/1;min-height:0;border-radius:14px 0 0 14px}
-    .hslide .hbody{flex:1;flex-direction:column;align-items:stretch;padding:18px 20px;height:auto}
+    .hslide .hbody{flex:1;min-width:0;flex-direction:column;align-items:stretch;padding:18px 20px;height:auto}
     .hslide .hprice2{margin-top:auto;align-self:flex-end}
-    .hslide .hname{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:21px}
+    .hslide .hname{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:21px;overflow:hidden;min-width:0}
   }
   .nprice,.rprice{flex:none;text-align:right}
   .nprice .was,.rprice .was{display:block;font-size:11.5px;width:fit-content;margin-left:auto}
@@ -685,7 +685,7 @@
   <div class="stats" id="stats"></div>
 
   <div class="shead" id="sale"><h2 style="border:none;margin:0;padding:0" data-i="nav_sale">セール中の商品</h2>
-    <div class="pilltabs" id="sortTabs"><span class="pill-ind"></span><button data-mode="pct" class="on" data-i="sort_pct">割引率順</button><button data-mode="amount" data-i="sort_amount">割引額順</button><button data-mode="cheap" data-i="sort_cheap">安い順</button></div></div>
+    <div class="pilltabs" id="sortTabs"><span class="pill-ind"></span><button data-mode="pop" class="on" data-i="sort_pop">人気順</button><button data-mode="pct" data-i="sort_pct">割引率順</button><button data-mode="amount" data-i="sort_amount">割引額順</button><button data-mode="cheap" data-i="sort_cheap">安い順</button></div></div>
   <div class="chips" id="chips">
     <button class="chip on" data-f="all" data-i="chip_all">すべて</button>
     <button class="chip" data-f="lowest" data-i="chip_lowest">過去最安値</button>
@@ -704,7 +704,6 @@
   <p class="note" data-i="sale_note">※ 通常価格は観測期間中の最高価格。セール判定はBoopaの収集データに基づく推定を含みます。</p>
 
   <h2 id="feat" data-i="nav_feat">注目の商品</h2>
-  <p class="fnote2" data-i="feat_note">セール中かどうかではなく、価格の動きの活発さと新着から選んでいます。</p>
   <div class="featwrap"><div class="capgrid" id="featGrid"><div id="featTrack"></div></div><button class="sarrow prev" id="featPrev" data-i-al="al_prev" aria-label="前へ">‹</button><button class="sarrow next" id="featNext" data-i-al="al_next" aria-label="次へ">›</button><div class="saleDots" id="featDots"></div><div class="railbar" id="featBar"><span></span></div></div>
   <div id="personal"></div>
 
@@ -797,7 +796,7 @@ ja: {
   nav_sale: "セール中の商品", nav_feat: "注目の商品", nav_browse: "新着・値下げ",
   hero_title: "注目＆おすすめ",
   feat_note: "セール中かどうかではなく、価格の動きの活発さと新着から選んでいます。",
-  sort_pct: "割引率順", sort_amount: "割引額順", sort_cheap: "安い順",
+  sort_pct: "割引率順", sort_amount: "割引額順", sort_cheap: "安い順", sort_pop: "人気順",
   chip_all: "すべて", chip_lowest: "過去最安値", rng_1d: "1日", rng_5d: "5日", rng_1m: "1か月", rng_6m: "6か月", rng_ytd: "年来初", rng_1y: "1年", rng_5y: "5年", rng_max: "最大", chip_half: "50%OFF以上", chip_onsale: "セール中",
   empty_none: "該当する商品がありません", more: "もっと見る",
   sale_note: "※ 通常価格は観測期間中の最高価格。セール判定はBoopaの収集データに基づく推定を含みます。",
@@ -830,7 +829,7 @@ en: {
   nav_sale: "On Sale", nav_feat: "Featured", nav_browse: "New & Price Drops",
   hero_title: "Featured & Recommended",
   feat_note: "Chosen for active price movement and freshness, not just whether they are on sale.",
-  sort_pct: "By discount %", sort_amount: "By amount saved", sort_cheap: "Price: low to high",
+  sort_pct: "By discount %", sort_amount: "By amount saved", sort_cheap: "Price: low to high", sort_pop: "Most popular",
   chip_all: "All", chip_lowest: "Lowest ever", rng_1d: "1D", rng_5d: "5D", rng_1m: "1M", rng_6m: "6M", rng_ytd: "YTD", rng_1y: "1Y", rng_5y: "5Y", rng_max: "Max", chip_half: "50% off or more", chip_onsale: "On sale",
   empty_none: "No matching products", more: "See more",
   sale_note: "* Regular price is the highest observed price. Sale status includes estimates based on Boopa's collected data.",
@@ -863,7 +862,7 @@ ko: {
   nav_sale: "할인 중인 상품", nav_feat: "주목 상품", nav_browse: "신착·가격 인하",
   hero_title: "주목 & 추천",
   feat_note: "할인 여부가 아니라 가격 변동의 활발함과 신착을 기준으로 골랐습니다.",
-  sort_pct: "할인율순", sort_amount: "할인액순", sort_cheap: "가격 낮은순",
+  sort_pct: "할인율순", sort_amount: "할인액순", sort_cheap: "가격 낮은순", sort_pop: "인기순",
   chip_all: "전체", chip_lowest: "역대 최저가", rng_1d: "1일", rng_5d: "5일", rng_1m: "1개월", rng_6m: "6개월", rng_ytd: "연초부터", rng_1y: "1년", rng_5y: "5년", rng_max: "전체", chip_half: "50% 이상 할인", chip_onsale: "할인 중",
   empty_none: "해당하는 상품이 없습니다", more: "더 보기",
   sale_note: "※ 통상 가격은 관측 기간 중 최고가입니다. 할인 판정은 Boopa의 수집 데이터에 기반한 추정을 포함합니다.",
@@ -896,7 +895,7 @@ ko: {
   nav_sale: "促销中的商品", nav_feat: "精选商品", nav_browse: "新品·降价",
   hero_title: "精选与推荐",
   feat_note: "并非按是否促销，而是按价格变动活跃度和上新来挑选。",
-  sort_pct: "按折扣率", sort_amount: "按优惠金额", sort_cheap: "价格从低到高",
+  sort_pct: "按折扣率", sort_amount: "按优惠金额", sort_cheap: "价格从低到高", sort_pop: "按人气",
   chip_all: "全部", chip_lowest: "历史最低", rng_1d: "1天", rng_5d: "5天", rng_1m: "1个月", rng_6m: "6个月", rng_ytd: "年初至今", rng_1y: "1年", rng_5y: "5年", rng_max: "全部", chip_half: "5折及以上", chip_onsale: "促销中",
   empty_none: "没有符合条件的商品", more: "查看更多",
   sale_note: "※ 原价为观测期内的最高价格。促销判定包含基于 Boopa 采集数据的推测。",
@@ -929,7 +928,7 @@ ko: {
   nav_sale: "促銷中的商品", nav_feat: "精選商品", nav_browse: "新品·降價",
   hero_title: "精選與推薦",
   feat_note: "並非按是否促銷，而是按價格變動活躍度和上新來挑選。",
-  sort_pct: "按折扣率", sort_amount: "按優惠金額", sort_cheap: "價格從低到高",
+  sort_pct: "按折扣率", sort_amount: "按優惠金額", sort_cheap: "價格從低到高", sort_pop: "按人氣",
   chip_all: "全部", chip_lowest: "歷史最低", rng_1d: "1天", rng_5d: "5天", rng_1m: "1個月", rng_6m: "6個月", rng_ytd: "年初至今", rng_1y: "1年", rng_5y: "5年", rng_max: "全部", chip_half: "5折及以上", chip_onsale: "促銷中",
   empty_none: "沒有符合條件的商品", more: "查看更多",
   sale_note: "※ 原價為觀測期內的最高價格。促銷判定包含基於 Boopa 採集數據的推測。",
@@ -1320,7 +1319,16 @@ const DATA_BASE = "https://mametarogg.github.io/booth-vrc-price-tracker/data/";
 async function fetchItemRecord(id){
   const r = await fetch(DATA_BASE + String(id).slice(0, 3) + "/" + id + ".json");
   if (!r.ok) return null;
-  return recordFromItem(await r.json());
+  const rec = recordFromItem(await r.json());
+  if (rec && !rec.image) {
+    const m = await fetchMeta(id).catch(() => null);
+    if (m) {
+      rec.image = m.image_resized || m.image || null;
+      if (!rec.shop && m.shop) rec.shop = m.shop.name || "";
+      if (m.name) rec.name = m.name;
+    }
+  }
+  return rec;
 }
 const META_BASE = "https://mametarogg.github.io/booth-vrc-price-tracker/meta/";
 const _metaCache = new Map();
@@ -1743,7 +1751,7 @@ function saleCard(s, i){
     </div>
   </div>`;
 }
-let sortMode = "pct", chipFilter = "all";
+let sortMode = "pop", chipFilter = "all";
 function saleHit(s){
   if (chipFilter === "lowest") return !!s.at_lowest;
   if (chipFilter === "free") return s.cur === 0;
@@ -1772,7 +1780,8 @@ let SALE_HOME = P.on_sale || [];
 let LISTS = { on_sale: P.on_sale || [], drops: P.drops || [], active: P.active || [], newest: P.newest || [], free: null };
 function renderSale(){
   let arr = [...SALE_HOME];
-  if (sortMode === "amount") arr.sort((a,b) => (b.base - b.cur) - (a.base - a.cur));
+  if (sortMode === "pop") arr.sort((a,b) => ((b.likes ?? -1) - (a.likes ?? -1)) || b.pct - a.pct);
+  else if (sortMode === "amount") arr.sort((a,b) => (b.base - b.cur) - (a.base - a.cur));
   else if (sortMode === "cheap") arr.sort((a,b) => a.cur - b.cur);
   else arr.sort((a,b) => b.pct - a.pct || (b.base - b.cur) - (a.base - a.cur));
   arr = arr.filter(saleHit);
