@@ -498,7 +498,7 @@
   .tlabel{font-size:9.5px;line-height:1.1;white-space:nowrap}
   .tabbar button.on .tlabel{font-weight:700}
   @keyframes bpop{0%{transform:scale(.35)}55%{transform:scale(1.2)}100%{transform:scale(1)}}
-  .spage{position:fixed;inset:0;background:var(--bg);z-index:40;overflow-y:auto;padding:16px 16px 112px;transform:translateY(102%);transition:transform .55s cubic-bezier(.32,1.18,.36,1);pointer-events:none}
+  .spage{position:fixed;inset:0;background:var(--bg);z-index:40;overflow-y:auto;overscroll-behavior:contain;padding:16px 16px 112px;transform:translateY(102%);transition:transform .55s cubic-bezier(.32,1.18,.36,1);pointer-events:none}
   .spage.open{transform:none;pointer-events:auto}
   #prodPage{z-index:45}
   .sp-head{display:flex;align-items:center;gap:12px;max-width:1080px;margin:0 auto}
@@ -1252,20 +1252,32 @@ function spRender(reset = true){
 document.getElementById("spMore").onclick = () => { spShown += 30; spRender(false); };
 // Auto-load the next batch as the list end approaches, so paging never
 // depends on the button alone (mobile taps on it proved unreliable).
+let spTick = 0;
+function spMaybeLoad(){
+  if (spTotal <= spShown) return;
+  const now = Date.now();
+  if (now - spTick < 350) return;
+  spTick = now;
+  spShown += 30; spRender(false);
+}
 const spIO = new IntersectionObserver(es => {
-  if (es.some(e => e.isIntersecting) && spTotal > spShown) { spShown += 30; spRender(false); }
+  if (es.some(e => e.isIntersecting)) spMaybeLoad();
 }, { root: document.getElementById("searchPage"), rootMargin: "700px 0px" });
 spIO.observe(document.querySelector("#searchPage .smore"));
-// Fallback: plain scroll-position detection, in case intersection
-// observation does not fire on the user's browser.
-let spScrollTick = 0;
+// Fallbacks if intersection observation does not fire on the user's
+// browser: the overlay's own scroll position, and a geometry check on
+// any scroll event (the home page under the overlay must not be able
+// to take the detection away).
 document.getElementById("searchPage").addEventListener("scroll", () => {
   const sp = document.getElementById("searchPage");
-  if (!sp.classList.contains("open")) return;
-  const now = Date.now();
-  if (now - spScrollTick < 350) return;
-  if (spTotal > spShown && sp.scrollHeight - sp.scrollTop - sp.clientHeight < 900) { spScrollTick = now; spShown += 30; spRender(false); }
+  if (spTotal > spShown && sp.scrollHeight - sp.scrollTop - sp.clientHeight < 900) spMaybeLoad();
 }, { passive: true });
+document.addEventListener("scroll", () => {
+  const sp = document.getElementById("searchPage");
+  if (!sp.classList.contains("open") || spTotal <= spShown) return;
+  const r = document.querySelector("#searchPage .smore").getBoundingClientRect();
+  if (r.top < window.innerHeight + 700 && r.bottom > -700) spMaybeLoad();
+}, { capture: true, passive: true });
 function openSearchPreset(f){
   spFilter = f;
   document.getElementById("spChips").querySelectorAll(".chip").forEach(y => y.classList.toggle("on", y.dataset.f === f));
