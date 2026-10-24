@@ -317,6 +317,9 @@
   .outlb{background:#ffdf00;color:#000;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;vertical-align:2px;white-space:nowrap}
   .cmpoutl{color:#e8c547;font-size:12px;font-weight:700;margin:0 0 8px}
   #cmpChart{position:relative}
+  .cmpranges{display:flex;gap:4px;flex-wrap:wrap;margin-top:9px}
+  .cmprange{background:#26262c;color:var(--sub);border:1px solid var(--border);font-size:11.5px;padding:3.5px 10px;border-radius:4px;cursor:pointer;font-family:inherit}
+  .cmprange.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
   .chartbox{position:relative}
   #cmpTip,.hvTip{position:absolute;top:8px;display:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
   .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
@@ -591,7 +594,7 @@ ja: {
   hero_title: "注目＆おすすめ",
   feat_note: "セール中かどうかではなく、価格の動きの活発さと新着から選んでいます。",
   sort_pct: "割引率順", sort_amount: "割引額順", sort_cheap: "安い順",
-  chip_all: "すべて", chip_lowest: "過去最安値", chip_half: "50%OFF以上", chip_onsale: "セール中",
+  chip_all: "すべて", chip_lowest: "過去最安値", rng_1d: "1日", rng_5d: "5日", rng_1m: "1か月", rng_6m: "6か月", rng_ytd: "年来初", rng_1y: "1年", rng_5y: "5年", rng_max: "最大", chip_half: "50%OFF以上", chip_onsale: "セール中",
   empty_none: "該当する商品がありません", more: "もっと見る",
   sale_note: "※ 通常価格は観測期間中の最高価格。セール判定はBoopaの収集データに基づく推定を含みます。",
   bt_new: "新着", bt_special: "スペシャル", bt_drop: "値下げ", bt_active: "価格変更が活発",
@@ -624,7 +627,7 @@ en: {
   hero_title: "Featured & Recommended",
   feat_note: "Chosen for active price movement and freshness, not just whether they are on sale.",
   sort_pct: "By discount %", sort_amount: "By amount saved", sort_cheap: "Price: low to high",
-  chip_all: "All", chip_lowest: "Lowest ever", chip_half: "50% off or more", chip_onsale: "On sale",
+  chip_all: "All", chip_lowest: "Lowest ever", rng_1d: "1D", rng_5d: "5D", rng_1m: "1M", rng_6m: "6M", rng_ytd: "YTD", rng_1y: "1Y", rng_5y: "5Y", rng_max: "Max", chip_half: "50% off or more", chip_onsale: "On sale",
   empty_none: "No matching products", more: "See more",
   sale_note: "* Regular price is the highest observed price. Sale status includes estimates based on Boopa's collected data.",
   bt_new: "New", bt_special: "Specials", bt_drop: "Price drops", bt_active: "Frequent price changes",
@@ -657,7 +660,7 @@ ko: {
   hero_title: "주목 & 추천",
   feat_note: "할인 여부가 아니라 가격 변동의 활발함과 신착을 기준으로 골랐습니다.",
   sort_pct: "할인율순", sort_amount: "할인액순", sort_cheap: "가격 낮은순",
-  chip_all: "전체", chip_lowest: "역대 최저가", chip_half: "50% 이상 할인", chip_onsale: "할인 중",
+  chip_all: "전체", chip_lowest: "역대 최저가", rng_1d: "1일", rng_5d: "5일", rng_1m: "1개월", rng_6m: "6개월", rng_ytd: "연초부터", rng_1y: "1년", rng_5y: "5년", rng_max: "전체", chip_half: "50% 이상 할인", chip_onsale: "할인 중",
   empty_none: "해당하는 상품이 없습니다", more: "더 보기",
   sale_note: "※ 통상 가격은 관측 기간 중 최고가입니다. 할인 판정은 Boopa의 수집 데이터에 기반한 추정을 포함합니다.",
   bt_new: "신착", bt_special: "스페셜", bt_drop: "가격 인하", bt_active: "가격 변동 활발",
@@ -690,7 +693,7 @@ ko: {
   hero_title: "精选与推荐",
   feat_note: "并非按是否促销，而是按价格变动活跃度和上新来挑选。",
   sort_pct: "按折扣率", sort_amount: "按优惠金额", sort_cheap: "价格从低到高",
-  chip_all: "全部", chip_lowest: "历史最低", chip_half: "5折及以上", chip_onsale: "促销中",
+  chip_all: "全部", chip_lowest: "历史最低", rng_1d: "1天", rng_5d: "5天", rng_1m: "1个月", rng_6m: "6个月", rng_ytd: "年初至今", rng_1y: "1年", rng_5y: "5年", rng_max: "全部", chip_half: "5折及以上", chip_onsale: "促销中",
   empty_none: "没有符合条件的商品", more: "查看更多",
   sale_note: "※ 原价为观测期内的最高价格。促销判定包含基于 Boopa 采集数据的推测。",
   bt_new: "新品", bt_special: "特价", bt_drop: "降价", bt_active: "价格变动频繁",
@@ -723,7 +726,7 @@ ko: {
   hero_title: "精選與推薦",
   feat_note: "並非按是否促銷，而是按價格變動活躍度和上新來挑選。",
   sort_pct: "按折扣率", sort_amount: "按優惠金額", sort_cheap: "價格從低到高",
-  chip_all: "全部", chip_lowest: "歷史最低", chip_half: "5折及以上", chip_onsale: "促銷中",
+  chip_all: "全部", chip_lowest: "歷史最低", rng_1d: "1天", rng_5d: "5天", rng_1m: "1個月", rng_6m: "6個月", rng_ytd: "年初至今", rng_1y: "1年", rng_5y: "5年", rng_max: "全部", chip_half: "5折及以上", chip_onsale: "促銷中",
   empty_none: "沒有符合條件的商品", more: "查看更多",
   sale_note: "※ 原價為觀測期內的最高價格。促銷判定包含基於 Boopa 採集數據的推測。",
   bt_new: "新品", bt_special: "特價", bt_drop: "降價", bt_active: "價格變動頻繁",
@@ -1488,6 +1491,17 @@ function bpChartSVG(ser, W, H){
   return `<svg viewBox="0 0 ${W} ${H}">${saleRects}<text x="${PL + 2}" y="10" fill="#6f6f78" font-size="${fs}">\u00a5${high.toLocaleString(LOCALE)}</text>${outlN ? `<text x="${W - PR - 2}" y="10" fill="#e8c547" font-size="${fs}" font-weight="700" text-anchor="end">${tr("outlier_n", {n: outlN})}</text>` : ""}<path d="${area}" fill="#fc4d50" opacity="0.12"/><path d="${path}" fill="none" stroke="#fc4d50" stroke-width="1.8"/><text x="${PL + 2}" y="${H - 3}" fill="#6f6f78" font-size="${fs}">${s[0][0]}</text><text x="${W - PR - 2}" y="${H - 3}" fill="#6f6f78" font-size="${fs}" text-anchor="end">${s[s.length - 1][0]}</text></svg>`;
 }
 const bpChartCache = new Map();
+async function fillFeatCharts(){
+  const phs = [...document.querySelectorAll("#featTrack [data-fchart]")];
+  for (const ph of phs) {
+    const id = ph.getAttribute("data-fchart");
+    ph.removeAttribute("data-fchart");
+    if (!bpChartCache.has(id)) bpChartCache.set(id, (async () => { try { const r = await fetchItemRecord(id); if (r) regP(r); return r; } catch { return null; } })());
+    const rec = await bpChartCache.get(id);
+    const ser = rec ? repSeriesOf(rec) : null;
+    if (ser && ph.isConnected) { ph.classList.add("kp"); ph.innerHTML = bpChartSVG(ser, 200, 64); }
+  }
+}
 async function fillBpChart(){
   const ph = document.querySelector("#bPrev [data-bpchart]");
   if (!ph) return;
@@ -1565,7 +1579,7 @@ function featCap(x, tag, meta, cls){
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
-      <div class="spark${fser ? " kp" : ""}">${fser ? bpChartSVG(fser, 200, 64) : sparkSVG(x.spark)}</div>
+      <div class="spark${fser ? " kp" : ""}"${fser ? "" : ` data-fchart="${x.id}"`}>${fser ? bpChartSVG(fser, 200, 64) : sparkSVG(x.spark)}</div>
       <div class="caprow">${(cls || "").includes("new") ? `<span class="newtag">${tag}</span>` : ""}${pct > 0 && x.on_sale ? `<span class="discst">-${pct}%</span><span class="was">${yen(x.base)}</span>` : ""}<span class="price">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
     </div>
   </div>`;
@@ -1586,6 +1600,7 @@ function featCap(x, tag, meta, cls){
     picked.forEach(x => items.push(featCap(x, tr("bt_new"), tr("added_on", {d: x.first_date}), " new")));
   }
   document.getElementById("featTrack").innerHTML = items.join("");
+  fillFeatCharts();
   featPager.reset();
   requestAnimationFrame(featBarUpdate);
   if (!items.length){
@@ -1735,6 +1750,9 @@ function renderPPBody(x){
 const CMP_COLORS = ["#fc4d50", "#f2994a", "#e8c547", "#a4d007", "#2dcccd", "#b388ff", "#ff7eb6", "#8d9eec", "#c98f4e", "#7fd08a", "#e06c75", "#98c379"];
 let cmpOn = {};
 let cmpOpen = false;
+const CMP_RANGES = {"1d": 1, "5d": 5, "1m": 30, "6m": 182, "1y": 365, "5y": 1825};
+const CMP_RANGE_KEYS = ["1d", "5d", "1m", "6m", "ytd", "1y", "5y", "max"];
+let cmpRange = "max";
 let CMP_GROUPS = [];
 function cmpSig(ser){ return ser.p.map(p => p[1] + (p[2] ? "s" : "")).join(","); }
 function cmpDefaults(x, keys){
@@ -1742,11 +1760,18 @@ function cmpDefaults(x, keys){
   keys.forEach(k => { cmpOn[k] = true; });
 }
 function cmpDomain(x, keys){
-  let high = 0, t0 = Infinity, t1 = -Infinity;
-  keys.forEach(k => { if (!cmpOn[k]) return; seriesOf(x, k).p.forEach(p => { if (!p[3] && p[1] > high) high = p[1]; const t = dnum(p[0]); if (t < t0) t0 = t; if (t > t1) t1 = t; }); });
+  let t0 = Infinity, t1 = -Infinity;
+  keys.forEach(k => { if (!cmpOn[k]) return; seriesOf(x, k).p.forEach(p => { const t = dnum(p[0]); if (t < t0) t0 = t; if (t > t1) t1 = t; }); });
   if (!isFinite(t0)) { t0 = 0; t1 = 1; }
   if (t1 <= t0) t1 = t0 + 1;
-  return {high, t0, t1};
+  // Period filter, same ranges as the Boopa extension: the window ends at
+  // the newest data point; "max" keeps the full span.
+  let w0 = t0;
+  if (cmpRange === "ytd") w0 = Math.max(t0, dnum(diso(t1).slice(0, 4) + "-01-01"));
+  else if (cmpRange !== "max") w0 = Math.max(t0, t1 - CMP_RANGES[cmpRange]);
+  let high = 0;
+  keys.forEach(k => { if (!cmpOn[k]) return; const ser = seriesOf(x, k); ser.p.forEach(p => { if (!p[3] && dnum(p[0]) >= w0 && p[1] > high) high = p[1]; }); const ap = pricePtAt(ser, w0); if (ap && !ap[3] && ap[1] > high) high = ap[1]; });
+  return {high, t0: w0, t1};
 }
 function compareSVG(x, keys){
   const act = keys.filter(k => cmpOn[k]);
@@ -1764,9 +1789,14 @@ function compareSVG(x, keys){
   }
   let lines = "";
   act.forEach(k => {
-    const s = seriesOf(x, k).p, col = CMP_COLORS[keys.indexOf(k) % CMP_COLORS.length];
+    const ser = seriesOf(x, k), s = ser.p, col = CMP_COLORS[keys.indexOf(k) % CMP_COLORS.length];
+    const disp = [];
+    const ap = pricePtAt(ser, t0);
+    if (ap && dnum(ap[0]) < t0) disp.push([diso(t0), ap[1], ap[2], ap[3]]);
+    s.forEach(p => { const t = dnum(p[0]); if (t >= t0 && t <= t1) disp.push(p); });
+    if (!disp.length) return;
     let path = "";
-    s.forEach((p, j) => { const cx = X(dnum(p[0])), cy = Y(p[1]); path += j === 0 ? `M${cx},${cy}` : ` H${cx} V${cy}`; });
+    disp.forEach((p, j) => { const cx = X(dnum(p[0])), cy = Y(p[1]); path += j === 0 ? `M${cx},${cy}` : ` H${cx} V${cy}`; });
     path += ` H${X(t1)}`;
     lines += `<path d="${path}" fill="none" stroke="${col}" stroke-width="2"/>`;
   });
@@ -1779,7 +1809,8 @@ function priceAt(ser, t){
   return v;
 }
 function pricePtAt(ser, t){
-  let pt = ser.p.length ? ser.p[0] : null;
+  if (!ser.p.length || dnum(ser.p[0][0]) > t) return null;
+  let pt = ser.p[0];
   for (const p of ser.p) { if (dnum(p[0]) <= t) pt = p; else break; }
   return pt;
 }
@@ -1834,7 +1865,8 @@ function wireCmpTip(x){
     const {t0, t1} = cmpDomain(x, keys);
     const t = t0 + (vx - PL) / (W - PL - PR) * (t1 - t0);
     const rows = keys.filter(k => cmpOn[k])
-      .map(k => { const pt = pricePtAt(seriesOf(x, k), t); return {name: k, col: CMP_COLORS[keys.indexOf(k) % CMP_COLORS.length], v: pt ? pt[1] : 0, outl: !!(pt && pt[3])}; })
+      .map(k => { const pt = pricePtAt(seriesOf(x, k), t); return pt ? {name: k, col: CMP_COLORS[keys.indexOf(k) % CMP_COLORS.length], v: pt[1], outl: !!pt[3]} : null; })
+      .filter(Boolean)
       .sort((p, q) => q.v - p.v)
       .map(rw => `<div class="cmtr"><span class="cmpdot" style="background:${rw.col}"></span><span class="cmtn">${esc(rw.name)}</span><b>${yen(rw.v)}</b>${rw.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`).join("");
     tip.innerHTML = `<div class="cmtd">${diso(t)}</div>` + rows;
@@ -1861,10 +1893,12 @@ function renderCompare(x){
     const on = !!cmpOn[k];
     return `<button type="button" class="cmpchip ${on ? "on" : ""}" data-ck="${i}" style="${on ? `border-color:${col};background:${col}26` : ""}"><span class="cmpdot" style="background:${col}"></span>${esc(k)} — ${yen(cur)}</button>`;
   }).join("");
+  const rangeBtns = CMP_RANGE_KEYS.map(k => `<button type="button" class="cmprange ${cmpRange === k ? "on" : ""}" data-cr="${k}">${tr("rng_" + k)}</button>`).join("");
   const outlTotal = keys.reduce((n, k) => n + seriesOf(x, k).p.filter(p => p[3]).length, 0);
-  el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span><button type="button" class="pp-toggle ${cmpOpen ? "open" : ""}" id="cmpTgl" style="margin-left:auto"><span class="car"></span></button></div><div id="cmpBody"${cmpOpen ? "" : " hidden"}><div class="cmplegend">${legend}</div>${outlTotal ? `<div class="cmpoutl">${tr("outlier_n", {n: outlTotal})}</div>` : ""}<div id="cmpChart">${compareSVG(x, keys)}<div id="cmpTip"></div></div></div></div>`;
+  el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span><button type="button" class="pp-toggle ${cmpOpen ? "open" : ""}" id="cmpTgl" style="margin-left:auto"><span class="car"></span></button></div><div id="cmpBody"${cmpOpen ? "" : " hidden"}><div class="cmplegend">${legend}</div>${outlTotal ? `<div class="cmpoutl">${tr("outlier_n", {n: outlTotal})}</div>` : ""}<div id="cmpChart">${compareSVG(x, keys)}<div id="cmpTip"></div></div><div class="cmpranges">${rangeBtns}</div></div></div>`;
   const cmpTgl = el.querySelector("#cmpTgl"), cmpBody = el.querySelector("#cmpBody");
   if (cmpTgl && cmpBody) cmpTgl.onclick = () => { cmpOpen = !cmpOpen; cmpBody.hidden = !cmpOpen; cmpTgl.classList.toggle("open", cmpOpen); };
+  el.querySelectorAll("[data-cr]").forEach(b => b.onclick = () => { cmpRange = b.dataset.cr; renderCompare(x); });
   el.querySelectorAll("[data-ck]").forEach(b => b.onclick = () => {
     const k = keys[+b.dataset.ck];
     if (cmpOn[k] && keys.filter(kk => cmpOn[kk]).length <= 1) return;
