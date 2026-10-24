@@ -1762,7 +1762,7 @@ function varBlockHTML(x, key, idx){
   const head = `<div class="pp-varhead">${key ? `<span class="pp-varname">${esc(key)}</span><span class="pp-varprice">${yen(curP)}</span>${s[s.length - 1][3] ? '<span class="outlb">' + tr("outlier") + '</span>' : ""}${onSaleNow ? `<span class="bpchip">${tr("chip_onsale")}</span>` : ""}${curP <= low ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}` : ""}<button type="button" class="chExpand" data-exp="${idx || 0}" aria-label="${tr("al_expand")}">${EXPAND_SVG}</button></div>`;
   const chg = changesHTML(ser);
   const chgSec = chg.n ? `<div class="pp-changes"><button type="button" class="pp-toggle" data-chgbtn>${tr("pp_changes")}（${chg.n}）<span class="car"></span></button><div class="pp-chgbody" hidden>${chg.html}</div></div>` : `<div class="pp-changes">${chg.html}</div>`;
-  return `<div class="pp-varblock">${head}<div class="pstats">${statsHTML(ser)}</div><div class="chartbox">${chartSVG(windowSeries(ser), key ? 210 : 300)}<div class="hvTip charttip"></div></div>${chgSec}</div>`;
+  return `<div class="pp-varblock">${head}<div class="pstats">${statsHTML(ser)}</div><div class="chartbox">${chartSVG(windowSeries(ser), key ? 210 : 300)}</div><div class="hvTip charttip"></div>${chgSec}</div>`;
 }
 function renderPPBody(x){
   const keys = x.variations ? Object.keys(x.variations) : [];
@@ -1904,7 +1904,8 @@ function chartTouch(svg, move, hide){
   svg.addEventListener("pointerleave", e => { if (e.pointerType !== "touch") hide(); });
 }
 function wireHover(box, ser){
-  const tip = box.querySelector(".hvTip");
+  const host = box.closest(".pp-varblock") || box;
+  const tip = host.querySelector(".hvTip");
   const svg = box.querySelector("svg");
   if (!tip || !svg || !ser || !ser.p || !ser.p.length) return;
   const pts = ser.p;
@@ -1922,9 +1923,17 @@ function wireHover(box, ser){
     const sale = !!(pt && pt[2]);
     tip.innerHTML = `<div class="cmtd">${diso(t)}</div><div class="cmtr"><b>${yen(v)}</b>${pt && pt[3] ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}${sale ? '<span class="cmpdot" style="background:#fc4d50"></span><span>' + tr("chip_onsale") + '</span>' : ""}</div>`;
     tip.style.display = "block";
-    const wrapW = box.clientWidth, sl = box.scrollLeft || 0;
-    const px = fx * svg.clientWidth;
-    tip.style.left = Math.min(Math.max(px + 12, sl + 4), Math.max(sl + 4, sl + wrapW - tip.offsetWidth - 4)) + "px";
+    if (box.classList.contains("cpchart")) {
+      const br = box.getBoundingClientRect();
+      tip.style.left = Math.min(Math.max(e.clientX - br.left + 12, 4), Math.max(4, br.width - tip.offsetWidth - 4)) + "px";
+      tip.style.top = "8px";
+    } else {
+      const block = tip.offsetParent || host;
+      const br = block.getBoundingClientRect();
+      const cr = box.getBoundingClientRect();
+      tip.style.left = Math.min(Math.max(e.clientX - br.left + 14, 4), Math.max(4, br.width - tip.offsetWidth - 4)) + "px";
+      tip.style.top = (window.innerWidth <= 700 ? Math.max(0, cr.top - br.top - tip.offsetHeight - 6) : cr.top - br.top + 8) + "px";
+    }
     const gd = svg.querySelector(".hvGuide");
     if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
   };
@@ -1965,7 +1974,8 @@ function wireCmpTip(x, wrap, tip){
     const cr = wrap.getBoundingClientRect();
     const px = e.clientX - br.left + 14;
     tip.style.left = Math.min(Math.max(px, 4), Math.max(4, br.width - tip.offsetWidth - 4)) + "px";
-    tip.style.top = Math.max(0, cr.top - br.top + 8) + "px";
+    const above = block !== wrap && window.innerWidth <= 700;
+    tip.style.top = (above ? Math.max(0, cr.top - br.top - tip.offsetHeight - 6) : Math.max(0, cr.top - br.top + 8)) + "px";
     const gd = svg.querySelector("#cmpGuide");
     if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
   };
