@@ -874,7 +874,7 @@ document.querySelectorAll("[data-i-ph]").forEach(el => { el.placeholder = tr(el.
 
 // ==== full (uncapped) lists: fetched lazily; pages fall back to the inlined sample ====
 async function loadFull(){
-  try { const r = await fetch("lists_full.json"); if (r.ok) return await r.json(); } catch {}
+  try { const r = await fetch("lists_full.json?v=20251025-2"); if (r.ok) return await r.json(); } catch {}
   return null;
 }
 

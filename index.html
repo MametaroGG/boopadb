@@ -1261,7 +1261,7 @@ async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
   try {
-    const rs = await Promise.all([0, 1, 2, 3, 4, 5].map(i => fetch("search_index_" + i + ".json")));
+    const rs = await Promise.all([0, 1, 2, 3, 4, 5].map(i => fetch("search_index_" + i + ".json?v=20251025-2")));
     if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow]); }
   } catch {}
   fullIndexLoading = false;
@@ -1331,7 +1331,7 @@ function fetchMeta(id){
 }
 const _relShardCache = {};
 function fetchRelShard(n){
-  if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json").then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json?v=20251025-2").then(r => r.ok ? r.json() : {}).catch(() => ({}));
   return _relShardCache[n];
 }
 const HEART_SVG = '<svg viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.1a5 5 0 1 1 7.5 6.5z"/></svg>';
@@ -2021,7 +2021,7 @@ document.getElementById("bMore").onclick = () => { location.href = BMORE[bTab] |
 setBTab("new");
 // Full lists swap-in: the home sale section and browse tabs run on the
 // whole catalog once lists_full.json arrives (the sample paints first).
-fetch("lists_full.json").then(r => r.ok ? r.json() : null).then(f => {
+fetch("lists_full.json?v=20251025-2").then(r => r.ok ? r.json() : null).then(f => {
   if (!f) return;
   FULL_LISTS = f;
   if (f.on_sale && f.on_sale.length) { SALE_HOME = f.on_sale; LISTS.on_sale = f.on_sale; renderSale(); }

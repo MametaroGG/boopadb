@@ -910,7 +910,7 @@ document.querySelectorAll("[data-i-ph]").forEach(el => { el.placeholder = tr(el.
 
 // ==== full (uncapped) lists: fetched lazily; pages fall back to the inlined sample ====
 async function loadFull(){
-  try { const r = await fetch("lists_full.json"); if (r.ok) return await r.json(); } catch {}
+  try { const r = await fetch("lists_full.json?v=20251025-2"); if (r.ok) return await r.json(); } catch {}
   return null;
 }
 
@@ -954,7 +954,7 @@ const byPct = (a, b) => b.pct - a.pct || (b.base - b.cur) - (a.base - a.cur);
 // if too few qualify so the mosaic never breaks.
 const featPick = arr => {
   const sane = arr.filter(s => s.base > 0 && s.base <= 100000)
-    .sort((a, b) => (b.at_lowest - a.at_lowest) || byPct(a, b));
+    .sort((a, b) => ((b.image ? 1 : 0) - (a.image ? 1 : 0)) || (b.at_lowest - a.at_lowest) || byPct(a, b));
   const rest = arr.filter(s => !sane.includes(s)).sort(byPct);
   return [...sane, ...rest].slice(0, 12);
 };
