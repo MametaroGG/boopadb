@@ -327,7 +327,20 @@
     .chartbox,#cmpChart{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
     .chartbox svg,#cmpChart svg{width:720px;max-width:none;height:auto}
   }
-  #cmpTip,.hvTip{position:absolute;top:8px;display:none;pointer-events:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  .chExpand{position:absolute;top:6px;right:6px;z-index:4;width:30px;height:30px;border-radius:8px;background:rgba(23,23,26,.88);border:1px solid var(--border2);display:none;align-items:center;justify-content:center;cursor:pointer}
+  .chExpand svg{width:16px;height:16px;fill:none;stroke:#ececee;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  @media (max-width:700px){.chExpand{display:flex}}
+  #chartPop{position:fixed;inset:0;z-index:80;background:rgba(6,6,8,.88);display:flex;align-items:center;justify-content:center;padding:12px}
+  #chartPop[hidden]{display:none}
+  .cp-box{background:#17171a;border:1px solid var(--border2);border-radius:14px;width:100%;max-width:880px;max-height:94vh;overflow-y:auto;padding:14px}
+  .cp-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  #cpTitle{font-size:15px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #cpClose{width:32px;height:32px;flex:none;border-radius:8px;background:#232329;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  #cpClose svg{width:16px;height:16px;fill:none;stroke:#ececee;stroke-width:2;stroke-linecap:round}
+  .cpchart{position:relative}
+  .cpchart svg{width:100%;height:auto;display:block;-webkit-touch-callout:none;user-select:none;touch-action:pan-y}
+  #cpRanges{margin-top:10px}
+  #cmpTip,#cpCmpTip,.hvTip{position:absolute;top:8px;display:none;pointer-events:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
   .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
   .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
   .cmtn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
@@ -561,6 +574,15 @@
   <div class="sp-head"><button class="sp-back" id="ppBack" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><div class="sp-title" data-i="pp_title">商品詳細</div></div>
   <div class="pp-inner" id="ppBody"></div>
 </div>
+<div id="chartPop" hidden>
+  <div class="cp-box">
+    <div class="cp-head"><span id="cpTitle"></span><button type="button" id="cpClose" data-i-al="al_close" aria-label="閉じる"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="cpLegend"></div>
+    <div id="cpOutl"></div>
+    <div class="cpchart" id="cpChart"></div>
+    <div class="cmpranges" id="cpRanges"></div>
+  </div>
+</div>
 <nav class="tabbar" id="tabbar">
   <svg id="barShape" aria-hidden="true"><path id="barPath" fill="#1e1e22" stroke="#2e2e35" stroke-width="1"/></svg>
   <button data-to="#hero" class="on"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/></svg><span class="tlabel" data-i="tab_home">ホーム</span></button>
@@ -612,7 +634,7 @@ ja: {
   ft_tm: "BOOTH は pixiv株式会社の商標です。その他の商標および著作物は、各権利者に帰属します。",
   pp_title: "商品詳細", sp_title: "商品検索", sp_ph: "商品名・ショップ名で検索", sp_shops: "ショップから探す",
   tab_home: "ホーム", tab_sale: "セール", tab_news: "ニュース", tab_ranking: "ランキング", tab_bm: "ブックマーク",
-  al_back: "戻る", al_prev: "前へ", al_next: "次へ", al_search: "検索", al_slide: "スライド",
+  al_back: "戻る", al_prev: "前へ", al_next: "次へ", al_expand: "拡大表示", al_close: "閉じる", al_search: "検索", al_slide: "スライド",
   st_total: "追跡中の商品", st_sale: "現在セール中（推定）", st_free: "現在無料の商品（元¥300以上）", st_changed: "価格変更のあった商品", st_period: "データ収集期間（最古の観測）",
   free: "無料", rib_sale: "セール",
   status_lowest: "過去最安値で販売中", save_note: "{v} お得",
@@ -645,7 +667,7 @@ en: {
   ft_tm: "BOOTH is a trademark of pixiv Inc. All other trademarks and works belong to their respective owners.",
   pp_title: "Product details", sp_title: "Search products", sp_ph: "Search by product or shop name", sp_shops: "Browse by shop",
   tab_home: "Home", tab_sale: "Sale", tab_news: "News", tab_ranking: "Rankings", tab_bm: "Bookmarks",
-  al_back: "Back", al_prev: "Previous", al_next: "Next", al_search: "Search", al_slide: "Slide",
+  al_back: "Back", al_prev: "Previous", al_next: "Next", al_expand: "Expand", al_close: "Close", al_search: "Search", al_slide: "Slide",
   st_total: "Products tracked", st_sale: "On sale now (est.)", st_free: "Free now (was ¥300+)", st_changed: "Products with price changes", st_period: "Data collection period (oldest)",
   free: "Free", rib_sale: "Sale",
   status_lowest: "Now at its lowest price ever", save_note: "Save {v}",
@@ -678,7 +700,7 @@ ko: {
   ft_tm: "BOOTH는 pixiv 주식회사의 상표입니다. 그 밖의 상표 및 저작물은 각 권리자에게 귀속합니다.",
   pp_title: "상품 상세", sp_title: "상품 검색", sp_ph: "상품명·샵 이름으로 검색", sp_shops: "샵으로 찾기",
   tab_home: "홈", tab_sale: "세일", tab_news: "뉴스", tab_ranking: "랭킹", tab_bm: "북마크",
-  al_back: "뒤로", al_prev: "이전", al_next: "다음", al_search: "검색", al_slide: "슬라이드",
+  al_back: "뒤로", al_prev: "이전", al_next: "다음", al_expand: "확대", al_close: "닫기", al_search: "검색", al_slide: "슬라이드",
   st_total: "추적 중인 상품", st_sale: "현재 할인 중(추정)", st_free: "현재 무료 상품(기존 ¥300 이상)", st_changed: "가격 변동이 있었던 상품", st_period: "데이터 수집 기간(가장 오래된 관측)",
   free: "무료", rib_sale: "세일",
   status_lowest: "역대 최저가로 판매 중", save_note: "{v} 절약",
@@ -711,7 +733,7 @@ ko: {
   ft_tm: "BOOTH 是 pixiv 株式会社的商标。其他商标及作品归各权利方所有。",
   pp_title: "商品详情", sp_title: "搜索商品", sp_ph: "按商品名或店铺名搜索", sp_shops: "按店铺浏览",
   tab_home: "首页", tab_sale: "促销", tab_news: "动态", tab_ranking: "排行榜", tab_bm: "收藏",
-  al_back: "返回", al_prev: "上一个", al_next: "下一个", al_search: "搜索", al_slide: "幻灯片",
+  al_back: "返回", al_prev: "上一个", al_next: "下一个", al_expand: "放大显示", al_close: "关闭", al_search: "搜索", al_slide: "幻灯片",
   st_total: "追踪中的商品", st_sale: "当前促销中（估计）", st_free: "当前免费商品（原价 ¥300 以上）", st_changed: "有价格变动的商品", st_period: "数据采集期间（最早观测）",
   free: "免费", rib_sale: "促销",
   status_lowest: "正以历史最低价销售", save_note: "省 {v}",
@@ -744,7 +766,7 @@ ko: {
   ft_tm: "BOOTH 是 pixiv 株式會社的商標。其他商標及作品歸各權利方所有。",
   pp_title: "商品詳情", sp_title: "搜尋商品", sp_ph: "按商品名或店舖名搜尋", sp_shops: "按店舖瀏覽",
   tab_home: "首頁", tab_sale: "促銷", tab_news: "動態", tab_ranking: "排行榜", tab_bm: "收藏",
-  al_back: "返回", al_prev: "上一個", al_next: "下一個", al_search: "搜尋", al_slide: "投影片",
+  al_back: "返回", al_prev: "上一個", al_next: "下一個", al_expand: "放大顯示", al_close: "關閉", al_search: "搜尋", al_slide: "投影片",
   st_total: "追蹤中的商品", st_sale: "當前促銷中（估計）", st_free: "當前免費商品（原價 ¥300 以上）", st_changed: "有價格變動的商品", st_period: "數據採集期間（最早觀測）",
   free: "免費", rib_sale: "促銷",
   status_lowest: "正以歷史最低價銷售", save_note: "省 {v}",
@@ -1908,11 +1930,11 @@ function wireBlockHovers(x){
   const keys = x.variations ? Object.keys(x.variations) : [];
   const all = keys.length ? keys.map(k => windowSeries(seriesOf(x, k))) : [windowSeries(seriesOf(x, null))];
   const sers = all.filter(ser => ser.p && ser.p.length >= 2);
-  document.querySelectorAll("#ppBody .chartbox").forEach((box, i) => { if (sers[i]) wireHover(box, sers[i]); box.scrollLeft = box.scrollWidth; });
+  document.querySelectorAll("#ppBody .chartbox").forEach((box, i) => { if (sers[i]) wireHover(box, sers[i]); box.scrollLeft = box.scrollWidth; box.appendChild(expandBtn(() => openChartPop("var", i))); });
 }
-function wireCmpTip(x){
-  const wrap = document.getElementById("cmpChart");
-  const tip = document.getElementById("cmpTip");
+function wireCmpTip(x, wrap, tip){
+  wrap = wrap || document.getElementById("cmpChart");
+  tip = tip || document.getElementById("cmpTip");
   const svg = wrap && wrap.querySelector("svg");
   if (!wrap || !svg || !tip) return;
   const hide = () => { tip.style.display = "none"; const gd = svg.querySelector("#cmpGuide"); if (gd) gd.setAttribute("opacity", "0"); };
@@ -1941,18 +1963,21 @@ function wireCmpTip(x){
   chartTouch(svg, move, hide);
   wrap.scrollLeft = wrap.scrollWidth;
 }
-function renderCompare(x){
-  const el = document.getElementById("ppCompare");
-  if (!el) return;
-  const keys = Object.keys(x.variations || {});
-  if (keys.length < 2) { el.innerHTML = ""; return; }
-  const legend = keys.map((k, i) => {
+function cmpLegendHTML(x, keys){
+  return keys.map((k, i) => {
     const s = seriesOf(x, k).p;
     const cur = s.length ? s[s.length - 1][1] : 0;
     const col = CMP_COLORS[i % CMP_COLORS.length];
     const on = !!cmpOn[k];
     return `<button type="button" class="cmpchip ${on ? "on" : ""}" data-ck="${i}" style="${on ? `border-color:${col};background:${col}26` : ""}"><span class="cmpdot" style="background:${col}"></span>${esc(k)} — ${yen(cur)}</button>`;
   }).join("");
+}
+function renderCompare(x){
+  const el = document.getElementById("ppCompare");
+  if (!el) return;
+  const keys = Object.keys(x.variations || {});
+  if (keys.length < 2) { el.innerHTML = ""; return; }
+  const legend = cmpLegendHTML(x, keys);
   const rangeBtns = rangeBtnsHTML();
   const outlTotal = keys.reduce((n, k) => n + seriesOf(x, k).p.filter(p => p[3]).length, 0);
   el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span><button type="button" class="pp-toggle ${cmpOpen ? "open" : ""}" id="cmpTgl" style="margin-left:auto"><span class="car"></span></button></div><div id="cmpBody"${cmpOpen ? "" : " hidden"}><div class="cmplegend">${legend}</div>${outlTotal ? `<div class="cmpoutl">${tr("outlier_n", {n: outlTotal})}</div>` : ""}<div id="cmpChart">${compareSVG(x, keys)}<div id="cmpTip"></div></div><div class="cmpranges">${rangeBtns}</div></div></div>`;
@@ -1966,10 +1991,62 @@ function renderCompare(x){
     renderCompare(x);
   });
   wireCmpTip(x);
+  const cw = el.querySelector("#cmpChart");
+  if (cw) cw.appendChild(expandBtn(() => openChartPop("cmp", 0)));
 }
+const EXPAND_SVG = '<svg viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></svg>';
+function expandBtn(onclick){
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "chExpand"; b.setAttribute("aria-label", tr("al_expand"));
+  b.innerHTML = EXPAND_SVG; b.onclick = onclick;
+  return b;
+}
+let cpState = null;
+function openChartPop(kind, idx){
+  const x = ppX; if (!x) return;
+  cpState = {kind, idx};
+  const pop = document.getElementById("chartPop");
+  const title = document.getElementById("cpTitle");
+  const chart = document.getElementById("cpChart");
+  const legend = document.getElementById("cpLegend");
+  const outl = document.getElementById("cpOutl");
+  legend.innerHTML = ""; outl.innerHTML = "";
+  if (kind === "cmp") {
+    const keys = Object.keys(x.variations || {});
+    title.textContent = tr("pp_compare");
+    legend.innerHTML = `<div class="cmplegend">${cmpLegendHTML(x, keys)}</div>`;
+    const ot = keys.reduce((n, k) => n + seriesOf(x, k).p.filter(p => p[3]).length, 0);
+    if (ot) outl.innerHTML = `<div class="cmpoutl">${tr("outlier_n", {n: ot})}</div>`;
+    chart.innerHTML = compareSVG(x, keys) + '<div id="cpCmpTip"></div>';
+    wireCmpTip(x, chart, document.getElementById("cpCmpTip"));
+    legend.querySelectorAll("[data-ck]").forEach(b => b.onclick = () => {
+      const k = keys[+b.dataset.ck];
+      if (cmpOn[k] && keys.filter(kk => cmpOn[kk]).length <= 1) return;
+      cmpOn[k] = !cmpOn[k];
+      renderCompare(x);
+      openChartPop("cmp", 0);
+    });
+  } else {
+    const key = ppKeys[idx] != null ? ppKeys[idx] : "";
+    const ws = windowSeries(seriesOf(x, key));
+    title.textContent = key || x.name;
+    chart.innerHTML = chartSVG(ws, 380) + '<div class="hvTip"></div>';
+    wireHover(chart, ws);
+  }
+  document.getElementById("cpRanges").innerHTML = rangeBtnsHTML();
+  pop.querySelectorAll("[data-cr]").forEach(b => b.onclick = () => { ppRange = b.dataset.cr; renderPPBody(ppX); wireBlockHovers(ppX); openChartPop(cpState.kind, cpState.idx); });
+  document.getElementById("cpClose").onclick = closeChartPop;
+  pop.onclick = e => { if (e.target === pop) closeChartPop(); };
+  pop.hidden = false;
+}
+function closeChartPop(){ const p = document.getElementById("chartPop"); if (p) p.hidden = true; cpState = null; }
+document.addEventListener("keydown", e => { if (e.key === "Escape" && cpState) closeChartPop(); });
+let ppX = null, ppKeys = [];
 function renderProdPage(x){
+  ppX = x;
   const bm = isBm(x.id);
   const keys = x.variations ? Object.keys(x.variations) : [];
+  ppKeys = keys;
   document.getElementById("ppBody").innerHTML = `
   <div class="pp-top">
     <div class="pp-imgwrap">${x.image ? `<img class="hbg" src="${x.image}" alt="" aria-hidden="true" referrerpolicy="no-referrer"><img class="hfg" src="${x.image}" alt="" referrerpolicy="no-referrer">` : ""}</div>
