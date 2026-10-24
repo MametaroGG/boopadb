@@ -322,12 +322,12 @@
   .cmprange.on{color:#fff;font-weight:700;border-bottom-color:var(--accent)}
   .pp-ranges{position:sticky;top:-17px;z-index:5;background:var(--bg);margin:0 0 10px;padding-top:8px}
   .chartbox{position:relative}
-  .chartbox svg,#cmpChart svg{-webkit-touch-callout:none;user-select:none}
+  .chartbox svg,#cmpChart svg{-webkit-touch-callout:none;user-select:none;touch-action:pan-y}
   @media (max-width:700px){
     .chartbox,#cmpChart{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
     .chartbox svg,#cmpChart svg{width:720px;max-width:none;height:auto}
   }
-  #cmpTip,.hvTip{position:absolute;top:8px;display:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  #cmpTip,.hvTip{position:absolute;top:8px;display:none;pointer-events:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
   .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
   .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
   .cmtn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
@@ -1843,25 +1843,39 @@ function pricePtAt(ser, t){
   return pt;
 }
 function chartTouch(svg, move, hide){
-  let timer = null, scrub = false, sx = 0, sy = 0, lastE = null, lastTouch = false;
+  const box = svg.parentElement;
+  let timer = null, scrubbing = false, sx = 0, sy = 0, downAt = 0, lastE = null;
+  const edgePan = e => {
+    const max = box.scrollWidth - box.clientWidth;
+    if (max <= 0) return;
+    const br = box.getBoundingClientRect(), vx = e.clientX - br.left;
+    if (vx > br.width - 36 && box.scrollLeft < max) { box.scrollLeft = Math.min(max, box.scrollLeft + 14); move(e); }
+    else if (vx < 36 && box.scrollLeft > 0) { box.scrollLeft = Math.max(0, box.scrollLeft - 14); move(e); }
+  };
   svg.addEventListener("contextmenu", e => e.preventDefault());
   svg.addEventListener("pointerdown", e => {
-    lastTouch = e.pointerType === "touch";
-    if (!lastTouch) { move(e); return; }
-    sx = e.clientX; sy = e.clientY; lastE = e; scrub = false;
+    if (e.pointerType !== "touch") { move(e); return; }
+    hide();
+    sx = e.clientX; sy = e.clientY; lastE = e; downAt = Date.now(); scrubbing = false;
     if (timer) clearTimeout(timer);
-    timer = setTimeout(() => { timer = null; scrub = true; svg.style.touchAction = "none"; if (lastE) move(lastE); }, 260);
+    timer = setTimeout(() => { timer = null; scrubbing = true; if (lastE) move(lastE); }, 200);
   });
   svg.addEventListener("pointermove", e => {
     if (e.pointerType !== "touch") { move(e); return; }
     lastE = e;
-    if (scrub) { e.preventDefault(); move(e); }
-    else if (timer && (Math.abs(e.clientX - sx) > 12 || Math.abs(e.clientY - sy) > 12)) { clearTimeout(timer); timer = null; }
+    if (scrubbing) { move(e); edgePan(e); return; }
+    const dx = Math.abs(e.clientX - sx), dy = Math.abs(e.clientY - sy);
+    if (dx >= 8 && dx > dy) { if (timer) { clearTimeout(timer); timer = null; } scrubbing = true; move(e); }
+    else if (dy > 10 && timer) { clearTimeout(timer); timer = null; }
   });
-  const end = () => { if (timer) { clearTimeout(timer); timer = null; } if (scrub) { scrub = false; svg.style.touchAction = ""; hide(); } };
-  svg.addEventListener("pointerup", end);
-  svg.addEventListener("pointercancel", end);
-  svg.addEventListener("pointerleave", () => { if (!lastTouch) hide(); });
+  svg.addEventListener("pointerup", e => {
+    if (timer) { clearTimeout(timer); timer = null; }
+    if (e.pointerType !== "touch") return;
+    if (!(scrubbing && Date.now() - downAt >= 400)) hide();
+    scrubbing = false;
+  });
+  svg.addEventListener("pointercancel", () => { if (timer) { clearTimeout(timer); timer = null; } scrubbing = false; hide(); });
+  svg.addEventListener("pointerleave", e => { if (e.pointerType !== "touch") hide(); });
 }
 function wireHover(box, ser){
   const tip = box.querySelector(".hvTip");

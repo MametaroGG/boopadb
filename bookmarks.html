@@ -321,12 +321,12 @@
   .cmprange.on{color:#fff;font-weight:700;border-bottom-color:var(--accent)}
   .pp-ranges{position:sticky;top:-17px;z-index:5;background:var(--bg);margin:0 0 10px;padding-top:8px}
   .chartbox{position:relative}
-  .chartbox svg,#cmpChart svg{-webkit-touch-callout:none;user-select:none}
+  .chartbox svg,#cmpChart svg{-webkit-touch-callout:none;user-select:none;touch-action:pan-y}
   @media (max-width:700px){
     .chartbox,#cmpChart{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
     .chartbox svg,#cmpChart svg{width:720px;max-width:none;height:auto}
   }
-  #cmpTip,.hvTip{position:absolute;top:8px;display:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  #cmpTip,.hvTip{position:absolute;top:8px;display:none;pointer-events:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
   .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
   .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
   .cmtn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
