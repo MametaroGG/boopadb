@@ -320,8 +320,13 @@
   .cmpranges{display:flex;gap:2px;flex-wrap:wrap;margin-top:10px;border-bottom:1px solid var(--border)}
   .cmprange{background:none;color:var(--sub);border:none;border-bottom:2px solid transparent;margin-bottom:-1px;font-size:13px;font-weight:400;padding:7px 13px;cursor:pointer;font-family:inherit}
   .cmprange.on{color:#fff;font-weight:700;border-bottom-color:var(--accent)}
-  .pp-ranges{position:sticky;top:0;z-index:5;background:var(--bg);margin:0 0 10px;padding-top:8px}
+  .pp-ranges{position:sticky;top:-17px;z-index:5;background:var(--bg);margin:0 0 10px;padding-top:8px}
   .chartbox{position:relative}
+  .chartbox svg,#cmpChart svg{-webkit-touch-callout:none;user-select:none}
+  @media (max-width:700px){
+    .chartbox,#cmpChart{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+    .chartbox svg,#cmpChart svg{width:720px;max-width:none;height:auto}
+  }
   #cmpTip,.hvTip{position:absolute;top:8px;display:none;background:#101012;border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;pointer-events:none;z-index:3;min-width:180px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
   .cmtd{color:var(--sub);font-weight:700;margin-bottom:5px}
   .cmtr{display:flex;align-items:center;gap:6px;padding:1.5px 0}
@@ -352,12 +357,12 @@
   .pcard .pimgw{position:relative;display:block}
   .pcard .bmflag{top:0;left:0;border-radius:10px 0 0 0}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
-  .chg{display:grid;grid-template-columns:86px 46px minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--border);font-size:13px}
-  .chg .cd{color:var(--faint);white-space:nowrap}
-  .chg .cb,.chg .ca,.chg .cr{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
-  .chg .up,.chg .down{white-space:nowrap}
-  .chg-head{font-size:11px;color:var(--faint);padding:4px 2px}
-  @media (max-width:560px){.chg{grid-template-columns:72px 40px minmax(0,1fr) minmax(0,1fr) auto;gap:7px;font-size:12px;padding:8px 0}.chg .cd{font-size:11.5px}}
+  .chgtable{display:grid;grid-template-columns:86px 46px minmax(0,1fr) minmax(0,1fr) auto;column-gap:10px;font-size:13px;padding:0 2px}
+  .chgtable>*{padding:8px 0;border-bottom:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;min-width:0}
+  .chgtable .cd{color:var(--faint)}
+  .chgtable .cb,.chgtable .ca,.chgtable .cr{font-variant-numeric:tabular-nums;justify-content:flex-end}
+  .chgtable .chh{font-size:11px;color:var(--faint);padding:4px 0}
+  @media (max-width:560px){.chgtable{grid-template-columns:72px 40px minmax(0,1fr) minmax(0,1fr) auto;column-gap:7px;font-size:12px;padding:0}.chgtable .cd{font-size:11.5px}}
   .pp-toggle{display:inline-flex;align-items:center;gap:7px;background:none;border:none;color:var(--sub);font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;padding:4px 2px}
   .pp-toggle:hover{color:var(--text)}
   .pp-toggle .car{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--sub);transition:transform .2s;flex:none}
@@ -1716,9 +1721,9 @@ function changesHTML(ser){
   if (!chgs.length) return {n: 0, html: '<p class="note">' + tr("pp_nochg") + '</p>'};
   const rows = chgs.slice(-8).reverse().map(c => {
     const d = c.to - c.from, pc = c.from ? Math.round(d / c.from * 100) : 0;
-    return `<div class="chg"><span class="cd">${c.date}</span><span class="${d < 0 ? "down" : "up"}">${d < 0 ? tr("pp_down") : tr("pp_up")}</span><span class="cb">${yen(c.from)}</span><span class="ca">${yen(c.to)}</span><span class="cr ${d < 0 ? "down" : "up"}">${d < 0 ? "" : "+"}${pc}%${c.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</span></div>`;
+    return `<span class="cd">${c.date}</span><span class="${d < 0 ? "down" : "up"}">${d < 0 ? tr("pp_down") : tr("pp_up")}</span><span class="cb">${yen(c.from)}</span><span class="ca">${yen(c.to)}</span><span class="cr ${d < 0 ? "down" : "up"}">${d < 0 ? "" : "+"}${pc}%${c.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</span>`;
   }).join("");
-  const html = `<div class="chg chg-head"><span>${tr("chg_date")}</span><span></span><span class="cb">${tr("chg_before")}</span><span class="ca">${tr("chg_after")}</span><span class="cr">${tr("chg_rate")}</span></div>` + rows;
+  const html = `<div class="chgtable"><span class="chh">${tr("chg_date")}</span><span class="chh"></span><span class="chh cb">${tr("chg_before")}</span><span class="chh ca">${tr("chg_after")}</span><span class="chh cr">${tr("chg_rate")}</span>` + rows + `</div>`;
   return {n: Math.min(chgs.length, 8), html};
 }
 function varBlockHTML(x, key){
@@ -1837,6 +1842,27 @@ function pricePtAt(ser, t){
   for (const p of ser.p) { if (dnum(p[0]) <= t) pt = p; else break; }
   return pt;
 }
+function chartTouch(svg, move, hide){
+  let timer = null, scrub = false, sx = 0, sy = 0, lastE = null, lastTouch = false;
+  svg.addEventListener("contextmenu", e => e.preventDefault());
+  svg.addEventListener("pointerdown", e => {
+    lastTouch = e.pointerType === "touch";
+    if (!lastTouch) { move(e); return; }
+    sx = e.clientX; sy = e.clientY; lastE = e; scrub = false;
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => { timer = null; scrub = true; svg.style.touchAction = "none"; if (lastE) move(lastE); }, 260);
+  });
+  svg.addEventListener("pointermove", e => {
+    if (e.pointerType !== "touch") { move(e); return; }
+    lastE = e;
+    if (scrub) { e.preventDefault(); move(e); }
+    else if (timer && (Math.abs(e.clientX - sx) > 12 || Math.abs(e.clientY - sy) > 12)) { clearTimeout(timer); timer = null; }
+  });
+  const end = () => { if (timer) { clearTimeout(timer); timer = null; } if (scrub) { scrub = false; svg.style.touchAction = ""; hide(); } };
+  svg.addEventListener("pointerup", end);
+  svg.addEventListener("pointercancel", end);
+  svg.addEventListener("pointerleave", () => { if (!lastTouch) hide(); });
+}
 function wireHover(box, ser){
   const tip = box.querySelector(".hvTip");
   const svg = box.querySelector("svg");
@@ -1856,21 +1882,19 @@ function wireHover(box, ser){
     const sale = !!(pt && pt[2]);
     tip.innerHTML = `<div class="cmtd">${diso(t)}</div><div class="cmtr"><b>${yen(v)}</b>${pt && pt[3] ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}${sale ? '<span class="cmpdot" style="background:#fc4d50"></span><span>' + tr("chip_onsale") + '</span>' : ""}</div>`;
     tip.style.display = "block";
-    const wrapW = box.clientWidth;
-    const px = fx * wrapW;
-    tip.style.left = Math.min(Math.max(px + 12, 4), Math.max(4, wrapW - tip.offsetWidth - 4)) + "px";
+    const wrapW = box.clientWidth, sl = box.scrollLeft || 0;
+    const px = fx * svg.clientWidth;
+    tip.style.left = Math.min(Math.max(px + 12, sl + 4), Math.max(sl + 4, sl + wrapW - tip.offsetWidth - 4)) + "px";
     const gd = svg.querySelector(".hvGuide");
     if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
   };
-  svg.addEventListener("pointermove", move);
-  svg.addEventListener("pointerdown", move);
-  svg.addEventListener("pointerleave", hide);
+  chartTouch(svg, move, hide);
 }
 function wireBlockHovers(x){
   const keys = x.variations ? Object.keys(x.variations) : [];
   const all = keys.length ? keys.map(k => windowSeries(seriesOf(x, k))) : [windowSeries(seriesOf(x, null))];
   const sers = all.filter(ser => ser.p && ser.p.length >= 2);
-  document.querySelectorAll("#ppBody .chartbox").forEach((box, i) => { if (sers[i]) wireHover(box, sers[i]); });
+  document.querySelectorAll("#ppBody .chartbox").forEach((box, i) => { if (sers[i]) wireHover(box, sers[i]); box.scrollLeft = box.scrollWidth; });
 }
 function wireCmpTip(x){
   const wrap = document.getElementById("cmpChart");
@@ -1894,15 +1918,14 @@ function wireCmpTip(x){
       .map(rw => `<div class="cmtr"><span class="cmpdot" style="background:${rw.col}"></span><span class="cmtn">${esc(rw.name)}</span><b>${yen(rw.v)}</b>${rw.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`).join("");
     tip.innerHTML = `<div class="cmtd">${diso(t)}</div>` + rows;
     tip.style.display = "block";
-    const wrapW = wrap.clientWidth;
-    const px = fx * wrapW;
-    tip.style.left = Math.min(Math.max(px + 12, 4), Math.max(4, wrapW - tip.offsetWidth - 4)) + "px";
+    const wrapW = wrap.clientWidth, sl = wrap.scrollLeft || 0;
+    const px = fx * svg.clientWidth;
+    tip.style.left = Math.min(Math.max(px + 12, sl + 4), Math.max(sl + 4, sl + wrapW - tip.offsetWidth - 4)) + "px";
     const gd = svg.querySelector("#cmpGuide");
     if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
   };
-  svg.addEventListener("pointermove", move);
-  svg.addEventListener("pointerdown", move);
-  svg.addEventListener("pointerleave", hide);
+  chartTouch(svg, move, hide);
+  wrap.scrollLeft = wrap.scrollWidth;
 }
 function renderCompare(x){
   const el = document.getElementById("ppCompare");
