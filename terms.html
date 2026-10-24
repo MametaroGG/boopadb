@@ -484,10 +484,10 @@
   .ptitle p b{color:#c8ec6e;font-weight:800}
   .catbar{position:sticky;top:0;z-index:40;background:rgba(16,16,18,.94);backdrop-filter:blur(8px);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:24px 0 4px;padding:10px 0}
   .catbar .chips{margin:0;justify-content:center}
-  .stabs{display:flex;gap:16px}
-  .stabs button{background:none;border:none;color:var(--sub);font-size:13px;font-weight:700;padding:6px 2px;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;white-space:nowrap}
-  @media (max-width:560px){.stabs{gap:11px}.stabs button{font-size:12px}}
-  .stabs button.on{color:#fff;border-bottom-color:var(--red)}
+  .stabs{display:flex;gap:2px}
+  .stabs button{background:none;border:none;color:var(--sub);font-size:13px;padding:7px 13px;cursor:pointer;font-family:inherit;transition:color .2s;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+  @media (max-width:560px){.stabs button{font-size:12px}}
+  .stabs button.on{color:#fff;font-weight:700;border-bottom-color:var(--red)}
   @media (max-width:899px){.ptitle h1{font-size:31px}}
 
   .doc{max-width:760px;margin:26px auto 10px;padding:0 4px}
