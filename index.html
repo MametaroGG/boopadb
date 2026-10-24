@@ -1673,7 +1673,7 @@ function chartSVG(ser, H){
   const prices = s.map(p => p[1]);
   const ordS = s.filter(p => !p[3]);
   const high = Math.max(...(ordS.length ? ordS : s).map(p => p[1]));
-  const outlN = s.length - ordS.length;
+  const outlN = ser.outl != null ? ser.outl : s.length - ordS.length;
   const W = 980, PL = 64, PR = 14, PT = 14, PB = 26;
   const iw = W - PL - PR, ih = H - PT - PB;
   const yMax = Math.ceil(high * 1.08 / 100) * 100 || 100;
@@ -1726,7 +1726,7 @@ function varBlockHTML(x, key){
   const head = key ? `<div class="pp-varhead"><span class="pp-varname">${esc(key)}</span><span class="pp-varprice">${yen(curP)}</span>${s[s.length - 1][3] ? '<span class="outlb">' + tr("outlier") + '</span>' : ""}${onSaleNow ? `<span class="bpchip">${tr("chip_onsale")}</span>` : ""}${curP <= low ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}</div>` : "";
   const chg = changesHTML(ser);
   const chgSec = chg.n ? `<div class="pp-changes"><button type="button" class="pp-toggle" data-chgbtn>${tr("pp_changes")}（${chg.n}）<span class="car"></span></button><div class="pp-chgbody" hidden>${chg.html}</div></div>` : `<div class="pp-changes">${chg.html}</div>`;
-  return `<div class="pp-varblock">${head}<div class="pstats">${statsHTML(ser)}</div><div class="chartbox">${chartSVG(ser, key ? 210 : 300)}<div class="hvTip charttip"></div></div>${chgSec}</div>`;
+  return `<div class="pp-varblock">${head}<div class="pstats">${statsHTML(ser)}</div><div class="chartbox">${chartSVG(windowSeries(ser), key ? 210 : 300)}<div class="hvTip charttip"></div></div>${chgSec}</div>`;
 }
 function renderPPBody(x){
   const keys = x.variations ? Object.keys(x.variations) : [];
@@ -1736,12 +1736,13 @@ function renderPPBody(x){
     statsEl.innerHTML = statsHTML(seriesOf(x, keys[0]));
     cmpDefaults(x, keys);
     renderCompare(x);
-    chartEl.innerHTML = keys.map(k => varBlockHTML(x, k)).join("");
+    chartEl.innerHTML = `<div class="cmpranges" style="margin:0 0 10px">${rangeBtnsHTML()}</div>` + keys.map(k => varBlockHTML(x, k)).join("");
   } else {
     const ser = seriesOf(x, null);
     statsEl.innerHTML = ser.p && ser.p.length >= 2 ? statsHTML(ser) : "";
-    chartEl.innerHTML = varBlockHTML(x, null);
+    chartEl.innerHTML = `<div class="cmpranges" style="margin:0 0 10px">${rangeBtnsHTML()}</div>` + varBlockHTML(x, null);
   }
+  chartEl.querySelectorAll("[data-cr]").forEach(b => b.onclick = () => { ppRange = b.dataset.cr; renderPPBody(x); wireBlockHovers(x); });
   chartEl.querySelectorAll("[data-chgbtn]").forEach(b => b.onclick = () => {
     const body = b.parentElement.querySelector(".pp-chgbody");
     if (!body) return;
@@ -1754,7 +1755,22 @@ let cmpOn = {};
 let cmpOpen = false;
 const CMP_RANGES = {"1d": 1, "5d": 5, "1m": 30, "6m": 182, "1y": 365, "5y": 1825};
 const CMP_RANGE_KEYS = ["1d", "5d", "1m", "6m", "ytd", "1y", "5y", "max"];
-let cmpRange = "max";
+let ppRange = "max";
+function rangeBtnsHTML(){ return CMP_RANGE_KEYS.map(k => `<button type="button" class="cmprange ${ppRange === k ? "on" : ""}" data-cr="${k}">${tr("rng_" + k)}</button>`).join(""); }
+function windowSeries(ser){
+  const s = ser && ser.p;
+  if (!s || s.length < 2 || ppRange === "max") return ser;
+  const t1 = dnum(s[s.length - 1][0]), t0f = dnum(s[0][0]);
+  const w0 = ppRange === "ytd" ? Math.max(t0f, dnum(diso(t1).slice(0, 4) + "-01-01")) : Math.max(t0f, t1 - CMP_RANGES[ppRange]);
+  if (w0 <= t0f) return ser;
+  const disp = [];
+  const ap = pricePtAt(ser, w0);
+  if (ap && dnum(ap[0]) < w0) disp.push([diso(w0), ap[1], ap[2], ap[3]]);
+  s.forEach(p => { const t = dnum(p[0]); if (t >= w0 && t <= t1) disp.push(p); });
+  if (!disp.length) return ser;
+  if (disp.length === 1) disp.push([diso(t1), disp[0][1], disp[0][2], disp[0][3]]);
+  return {p: disp, d: ser.d, sd: disp.filter(p => p[2]).length, outl: s.filter(p => p[3]).length};
+}
 let CMP_GROUPS = [];
 function cmpSig(ser){ return ser.p.map(p => p[1] + (p[2] ? "s" : "")).join(","); }
 function cmpDefaults(x, keys){
@@ -1769,8 +1785,8 @@ function cmpDomain(x, keys){
   // Period filter, same ranges as the Boopa extension: the window ends at
   // the newest data point; "max" keeps the full span.
   let w0 = t0;
-  if (cmpRange === "ytd") w0 = Math.max(t0, dnum(diso(t1).slice(0, 4) + "-01-01"));
-  else if (cmpRange !== "max") w0 = Math.max(t0, t1 - CMP_RANGES[cmpRange]);
+  if (ppRange === "ytd") w0 = Math.max(t0, dnum(diso(t1).slice(0, 4) + "-01-01"));
+  else if (ppRange !== "max") w0 = Math.max(t0, t1 - CMP_RANGES[ppRange]);
   let high = 0;
   keys.forEach(k => { if (!cmpOn[k]) return; const ser = seriesOf(x, k); ser.p.forEach(p => { if (!p[3] && dnum(p[0]) >= w0 && p[1] > high) high = p[1]; }); const ap = pricePtAt(ser, w0); if (ap && !ap[3] && ap[1] > high) high = ap[1]; });
   return {high, t0: w0, t1};
@@ -1847,7 +1863,7 @@ function wireHover(box, ser){
 }
 function wireBlockHovers(x){
   const keys = x.variations ? Object.keys(x.variations) : [];
-  const all = keys.length ? keys.map(k => seriesOf(x, k)) : [seriesOf(x, null)];
+  const all = keys.length ? keys.map(k => windowSeries(seriesOf(x, k))) : [windowSeries(seriesOf(x, null))];
   const sers = all.filter(ser => ser.p && ser.p.length >= 2);
   document.querySelectorAll("#ppBody .chartbox").forEach((box, i) => { if (sers[i]) wireHover(box, sers[i]); });
 }
@@ -1895,12 +1911,12 @@ function renderCompare(x){
     const on = !!cmpOn[k];
     return `<button type="button" class="cmpchip ${on ? "on" : ""}" data-ck="${i}" style="${on ? `border-color:${col};background:${col}26` : ""}"><span class="cmpdot" style="background:${col}"></span>${esc(k)} — ${yen(cur)}</button>`;
   }).join("");
-  const rangeBtns = CMP_RANGE_KEYS.map(k => `<button type="button" class="cmprange ${cmpRange === k ? "on" : ""}" data-cr="${k}">${tr("rng_" + k)}</button>`).join("");
+  const rangeBtns = rangeBtnsHTML();
   const outlTotal = keys.reduce((n, k) => n + seriesOf(x, k).p.filter(p => p[3]).length, 0);
   el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span><button type="button" class="pp-toggle ${cmpOpen ? "open" : ""}" id="cmpTgl" style="margin-left:auto"><span class="car"></span></button></div><div id="cmpBody"${cmpOpen ? "" : " hidden"}><div class="cmplegend">${legend}</div>${outlTotal ? `<div class="cmpoutl">${tr("outlier_n", {n: outlTotal})}</div>` : ""}<div id="cmpChart">${compareSVG(x, keys)}<div id="cmpTip"></div></div><div class="cmpranges">${rangeBtns}</div></div></div>`;
   const cmpTgl = el.querySelector("#cmpTgl"), cmpBody = el.querySelector("#cmpBody");
   if (cmpTgl && cmpBody) cmpTgl.onclick = () => { cmpOpen = !cmpOpen; cmpBody.hidden = !cmpOpen; cmpTgl.classList.toggle("open", cmpOpen); };
-  el.querySelectorAll("[data-cr]").forEach(b => b.onclick = () => { cmpRange = b.dataset.cr; renderCompare(x); });
+  el.querySelectorAll("[data-cr]").forEach(b => b.onclick = () => { ppRange = b.dataset.cr; renderPPBody(x); wireBlockHovers(x); });
   el.querySelectorAll("[data-ck]").forEach(b => b.onclick = () => {
     const k = keys[+b.dataset.ck];
     if (cmpOn[k] && keys.filter(kk => cmpOn[kk]).length <= 1) return;
