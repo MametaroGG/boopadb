@@ -83,6 +83,7 @@
   .cname{font-size:13.5px;font-weight:600;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.9em}
   .cshop{font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .crow{margin-top:auto;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .crow .price.solo{display:inline-flex;align-items:center;height:26px;background:#26262c;padding:0 8px;font-size:16px;font-weight:600}
   .drow{display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px 12px;margin-bottom:8px}
   .drow img{width:64px;height:48px;object-fit:cover;border-radius:6px;background:#131316;flex:none}
   .drow .dn{flex:1;min-width:0}
@@ -1162,7 +1163,7 @@ function fillCardPrice(rec){
   if (!crow) return;
   crow.innerHTML = rec.sale && rec.pct > 0
     ? `<span class="bprice"><span class="discst">-${rec.pct}%</span><span class="bstack"><span class="was">${yen(rec.base)}</span><span class="price">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span></span></span>`
-    : `${rec.base > rec.cur ? `<span class="was">${yen(rec.base)}</span>` : ""}<span class="price" style="font-size:16px">${yen(rec.cur)}</span>`;
+    : `<span class="price solo">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span>`;
   if (rec.at_lowest) {
     const card = crow.closest(".card");
     const tw = card && card.querySelector(".thumbwrap");
@@ -1322,7 +1323,7 @@ function saleCard(s, i){
       <div class="cname"><a href="${itemUrl(s.id)}" target="_blank" rel="noopener">${esc(s.name)}</a></div>
       <div class="cshop">${esc(s.shop || "")}</div>
       <div class="htags">${esc(s.sale === false ? htagsPlain(s) : htags(s))}</div>
-      <div class="crow">${s.sale !== false && s.pct > 0 ? `<span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span></span></span>` : `<span class="was">${yen(s.base)}</span><span class="price" style="font-size:16px">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span>`}</div>
+      <div class="crow">${s.sale !== false && s.pct > 0 ? `<span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span></span></span>` : `<span class="price solo">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span>`}</div>
     </div>
   </div>`;
 }
