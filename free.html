@@ -196,13 +196,16 @@
   .capbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:5px;flex:1}
   .capname{font-size:14px;font-weight:700;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:40px}
   .capshop{font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .caprow{display:flex;align-items:stretch;gap:4px 0;margin-top:auto;flex-wrap:wrap}
+  .caprow{display:flex;align-items:stretch;gap:0;margin-top:auto;flex-wrap:nowrap}
   /* Joined Steam-style price cluster: every segment is the same height and
      touches the next with no gap, so badge + prices read as one strip. */
   .discst{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:var(--green-bg);color:#c8ec6e;font-weight:800;font-size:13.5px;padding:0 7px;border-radius:0;line-height:1}
   .newtag{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:var(--accent);color:#fff;font-weight:600;font-size:11px;letter-spacing:.05em;padding:0 8px;line-height:1}
   .caprow .was,.bprice .was,.bprow .was{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:#26262c;padding:0 3px 0 8px;line-height:1}
   .caprow .was{font-size:12px}
+  .caprow .was{padding:0 2px 0 5px}
+  .caprow .price{padding:0 5px 0 2px}
+  .caprow .discst{padding:0 5px}
   .caprow .price,.bprice .price,.bprow .price{display:inline-flex;align-items:center;height:24px;box-sizing:border-box;background:#26262c;padding:0 8px 0 3px;line-height:1}
   .bprice .price{font-size:14px}
   .discst + .price{padding-left:8px}
