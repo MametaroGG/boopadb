@@ -327,8 +327,9 @@
     .chartbox,#cmpChart{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
     .chartbox svg,#cmpChart svg{width:720px;max-width:none;height:auto}
   }
-  .chExpand{position:absolute;top:6px;right:6px;z-index:4;width:30px;height:30px;border-radius:8px;background:rgba(23,23,26,.88);border:1px solid var(--border2);display:none;align-items:center;justify-content:center;cursor:pointer}
+  .chExpand{width:30px;height:30px;flex:none;border-radius:8px;background:rgba(23,23,26,.88);border:1px solid var(--border2);display:none;align-items:center;justify-content:center;cursor:pointer}
   .chExpand svg{width:16px;height:16px;fill:none;stroke:#ececee;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .pp-varhead .chExpand{margin-left:auto}
   @media (max-width:700px){.chExpand{display:flex}}
   #chartPop{position:fixed;inset:0;z-index:80;background:rgba(6,6,8,.88);display:flex;align-items:center;justify-content:center;padding:12px}
   #chartPop[hidden]{display:none}
@@ -348,7 +349,7 @@
   .cmtr b{flex:none}
   .cmmore{color:var(--faint);font-size:11px}
   .cmpchip:not(.on){opacity:.45}
-  .pp-varblock{background:#17171a;border:1px solid #26262c;border-radius:12px;padding:14px 16px;margin:0 0 14px}
+  .pp-varblock{position:relative;background:#17171a;border:1px solid #26262c;border-radius:12px;padding:14px 16px;margin:0 0 14px}
   .pp-varhead{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
   .pp-varname{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .pp-varprice{font-weight:700;font-size:15px}
@@ -1751,14 +1752,14 @@ function changesHTML(ser){
   const html = `<div class="chgtable"><span class="chh">${tr("chg_date")}</span><span class="chh"></span><span class="chh cb">${tr("chg_before")}</span><span class="chh ca">${tr("chg_after")}</span><span class="chh cr">${tr("chg_rate")}</span>` + rows + `</div>`;
   return {n: Math.min(chgs.length, 8), html};
 }
-function varBlockHTML(x, key){
+function varBlockHTML(x, key, idx){
   const ser = seriesOf(x, key);
   const s = ser.p;
   if (!s || s.length < 2) return key ? "" : '<p class="note">' + tr("pp_nodata") + '</p>';
   const prices = s.map(p => p[1]);
   const curP = prices[prices.length - 1], low = Math.min(...prices);
   const onSaleNow = !!s[s.length - 1][2];
-  const head = key ? `<div class="pp-varhead"><span class="pp-varname">${esc(key)}</span><span class="pp-varprice">${yen(curP)}</span>${s[s.length - 1][3] ? '<span class="outlb">' + tr("outlier") + '</span>' : ""}${onSaleNow ? `<span class="bpchip">${tr("chip_onsale")}</span>` : ""}${curP <= low ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}</div>` : "";
+  const head = `<div class="pp-varhead">${key ? `<span class="pp-varname">${esc(key)}</span><span class="pp-varprice">${yen(curP)}</span>${s[s.length - 1][3] ? '<span class="outlb">' + tr("outlier") + '</span>' : ""}${onSaleNow ? `<span class="bpchip">${tr("chip_onsale")}</span>` : ""}${curP <= low ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}` : ""}<button type="button" class="chExpand" data-exp="${idx || 0}" aria-label="${tr("al_expand")}">${EXPAND_SVG}</button></div>`;
   const chg = changesHTML(ser);
   const chgSec = chg.n ? `<div class="pp-changes"><button type="button" class="pp-toggle" data-chgbtn>${tr("pp_changes")}（${chg.n}）<span class="car"></span></button><div class="pp-chgbody" hidden>${chg.html}</div></div>` : `<div class="pp-changes">${chg.html}</div>`;
   return `<div class="pp-varblock">${head}<div class="pstats">${statsHTML(ser)}</div><div class="chartbox">${chartSVG(windowSeries(ser), key ? 210 : 300)}<div class="hvTip charttip"></div></div>${chgSec}</div>`;
@@ -1771,11 +1772,11 @@ function renderPPBody(x){
     statsEl.innerHTML = statsHTML(seriesOf(x, keys[0]));
     cmpDefaults(x, keys);
     renderCompare(x);
-    chartEl.innerHTML = `<div class="cmpranges pp-ranges">${rangeBtnsHTML()}</div>` + keys.map(k => varBlockHTML(x, k)).join("");
+    chartEl.innerHTML = `<div class="cmpranges pp-ranges">${rangeBtnsHTML()}</div>` + keys.map((k, i) => varBlockHTML(x, k, i)).join("");
   } else {
     const ser = seriesOf(x, null);
     statsEl.innerHTML = ser.p && ser.p.length >= 2 ? statsHTML(ser) : "";
-    chartEl.innerHTML = `<div class="cmpranges pp-ranges">${rangeBtnsHTML()}</div>` + varBlockHTML(x, null);
+    chartEl.innerHTML = `<div class="cmpranges pp-ranges">${rangeBtnsHTML()}</div>` + varBlockHTML(x, null, 0);
   }
   chartEl.querySelectorAll("[data-cr]").forEach(b => b.onclick = () => { ppRange = b.dataset.cr; renderPPBody(x); wireBlockHovers(x); });
   chartEl.querySelectorAll("[data-chgbtn]").forEach(b => b.onclick = () => {
@@ -1933,7 +1934,8 @@ function wireBlockHovers(x){
   const keys = x.variations ? Object.keys(x.variations) : [];
   const all = keys.length ? keys.map(k => windowSeries(seriesOf(x, k))) : [windowSeries(seriesOf(x, null))];
   const sers = all.filter(ser => ser.p && ser.p.length >= 2);
-  document.querySelectorAll("#ppBody .chartbox").forEach((box, i) => { if (sers[i]) wireHover(box, sers[i]); box.scrollLeft = box.scrollWidth; box.appendChild(expandBtn(() => openChartPop("var", i))); });
+  document.querySelectorAll("#ppBody .chartbox").forEach((box, i) => { if (sers[i]) wireHover(box, sers[i]); box.scrollLeft = box.scrollWidth; });
+  document.querySelectorAll("#ppBody [data-exp]").forEach(b => { b.onclick = () => openChartPop("var", +b.dataset.exp); });
 }
 function wireCmpTip(x, wrap, tip){
   wrap = wrap || document.getElementById("cmpChart");
@@ -1954,13 +1956,16 @@ function wireCmpTip(x, wrap, tip){
       .map(k => { const pt = pricePtAt(seriesOf(x, k), t); return pt ? {name: k, col: CMP_COLORS[keys.indexOf(k) % CMP_COLORS.length], v: pt[1], outl: !!pt[3]} : null; })
       .filter(Boolean)
       .sort((p, q) => q.v - p.v);
-    const rows = allRows.slice(0, 8).map(rw => `<div class="cmtr"><span class="cmpdot" style="background:${rw.col}"></span><span class="cmtn">${esc(rw.name)}</span><b>${yen(rw.v)}</b>${rw.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`).join("")
-      + (allRows.length > 8 ? `<div class="cmtr cmmore">${tr("cmp_more", {n: allRows.length - 8})}</div>` : "");
+    const rows = allRows.slice(0, 10).map(rw => `<div class="cmtr"><span class="cmpdot" style="background:${rw.col}"></span><span class="cmtn">${esc(rw.name)}</span><b>${yen(rw.v)}</b>${rw.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</div>`).join("")
+      + (allRows.length > 8 ? `<div class="cmtr cmmore">${tr("cmp_more", {n: allRows.length - 10})}</div>` : "");
     tip.innerHTML = `<div class="cmtd">${diso(t)}</div>` + rows;
     tip.style.display = "block";
-    const wrapW = wrap.clientWidth, sl = wrap.scrollLeft || 0;
-    const px = fx * svg.clientWidth;
-    tip.style.left = Math.min(Math.max(px + 12, sl + 4), Math.max(sl + 4, sl + wrapW - tip.offsetWidth - 4)) + "px";
+    const block = tip.parentElement;
+    const br = block.getBoundingClientRect();
+    const cr = wrap.getBoundingClientRect();
+    const px = e.clientX - br.left + 14;
+    tip.style.left = Math.min(Math.max(px, 4), Math.max(4, br.width - tip.offsetWidth - 4)) + "px";
+    tip.style.top = Math.max(0, cr.top - br.top + 8) + "px";
     const gd = svg.querySelector("#cmpGuide");
     if (gd) { gd.setAttribute("x1", vx); gd.setAttribute("x2", vx); gd.setAttribute("opacity", "0.5"); }
   };
@@ -1984,7 +1989,7 @@ function renderCompare(x){
   const legend = cmpLegendHTML(x, keys);
   const rangeBtns = rangeBtnsHTML();
   const outlTotal = keys.reduce((n, k) => n + seriesOf(x, k).p.filter(p => p[3]).length, 0);
-  el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span><button type="button" class="pp-toggle ${cmpOpen ? "open" : ""}" id="cmpTgl" style="margin-left:auto"><span class="car"></span></button></div><div id="cmpBody"${cmpOpen ? "" : " hidden"}><div class="cmplegend">${legend}</div>${outlTotal ? `<div class="cmpoutl">${tr("outlier_n", {n: outlTotal})}</div>` : ""}<div id="cmpChart">${compareSVG(x, keys)}<div id="cmpTip"></div></div><div class="cmpranges">${rangeBtns}</div></div></div>`;
+  el.innerHTML = `<div class="pp-varblock"><div class="pp-varhead"><span class="pp-varname">${tr("pp_compare")}</span><button type="button" class="chExpand" data-cmp-exp aria-label="${tr("al_expand")}">${EXPAND_SVG}</button><button type="button" class="pp-toggle ${cmpOpen ? "open" : ""}" id="cmpTgl"><span class="car"></span></button></div><div id="cmpBody"${cmpOpen ? "" : " hidden"}><div class="cmplegend">${legend}</div>${outlTotal ? `<div class="cmpoutl">${tr("outlier_n", {n: outlTotal})}</div>` : ""}<div id="cmpChart">${compareSVG(x, keys)}</div><div class="cmpranges">${rangeBtns}</div></div><div id="cmpTip"></div></div>`;
   const cmpTgl = el.querySelector("#cmpTgl"), cmpBody = el.querySelector("#cmpBody");
   if (cmpTgl && cmpBody) cmpTgl.onclick = () => { cmpOpen = !cmpOpen; cmpBody.hidden = !cmpOpen; cmpTgl.classList.toggle("open", cmpOpen); };
   el.querySelectorAll("[data-cr]").forEach(b => b.onclick = () => { ppRange = b.dataset.cr; renderPPBody(x); wireBlockHovers(x); });
@@ -1995,8 +2000,8 @@ function renderCompare(x){
     renderCompare(x);
   });
   wireCmpTip(x);
-  const cw = el.querySelector("#cmpChart");
-  if (cw) cw.appendChild(expandBtn(() => openChartPop("cmp", 0)));
+  const eb = el.querySelector("[data-cmp-exp]");
+  if (eb) eb.onclick = () => openChartPop("cmp", 0);
 }
 const EXPAND_SVG = '<svg viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></svg>';
 function expandBtn(onclick){

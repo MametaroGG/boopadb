@@ -326,8 +326,9 @@
     .chartbox,#cmpChart{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
     .chartbox svg,#cmpChart svg{width:720px;max-width:none;height:auto}
   }
-  .chExpand{position:absolute;top:6px;right:6px;z-index:4;width:30px;height:30px;border-radius:8px;background:rgba(23,23,26,.88);border:1px solid var(--border2);display:none;align-items:center;justify-content:center;cursor:pointer}
+  .chExpand{width:30px;height:30px;flex:none;border-radius:8px;background:rgba(23,23,26,.88);border:1px solid var(--border2);display:none;align-items:center;justify-content:center;cursor:pointer}
   .chExpand svg{width:16px;height:16px;fill:none;stroke:#ececee;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .pp-varhead .chExpand{margin-left:auto}
   @media (max-width:700px){.chExpand{display:flex}}
   #chartPop{position:fixed;inset:0;z-index:80;background:rgba(6,6,8,.88);display:flex;align-items:center;justify-content:center;padding:12px}
   #chartPop[hidden]{display:none}
@@ -347,7 +348,7 @@
   .cmtr b{flex:none}
   .cmmore{color:var(--faint);font-size:11px}
   .cmpchip:not(.on){opacity:.45}
-  .pp-varblock{background:#17171a;border:1px solid #26262c;border-radius:12px;padding:14px 16px;margin:0 0 14px}
+  .pp-varblock{position:relative;background:#17171a;border:1px solid #26262c;border-radius:12px;padding:14px 16px;margin:0 0 14px}
   .pp-varhead{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
   .pp-varname{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .pp-varprice{font-weight:700;font-size:15px}
