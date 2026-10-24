@@ -144,8 +144,8 @@
   .saleDots{display:none}
   .railbar{display:none}
   @media (max-width:899px){
-    .railbar{display:block;height:4px;border-radius:2px;background:#232329;margin-top:10px;position:relative;overflow:hidden}
-    .railbar span{position:absolute;top:0;left:0;height:100%;border-radius:2px;background:#5b5b66}
+    .railbar{display:block;height:4px;border-radius:2px;background:#232329;background-clip:content-box;padding:6px 0;margin-top:4px;position:relative;overflow:hidden;cursor:pointer;touch-action:none}
+    .railbar span{position:absolute;top:6px;left:0;height:4px;border-radius:2px;background:#5b5b66}
   }
   @media (min-width:900px){
     .salepanel{position:relative}
@@ -1372,6 +1372,19 @@ function bindRailBar(railId, barId){
     thumb.style.transform = `translateX(${maxX * (rail.scrollLeft / (sw - cw))}px)`;
   }
   rail.addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
+  let dragging = false;
+  function seek(e){
+    const rect = bar.getBoundingClientRect();
+    const sw = rail.scrollWidth, cw = rail.clientWidth;
+    if (sw <= cw) return;
+    const tw = Math.max(28, rect.width * cw / sw);
+    const frac = Math.min(1, Math.max(0, (e.clientX - rect.left - tw / 2) / (rect.width - tw)));
+    rail.scrollLeft = frac * (sw - cw);
+  }
+  bar.addEventListener("pointerdown", e => { dragging = true; bar.setPointerCapture(e.pointerId); seek(e); e.preventDefault(); });
+  bar.addEventListener("pointermove", e => { if (dragging) seek(e); });
+  bar.addEventListener("pointerup", () => { dragging = false; });
+  bar.addEventListener("pointercancel", () => { dragging = false; });
   window.addEventListener("resize", () => setTimeout(update, 160));
   return update;
 }

@@ -143,8 +143,8 @@
   .saleDots{display:none}
   .railbar{display:none}
   @media (max-width:899px){
-    .railbar{display:block;height:4px;border-radius:2px;background:#232329;margin-top:10px;position:relative;overflow:hidden}
-    .railbar span{position:absolute;top:0;left:0;height:100%;border-radius:2px;background:#5b5b66}
+    .railbar{display:block;height:4px;border-radius:2px;background:#232329;background-clip:content-box;padding:6px 0;margin-top:4px;position:relative;overflow:hidden;cursor:pointer;touch-action:none}
+    .railbar span{position:absolute;top:6px;left:0;height:4px;border-radius:2px;background:#5b5b66}
   }
   @media (min-width:900px){
     .salepanel{position:relative}
