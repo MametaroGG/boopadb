@@ -1200,7 +1200,7 @@ function chipSet(filter){
   }
   return [...seen.values()];
 }
-let spFilter = "all", spShown = 30;
+let spFilter = "all", spShown = 30, spTotal = 0;
 function spRender(reset = true){
   if (reset) spShown = 30;
   const q = document.getElementById("spQ").value.trim().toLowerCase();
@@ -1244,10 +1244,17 @@ function spRender(reset = true){
   document.getElementById("spEmpty").style.display = hits.length ? "none" : "block";
   const slice = hits.slice(0, spShown);
   document.getElementById("spGrid").innerHTML = slice.map((x, i) => x.plain ? plainCard(x, i) : saleCard({...x, pct: x.pct}, i)).join("");
+  spTotal = hits.length;
   document.getElementById("spMore").style.display = hits.length > spShown ? "" : "none";
   slice.forEach(x => { if (x.plain) fillPriceLazy(x.id); });
 }
 document.getElementById("spMore").onclick = () => { spShown += 30; spRender(false); };
+// Auto-load the next batch as the list end approaches, so paging never
+// depends on the button alone (mobile taps on it proved unreliable).
+const spIO = new IntersectionObserver(es => {
+  if (es.some(e => e.isIntersecting) && spTotal > spShown) { spShown += 30; spRender(false); }
+}, { root: document.getElementById("searchPage"), rootMargin: "700px 0px" });
+spIO.observe(document.querySelector("#searchPage .smore"));
 function openSearchPreset(f){
   spFilter = f;
   document.getElementById("spChips").querySelectorAll(".chip").forEach(y => y.classList.toggle("on", y.dataset.f === f));
