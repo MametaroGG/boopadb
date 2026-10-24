@@ -425,6 +425,7 @@
   .pcard .pb{display:block;padding:8px 9px}
   .pcard .pn{display:block;font-size:11.5px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:32px}
   .pcard .pp2{display:flex;gap:6px;align-items:center;margin-top:5px}
+  .pcard .price.solo{display:inline-flex;align-items:center;height:24px;background:#26262c;padding:0 7px;font-size:13px;font-weight:600}
   .vchip{background:#4c6b22;color:#c8ec6e;font-size:10px;font-weight:700;padding:1.5px 6px;border-radius:4px;white-space:nowrap}
   .browse2{margin-top:28px}
   .btabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);scrollbar-width:none}
@@ -2179,8 +2180,8 @@ function pcardHTML(h){
   const onSale = !!(now && now.base > cur && (now.on_sale || now.sale || saleIds().has(String(h.id))));
   const pct = onSale ? (now.pct != null ? now.pct : Math.round((1 - cur / now.base) * 100)) : 0;
   const priceHTML = onSale
-    ? `<span class="bprice"><span class="discst">-${pct}%</span><span class="bstack"><span class="was">${yen(now.base)}</span><span class="price">${cur === 0 ? tr("free") : yen(cur)}</span></span></span>`
-    : `<span class="price" style="font-size:13px">${yen(cur)}</span>`;
+    ? `<span class="bprice"><span class="discst">-${pct}%</span><span class="bstack"><span class="was">${yen(now.base)}</span><span class="price">${cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(cur)}</span></span></span>`
+    : `<span class="price solo">${cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(cur)}</span>`;
   return `<a class="pcard" href="${itemUrl(h.id)}">
     <span class="pimgw">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="pph">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
     <span class="pb"><span class="pn">${esc(h.name)}</span>
