@@ -235,6 +235,21 @@
   #spMoreFloat{position:fixed;right:16px;bottom:84px;z-index:42;background:rgba(27,27,31,.95);color:var(--text);border:1px solid var(--border2);border-radius:999px;padding:11px 26px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 10px 26px rgba(0,0,0,.55)}
   #spMoreFloat[hidden]{display:none}
   #spMoreFloat:active{transform:scale(.97)}
+  .sp-price{padding:2px 2px 0}
+  .sp-price-val{text-align:center;color:var(--sub);font-size:13px;margin-top:2px}
+  #spPrice{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;cursor:pointer;margin:0}
+  #spPrice::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:#3a3a41}
+  #spPrice::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#e8e8ec;margin-top:-7px;box-shadow:0 1px 5px rgba(0,0,0,.5)}
+  #spPrice::-moz-range-track{height:4px;border-radius:2px;background:#3a3a41}
+  #spPrice::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:#e8e8ec}
+  @media (min-width:900px){
+    .sp-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:26px;align-items:start}
+    .sp-results{grid-column:1;grid-row:1;min-width:0}
+    .sp-side{grid-column:2;grid-row:1;position:sticky;top:0}
+    .sp-side .chips{flex-direction:column;align-items:stretch;flex-wrap:nowrap}
+    .sp-side .chip{text-align:left}
+    .sp-side .kwrap{flex-direction:column;align-items:stretch}
+  }
   .hmeta{font-size:12.5px;color:var(--sub);margin-top:3px}
   .hmain .htags2{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
   .htag{font-size:11px;background:#2a2a2f;color:var(--sub);padding:2.5px 9px;border-radius:4px}
@@ -628,6 +643,8 @@
   <div class="sp-head"><button class="sp-back" id="spBack" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><div class="sp-title" data-i="sp_title">商品検索</div></div>
   <div class="sp-inner">
     <div class="sp-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg><input id="spQ" type="search" data-i-ph="sp_ph" placeholder="商品名・ショップ名で検索" autocomplete="off"></div>
+    <div class="sp-main"><div class="sp-side">
+    <div class="sp-sec" data-i="sp_filter">絞り込み</div>
     <div class="chips" id="spChips">
       <button class="chip on" data-f="all" data-i="chip_all">すべて</button>
       <button class="chip" data-f="sale" data-i="chip_onsale">セール中</button>
@@ -637,13 +654,18 @@
       <button class="chip" data-f="new" data-i="bt_new">新着</button>
       <button class="chip" data-f="active" data-i="bt_active">価格変更が活発</button>
     </div>
+    <div class="sp-sec" data-i="sp_price_t">価格で絞り込む</div>
+    <div class="sp-price"><input type="range" id="spPrice" min="0" max="12" step="1" value="12" data-i-al="sp_price_t" aria-label="価格で絞り込む"><div class="sp-price-val" id="spPriceVal"></div></div>
     <div class="sp-sec" data-i="sp_shops">ショップから探す</div>
     <div class="kwrap" id="spKw"></div>
+    </div>
+    <div class="sp-results">
     <div class="sp-count" id="spCount"></div>
     <div class="grid" id="spGrid"></div>
     <div class="smore"><button id="spMore" type="button" data-i="more">もっと見る</button></div>
     <button id="spMoreFloat" type="button" data-i="more" hidden>もっと見る</button>
     <div class="empty" id="spEmpty" data-i="empty_none">該当する商品がありません</div>
+    </div></div>
   </div>
 </div>
 <script>
@@ -665,7 +687,7 @@ ja: {
   ft_legal: "BoopaDB は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。",
   ft_terms: "利用規約", ft_priv: "プライバシー",
   ft_tm: "BOOTH は pixiv株式会社の商標です。その他の商標および著作物は、各権利者に帰属します。",
-  pp_title: "商品詳細", sp_title: "商品検索", sp_ph: "商品名・ショップ名で検索", sp_shops: "ショップから探す",
+  pp_title: "商品詳細", sp_title: "商品検索", sp_ph: "商品名・ショップ名で検索", sp_shops: "ショップから探す", sp_filter: "絞り込み", sp_price_t: "価格で絞り込む", sp_price_any: "価格は問わない", sp_price_upto: "¥{n} 以下",
   tab_home: "ホーム", tab_sale: "セール", tab_news: "ニュース", tab_ranking: "ランキング", tab_bm: "ブックマーク",
   al_back: "戻る", al_prev: "前へ", al_next: "次へ", al_expand: "拡大表示", al_close: "閉じる", cmp_more: "ほか{n}件", al_search: "検索", al_slide: "スライド",
   st_total: "追跡中の商品", st_sale: "現在セール中（推定）", st_free: "現在無料の商品（元¥100以上）", st_changed: "価格変更のあった商品", st_period: "データ収集期間（最古の観測）",
@@ -698,7 +720,7 @@ en: {
   ft_legal: "BoopaDB is an unofficial project, not affiliated with BOOTH or pixiv Inc. All times are Japan Standard Time (JST).",
   ft_terms: "Terms", ft_priv: "Privacy",
   ft_tm: "BOOTH is a trademark of pixiv Inc. All other trademarks and works belong to their respective owners.",
-  pp_title: "Product details", sp_title: "Search products", sp_ph: "Search by product or shop name", sp_shops: "Browse by shop",
+  pp_title: "Product details", sp_title: "Search products", sp_ph: "Search by product or shop name", sp_shops: "Browse by shop", sp_filter: "Filters", sp_price_t: "Filter by price", sp_price_any: "Any price", sp_price_upto: "Up to ¥{n}",
   tab_home: "Home", tab_sale: "Sale", tab_news: "News", tab_ranking: "Rankings", tab_bm: "Bookmarks",
   al_back: "Back", al_prev: "Previous", al_next: "Next", al_expand: "Expand", al_close: "Close", cmp_more: "+{n} more", al_search: "Search", al_slide: "Slide",
   st_total: "Products tracked", st_sale: "On sale now (est.)", st_free: "Free now (was ¥100+)", st_changed: "Products with price changes", st_period: "Data collection period (oldest)",
@@ -731,7 +753,7 @@ ko: {
   ft_legal: "BoopaDB는 BOOTH 및 pixiv 주식회사와 관계없는 비공식 프로젝트입니다. 모든 시간은 일본 시간(JST)입니다.",
   ft_terms: "이용약관", ft_priv: "개인정보",
   ft_tm: "BOOTH는 pixiv 주식회사의 상표입니다. 그 밖의 상표 및 저작물은 각 권리자에게 귀속합니다.",
-  pp_title: "상품 상세", sp_title: "상품 검색", sp_ph: "상품명·샵 이름으로 검색", sp_shops: "샵으로 찾기",
+  pp_title: "상품 상세", sp_title: "상품 검색", sp_ph: "상품명·샵 이름으로 검색", sp_shops: "샵으로 찾기", sp_filter: "필터", sp_price_t: "가격으로 좁히기", sp_price_any: "가격 무관", sp_price_upto: "¥{n} 이하",
   tab_home: "홈", tab_sale: "세일", tab_news: "뉴스", tab_ranking: "랭킹", tab_bm: "북마크",
   al_back: "뒤로", al_prev: "이전", al_next: "다음", al_expand: "확대", al_close: "닫기", cmp_more: "외 {n}개", al_search: "검색", al_slide: "슬라이드",
   st_total: "추적 중인 상품", st_sale: "현재 할인 중(추정)", st_free: "현재 무료 상품(기존 ¥100 이상)", st_changed: "가격 변동이 있었던 상품", st_period: "데이터 수집 기간(가장 오래된 관측)",
@@ -764,7 +786,7 @@ ko: {
   ft_legal: "BoopaDB 是与 BOOTH 及 pixiv 株式会社无关的非官方项目。所有时间均为日本时间（JST）。",
   ft_terms: "使用条款", ft_priv: "隐私",
   ft_tm: "BOOTH 是 pixiv 株式会社的商标。其他商标及作品归各权利方所有。",
-  pp_title: "商品详情", sp_title: "搜索商品", sp_ph: "按商品名或店铺名搜索", sp_shops: "按店铺浏览",
+  pp_title: "商品详情", sp_title: "搜索商品", sp_ph: "按商品名或店铺名搜索", sp_shops: "按店铺浏览", sp_filter: "筛选", sp_price_t: "按价格筛选", sp_price_any: "不限价格", sp_price_upto: "¥{n} 以下",
   tab_home: "首页", tab_sale: "促销", tab_news: "动态", tab_ranking: "排行榜", tab_bm: "收藏",
   al_back: "返回", al_prev: "上一个", al_next: "下一个", al_expand: "放大显示", al_close: "关闭", cmp_more: "还有{n}个", al_search: "搜索", al_slide: "幻灯片",
   st_total: "追踪中的商品", st_sale: "当前促销中（估计）", st_free: "当前免费商品（原价 ¥100 以上）", st_changed: "有价格变动的商品", st_period: "数据采集期间（最早观测）",
@@ -797,7 +819,7 @@ ko: {
   ft_legal: "BoopaDB 是與 BOOTH 及 pixiv 株式會社無關的非官方項目。所有時間均為日本時間（JST）。",
   ft_terms: "使用條款", ft_priv: "隱私",
   ft_tm: "BOOTH 是 pixiv 株式會社的商標。其他商標及作品歸各權利方所有。",
-  pp_title: "商品詳情", sp_title: "搜尋商品", sp_ph: "按商品名或店舖名搜尋", sp_shops: "按店舖瀏覽",
+  pp_title: "商品詳情", sp_title: "搜尋商品", sp_ph: "按商品名或店舖名搜尋", sp_shops: "按店舖瀏覽", sp_filter: "篩選", sp_price_t: "按價格篩選", sp_price_any: "不限價格", sp_price_upto: "¥{n} 以下",
   tab_home: "首頁", tab_sale: "促銷", tab_news: "動態", tab_ranking: "排行榜", tab_bm: "收藏",
   al_back: "返回", al_prev: "上一個", al_next: "下一個", al_expand: "放大顯示", al_close: "關閉", cmp_more: "還有{n}個", al_search: "搜尋", al_slide: "投影片",
   st_total: "追蹤中的商品", st_sale: "當前促銷中（估計）", st_free: "當前免費商品（原價 ¥100 以上）", st_changed: "有價格變動的商品", st_period: "數據採集期間（最早觀測）",
@@ -1216,6 +1238,9 @@ function chipSet(filter){
 let FULL_LISTS = null;
 let spFilter = "all", spShown = 30, spTotal = 0, spRendered = 0, spKey = "";
 const spMoreFloat = document.getElementById("spMoreFloat");
+const SP_CAPS = [500, 1000, 1500, 2000, 3000, 5000, 7000, 10000, 15000, 20000, 30000, 50000];
+let spMaxPrice = null, spPriceT = null;
+function spPriceLabel(){ document.getElementById("spPriceVal").textContent = spMaxPrice == null ? tr("sp_price_any") : tr("sp_price_upto", {n: spMaxPrice.toLocaleString(LOCALE)}); }
 function spRender(reset = true){
   if (reset) spShown = 30;
   const q = document.getElementById("spQ").value.trim().toLowerCase();
@@ -1259,15 +1284,17 @@ function spRender(reset = true){
     if (spFilter === "active") hits = hits.sort((a, b) => (b.changes_recent || 0) - (a.changes_recent || 0));
   }
   if (!hits) hits = spIndex;
-  if (!q && spFilter === "all" && fullIndex) countOverride = tr("sp_total", {n: fullIndex.length});
+  if (spMaxPrice != null) hits = hits.filter(x => x.cur != null && x.cur <= spMaxPrice);
+  if (!q && spFilter === "all" && fullIndex && spMaxPrice == null) countOverride = tr("sp_total", {n: fullIndex.length});
   document.getElementById("spCount").textContent = countOverride || tr("sp_count", {n: hits.length});
+  spPriceLabel();
   document.getElementById("spEmpty").style.display = hits.length ? "none" : "block";
   spTotal = hits.length;
   // Append-only: rebuilding the whole grid per batch repainted every card
   // and restarted every entrance animation, which is what turned fast
   // scrolling dark and stalled paging. A changed query/filter/data
   // generation still rebuilds from scratch.
-  const key = q + "|" + spFilter + "|" + (fullIndex ? "F" : "-") + "|" + (FULL_LISTS ? "L" : "-");
+  const key = q + "|" + spFilter + "|" + (fullIndex ? "F" : "-") + "|" + (FULL_LISTS ? "L" : "-") + "|" + (spMaxPrice == null ? "A" : spMaxPrice);
   const grid = document.getElementById("spGrid");
   const cardOf = (x, i) => x.plain ? plainCard(x, i) : saleCard({...x, pct: x.pct}, i);
   let fillFrom = -1;
@@ -1288,6 +1315,9 @@ function spRender(reset = true){
 function spLoadMore(){ if (spTotal > spShown) { spShown += 30; spRender(false); } }
 document.getElementById("spMore").onclick = spLoadMore;
 spMoreFloat.onclick = spLoadMore;
+const spPriceEl = document.getElementById("spPrice");
+spPriceEl.addEventListener("input", () => { const v = +spPriceEl.value; spMaxPrice = v >= SP_CAPS.length ? null : SP_CAPS[v]; spPriceLabel(); clearTimeout(spPriceT); spPriceT = setTimeout(() => spRender(), 180); });
+spPriceLabel();
 // Auto-load the next batch as the list end approaches, so paging never
 // depends on the button alone (mobile taps on it proved unreliable).
 let spTick = 0, spRetryT = null, spScrollT = null;
