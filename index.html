@@ -69,7 +69,8 @@
   @media (min-width:900px){#spGrid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr))}}
   #featGrid{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:2px 2px 10px}
   #featGrid::-webkit-scrollbar{display:none}
-  #featGrid .card{flex:0 0 168px;scroll-snap-align:start}
+  #featGrid .card{flex:0 0 168px;scroll-snap-align:start;position:relative;overflow:visible}
+  #featGrid .capimg{border-radius:10px 10px 0 0}
   @media (min-width:900px){#featGrid .card{flex-basis:212px}}
   .card{background:linear-gradient(180deg,#1d1d21,#17171a);border:1px solid #202025;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(0,0,0,.42)}
   .card:hover{border-color:var(--border2)}
@@ -196,7 +197,7 @@
   .harrow:hover{color:#fff}
   @media (min-width:900px){
     .hslide{flex-direction:row}
-    .hslide .himg{flex:1.55;aspect-ratio:auto;min-height:330px}
+    .hslide .himg{flex:1.55;aspect-ratio:auto;min-height:330px;border-radius:14px 0 0 14px}
     .hslide .hbody{flex:1;flex-direction:column;align-items:stretch;padding:18px 20px;height:auto}
     .hslide .hprice2{margin-top:auto;align-self:flex-end}
     .hslide .hname{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:21px}
@@ -228,11 +229,11 @@
   @media (min-width:900px){.adslot{margin-left:calc(50% - 50vw - 59px)}}
   .adtag{position:absolute;top:8px;right:8px;background:rgba(10,10,12,.55);color:#cfcfd4;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.06em}
   .hero-track{display:flex;gap:12px;transition:transform .65s cubic-bezier(.3,1.25,.4,1)}
-  .hslide{flex:0 0 90%;min-width:0;display:flex;border-radius:14px;overflow:hidden;opacity:.35;filter:saturate(.55) brightness(.7);transition:opacity .45s,filter .45s}
+  .hslide{flex:0 0 90%;min-width:0;display:flex;border-radius:14px;position:relative;opacity:.35;filter:saturate(.55) brightness(.7);transition:opacity .45s,filter .45s}
   .hslide.active{opacity:1;filter:none}
   @media (min-width:900px){.hslide{flex-basis:84%}}
   @media (max-width:899px){.hslide{flex-direction:column}}
-  .hslide .himg{position:relative;aspect-ratio:16/8;background:#131316;display:block;overflow:hidden}
+  .hslide .himg{position:relative;aspect-ratio:16/8;background:#131316;display:block;overflow:hidden;border-radius:14px 14px 0 0}
   .hslide .himg img{position:absolute;inset:0;width:100%;height:100%}
   .hslide .himg .hbg{object-fit:cover;filter:blur(26px) brightness(.5);transform:scale(1.3)}
   .hslide .himg .hfg{object-fit:contain;object-position:left}
@@ -251,7 +252,7 @@
   .rib.sale{background:#e04347}
   .rib.act{background:#3a3a41}
   .fnote2{font-size:12px;color:var(--faint);margin:-8px 0 10px}
-  .ftag{position:absolute;top:0;left:0;background:rgba(23,23,26,.88);color:#fff;font-size:10.5px;line-height:1.3;font-weight:700;padding:2.5px 9px;z-index:2}
+  .ftag{position:absolute;top:0;left:0;background:rgba(23,23,26,.88);color:#fff;font-size:10.5px;line-height:1.3;font-weight:700;padding:2.5px 9px;z-index:2;pointer-events:none}
   .spark{margin-top:2px}
   .spark svg{display:block;width:100%;height:28px}
   .fmeta{font-size:11px;color:var(--faint);margin-left:auto}
@@ -337,9 +338,9 @@
   .spage::-webkit-scrollbar{width:8px}
   .spage::-webkit-scrollbar-track{background:transparent}
   .spage::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
-  .pcard{flex:0 0 138px;background:#17171a;border:1px solid var(--border);border-radius:10px;overflow:hidden;text-decoration:none;color:var(--text);position:relative}
-  .pcard img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#131316}
-  .pcard .pph{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1/1;background:#1b1b1f}
+  .pcard{flex:0 0 138px;background:#17171a;border:1px solid var(--border);border-radius:10px;overflow:visible;text-decoration:none;color:var(--text);position:relative}
+  .pcard img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#131316;border-radius:10px 10px 0 0}
+  .pcard .pph{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1/1;background:#1b1b1f;border-radius:10px 10px 0 0}
   .pcard .pph svg{width:34px;height:34px;stroke:#2c2c33;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
   .pcard .pb{display:block;padding:8px 9px}
   .pcard .pn{display:block;font-size:11.5px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:32px}
@@ -807,7 +808,7 @@ const track = document.getElementById("heroTrack");
 const dotsEl = document.getElementById("heroDots");
 track.innerHTML = heroItems.map(x => `
   <div class="hslide">
-    <a class="himg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img class="hbg" src="${x.image}" alt="" aria-hidden="true" referrerpolicy="no-referrer" onerror="const w = this.closest('.himg'); if (w) w.querySelectorAll('img').forEach(i => i.remove())"><img class="hfg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="const w = this.closest('.himg'); if (w) w.querySelectorAll('img').forEach(i => i.remove())">` : ""}<span class="rib ${x._rib[0]}">${x._rib[1]}</span>${bmFlag(x.id)}</a>
+    <a class="himg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img class="hbg" src="${x.image}" alt="" aria-hidden="true" referrerpolicy="no-referrer" onerror="const w = this.closest('.himg'); if (w) w.querySelectorAll('img').forEach(i => i.remove())"><img class="hfg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="const w = this.closest('.himg'); if (w) w.querySelectorAll('img').forEach(i => i.remove())">` : ""}<span class="rib ${x._rib[0]}">${x._rib[1]}</span></a>${bmFlag(x.id)}
     <div class="hbody">
       <div class="hname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="hsub"><span class="hstatus">${x._status}</span>${x.shop ? `<span class="hshop">${esc(x.shop)}</span>` : ""}</div>
@@ -1394,7 +1395,7 @@ function sparkSVG(spark){
 function featCap(x, tag, meta){
   const pct = x.base > x.cur ? Math.round((1 - x.cur / x.base) * 100) : 0;
   return `<div class="card">
-    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}<span class="ftag">${tag}</span>${bmFlag(x.id, "u2")}</a>
+    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="phcard">${PH_ICON}</span>`}${bmFlag(x.id, "u2")}</a><span class="ftag">${tag}</span>
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
