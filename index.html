@@ -222,8 +222,7 @@
   .ritem .rp{font-size:12px;color:var(--sub)}
   .hero{position:relative}
   html,body{overflow-x:clip}
-  .heroh{margin:26px 0 12px;padding-left:5%}
-  @media (min-width:900px){.heroh{padding-left:8%}}
+  .heroh{margin:26px 0 12px}
   .adslot{display:block;position:relative;overflow:hidden;width:100vw;margin-left:calc(50% - 50vw);background:#293543}
   .adslot img{width:min(840px,100%);height:auto;display:block;margin:0 auto;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 26px,#000 calc(100% - 26px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 26px,#000 calc(100% - 26px),transparent 100%)}
   @media (min-width:900px){.adslot{margin-left:calc(50% - 50vw - 59px)}}
@@ -832,7 +831,7 @@ function heroPos(p, animate){
   const slide = track.children[0];
   if (!slide) return;
   const w = slide.getBoundingClientRect().width;
-  const center = (track.parentElement.clientWidth - w) / 2;
+  const center = 0;
   if (!animate) track.style.transition = "none";
   track.style.transform = `translateX(${center - (w + 12) * p}px)`;
   if (!animate) { void track.offsetWidth; track.style.transition = ""; }
