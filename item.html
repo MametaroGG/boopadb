@@ -685,7 +685,7 @@
   <div class="stats" id="stats"></div>
 
   <div class="shead" id="sale"><h2 style="border:none;margin:0;padding:0" data-i="nav_sale">セール中の商品</h2>
-    <div class="pilltabs" id="sortTabs"><span class="pill-ind"></span><button data-mode="new" class="on" data-i="sort_new">新着順</button><button data-mode="pop" data-i="sort_pop">人気順</button><button data-mode="pct" data-i="sort_pct">割引率順</button><button data-mode="amount" data-i="sort_amount">割引額順</button><button data-mode="cheap" data-i="sort_cheap">安い順</button></div></div>
+    <div class="pilltabs" id="sortTabs"><span class="pill-ind"></span><button data-mode="new" class="on" data-i="sort_new">新着順</button><button data-mode="pop" data-i="sort_pop">人気順</button><button data-mode="pct" data-i="sort_pct">割引率順</button><button data-mode="amount" data-i="sort_amount">割引額順</button></div></div>
   <div class="chips" id="chips">
     <button class="chip on" data-f="all" data-i="chip_all">すべて</button>
     <button class="chip" data-f="lowest" data-i="chip_lowest">過去最安値</button>
@@ -1783,7 +1783,6 @@ function renderSale(){
   if (sortMode === "new") arr.sort((a,b) => (Number(b.id) - Number(a.id)) || ((b.likes ?? -1) - (a.likes ?? -1)));
   else if (sortMode === "pop") arr.sort((a,b) => ((b.likes ?? -1) - (a.likes ?? -1)) || b.pct - a.pct);
   else if (sortMode === "amount") arr.sort((a,b) => (b.base - b.cur) - (a.base - a.cur));
-  else if (sortMode === "cheap") arr.sort((a,b) => a.cur - b.cur);
   else arr.sort((a,b) => b.pct - a.pct || (b.base - b.cur) - (a.base - a.cur));
   arr = arr.filter(saleHit);
   // Gag listings (joke base prices like ¥9,999,999) never headline the rail:
