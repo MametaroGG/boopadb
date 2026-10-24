@@ -230,6 +230,11 @@
   .smore button{background:rgba(255,255,255,.07);color:#e8e8ea;border:1px solid rgba(255,255,255,.16);font-weight:700;font-size:12.5px;padding:7px 20px;border-radius:3px;cursor:pointer;font-family:inherit}
   .smore button:hover{background:rgba(255,255,255,.14)}
   .smore button:active{transform:scale(.96)}
+  #searchPage .smore{text-align:center;margin-top:16px}
+  #searchPage .smore button{width:100%;padding:13px;font-size:14px;border-radius:8px;background:#1b1b1f}
+  #spMoreFloat{position:fixed;right:16px;bottom:84px;z-index:42;background:rgba(27,27,31,.95);color:var(--text);border:1px solid var(--border2);border-radius:999px;padding:11px 26px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 10px 26px rgba(0,0,0,.55)}
+  #spMoreFloat[hidden]{display:none}
+  #spMoreFloat:active{transform:scale(.97)}
   .hmeta{font-size:12.5px;color:var(--sub);margin-top:3px}
   .hmain .htags2{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
   .htag{font-size:11px;background:#2a2a2f;color:var(--sub);padding:2.5px 9px;border-radius:4px}
@@ -637,6 +642,7 @@
     <div class="sp-count" id="spCount"></div>
     <div class="grid" id="spGrid"></div>
     <div class="smore"><button id="spMore" type="button" data-i="more">もっと見る</button></div>
+    <button id="spMoreFloat" type="button" data-i="more" hidden>もっと見る</button>
     <div class="empty" id="spEmpty" data-i="empty_none">該当する商品がありません</div>
   </div>
 </div>
@@ -1209,6 +1215,7 @@ function chipSet(filter){
 }
 let FULL_LISTS = null;
 let spFilter = "all", spShown = 30, spTotal = 0, spRendered = 0, spKey = "";
+const spMoreFloat = document.getElementById("spMoreFloat");
 function spRender(reset = true){
   if (reset) spShown = 30;
   const q = document.getElementById("spQ").value.trim().toLowerCase();
@@ -1275,9 +1282,12 @@ function spRender(reset = true){
   }
   spKey = key;
   document.getElementById("spMore").style.display = hits.length > spShown ? "" : "none";
+  spMoreFloat.hidden = !(hits.length > spShown);
   if (fillFrom >= 0) hits.slice(fillFrom, spRendered).forEach(x => { if (x.plain) fillPriceLazy(x.id); });
 }
-document.getElementById("spMore").onclick = () => { spShown += 30; spRender(false); };
+function spLoadMore(){ if (spTotal > spShown) { spShown += 30; spRender(false); } }
+document.getElementById("spMore").onclick = spLoadMore;
+spMoreFloat.onclick = spLoadMore;
 // Auto-load the next batch as the list end approaches, so paging never
 // depends on the button alone (mobile taps on it proved unreliable).
 let spTick = 0, spRetryT = null, spScrollT = null;
