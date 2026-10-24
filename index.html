@@ -69,6 +69,8 @@
   @media (min-width:900px){#spGrid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr))}}
   #featGrid{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:2px 2px 10px}
   #featGrid::-webkit-scrollbar{display:none}
+  #featTrack{display:contents}
+  .featwrap{position:relative}
   #featGrid .card{flex:0 0 168px;scroll-snap-align:start;position:relative;overflow:visible;border-radius:0}
   #featGrid .capimg{border-radius:0}
   @media (min-width:900px){#featGrid .card{flex-basis:212px}}
@@ -142,11 +144,16 @@
   .saleDots{display:none}
   @media (min-width:900px){
     .salepanel{position:relative}
+    .salepanel.hp{margin-left:54px;margin-right:54px}
+    .featwrap{margin:0 54px}
+    #featGrid{overflow:hidden}
+    #featTrack{display:flex;gap:10px;position:relative;transition:transform .55s cubic-bezier(.22,.8,.3,1)}
+    .featwrap .sarrow{top:46%}
     .saleRail{overflow:hidden}
     .saleTrack{display:flex;gap:8px;position:relative;transition:transform .55s cubic-bezier(.22,.8,.3,1)}
-    .sarrow{display:block;position:absolute;top:50%;transform:translateY(-50%);z-index:5;background:none;border:none;color:rgba(255,255,255,.75);font-size:44px;line-height:1;cursor:pointer;padding:10px 8px;font-family:inherit}
-    .sarrow.prev{left:0}
-    .sarrow.next{right:0}
+    .sarrow{display:block;position:absolute;top:50%;transform:translateY(-50%);z-index:5;background:none;border:none;color:rgba(255,255,255,.75);font-size:56px;line-height:1;cursor:pointer;padding:8px 2px;font-family:inherit}
+    .sarrow.prev{left:-54px}
+    .sarrow.next{right:-54px}
     .sarrow:hover{color:#fff}
     .saleDots{display:flex;gap:6px;justify-content:center;margin-top:10px}
     .saleDots span{width:22px;height:4px;border-radius:2px;background:#33333a}
@@ -487,7 +494,7 @@
     <button class="chip" data-f="free" data-i="free">無料</button>
     <button class="chip" data-f="half" data-i="chip_half">50%OFF以上</button>
   </div>
-  <div class="salepanel">
+  <div class="salepanel hp">
     <div class="saleRail" id="saleRail"><div class="saleTrack" id="saleTrack"></div></div>
     <button class="sarrow prev" id="salePrev" data-i-al="al_prev" aria-label="前へ">‹</button>
     <button class="sarrow next" id="saleNext" data-i-al="al_next" aria-label="次へ">›</button>
@@ -499,7 +506,7 @@
 
   <h2 id="feat" data-i="nav_feat">注目の商品</h2>
   <p class="fnote2" data-i="feat_note">セール中かどうかではなく、価格の動きの活発さと新着から選んでいます。</p>
-  <div class="capgrid" id="featGrid"></div>
+  <div class="featwrap"><div class="capgrid" id="featGrid"><div id="featTrack"></div></div><button class="sarrow prev" id="featPrev" data-i-al="al_prev" aria-label="前へ">‹</button><button class="sarrow next" id="featNext" data-i-al="al_next" aria-label="次へ">›</button><div class="saleDots" id="featDots"></div></div>
   <div id="personal"></div>
 
   <div class="browse2" id="browse2">
@@ -1297,44 +1304,51 @@ function renderSale(){
     else { html += railTile(items[i], false); i++; }
   }
   document.getElementById("saleTrack").innerHTML = html;
-  salePage = 0;
-  requestAnimationFrame(layoutSalePager);
+  salePager.reset();
   document.getElementById("saleEmpty").style.display = arr.length ? "none" : "block";
   document.getElementById("saleMore").style.display = arr.length ? "" : "none";
 }
-let salePage = 0, salePages = [0], saleResizeT = null;
-function layoutSalePager(){
-  const rail = document.getElementById("saleRail"), track = document.getElementById("saleTrack");
-  const prev = document.getElementById("salePrev"), next = document.getElementById("saleNext"), dots = document.getElementById("saleDots");
-  if (window.innerWidth < 900) { track.style.transform = ""; return; }
-  const W = rail.clientWidth, cols = [...track.children];
-  if (!cols.length) { salePages = [0]; }
-  else {
-    const starts = [0];
-    let pageStartIdx = 0;
-    for (let k = 1; k < cols.length; k++) {
-      if (cols[k].offsetLeft + cols[k].offsetWidth - cols[pageStartIdx].offsetLeft > W) { starts.push(cols[k].offsetLeft); pageStartIdx = k; }
-    }
-    const maxShift = Math.max(0, track.scrollWidth - W);
-    salePages = [...new Set(starts.map(s => Math.min(s, maxShift)))];
+function makePager(railId, trackId, prevId, nextId, dotsId){
+  const st = { page: 0, pages: [0], t: null };
+  const el = id => document.getElementById(id);
+  function draw(){
+    const track = el(trackId), dots = el(dotsId);
+    track.style.transform = `translateX(${-st.pages[st.page]}px)`;
+    dots.innerHTML = st.pages.map((_, i) => `<span class="${i === st.page ? "on" : ""}"></span>`).join("");
   }
-  if (salePage >= salePages.length) salePage = salePages.length - 1;
-  const multi = salePages.length > 1;
-  prev.style.display = next.style.display = multi ? "" : "none";
-  dots.style.display = multi ? "" : "none";
-  dots.innerHTML = salePages.map((_, i) => `<span class="${i === salePage ? "on" : ""}"></span>`).join("");
-  track.style.transform = `translateX(${-salePages[salePage]}px)`;
+  function layout(){
+    const rail = el(railId), track = el(trackId), prev = el(prevId), next = el(nextId), dots = el(dotsId);
+    if (!rail || !track) return;
+    if (window.innerWidth < 900) { track.style.transform = ""; return; }
+    const W = rail.clientWidth, cols = [...track.children];
+    if (!cols.length) st.pages = [0];
+    else {
+      const starts = [0];
+      let psi = 0;
+      for (let k = 1; k < cols.length; k++) {
+        if (cols[k].offsetLeft + cols[k].offsetWidth - cols[psi].offsetLeft > W) { starts.push(cols[k].offsetLeft); psi = k; }
+      }
+      const maxShift = Math.max(0, track.scrollWidth - W);
+      st.pages = [...new Set(starts.map(s => Math.min(s, maxShift)))];
+    }
+    if (st.page >= st.pages.length) st.page = st.pages.length - 1;
+    const multi = st.pages.length > 1;
+    prev.style.display = next.style.display = multi ? "" : "none";
+    dots.style.display = multi ? "" : "none";
+    draw();
+  }
+  function go(d){
+    if (st.pages.length < 2) return;
+    st.page = (st.page + d + st.pages.length) % st.pages.length;
+    draw();
+  }
+  el(prevId).onclick = () => go(-1);
+  el(nextId).onclick = () => go(1);
+  window.addEventListener("resize", () => { clearTimeout(st.t); st.t = setTimeout(layout, 150); });
+  return { layout, reset(){ st.page = 0; requestAnimationFrame(layout); } };
 }
-function goSalePage(d){
-  if (salePages.length < 2) return;
-  salePage = (salePage + d + salePages.length) % salePages.length;
-  const track = document.getElementById("saleTrack"), dots = document.getElementById("saleDots");
-  track.style.transform = `translateX(${-salePages[salePage]}px)`;
-  dots.innerHTML = salePages.map((_, i) => `<span class="${i === salePage ? "on" : ""}"></span>`).join("");
-}
-document.getElementById("salePrev").onclick = () => goSalePage(-1);
-document.getElementById("saleNext").onclick = () => goSalePage(1);
-window.addEventListener("resize", () => { clearTimeout(saleResizeT); saleResizeT = setTimeout(layoutSalePager, 150); });
+const salePager = makePager("saleRail", "saleTrack", "salePrev", "saleNext", "saleDots");
+const featPager = makePager("featGrid", "featTrack", "featPrev", "featNext", "featDots");
 document.getElementById("saleMore").onclick = () => { location.href = "sale.html"; };
 function railTile(s, sm){
   const strip = `<span class="pstrip"><span class="discst">-${s.pct}%</span>${!sm && s.base > s.cur ? `<span class="pwas">${yen(s.base)}</span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span>`;
@@ -1476,11 +1490,13 @@ function featCap(x, tag, meta, cls){
     }
     picked.forEach(x => items.push(featCap(x, tr("bt_new"), tr("added_on", {d: x.first_date}), " new")));
   }
-  document.getElementById("featGrid").innerHTML = items.join("");
+  document.getElementById("featTrack").innerHTML = items.join("");
+  featPager.reset();
   if (!items.length){
     document.getElementById("feat").style.display = "none";
     document.querySelector(".fnote2").style.display = "none";
     document.getElementById("featGrid").style.display = "none";
+    document.querySelector(".featwrap").style.display = "none";
   }
 }
 
