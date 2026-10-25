@@ -573,6 +573,20 @@
   html[data-theme="light"] .bmvals{background:#e8e8ed}
   .bmvals .was{background:none;padding:0;height:auto;font-size:12.5px}
   .bmvals .price{font-weight:800;font-size:14.5px;white-space:nowrap}
+  span.was.wl{font-size:11px}
+  span.was.wxl{font-size:9.5px}
+  .bmvals .was.wl{font-size:11px}
+  .bmvals .was.wxl{font-size:9.5px}
+  .caprow .was.wl{font-size:10.5px}
+  .caprow .was.wxl{font-size:9px}
+  .bprice .bstack .was.wl{font-size:9.5px}
+  .bprice .bstack .was.wxl{font-size:8.5px}
+  .mcell .scrim .was.wl{font-size:10px}
+  .mcell .scrim .was.wxl{font-size:9px}
+  .bmvals .price.wl{font-size:12.5px}
+  .bmvals .price.wxl{font-size:11px}
+  .caprow .price.wl{font-size:12px}
+  .caprow .price.wxl{font-size:10.5px}
   .bmname{display:block;font-size:12px;font-weight:600;line-height:1.35;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .prow::-webkit-scrollbar{height:6px}
   .prow::-webkit-scrollbar-track{background:transparent}
@@ -1165,6 +1179,7 @@ document.querySelectorAll("[data-i-al]").forEach(el => { el.setAttribute("aria-l
 }
 
 const yen = n => n === 0 ? tr("free") : "¥" + n.toLocaleString(LOCALE);
+const wCls = amt => { if (amt == null) return ""; const n = yen(amt).length; return n >= 10 ? " wxl" : n >= 8 ? " wl" : ""; };
 const PH_ICON = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M3 16l5-4 4 3 3-2 6 4"/></svg>';
 function imgPh(el, cls){ var s = document.createElement('span'); s.className = cls; s.innerHTML = PH_ICON; el.replaceWith(s); }
 const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1291,7 +1306,7 @@ function heroSlideHTML(x){
       <div class="hname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="hsub"><span class="hstatus">${x._status}</span>${x.shop ? `<span class="hshop">${esc(x.shop)}</span>` : ""}</div>
       <div class="hmeta" data-hmeta="${x.id}">${heroMetaHTML(x)}</div>
-      <div class="hprice2">${x._disc > 0 ? `<span class="disc">-${x._disc}%</span>` : ""}${x.base > x.cur ? `<span class="was">${yen(x.base)}</span>` : ""}<span class="price${x.cur === 0 ? " free" : ""}">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
+      <div class="hprice2">${x._disc > 0 ? `<span class="disc">-${x._disc}%</span>` : ""}${x.base > x.cur ? `<span class="was${wCls(x.base)}">${yen(x.base)}</span>` : ""}<span class="price${x.cur === 0 ? " free" : ""}">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
     </div>
   </div>`;
 }
@@ -1670,6 +1685,31 @@ function fetchMeta(id){
   if (!_metaCache.has(id)) _metaCache.set(id, fetch(META_BASE + id.slice(0, 3) + "/" + id + ".json").then(r => r.ok ? r.json() : null).catch(() => null));
   return _metaCache.get(id);
 }
+async function fillImgs(){
+  if (window._filling) return;
+  const els = [...document.querySelectorAll("[data-fill]")];
+  if (!els.length) return;
+  window._filling = true;
+  try {
+    await Promise.all(els.map(async el => {
+      const id = el.getAttribute("data-fill");
+      el.removeAttribute("data-fill");
+      const m = await fetchMeta(id).catch(() => null);
+      const img = m && (m.image_resized || m.image);
+      if (img && el.isConnected) {
+        const cls = el.classList.contains("bthph") ? "bthph" : el.classList.contains("pph") ? "pph" : "phcard";
+        const im = document.createElement("img");
+        if (cls === "bthph") im.className = "bth";
+        im.src = img; im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+        im.onerror = () => imgPh(im, cls);
+        el.replaceWith(im);
+        const rec = PROD.get(String(id)); if (rec && !rec.image) rec.image = img;
+        for (const k in LISTS) { const a = LISTS[k]; if (Array.isArray(a)) for (const s of a) if (String(s.id) === String(id) && !s.image) s.image = img; }
+      }
+    }));
+  } finally { window._filling = false; if (document.querySelector("[data-fill]")) fillImgs(); }
+}
+new MutationObserver(() => { if (document.querySelector("[data-fill]")) fillImgs(); }).observe(document.body, {childList: true, subtree: true});
 const _relShardCache = {};
 // Parent/child judgments are WITHDRAWN (user decision, 2026-10-25): the
 // refs fallback and the scraper's heuristic base_refs are both unproven.
@@ -1705,7 +1745,7 @@ function relCard(id, m, i){
   const shop = m && m.shop ? (m.shop.name || "") : "";
   const likes = m && typeof m.likes === "number" ? `<div class="clikes">${HEART_SVG}${m.likes.toLocaleString()}</div>` : "";
   return `<div class="card" style="animation-delay:${((i || 0) % 30) * 45}ms">
-    <a class="thumbwrap" href="${itemUrl(id)}" target="_blank" rel="noopener">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard">${PH_ICON}</span>`}${bmFlag(id)}</a>
+    <a class="thumbwrap" href="${itemUrl(id)}" target="_blank" rel="noopener">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${id}">${PH_ICON}</span>`}${bmFlag(id)}</a>
     <div class="cbody">
       <div class="cname"><a href="${itemUrl(id)}" target="_blank" rel="noopener">${esc(m ? m.name : "")}</a></div>
       <div class="cshop">${esc(shop)}</div>
@@ -1717,7 +1757,7 @@ function relCard(id, m, i){
 function relFillPrice(rec){
   document.querySelectorAll(`[data-relcrow="${rec.id}"]`).forEach(crow => {
     crow.innerHTML = rec.sale && rec.pct > 0
-      ? `<span class="bprice"><span class="discst">-${rec.pct}%</span><span class="bstack"><span class="was">${yen(rec.base)}</span><span class="price">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span></span></span>`
+      ? `<span class="bprice"><span class="discst">-${rec.pct}%</span><span class="bstack"><span class="was${wCls(rec.base)}">${yen(rec.base)}</span><span class="price">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span></span></span>`
       : `<span class="price solo">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span>`;
   });
 }
@@ -1805,7 +1845,7 @@ function fillCardPrice(rec){
   const crow = document.querySelector(`[data-crow="${rec.id}"]`);
   if (!crow) return;
   crow.innerHTML = rec.sale && rec.pct > 0
-    ? `<span class="bprice"><span class="discst">-${rec.pct}%</span><span class="bstack"><span class="was">${yen(rec.base)}</span><span class="price">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span></span></span>`
+    ? `<span class="bprice"><span class="discst">-${rec.pct}%</span><span class="bstack"><span class="was${wCls(rec.base)}">${yen(rec.base)}</span><span class="price">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span></span></span>`
     : `<span class="price solo">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span>`;
   if (rec.at_lowest) {
     const card = crow.closest(".card");
@@ -2240,7 +2280,7 @@ function saleCard(s, i){
   return `
   <div class="card" style="animation-delay:${((i || 0) % 30) * 45}ms" data-pct="${s.pct}" data-free="${s.cur === 0 ? 1 : 0}" data-lowest="${s.at_lowest ? 1 : 0}" data-text="${esc((s.name + " " + (s.shop || "")).toLowerCase())}">
     <a class="thumbwrap" href="${itemUrl(s.id)}" target="_blank" rel="noopener">
-      ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard">${PH_ICON}</span>`}
+      ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}
       ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + "</span>" : ""}
       ${bmFlag(s.id, s.at_lowest ? "u2" : "")}
     </a>
@@ -2248,7 +2288,7 @@ function saleCard(s, i){
       <div class="cname"><a href="${itemUrl(s.id)}" target="_blank" rel="noopener">${esc(s.name)}</a></div>
       <div class="cshop">${esc(s.shop || "")}</div>
       <div class="htags">${esc(s.sale === false ? htagsPlain(s) : htags(s))}</div>
-      <div class="crow">${s.sale !== false && s.pct > 0 ? `<span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span></span></span>` : `<span class="price solo">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span>`}</div>
+      <div class="crow">${s.sale !== false && s.pct > 0 ? `<span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span></span></span>` : `<span class="price solo">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span>`}</div>
     </div>
   </div>`;
 }
@@ -2261,19 +2301,19 @@ function saleHit(s){
 }
 function mosaicCell(s, i){
   return `<a class="card mcell m${i + 1}" href="${itemUrl(s.id)}" target="_blank" rel="noopener">
-    ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard">${PH_ICON}</span>`}
+    ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}
     ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : (s.cur === 0 ? '<span class="mlab">' + tr("free") + '</span>' : "")}
     ${bmFlag(s.id, (s.at_lowest || s.cur === 0) ? "u2" : "")}
-    <span class="scrim"><span class="discst">-${s.pct}%</span><span class="was">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span>
+    <span class="scrim"><span class="discst">-${s.pct}%</span><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span>
   </a>`;
 }
 function steamCap(s){
   return `<div class="card">
-    <a class="capimg" href="${itemUrl(s.id)}" target="_blank" rel="noopener">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard">${PH_ICON}</span>`}${bmFlag(s.id)}</a>
+    <a class="capimg" href="${itemUrl(s.id)}" target="_blank" rel="noopener">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}</a>
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(s.id)}" target="_blank" rel="noopener">${esc(s.name)}</a></div>
       <div class="capshop">${esc(s.shop || "")}</div>
-      <div class="capbtm">${s.at_lowest ? '<div class="lowtx">' + tr("chip_lowest") + '</div>' : ""}<div class="caprow"><span class="discst">-${s.pct}%</span><span class="was">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></div></div>
+      <div class="capbtm">${s.at_lowest ? '<div class="lowtx">' + tr("chip_lowest") + '</div>' : ""}<div class="caprow"><span class="discst">-${s.pct}%</span><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price${wCls(s.cur)}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></div></div>
     </div>
   </div>`;
 }
@@ -2382,9 +2422,9 @@ document.getElementById("saleMore").onclick = () => { location.href = "sale.html
 function railTile(s, sm){
   const priceIn = s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur);
   const strip = sm
-    ? `<span class="pstrip"><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack">${s.base > s.cur ? `<span class="was">${yen(s.base)}</span>` : ""}<span class="price">${priceIn}</span></span></span></span>`
+    ? `<span class="pstrip"><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack">${s.base > s.cur ? `<span class="was${wCls(s.base)}">${yen(s.base)}</span>` : ""}<span class="price">${priceIn}</span></span></span></span>`
     : `<span class="pstrip"><span class="discst">-${s.pct}%</span>${s.base > s.cur ? `<span class="pwas"><span class="wasx">${yen(s.base)}</span></span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${priceIn}</span></span>`;
-  return `<a class="rtile${sm ? " sm" : ""}" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, s.at_lowest ? "u2" : "")}</span>${strip}</a>`;
+  return `<a class="rtile${sm ? " sm" : ""}" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, s.at_lowest ? "u2" : "")}</span>${strip}</a>`;
 }
 const tabsEl = document.getElementById("sortTabs");
 const ind = tabsEl.querySelector(".pill-ind");
@@ -2438,9 +2478,9 @@ const BTABS = {
 let bTab = "new", bItems = [], bShown = 7;
 function browHTML(x, i){
   return `<a class="brow${i === 0 ? " sel" : ""}" data-i="${i}" href="${itemUrl(x.id)}" target="_blank" rel="noopener">
-    <span class="bthw">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'bthph')">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(x.id)}</span>
+    <span class="bthw">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${x.id}">${PH_ICON}</span>`}${bmFlag(x.id)}</span>
     <span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bshop">${esc(x.shop || "")}</span><span class="bnote">${x.note || ""}</span></span>
-    <span class="bprice">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="bstack"><span class="was">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</span>
+    <span class="bprice">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="bstack"><span class="was${wCls(x.base)}">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</span>
   </a>`;
 }
 function repSeriesOf(x){
@@ -2508,7 +2548,7 @@ function bPrevHTML(x){
     <div class="bpchips">${(x.chips || []).map(c => `<span class="bpchip">${esc(c)}</span>`).join("")}</div>
     ${x.image ? `<img class="bpimg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}
     ${repSeriesOf(x) ? `<div class="bpspark bpchart"><div class="cap">${tr("pp_chart")}</div>${bpChartSVG(repSeriesOf(x), 340, 118)}</div>` : `<div class="bpspark bpchart" data-bpchart="${x.id}"><div class="cap">${tr("pp_chart")}</div><div class="bpchart-load"></div></div>`}
-    <div class="bprow">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="was">${yen(x.base)}</span>` : ""}<span class="price">${yen(x.cur)}</span>${x.at_lowest ? '<span class="lowest">' + tr("chip_lowest") + '</span>' : ""}</div>`;
+    <div class="bprow">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="was${wCls(x.base)}">${yen(x.base)}</span>` : ""}<span class="price">${yen(x.cur)}</span>${x.at_lowest ? '<span class="lowest">' + tr("chip_lowest") + '</span>' : ""}</div>`;
 }
 function renderBList(){
   const list = document.getElementById("bList");
@@ -2582,12 +2622,12 @@ function featCap(x, tag, meta, cls){
   const pct = x.base > x.cur ? Math.round((1 - x.cur / x.base) * 100) : 0;
   const fser = repSeriesOf(x);
   return `<div class="card">
-    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard">${PH_ICON}</span>`}${bmFlag(x.id, (cls || "").includes("new") ? "" : "u2")}</a>${(cls || "").includes("new") ? "" : `<span class="ftag${cls || ""}">${tag}</span>`}
+    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${x.id}">${PH_ICON}</span>`}${bmFlag(x.id, (cls || "").includes("new") ? "" : "u2")}</a>${(cls || "").includes("new") ? "" : `<span class="ftag${cls || ""}">${tag}</span>`}
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
       <div class="spark${fser ? " kp" : ""}"${fser ? "" : ` data-fchart="${x.id}"`}>${fser ? bpChartSVG(fser, 200, 64) : sparkSVG(x.spark)}</div>
-      <div class="caprow">${(cls || "").includes("new") ? `<span class="newtag">${tag}</span>` : ""}${pct > 0 && x.on_sale ? `<span class="discst">-${pct}%</span><span class="was"><span class="wasx">${yen(x.base)}</span></span>` : (x.on_sale ? `<span class="saletag">${tr("rib_sale")}</span>` : "")}<span class="price">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
+      <div class="caprow">${(cls || "").includes("new") ? `<span class="newtag">${tag}</span>` : ""}${pct > 0 && x.on_sale ? `<span class="discst">-${pct}%</span><span class="was${wCls(x.base)}"><span class="wasx">${yen(x.base)}</span></span>` : (x.on_sale ? `<span class="saletag">${tr("rib_sale")}</span>` : "")}<span class="price${wCls(x.cur)}">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
     </div>
   </div>`;
 }
@@ -3159,10 +3199,10 @@ function pcardHTML(h){
   const onSale = !!(now && now.base > cur && (now.on_sale || now.sale || saleIds().has(String(h.id))));
   const pct = onSale ? (now.pct != null ? now.pct : Math.round((1 - cur / now.base) * 100)) : 0;
   const priceHTML = onSale
-    ? `<span class="bprice"><span class="discst">-${pct}%</span><span class="bstack"><span class="was">${yen(now.base)}</span><span class="price">${cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(cur)}</span></span></span>`
+    ? `<span class="bprice"><span class="discst">-${pct}%</span><span class="bstack"><span class="was${wCls(now.base)}">${yen(now.base)}</span><span class="price">${cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(cur)}</span></span></span>`
     : `<span class="price solo">${cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(cur)}</span>`;
   return `<a class="pcard" href="${itemUrl(h.id)}">
-    <span class="pimgw">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'pph')">` : `<span class="pph">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
+    <span class="pimgw">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'pph')">` : `<span class="pph" data-fill="${h.id}">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
     <span class="pb"><span class="pn">${esc(h.name)}</span>
     <span class="pp2">${!onSale && drop ? `<span class="vchip">${tr("seen_drop", {v: yen(h.cur - cur)})}</span>` : ""}${priceHTML}</span></span></a>`;
 }
@@ -3174,10 +3214,10 @@ function bmCardHTML(h){
   const pct = onSale ? (now.pct != null ? now.pct : Math.round((1 - cur / now.base) * 100)) : 0;
   const priceTxt = cur === 0 ? `<span class="free">${tr("free")}</span>` : (cur == null ? "—" : yen(cur));
   const strip = onSale
-    ? `<span class="bmstrip">${pct > 0 ? `<span class="discst">-${pct}%</span>` : `<span class="saletag">${tr("rib_sale")}</span>`}<span class="bmvals"><span class="was">${yen(now.base)}</span><span class="price">${priceTxt}</span></span></span>`
-    : `<span class="bmstrip"><span class="bmvals"><span class="price">${priceTxt}</span></span></span>`;
+    ? `<span class="bmstrip">${pct > 0 ? `<span class="discst">-${pct}%</span>` : `<span class="saletag">${tr("rib_sale")}</span>`}<span class="bmvals"><span class="was${wCls(now.base)}">${yen(now.base)}</span><span class="price${wCls(cur)}">${priceTxt}</span></span></span>`
+    : `<span class="bmstrip"><span class="bmvals"><span class="price${wCls(cur)}">${priceTxt}</span></span></span>`;
   return `<a class="bmcard" href="${itemUrl(h.id)}" title="${esc(h.name)}">
-    <span class="bmimg">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'pph')">` : `<span class="pph">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
+    <span class="bmimg">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'pph')">` : `<span class="pph" data-fill="${h.id}">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
     ${strip}<span class="bmname">${esc(h.name)}</span></a>`;
 }
 function renderPersonal(){

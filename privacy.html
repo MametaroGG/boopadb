@@ -572,6 +572,20 @@
   html[data-theme="light"] .bmvals{background:#e8e8ed}
   .bmvals .was{background:none;padding:0;height:auto;font-size:12.5px}
   .bmvals .price{font-weight:800;font-size:14.5px;white-space:nowrap}
+  span.was.wl{font-size:11px}
+  span.was.wxl{font-size:9.5px}
+  .bmvals .was.wl{font-size:11px}
+  .bmvals .was.wxl{font-size:9.5px}
+  .caprow .was.wl{font-size:10.5px}
+  .caprow .was.wxl{font-size:9px}
+  .bprice .bstack .was.wl{font-size:9.5px}
+  .bprice .bstack .was.wxl{font-size:8.5px}
+  .mcell .scrim .was.wl{font-size:10px}
+  .mcell .scrim .was.wxl{font-size:9px}
+  .bmvals .price.wl{font-size:12.5px}
+  .bmvals .price.wxl{font-size:11px}
+  .caprow .price.wl{font-size:12px}
+  .caprow .price.wxl{font-size:10.5px}
   .bmname{display:block;font-size:12px;font-weight:600;line-height:1.35;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .prow::-webkit-scrollbar{height:6px}
   .prow::-webkit-scrollbar-track{background:transparent}
@@ -1030,6 +1044,7 @@ const PH_ICON = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="1
 function imgPh(el, cls){ var s = document.createElement('span'); s.className = cls; s.innerHTML = PH_ICON; el.replaceWith(s); }
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const yen = n => n === 0 ? tr("free") : "¥" + Number(n).toLocaleString(LOCALE);
+const wCls = amt => { if (amt == null) return ""; const n = yen(amt).length; return n >= 10 ? " wxl" : n >= 8 ? " wl" : ""; };
 const itemLink = id => `index.html#item-${id}`;
 const num = n => Number(n).toLocaleString(LOCALE);
 
