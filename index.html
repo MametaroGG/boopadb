@@ -21,6 +21,16 @@
   body{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:radial-gradient(1200px 520px at 50% -120px,#26262c 0%,rgba(38,38,44,0) 60%),var(--bg);color:var(--text);line-height:1.55;font-size:14px;font-variant-numeric:tabular-nums}
   a{color:inherit;text-decoration:none}
   a:hover{color:#fff}
+  #splash{position:fixed;inset:0;z-index:9999;background:#101012;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .35s ease}
+  [data-theme="light"] #splash{background:#f4f4f5}
+  #splash[hidden]{display:none}
+  #splash.bye{opacity:0;pointer-events:none}
+  #splash img{width:104px;height:104px;border-radius:50%;animation:splIn .45s ease-out}
+  #splash .splogo{font-family:"Orbitron","Hiragino Kaku Gothic ProN",sans-serif;font-size:30px;font-weight:900;letter-spacing:.5px;color:#ececee;animation:splIn .45s ease-out}
+  [data-theme="light"] #splash .splogo{color:#17171a}
+  #splash .splogo span{color:var(--accent)}
+  @keyframes splIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+  html.splock,html.splock body{overflow:hidden}
   header{background:linear-gradient(180deg,#1f1f23,#151517);border-bottom:1px solid var(--border);padding:12px 0}
   .hwrap{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .logo{font-family:"Orbitron","Hiragino Kaku Gothic ProN",sans-serif;font-size:21px;font-weight:900;letter-spacing:.5px}
@@ -727,6 +737,30 @@
 </style>
 </head>
 <body>
+<div id="splash" hidden>
+  <img src="favicon-192.png" alt="">
+  <div class="splogo">Boopa<span>DB</span></div>
+</div>
+<script>
+(function(){
+  var sp = document.getElementById('splash');
+  var standalone = false;
+  try { standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) {}
+  if (!standalone || !sp) { if (sp) sp.remove(); return; }
+  sp.hidden = false;
+  document.documentElement.classList.add('splock');
+  var done = false;
+  function hide() {
+    if (done) return; done = true;
+    sp.classList.add('bye');
+    document.documentElement.classList.remove('splock');
+    setTimeout(function(){ sp.remove(); }, 420);
+  }
+  if (document.readyState === 'complete') setTimeout(hide, 350);
+  else addEventListener('load', function(){ setTimeout(hide, 350); });
+  setTimeout(hide, 2800);
+})();
+</script>
 <header>
   <div class="hwrap">
   <a class="logo" href="index.html" style="text-decoration:none;color:inherit">Boopa<span>DB</span></a>
