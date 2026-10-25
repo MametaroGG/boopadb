@@ -1564,6 +1564,7 @@ function pxImg(v){ return !v ? "" : (String(v).includes("://") ? String(v) : "ht
 function isoFD(n){ if (!n) return ""; const t = String(n); return t.slice(0, 4) + "-" + t.slice(4, 6) + "-" + t.slice(6, 8); }
 // ---- full-catalog search (search_index.json: every tracked product) ----
 let fullIndex = null, fullIndexLoading = false, spCatMap = new Map();
+const SP_CATS = ["3D衣装 3Dモデル", "3D小道具 3Dモデル", "3Dテクスチャ 3Dモデル", "3D装飾品 3Dモデル", "3Dモデル（その他） 3Dモデル", "3Dキャラクター 3Dモデル", "3D環境・ワールド 3Dモデル", "VRoid 3Dモデル", "3Dツール・システム 3Dモデル", "3Dモーション・アニメーション 3Dモデル", "3D髪型 3Dモデル", "ソフトウェア ソフトウェア・ハードウェア", "3D靴 3Dモデル", "素材（その他） 素材データ", "ゲーム関連商品 ゲーム", "ヘアアクセサリー アクセサリー", "イラスト（その他） イラスト"];
 function spEnrichFromIndex(){
   if (!fullIndex) return;
   const byId = new Map(fullIndex.map(e => [e[0], e]));
@@ -2234,13 +2235,23 @@ function spCatSync(){
 }
 function spCatRender(){
   const host = document.getElementById("spKw");
-  if (!host || !fullIndex) return;
-  const counts = new Map();
-  for (const e of fullIndex) { if (e[8]) counts.set(e[8], (counts.get(e[8]) || 0) + 1); }
-  const top = [...counts.entries()].sort((a, b) => b[1] - a[1]);
-  host.innerHTML = top.map(([lower]) => { const raw = spCatNames.get(lower) || lower; return `<button class="kw" data-cat="${esc(raw)}">${esc(catLabel(raw))}</button>`; }).join("");
+  if (!host) return;
+  let raws;
+  if (fullIndex) {
+    const counts = new Map();
+    for (const e of fullIndex) { if (e[8]) counts.set(e[8], (counts.get(e[8]) || 0) + 1); }
+    raws = [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([lower]) => spCatNames.get(lower) || lower);
+  } else {
+    // The index (tens of MB) can take a while on slow connections; the
+    // category list itself is static taxonomy, so paint it immediately
+    // and let the live render refine the order once the index arrives.
+    raws = SP_CATS;
+    for (const raw of raws) { const k = raw.toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, raw); }
+  }
+  host.innerHTML = raws.map(raw => `<button class="kw" data-cat="${esc(raw)}">${esc(catLabel(raw))}</button>`).join("");
   host.querySelectorAll(".kw").forEach(k => {
     k.onclick = () => {
+      if (!fullIndex) loadFullIndex();
       spCatMode = spCatMode === k.dataset.cat ? null : k.dataset.cat;
       spRelId = null; spRelIds = null; spRelName = "";
       spCatSync();
@@ -2250,6 +2261,7 @@ function spCatRender(){
   });
   spCatSync();
 }
+spCatRender();
 spRender();
 function repaintCharts(){
   const pp = document.getElementById("prodPage");
