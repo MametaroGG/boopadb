@@ -1469,12 +1469,26 @@ function pxImg(v){ return !v ? "" : (String(v).includes("://") ? String(v) : "ht
 function isoFD(n){ if (!n) return ""; const t = String(n); return t.slice(0, 4) + "-" + t.slice(4, 6) + "-" + t.slice(6, 8); }
 // ---- full-catalog search (search_index.json: every tracked product) ----
 let fullIndex = null, fullIndexLoading = false, spCatMap = new Map();
+function spEnrichFromIndex(){
+  if (!fullIndex) return;
+  const byId = new Map(fullIndex.map(e => [e[0], e]));
+  const fill = x => { const e = byId.get(String(x.id)); if (!e) return; if (x.likes == null) x.likes = e[9]; if (!x.first_date) x.first_date = isoFD(e[11]); if (x.per_day == null) x.per_day = (e[12] || 0) / 10; };
+  spIndex.forEach(fill);
+  if (FULL_LISTS) for (const k of Object.keys(FULL_LISTS)) { const v = FULL_LISTS[k]; if (Array.isArray(v)) v.forEach(fill); }
+}
+let spCatalogCache = { idx: null, hits: null };
+function spCatalogHits(){
+  if (spCatalogCache.idx !== fullIndex) {
+    spCatalogCache = { idx: fullIndex, hits: fullIndex.map(e => ({id: e[0], name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10})) };
+  }
+  return spCatalogCache.hits;
+}
 async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
   try {
     const rs = await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => fetch("search_index_" + i + ".json?v=20251025-6")));
-    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow, cat, likes, img, fd, pd]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow, String(cat || "").toLowerCase().normalize("NFKC"), likes || 0, pxImg(img), fd || 0, pd || 0]); spCatMap = new Map(fullIndex.map(e => [e[0], e[8]])); for (const row of raw) { const c = row[7]; if (c) { const k = String(c).toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, String(c)); } } if (typeof spCatRender === "function") spCatRender(); }
+    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow, cat, likes, img, fd, pd]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow, String(cat || "").toLowerCase().normalize("NFKC"), likes || 0, pxImg(img), fd || 0, pd || 0]); spCatMap = new Map(fullIndex.map(e => [e[0], e[8]])); for (const row of raw) { const c = row[7]; if (c) { const k = String(c).toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, String(c)); } } if (typeof spCatRender === "function") spCatRender(); spEnrichFromIndex(); }
   } catch {}
   fullIndexLoading = false;
   if (fullIndex && spage.classList.contains("open")) spRender(false);
@@ -1794,6 +1808,10 @@ function spRender(reset = true){
       if (!e) continue;
       hits.push({id, name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
     }
+  }
+  if (!hits && !q && spFilter === "all" && !spCatMode && !spRelIds && spSort !== "rel") {
+    if (fullIndex) hits = spCatalogHits();
+    else loadFullIndex();
   }
   if (!hits && q && spFilter === "all" && fullIndex) {
     loadAff();
@@ -2389,6 +2407,7 @@ setBTab("new");
 fetch("lists_full.json?v=20251025-3").then(r => r.ok ? r.json() : null).then(f => {
   if (!f) return;
   FULL_LISTS = f;
+  if (fullIndex) spEnrichFromIndex();
   if (f.stats) renderStats(f.stats);
   if (f.on_sale && f.on_sale.length) { SALE_HOME = f.on_sale; LISTS.on_sale = f.on_sale; renderSale(); }
   if (f.drops) LISTS.drops = f.drops;
