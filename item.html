@@ -1483,6 +1483,38 @@ function spCatalogHits(){
   }
   return spCatalogCache.hits;
 }
+let spLandingCache = { key: null, hits: null };
+function spLandingHits(){
+  const key = fullIndex.length + "|" + HIST.map(h => h.id).join(",") + "|" + BMS.map(b => b.id).join(",");
+  if (spLandingCache.key === key) return spLandingCache.hits;
+  const byIdF = new Map(fullIndex.map(e => [e[0], e]));
+  const rich = new Map(spIndex.map(x => [String(x.id), x]));
+  const plainOf = e => ({id: e[0], name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
+  const objOf = id => rich.get(String(id)) || (byIdF.has(String(id)) ? plainOf(byIdF.get(String(id))) : null);
+  const seen = new Set(), out = [];
+  const push = x => { if (x && !seen.has(String(x.id))) { seen.add(String(x.id)); out.push(x); } };
+  HIST.slice(0, 12).forEach(h => push(objOf(h.id) || {id: h.id, name: h.name, shop: h.shop || "", image: h.image || null, cur: h.cur, base: h.cur, pct: 0, plain: true}));
+  const bmCats = new Set(BMS.map(b => spCatMap.get(String(b.id))).filter(Boolean));
+  const bmStream = bmCats.size ? fullIndex.filter(e => bmCats.has(e[8])).sort((a, b) => (b[9] || 0) - (a[9] || 0)) : [];
+  const popStream = [...fullIndex].sort((a, b) => (b[9] || 0) - (a[9] || 0));
+  const newSeen = new Set(spIndex.map(x => String(x.id)));
+  const newStream = [...spIndex, ...(chipSet("new") || []).filter(x => !newSeen.has(String(x.id)))];
+  const streams = [
+    bmStream.map(e => () => objOf(e[0])),
+    popStream.map(e => () => objOf(e[0])),
+    newStream.map(x => () => x)
+  ].filter(st => st.length);
+  const ptr = streams.map(() => 0);
+  let progressed = true;
+  while (progressed && out.length < 3000) {
+    progressed = false;
+    for (let s = 0; s < streams.length && out.length < 3000; s++) {
+      if (ptr[s] < streams[s].length) { push(streams[s][ptr[s]++]()); progressed = true; }
+    }
+  }
+  spLandingCache = { key, hits: out };
+  return out;
+}
 async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
@@ -1851,10 +1883,11 @@ function spRender(reset = true){
     }
     if (shopHits.length) hits = [...hits, ...shopHits].sort(spRelSort);
   } else if (!hits && !q && spFilter === "all" && FULL_LISTS && FULL_LISTS.newest && FULL_LISTS.newest.length) {
-    // Landing with no query: keep browsing past the curated sample into
-    // the full newest list, so scrolling does not dead-end at 41 items.
-    const seen = new Set(spIndex.map(x => String(x.id)));
-    hits = [...spIndex, ...(chipSet("new") || []).filter(x => !seen.has(String(x.id)))];
+    // Landing with no query (relevance): personal blend — recently viewed
+    // first, then bookmark-category picks, popular items and the newest
+    // list woven round-robin. Pool fallback until the full index arrives.
+    if (fullIndex) hits = spLandingHits();
+    else { const seen = new Set(spIndex.map(x => String(x.id))); hits = [...spIndex, ...(chipSet("new") || []).filter(x => !seen.has(String(x.id)))]; }
   } else if (!hits) {
     hits = spIndex.filter(x => {
       if (q && !(x.name + " " + (x.shop || "")).toLowerCase().includes(q)) return false;
