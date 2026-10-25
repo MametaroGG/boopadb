@@ -464,6 +464,11 @@
   .pp-booth{background:#e04347;color:#fff;font-weight:700;font-size:13.5px;padding:9px 18px;border-radius:8px;text-decoration:none}
   .pp-bmbtn{background:#232329;color:var(--text);border:1px solid var(--border2);font-weight:700;font-size:13.5px;line-height:1;padding:9px 16px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:7px;width:200px;box-sizing:border-box}
   .pp-bmbtn svg{width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .pp-recbtn{background:#232329;color:var(--text);border:1px solid var(--border2);font-weight:700;font-size:13.5px;line-height:1;padding:9px 16px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:7px;box-sizing:border-box}
+  .pp-recbtn svg{width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .pp-recbtn .pp-recn{font-variant-numeric:tabular-nums;font-weight:700}
+  .pp-recbtn.on{background:#3a2729;border-color:#9c4a4e;color:#ff8f93}
+  .pp-recbtn.on svg{fill:currentColor}
   .newsbar{text-align:right;margin:8px 2px 0;font-size:13px}
   .newsbar a{color:var(--sub);text-decoration:none}
   .noimg{display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:110px;background:#1b1b1f}
@@ -751,6 +756,8 @@
   html[data-theme="light"] .railbar{background:#d8d8df}
   html[data-theme="light"] .tile{background:linear-gradient(135deg,#ffffff,#eef0f2)}
   html[data-theme="light"] .pp-bmbtn,html[data-theme="light"] #cpClose{background:#f0f0f3}
+  html[data-theme="light"] .pp-recbtn{background:#f0f0f3}
+  html[data-theme="light"] .pp-recbtn.on{background:#fdeeee;border-color:#e3a7ab;color:#c93a3f}
   html[data-theme="light"] tbody tr:hover,html[data-theme="light"] .ritem:hover{background:#f0f0f3}
   html[data-theme="light"] .kw{background:#f0f0f3}
   html[data-theme="light"] #spPrice::-webkit-slider-runnable-track,html[data-theme="light"] #spPrice::-moz-range-track{background:#cfcfd8}
@@ -1002,7 +1009,7 @@ ja: {
   note_dropped: "{d} に値下げ", note_nowfree: "現在無料",
   pp_cur: "現在価格", pp_high: "最高価格", pp_avg: "平均価格", pp_saledays: "セール観測日数", pp_days: "観測日数", days_fmt: "{n}日",
   pp_chart: "価格推移", pp_history: "価格変更履歴", pp_same: "同じショップの商品", pp_parents: "親作品", pp_children: "子作品", rel_more: "もっと見る",
-  pp_booth: "BOOTHで見る", pp_bm: "ブックマーク", pp_bmed: "ブックマーク済み", bm_more: "もっと見る", pp_vars: "バリエーション（{n}件）", pp_compare: "価格推移を比較", pp_changes: "価格変更履歴", cmp_others: "ほか{n}件", outlier: "規格外", outlier_n: "▲ 規格外{n}件",
+  pp_booth: "BOOTHで見る", pp_bm: "ブックマーク", pp_bmed: "ブックマーク済み", pp_rec: "おすすめできる", pp_reced: "おすすめ済み", bm_more: "もっと見る", pp_vars: "バリエーション（{n}件）", pp_compare: "価格推移を比較", pp_changes: "価格変更履歴", cmp_others: "ほか{n}件", outlier: "規格外", outlier_n: "▲ 規格外{n}件",
   pp_nodata: "価格データが不足しています。", pp_nochg: "価格変更は観測されていません。",
   pp_salenote: "ピンクの帯はセール中と推定された期間です。", pp_down: "値下げ", chg_date: "日付", chg_before: "変更前", chg_after: "変更後", chg_rate: "変化率", pp_up: "値上げ",
   sp_count: "{n} 件", sp_total: "全{n}件から検索", sec_recent: "最近見た商品", seen_drop: "見た時より -{v}",
@@ -1035,7 +1042,7 @@ en: {
   note_dropped: "Price drop on {d}", note_nowfree: "Free now",
   pp_cur: "Current price", pp_high: "Highest price", pp_avg: "Average price", pp_saledays: "Days on sale (observed)", pp_days: "Days observed", days_fmt: "{n} days",
   pp_chart: "Price history", pp_history: "Price change history", pp_same: "More from this shop", pp_parents: "Parent works", pp_children: "Derivative works", rel_more: "Show more",
-  pp_booth: "View on BOOTH", pp_bm: "Bookmark", pp_bmed: "Bookmarked", bm_more: "See more", pp_vars: "Variations ({n})", pp_compare: "Compare price histories", pp_changes: "Price change history", cmp_others: "+{n} more", outlier: "Outlier", outlier_n: "▲ Outliers: {n}",
+  pp_booth: "View on BOOTH", pp_bm: "Bookmark", pp_bmed: "Bookmarked", pp_rec: "Recommend", pp_reced: "Recommended", bm_more: "See more", pp_vars: "Variations ({n})", pp_compare: "Compare price histories", pp_changes: "Price change history", cmp_others: "+{n} more", outlier: "Outlier", outlier_n: "▲ Outliers: {n}",
   pp_nodata: "Not enough price data yet.", pp_nochg: "No price changes observed.",
   pp_salenote: "Pink bands are periods estimated to be on sale.", pp_down: "Drop", chg_date: "Date", chg_before: "Before", chg_after: "After", chg_rate: "Change", pp_up: "Rise",
   sp_count: "{n} items", sp_total: "Search all {n} products", sec_recent: "Recently viewed", seen_drop: "Down {v} since viewed",
@@ -1068,7 +1075,7 @@ ko: {
   note_dropped: "{d} 가격 인하", note_nowfree: "현재 무료",
   pp_cur: "현재 가격", pp_high: "최고 가격", pp_avg: "평균 가격", pp_saledays: "할인 관측 일수", pp_days: "관측 일수", days_fmt: "{n}일",
   pp_chart: "가격 추이", pp_history: "가격 변동 이력", pp_same: "같은 샵의 상품", pp_parents: "부모 작품", pp_children: "파생 작품", rel_more: "더 보기",
-  pp_booth: "BOOTH에서 보기", pp_bm: "북마크", pp_bmed: "북마크됨", bm_more: "더 보기", pp_vars: "바리에이션({n}종)", pp_compare: "가격 추이 비교", pp_changes: "가격 변동 내역", cmp_others: "외 {n}개", outlier: "이상치", outlier_n: "▲ 이상치 {n}건",
+  pp_booth: "BOOTH에서 보기", pp_bm: "북마크", pp_bmed: "북마크됨", pp_rec: "추천해요", pp_reced: "추천했어요", bm_more: "더 보기", pp_vars: "바리에이션({n}종)", pp_compare: "가격 추이 비교", pp_changes: "가격 변동 내역", cmp_others: "외 {n}개", outlier: "이상치", outlier_n: "▲ 이상치 {n}건",
   pp_nodata: "가격 데이터가 부족합니다.", pp_nochg: "가격 변동이 관측되지 않았습니다.",
   pp_salenote: "분홍색 띠는 할인 중으로 추정되는 기간입니다.", pp_down: "인하", chg_date: "날짜", chg_before: "변경 전", chg_after: "변경 후", chg_rate: "변동률", pp_up: "인상",
   sp_count: "{n}건", sp_total: "전체 {n}건에서 검색", sec_recent: "최근 본 상품", seen_drop: "본 이후 -{v}",
@@ -1101,7 +1108,7 @@ ko: {
   note_dropped: "{d} 降价", note_nowfree: "当前免费",
   pp_cur: "当前价格", pp_high: "最高价格", pp_avg: "平均价格", pp_saledays: "促销观测天数", pp_days: "观测天数", days_fmt: "{n} 天",
   pp_chart: "价格走势", pp_history: "价格变动记录", pp_same: "同店铺的其他商品", pp_parents: "父作品", pp_children: "子作品", rel_more: "查看更多",
-  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", bm_more: "查看更多", pp_vars: "规格（{n}种）", pp_compare: "比较价格走势", pp_changes: "价格变更记录", cmp_others: "+{n} 个", outlier: "离群值", outlier_n: "▲ 离群值{n}条",
+  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_rec: "推荐", pp_reced: "已推荐", bm_more: "查看更多", pp_vars: "规格（{n}种）", pp_compare: "比较价格走势", pp_changes: "价格变更记录", cmp_others: "+{n} 个", outlier: "离群值", outlier_n: "▲ 离群值{n}条",
   pp_nodata: "价格数据不足。", pp_nochg: "尚未观测到价格变动。",
   pp_salenote: "粉色区间为推测的促销期间。", pp_down: "降价", chg_date: "日期", chg_before: "变更前", chg_after: "变更后", chg_rate: "变化率", pp_up: "涨价",
   sp_count: "{n} 件", sp_total: "从全部 {n} 件中搜索", sec_recent: "最近浏览", seen_drop: "浏览后降了 {v}",
@@ -1134,7 +1141,7 @@ ko: {
   note_dropped: "{d} 降價", note_nowfree: "當前免費",
   pp_cur: "當前價格", pp_high: "最高價格", pp_avg: "平均價格", pp_saledays: "促銷觀測天數", pp_days: "觀測天數", days_fmt: "{n} 天",
   pp_chart: "價格走勢", pp_history: "價格變動記錄", pp_same: "同店舖的其他商品", pp_parents: "父作品", pp_children: "子作品", rel_more: "查看更多",
-  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", bm_more: "查看更多", pp_vars: "規格（{n}種）", pp_compare: "比較價格走勢", pp_changes: "價格變更記錄", cmp_others: "+{n} 個", outlier: "離群值", outlier_n: "▲ 離群值{n}筆",
+  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_rec: "推薦", pp_reced: "已推薦", bm_more: "查看更多", pp_vars: "規格（{n}種）", pp_compare: "比較價格走勢", pp_changes: "價格變更記錄", cmp_others: "+{n} 個", outlier: "離群值", outlier_n: "▲ 離群值{n}筆",
   pp_nodata: "價格數據不足。", pp_nochg: "尚未觀測到價格變動。",
   pp_salenote: "粉色區間為推測的促銷期間。", pp_down: "降價", chg_date: "日期", chg_before: "變更前", chg_after: "變更後", chg_rate: "變化率", pp_up: "漲價",
   sp_count: "{n} 件", sp_total: "從全部 {n} 件中搜尋", sec_recent: "最近瀏覽", seen_drop: "瀏覽後降了 {v}",
@@ -3154,6 +3161,7 @@ function renderProdPage(x){
       <div class="pp-actions">
         <a class="pp-booth" data-ext href="${itemUrl(x.id)}" target="_blank" rel="noopener">${tr("pp_booth")}</a>
         <button class="pp-bmbtn ${bm ? "on" : ""}" id="ppBmBtn" type="button"><svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2z"/></svg>${bm ? tr("pp_bmed") : tr("pp_bm")}</button>
+        <button class="pp-recbtn" id="ppRecBtn" type="button"><svg viewBox="0 0 24 24"><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/><path d="M7 10v12"/></svg><span id="ppRecLabel">${tr("pp_rec")}</span><span class="pp-recn" id="ppRecN" hidden></span></button>
       </div>
     </div>
   </div>
@@ -3166,6 +3174,8 @@ function renderProdPage(x){
   renderPPBody(x);
   wireBlockHovers(x);
   document.getElementById("ppBmBtn").onclick = () => toggleBm(x);
+  document.getElementById("ppRecBtn").onclick = () => toggleRec(x);
+  loadRec(x.id);
   const same = [...PROD.values()].filter(y => y.shop && y.shop === x.shop && String(y.id) !== String(x.id)).slice(0, 4);
   document.getElementById("ppSame").innerHTML = same.map(y => saleCard(y, 0)).join("");
   document.getElementById("ppSameSec").style.display = same.length ? "" : "none";
@@ -3204,6 +3214,38 @@ function fillPPMeta(x){
     const el = document.getElementById("ppMeta");
     if (el) el.innerHTML = ppMetaHTML(x);
   }).catch(() => {});
+}
+// ---- recommend (good) button: one vote per anonymous device id,
+// served by the same mini-PC service as the site stats. The count is
+// shown only when it is at least 1, so no product ever displays a 0.
+const REC_API = "https://nucbox-m7.tailb48431.ts.net";
+function recVid(){ try { return localStorage.getItem("boopadb_vid") || null; } catch (e) { return null; } }
+function paintRec(st){
+  const btn = document.getElementById("ppRecBtn");
+  if (!btn || !st) return;
+  btn.classList.toggle("on", !!st.mine);
+  const label = document.getElementById("ppRecLabel");
+  if (label) label.textContent = st.mine ? tr("pp_reced") : tr("pp_rec");
+  const n = document.getElementById("ppRecN");
+  if (n) { n.hidden = !(st.count > 0); n.textContent = st.count > 0 ? String(st.count) : ""; }
+}
+function loadRec(id){
+  const v = recVid();
+  if (!v) return;
+  fetch(REC_API + "/rec?item=" + encodeURIComponent(id) + "&v=" + encodeURIComponent(v))
+    .then(r => r.json())
+    .then(st => { if (curProd && String(curProd.id) === String(id)) paintRec(st); })
+    .catch(() => {});
+}
+function toggleRec(x){
+  const v = recVid();
+  if (!v) return;
+  const btn = document.getElementById("ppRecBtn");
+  const on = !(btn && btn.classList.contains("on"));
+  fetch(REC_API + "/rec", { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ v, item: String(x.id), on }) })
+    .then(r => r.json())
+    .then(st => { if (curProd && String(curProd.id) === String(x.id)) paintRec(st); })
+    .catch(() => {});
 }
 function toggleBm(x){
   if (isBm(x.id)) BMS = BMS.filter(b => String(b.id) !== String(x.id));

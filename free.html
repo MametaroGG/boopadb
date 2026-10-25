@@ -463,6 +463,11 @@
   .pp-booth{background:#e04347;color:#fff;font-weight:700;font-size:13.5px;padding:9px 18px;border-radius:8px;text-decoration:none}
   .pp-bmbtn{background:#232329;color:var(--text);border:1px solid var(--border2);font-weight:700;font-size:13.5px;line-height:1;padding:9px 16px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:7px;width:200px;box-sizing:border-box}
   .pp-bmbtn svg{width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .pp-recbtn{background:#232329;color:var(--text);border:1px solid var(--border2);font-weight:700;font-size:13.5px;line-height:1;padding:9px 16px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:7px;box-sizing:border-box}
+  .pp-recbtn svg{width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .pp-recbtn .pp-recn{font-variant-numeric:tabular-nums;font-weight:700}
+  .pp-recbtn.on{background:#3a2729;border-color:#9c4a4e;color:#ff8f93}
+  .pp-recbtn.on svg{fill:currentColor}
   .newsbar{text-align:right;margin:8px 2px 0;font-size:13px}
   .newsbar a{color:var(--sub);text-decoration:none}
   .noimg{display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:110px;background:#1b1b1f}
@@ -750,6 +755,8 @@
   html[data-theme="light"] .railbar{background:#d8d8df}
   html[data-theme="light"] .tile{background:linear-gradient(135deg,#ffffff,#eef0f2)}
   html[data-theme="light"] .pp-bmbtn,html[data-theme="light"] #cpClose{background:#f0f0f3}
+  html[data-theme="light"] .pp-recbtn{background:#f0f0f3}
+  html[data-theme="light"] .pp-recbtn.on{background:#fdeeee;border-color:#e3a7ab;color:#c93a3f}
   html[data-theme="light"] tbody tr:hover,html[data-theme="light"] .ritem:hover{background:#f0f0f3}
   html[data-theme="light"] .kw{background:#f0f0f3}
   html[data-theme="light"] #spPrice::-webkit-slider-runnable-track,html[data-theme="light"] #spPrice::-moz-range-track{background:#cfcfd8}
