@@ -548,18 +548,19 @@
   .pmod-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
   .pmod-h h2{margin:0}
   .bmmore{flex:none;background:#dcdce1;color:#17171a;font-weight:700;font-size:12.5px;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;text-decoration:none;font-family:inherit}
-  .bmmore:hover{background:#fff}
+  .bmmore:hover,.bmmore:focus,.bmmore:active{background:#fff;color:#17171a}
   html[data-theme="light"] .bmmore{background:#e2e2e8}
   html[data-theme="light"] .bmmore:hover{background:#d5d5dd}
   .bmpanel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px}
+  .pmod-f{display:flex;justify-content:flex-end;margin-top:10px}
   .pmod{min-width:0}
   .bmgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 12px}
   .bmgrid>*{min-width:0}
   .bmgrid.frozen .bmcard:nth-child(n+5){display:none}
   .bmcard{display:block;text-decoration:none;color:var(--text);min-width:0}
   .bmcard .bmimg{position:relative;display:block;border-radius:8px;overflow:hidden;background:#131316}
-  .bmcard .bmimg img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
-  .bmcard .bmimg .pph{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:16/9;background:#1b1b1f}
+  .bmcard .bmimg img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+  .bmcard .bmimg .pph{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1/1;background:#1b1b1f}
   .bmcard .bmimg .pph svg{width:34px;height:34px;stroke:#2c2c33;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
   .bmcard .bmflag{top:0;left:0;border-radius:8px 0 0 0}
   .bmstrip{display:flex;align-items:stretch;height:32px;margin-top:0;min-width:0}
@@ -1313,23 +1314,53 @@ function heroPos(p, animate){
   if (!slide) return;
   const w = slide.getBoundingClientRect().width;
   const center = (track.parentElement.clientWidth - w) / 2;
-  if (!animate) track.style.transition = "none";
-  track.style.transform = `translateX(${Math.round(center - (w + 12) * p)}px)`;
-  if (!animate) { void track.offsetWidth; track.style.transition = ""; }
+  if (animate) {
+    track.style.transition = "";
+    track.style.transform = `translateX(${Math.round(center - (w + 12) * p)}px)`;
+  } else {
+    // Instant reposition: kill the transition, commit the transform with a
+    // forced reflow, and only restore the transition on the next frame —
+    // restoring it in the same task lets some mobile browsers animate the
+    // jump anyway (the visible "rewind" across all slides).
+    track.style.transition = "none";
+    track.style.transform = `translateX(${Math.round(center - (w + 12) * p)}px)`;
+    void track.offsetWidth;
+    requestAnimationFrame(() => { track.style.transition = ""; });
+  }
   [...track.children].forEach((s, j) => s.classList.toggle("active", j === p));
 }
 function heroGo(i){
-  hi = ((i % HN) + HN) % HN;
+  i = ((i % HN) + HN) % HN;
+  // Jumping between the last and first slides goes through the clone so it
+  // keeps moving in the same direction instead of sweeping across all slides.
+  if (HN > 1 && hi === HN - 1 && i === 0) { heroStep(1); return; }
+  if (HN > 1 && hi === 0 && i === HN - 1) { heroStep(-1); return; }
+  hi = i;
   heroPos(hi + 1, true);
   dotsEl.querySelectorAll("button").forEach((d, j) => d.classList.toggle("on", j === hi));
 }
+let wrapPending = false;
 function heroStep(dir){
   const target = hi + dir;
   if (target >= 0 && target < HN) { heroGo(target); return; }
+  if (wrapPending) return;
+  wrapPending = true;
   heroPos(dir > 0 ? HN + 1 : 0, true);
   hi = ((target % HN) + HN) % HN;
   dotsEl.querySelectorAll("button").forEach((d, j) => d.classList.toggle("on", j === hi));
-  setTimeout(() => heroPos(hi + 1, false), 690);
+  // Reset to the real slide the moment the wrap animation actually ends
+  // (a fixed timer can fire mid-animation on a busy main thread).
+  let done = false;
+  const reset = () => {
+    if (done) return;
+    done = true;
+    wrapPending = false;
+    track.removeEventListener("transitionend", onEnd);
+    heroPos(hi + 1, false);
+  };
+  const onEnd = e => { if (e.propertyName === "transform") reset(); };
+  track.addEventListener("transitionend", onEnd);
+  setTimeout(reset, 820);
 }
 window.addEventListener("resize", () => heroPos(hi + 1, false));
 function heroPlay(){ heroStop(); heroTimer = setInterval(() => heroStep(1), 4200); }
@@ -3123,8 +3154,8 @@ function bmCardHTML(h){
 function renderPersonal(){
   const el = document.getElementById("personal");
   const mods = [];
-  if (BMS.length) mods.push(`<section class="pmod"><div class="pmod-h"><h2>${tr("pp_bm")}</h2><a class="bmmore" href="bookmarks.html">${tr("bm_more")}</a></div><div class="bmpanel"><div class="bmgrid">${BMS.slice(0, 4).map(bmCardHTML).join("")}</div></div></section>`);
-  if (HIST.length) mods.push(`<section class="pmod"><div class="pmod-h"><h2>${tr("sec_recent")}</h2>${HIST.length > 4 ? `<button class="bmmore" id="histMore" type="button">${tr("bm_more")}</button>` : ""}</div><div class="bmpanel"><div class="bmgrid${HIST.length > 4 ? " frozen" : ""}" id="histGrid">${HIST.slice(0, 12).map(bmCardHTML).join("")}</div></div></section>`);
+  if (BMS.length) mods.push(`<section class="pmod"><div class="pmod-h"><h2>${tr("pp_bm")}</h2></div><div class="bmpanel"><div class="bmgrid">${BMS.slice(0, 4).map(bmCardHTML).join("")}</div></div><div class="pmod-f"><a class="bmmore" href="bookmarks.html">${tr("bm_more")}</a></div></section>`);
+  if (HIST.length) mods.push(`<section class="pmod"><div class="pmod-h"><h2>${tr("sec_recent")}</h2></div><div class="bmpanel"><div class="bmgrid${HIST.length > 4 ? " frozen" : ""}" id="histGrid">${HIST.slice(0, 12).map(bmCardHTML).join("")}</div></div>${HIST.length > 4 ? `<div class="pmod-f"><button class="bmmore" id="histMore" type="button">${tr("bm_more")}</button></div>` : ""}</section>`);
   el.innerHTML = mods.length ? `<div class="pmods">${mods.join("")}</div>` : "";
   const hm = document.getElementById("histMore");
   if (hm) hm.onclick = () => { document.getElementById("histGrid").classList.remove("frozen"); hm.remove(); };
