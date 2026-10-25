@@ -202,6 +202,12 @@
     .mosaic{grid-template-columns:repeat(4,1fr)}
   }
   .capgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:10px}
+  .relrow{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;margin-top:10px;padding:2px 2px 10px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+  .relrow::-webkit-scrollbar{height:6px}
+  .relrow::-webkit-scrollbar-track{background:transparent}
+  .relrow::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
+  .relrow .card{flex:0 0 190px;scroll-snap-align:start}
+  @media (max-width:640px){.relrow .card{flex-basis:154px}}
   .capimg{position:relative;aspect-ratio:1/1;background:#131316;display:block;overflow:hidden}
   .capimg img{width:100%;height:100%;object-fit:cover;display:block}
   .capbody{padding:10px 12px 0;display:flex;flex-direction:column;gap:5px;flex:1}
@@ -622,8 +628,8 @@
   html[data-theme="light"] .pp-varblock{background:var(--panel);border-color:var(--border)}
   html[data-theme="light"] .lowtx{color:#4c7a1f}
   html[data-theme="light"] .langmenu button.on::after,html[data-theme="light"] .spsortmi.on::after{color:#4c7a1f}
-  html[data-theme="light"] .chartbox,html[data-theme="light"] .prow,html[data-theme="light"] .spage{scrollbar-color:#c2c2cc transparent}
-  html[data-theme="light"] .prow::-webkit-scrollbar-thumb,html[data-theme="light"] .spage::-webkit-scrollbar-thumb{background:#c2c2cc}
+  html[data-theme="light"] .chartbox,html[data-theme="light"] .prow,html[data-theme="light"] .relrow,html[data-theme="light"] .spage{scrollbar-color:#c2c2cc transparent}
+  html[data-theme="light"] .prow::-webkit-scrollbar-thumb,html[data-theme="light"] .relrow::-webkit-scrollbar-thumb,html[data-theme="light"] .spage::-webkit-scrollbar-thumb{background:#c2c2cc}
   html[data-theme="light"] .bthph svg{stroke:#c9c9d2}
   html[data-theme="light"] .cmpchip.on{border-color:var(--border2)}
   html[data-theme="light"] .railbar{background:#d8d8df}
@@ -666,7 +672,7 @@
   html[data-theme="light"] .pp-bmbtn.on{background:#fdf3d0;border-color:#d9a521;color:#c99700}
   html[data-theme="light"] .searchbox input{background:#ffffff}
   html[data-theme="light"] body::-webkit-scrollbar-track{background:#f4f4f6}
-  html[data-theme="light"] .prow::-webkit-scrollbar-thumb:hover{background:#b9b9c2}
+  html[data-theme="light"] .prow::-webkit-scrollbar-thumb:hover,html[data-theme="light"] .relrow::-webkit-scrollbar-thumb:hover{background:#b9b9c2}
   html[data-theme="light"] .hslide .hprice2 .price.free{color:var(--text)}
   html[data-theme="light"] .harrow{color:rgba(29,29,32,.55)}
   html[data-theme="light"] .card{box-shadow:0 1px 3px rgba(0,0,0,.07),0 3px 10px rgba(0,0,0,.05)}
