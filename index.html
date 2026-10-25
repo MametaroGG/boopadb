@@ -904,8 +904,6 @@
       <button class="chip" data-f="lowest" data-i="chip_lowest">過去最安値</button>
       <button class="chip" data-f="free" data-i="free">無料</button>
       <button class="chip" data-f="drop" data-i="bt_drop">値下げ</button>
-      <button class="chip" data-f="new" data-i="bt_new">新着</button>
-      <button class="chip" data-f="rising" data-i="bt_rising">急上昇</button>
     </div>
     <div class="sp-sec" data-i="sp_price_t">価格で絞り込む</div>
     <div class="sp-price"><input type="range" id="spPrice" min="0" max="12" step="1" value="12" data-i-al="sp_price_t" aria-label="価格で絞り込む"><div class="sp-price-val" id="spPriceVal"></div></div>
@@ -941,7 +939,7 @@ ja: {
   ft_legal: "BoopaDB は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。",
   ft_terms: "利用規約", ft_priv: "プライバシー", ft_app: "アプリ", app_promo_t: "BoopaDBをアプリとして使う", app_promo_b: "ホーム画面に追加すると、全画面で開けるようになります",
   ft_tm: "BOOTH は pixiv株式会社の商標です。その他の商標および著作物は、各権利者に帰属します。",
-  pp_title: "商品詳細", sp_title: "商品検索", sp_ph: "商品名・ショップ名で検索", sp_shops: "カテゴリーから探す", sp_filter: "絞り込み", sp_price_t: "価格で絞り込む", sp_price_any: "価格は問わない", sp_reset: "リセット", sp_show_results: "結果を表示", sp_sort_rel: "適合性", sp_sort_new: "新着順", sp_sort_price_asc: "価格の安い順", sp_sort_price_desc: "価格の高い順", sp_sort_pct: "割引率の高い順", sp_sort_name: "名前順", th_toggle: "テーマ切替", sp_price_upto: "¥{n} 以下",
+  pp_title: "商品詳細", sp_title: "商品検索", sp_ph: "商品名・ショップ名で検索", sp_shops: "カテゴリーから探す", sp_filter: "絞り込み", sp_price_t: "価格で絞り込む", sp_price_any: "価格は問わない", sp_reset: "リセット", sp_show_results: "結果を表示", sp_sort_rel: "適合性", sp_sort_pop: "人気順", sp_sort_rising: "急上昇", sp_sort_new: "新着順", sp_sort_price_asc: "価格の安い順", sp_sort_price_desc: "価格の高い順", sp_sort_pct: "割引率の高い順", sp_sort_name: "名前順", th_toggle: "テーマ切替", sp_price_upto: "¥{n} 以下",
   tab_home: "ホーム", tab_sale: "セール", tab_news: "ニュース", tab_ranking: "ランキング", tab_bm: "ブックマーク",
   al_back: "戻る", al_prev: "前へ", al_next: "次へ", al_expand: "拡大表示", al_close: "閉じる", cmp_more: "ほか{n}件", al_search: "検索", al_slide: "スライド",
   st_total: "追跡中の商品", st_sale: "現在セール中（推定）", st_free: "現在無料の商品（元¥100以上）", st_changed: "価格変更のあった商品", st_period: "データ収集期間（最古の観測）",
@@ -974,7 +972,7 @@ en: {
   ft_legal: "BoopaDB is an unofficial project, not affiliated with BOOTH or pixiv Inc. All times are Japan Standard Time (JST).",
   ft_terms: "Terms", ft_priv: "Privacy", ft_app: "App", app_promo_t: "Use BoopaDB as an app", app_promo_b: "Add it to your home screen to open it full-screen",
   ft_tm: "BOOTH is a trademark of pixiv Inc. All other trademarks and works belong to their respective owners.",
-  pp_title: "Product details", sp_title: "Search products", sp_ph: "Search by product or shop name", sp_shops: "Browse by category", sp_filter: "Filters", sp_price_t: "Filter by price", sp_price_any: "Any price", sp_reset: "Reset", sp_show_results: "Show results", sp_sort_rel: "Relevance", sp_sort_new: "Newest", sp_sort_price_asc: "Price: low to high", sp_sort_price_desc: "Price: high to low", sp_sort_pct: "Biggest discount", sp_sort_name: "Name", th_toggle: "Toggle theme", sp_price_upto: "Up to ¥{n}",
+  pp_title: "Product details", sp_title: "Search products", sp_ph: "Search by product or shop name", sp_shops: "Browse by category", sp_filter: "Filters", sp_price_t: "Filter by price", sp_price_any: "Any price", sp_reset: "Reset", sp_show_results: "Show results", sp_sort_rel: "Relevance", sp_sort_pop: "Popularity", sp_sort_rising: "Rising", sp_sort_new: "Newest", sp_sort_price_asc: "Price: low to high", sp_sort_price_desc: "Price: high to low", sp_sort_pct: "Biggest discount", sp_sort_name: "Name", th_toggle: "Toggle theme", sp_price_upto: "Up to ¥{n}",
   tab_home: "Home", tab_sale: "Sale", tab_news: "News", tab_ranking: "Rankings", tab_bm: "Bookmarks",
   al_back: "Back", al_prev: "Previous", al_next: "Next", al_expand: "Expand", al_close: "Close", cmp_more: "+{n} more", al_search: "Search", al_slide: "Slide",
   st_total: "Products tracked", st_sale: "On sale now (est.)", st_free: "Free now (was ¥100+)", st_changed: "Products with price changes", st_period: "Data collection period (oldest)",
@@ -1007,7 +1005,7 @@ ko: {
   ft_legal: "BoopaDB는 BOOTH 및 pixiv 주식회사와 관계없는 비공식 프로젝트입니다. 모든 시간은 일본 시간(JST)입니다.",
   ft_terms: "이용약관", ft_priv: "개인정보", ft_app: "앱", app_promo_t: "BoopaDB를 앱으로 사용하기", app_promo_b: "홈 화면에 추가하면 전체 화면으로 열 수 있습니다",
   ft_tm: "BOOTH는 pixiv 주식회사의 상표입니다. 그 밖의 상표 및 저작물은 각 권리자에게 귀속합니다.",
-  pp_title: "상품 상세", sp_title: "상품 검색", sp_ph: "상품명·샵 이름으로 검색", sp_shops: "카테고리로 찾기", sp_filter: "필터", sp_price_t: "가격으로 좁히기", sp_price_any: "가격 무관", sp_reset: "초기화", sp_show_results: "결과 표시", sp_sort_rel: "관련도", sp_sort_new: "최신순", sp_sort_price_asc: "가격 낮은 순", sp_sort_price_desc: "가격 높은 순", sp_sort_pct: "할인율 높은 순", sp_sort_name: "이름순", th_toggle: "테마 전환", sp_price_upto: "¥{n} 이하",
+  pp_title: "상품 상세", sp_title: "상품 검색", sp_ph: "상품명·샵 이름으로 검색", sp_shops: "카테고리로 찾기", sp_filter: "필터", sp_price_t: "가격으로 좁히기", sp_price_any: "가격 무관", sp_reset: "초기화", sp_show_results: "결과 표시", sp_sort_rel: "관련도", sp_sort_pop: "인기순", sp_sort_rising: "급상승", sp_sort_new: "최신순", sp_sort_price_asc: "가격 낮은 순", sp_sort_price_desc: "가격 높은 순", sp_sort_pct: "할인율 높은 순", sp_sort_name: "이름순", th_toggle: "테마 전환", sp_price_upto: "¥{n} 이하",
   tab_home: "홈", tab_sale: "세일", tab_news: "뉴스", tab_ranking: "랭킹", tab_bm: "북마크",
   al_back: "뒤로", al_prev: "이전", al_next: "다음", al_expand: "확대", al_close: "닫기", cmp_more: "외 {n}개", al_search: "검색", al_slide: "슬라이드",
   st_total: "추적 중인 상품", st_sale: "현재 할인 중(추정)", st_free: "현재 무료 상품(기존 ¥100 이상)", st_changed: "가격 변동이 있었던 상품", st_period: "데이터 수집 기간(가장 오래된 관측)",
@@ -1040,7 +1038,7 @@ ko: {
   ft_legal: "BoopaDB 是与 BOOTH 及 pixiv 株式会社无关的非官方项目。所有时间均为日本时间（JST）。",
   ft_terms: "使用条款", ft_priv: "隐私", ft_app: "应用", app_promo_t: "将 BoopaDB 作为应用使用", app_promo_b: "添加到主屏幕后可以全屏打开",
   ft_tm: "BOOTH 是 pixiv 株式会社的商标。其他商标及作品归各权利方所有。",
-  pp_title: "商品详情", sp_title: "搜索商品", sp_ph: "按商品名或店铺名搜索", sp_shops: "按类别浏览", sp_filter: "筛选", sp_price_t: "按价格筛选", sp_price_any: "不限价格", sp_reset: "重置", sp_show_results: "显示结果", sp_sort_rel: "相关性", sp_sort_new: "最新上架", sp_sort_price_asc: "价格从低到高", sp_sort_price_desc: "价格从高到低", sp_sort_pct: "折扣率最高", sp_sort_name: "名称", th_toggle: "切换主题", sp_price_upto: "¥{n} 以下",
+  pp_title: "商品详情", sp_title: "搜索商品", sp_ph: "按商品名或店铺名搜索", sp_shops: "按类别浏览", sp_filter: "筛选", sp_price_t: "按价格筛选", sp_price_any: "不限价格", sp_reset: "重置", sp_show_results: "显示结果", sp_sort_rel: "相关性", sp_sort_pop: "人气顺", sp_sort_rising: "急升", sp_sort_new: "最新上架", sp_sort_price_asc: "价格从低到高", sp_sort_price_desc: "价格从高到低", sp_sort_pct: "折扣率最高", sp_sort_name: "名称", th_toggle: "切换主题", sp_price_upto: "¥{n} 以下",
   tab_home: "首页", tab_sale: "促销", tab_news: "动态", tab_ranking: "排行榜", tab_bm: "收藏",
   al_back: "返回", al_prev: "上一个", al_next: "下一个", al_expand: "放大显示", al_close: "关闭", cmp_more: "还有{n}个", al_search: "搜索", al_slide: "幻灯片",
   st_total: "追踪中的商品", st_sale: "当前促销中（估计）", st_free: "当前免费商品（原价 ¥100 以上）", st_changed: "有价格变动的商品", st_period: "数据采集期间（最早观测）",
@@ -1073,7 +1071,7 @@ ko: {
   ft_legal: "BoopaDB 是與 BOOTH 及 pixiv 株式會社無關的非官方項目。所有時間均為日本時間（JST）。",
   ft_terms: "使用條款", ft_priv: "隱私", ft_app: "應用", app_promo_t: "將 BoopaDB 作為應用使用", app_promo_b: "新增到主畫面後可以全螢幕開啟",
   ft_tm: "BOOTH 是 pixiv 株式會社的商標。其他商標及作品歸各權利方所有。",
-  pp_title: "商品詳情", sp_title: "搜尋商品", sp_ph: "按商品名或店舖名搜尋", sp_shops: "按類別瀏覽", sp_filter: "篩選", sp_price_t: "按價格篩選", sp_price_any: "不限價格", sp_reset: "重置", sp_show_results: "顯示結果", sp_sort_rel: "相關性", sp_sort_new: "最新上架", sp_sort_price_asc: "價格從低到高", sp_sort_price_desc: "價格從高到低", sp_sort_pct: "折扣率最高", sp_sort_name: "名稱", th_toggle: "切換主題", sp_price_upto: "¥{n} 以下",
+  pp_title: "商品詳情", sp_title: "搜尋商品", sp_ph: "按商品名或店舖名搜尋", sp_shops: "按類別瀏覽", sp_filter: "篩選", sp_price_t: "按價格篩選", sp_price_any: "不限價格", sp_reset: "重置", sp_show_results: "顯示結果", sp_sort_rel: "相關性", sp_sort_pop: "人氣順", sp_sort_rising: "急升", sp_sort_new: "最新上架", sp_sort_price_asc: "價格從低到高", sp_sort_price_desc: "價格從高到低", sp_sort_pct: "折扣率最高", sp_sort_name: "名稱", th_toggle: "切換主題", sp_price_upto: "¥{n} 以下",
   tab_home: "首頁", tab_sale: "促銷", tab_news: "動態", tab_ranking: "排行榜", tab_bm: "收藏",
   al_back: "返回", al_prev: "上一個", al_next: "下一個", al_expand: "放大顯示", al_close: "關閉", cmp_more: "還有{n}個", al_search: "搜尋", al_slide: "投影片",
   st_total: "追蹤中的商品", st_sale: "當前促銷中（估計）", st_free: "當前免費商品（原價 ¥100 以上）", st_changed: "有價格變動的商品", st_period: "數據採集期間（最早觀測）",
@@ -1468,14 +1466,15 @@ const spIndex = (() => {
 })();
 
 function pxImg(v){ return !v ? "" : (String(v).includes("://") ? String(v) : "https://booth.pximg.net/c/620x620/" + v + "_base_resized.jpg"); }
+function isoFD(n){ if (!n) return ""; const t = String(n); return t.slice(0, 4) + "-" + t.slice(4, 6) + "-" + t.slice(6, 8); }
 // ---- full-catalog search (search_index.json: every tracked product) ----
 let fullIndex = null, fullIndexLoading = false, spCatMap = new Map();
 async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
   try {
-    const rs = await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => fetch("search_index_" + i + ".json?v=20251025-5")));
-    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow, cat, likes, img]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow, String(cat || "").toLowerCase().normalize("NFKC"), likes || 0, pxImg(img)]); spCatMap = new Map(fullIndex.map(e => [e[0], e[8]])); for (const row of raw) { const c = row[7]; if (c) { const k = String(c).toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, String(c)); } } if (typeof spCatRender === "function") spCatRender(); }
+    const rs = await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => fetch("search_index_" + i + ".json?v=20251025-6")));
+    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow, cat, likes, img, fd, pd]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow, String(cat || "").toLowerCase().normalize("NFKC"), likes || 0, pxImg(img), fd || 0, pd || 0]); spCatMap = new Map(fullIndex.map(e => [e[0], e[8]])); for (const row of raw) { const c = row[7]; if (c) { const k = String(c).toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, String(c)); } } if (typeof spCatRender === "function") spCatRender(); }
   } catch {}
   fullIndexLoading = false;
   if (fullIndex && spage.classList.contains("open")) spRender(false);
@@ -1780,7 +1779,7 @@ function spRender(reset = true){
     for (const e of fullIndex) {
       if (e[8] !== target) continue;
       const r = rich.get(e[0]);
-      hits.push(r ? {...r, _likes: r.likes || e[9] || 0} : {id: e[0], name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, _likes: e[9] || 0});
+      hits.push(r ? {...r, _likes: r.likes || e[9] || 0, likes: r.likes || e[9] || 0, first_date: r.first_date || isoFD(e[11]), per_day: r.per_day != null ? r.per_day : (e[12] || 0) / 10} : {id: e[0], name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, _likes: e[9] || 0, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
     }
     hits.sort((a, b) => (b._likes || 0) - (a._likes || 0));
   }
@@ -1793,20 +1792,20 @@ function spRender(reset = true){
       if (r) { hits.push(r); continue; }
       const e = byId.get(id);
       if (!e) continue;
-      hits.push({id, name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined});
+      hits.push({id, name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
     }
   }
   if (!hits && q && spFilter === "all" && fullIndex) {
     loadAff();
     const rich = new Map(spIndex.map(x => [String(x.id), x]));
     hits = [];
-    for (const [id, name, lower, icur, ibase, ilowest, isale, iatlow, icat, ilikes, iimg] of fullIndex) {
+    for (const [id, name, lower, icur, ibase, ilowest, isale, iatlow, icat, ilikes, iimg, ifd, ipd] of fullIndex) {
       const pos = lower.indexOf(q);
       const catHit = pos < 0 && !!icat && icat.indexOf(q) >= 0;
       if (pos < 0 && !catHit) continue;
       const r = rich.get(id);
-      if (r) hits.push({...r, _rank: catHit ? 3.5 : (pos === 0 ? 0 : 2), _likes: r.likes || ilikes || 0, _cat: icat});
-      else hits.push({id, name, shop: "", image: iimg || null, cur: icur, base: ibase, lowest: ilowest, sale: !!isale, pct: ibase > icur ? Math.round((1 - icur / ibase) * 100) : 0, at_lowest: !!iatlow, plain: icur === null || icur === undefined, _rank: catHit ? 3.5 : (pos === 0 ? 1 : 3), _likes: ilikes || 0, _cat: icat});
+      if (r) hits.push({...r, _rank: catHit ? 3.5 : (pos === 0 ? 0 : 2), _likes: r.likes || ilikes || 0, _cat: icat, likes: r.likes || ilikes || 0, first_date: r.first_date || isoFD(ifd), per_day: r.per_day != null ? r.per_day : (ipd || 0) / 10});
+      else hits.push({id, name, shop: "", image: iimg || null, cur: icur, base: ibase, lowest: ilowest, sale: !!isale, pct: ibase > icur ? Math.round((1 - icur / ibase) * 100) : 0, at_lowest: !!iatlow, plain: icur === null || icur === undefined, _rank: catHit ? 3.5 : (pos === 0 ? 1 : 3), _likes: ilikes || 0, _cat: icat, likes: ilikes || 0, first_date: isoFD(ifd), per_day: (ipd || 0) / 10});
     }
     hits.sort(spRelSort);
     if (hits.length < 50) {
@@ -1814,13 +1813,13 @@ function spRender(reset = true){
       if (tokens.length >= 2) {
         const have = new Set(hits.map(h => String(h.id)));
         const extra = [];
-        for (const [id, name, lower, cur, base, lowest, isale, atlow, icat, ilikes, img] of fullIndex) {
+        for (const [id, name, lower, cur, base, lowest, isale, atlow, icat, ilikes, img, ifd, ipd] of fullIndex) {
           if (have.has(String(id))) continue;
           let matched = 0;
           for (const t of tokens) if (lower.includes(t) || (icat && icat.includes(t))) matched++;
           const r = rich.get(String(id));
-          if (matched === tokens.length) extra.push(r ? {...r, _rank: 4, _likes: r.likes || ilikes || 0, _cat: icat} : {id, name, shop: "", image: img || null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 4, _likes: ilikes || 0, _cat: icat});
-          else if (tokens.length >= 3 && matched >= 3 && matched >= tokens.length - 1) extra.push(r ? {...r, _rank: 5, _likes: r.likes || ilikes || 0, _cat: icat} : {id, name, shop: "", image: img || null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 5, _likes: ilikes || 0, _cat: icat});
+          if (matched === tokens.length) extra.push(r ? {...r, _rank: 4, _likes: r.likes || ilikes || 0, _cat: icat, likes: r.likes || ilikes || 0, first_date: r.first_date || isoFD(ifd), per_day: r.per_day != null ? r.per_day : (ipd || 0) / 10} : {id, name, shop: "", image: img || null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 4, _likes: ilikes || 0, _cat: icat, likes: ilikes || 0, first_date: isoFD(ifd), per_day: (ipd || 0) / 10});
+          else if (tokens.length >= 3 && matched >= 3 && matched >= tokens.length - 1) extra.push(r ? {...r, _rank: 5, _likes: r.likes || ilikes || 0, _cat: icat, likes: r.likes || ilikes || 0, first_date: r.first_date || isoFD(ifd), per_day: r.per_day != null ? r.per_day : (ipd || 0) / 10} : {id, name, shop: "", image: img || null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 5, _likes: ilikes || 0, _cat: icat, likes: ilikes || 0, first_date: isoFD(ifd), per_day: (ipd || 0) / 10});
         }
         if (extra.length) hits = [...hits, ...extra].sort(spRelSort);
       }
@@ -1856,6 +1855,8 @@ function spRender(reset = true){
   if (spMaxPrice != null) hits = hits.filter(x => x.cur != null && x.cur <= spMaxPrice);
   if (spSort !== "rel") {
     const by = {
+      pop: (a, b) => ((b._likes != null ? b._likes : (b.likes || 0)) - (a._likes != null ? a._likes : (a.likes || 0))),
+      rising: (a, b) => ((b.per_day || 0) - (a.per_day || 0)) || ((b._likes != null ? b._likes : (b.likes || 0)) - (a._likes != null ? a._likes : (a.likes || 0))),
       price_asc: (a, b) => (a.cur == null ? Infinity : a.cur) - (b.cur == null ? Infinity : b.cur),
       price_desc: (a, b) => (b.cur == null ? -Infinity : b.cur) - (a.cur == null ? -Infinity : a.cur),
       pct: (a, b) => (b.pct || 0) - (a.pct || 0),
@@ -1941,7 +1942,7 @@ document.getElementById("spFilterReset").addEventListener("click", () => {
   spPriceLabel();
   spRender();
 });
-const SP_SORTS = [["rel", "sp_sort_rel"], ["price_asc", "sp_sort_price_asc"], ["price_desc", "sp_sort_price_desc"], ["pct", "sp_sort_pct"], ["name", "sp_sort_name"]];
+const SP_SORTS = [["rel", "sp_sort_rel"], ["pop", "sp_sort_pop"], ["new", "sp_sort_new"], ["rising", "sp_sort_rising"], ["price_asc", "sp_sort_price_asc"], ["price_desc", "sp_sort_price_desc"], ["pct", "sp_sort_pct"], ["name", "sp_sort_name"]];
 let spSort = "rel";
 const spSortMenu = document.getElementById("spSortMenu");
 function spSortSync(){
