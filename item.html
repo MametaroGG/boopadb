@@ -25,7 +25,13 @@
   [data-theme="light"] #splash{background:#f4f4f5}
   #splash[hidden]{display:none}
   #splash.bye{opacity:0;pointer-events:none}
-  #splash img{width:104px;height:104px;border-radius:50%;animation:splIn .45s ease-out}
+  #splash svg{width:112px;height:112px;animation:splIn .45s ease-out}
+  #splash .spl-ring{stroke-dasharray:346;stroke-dashoffset:346;animation:splDraw .8s .1s ease-out forwards}
+  #splash .spl-line{stroke-dasharray:130;stroke-dashoffset:130;animation:splDraw .7s .55s ease-out forwards}
+  #splash .spl-head{opacity:0;animation:splFade .25s 1.2s ease-out forwards}
+  #splash .spl-tag{opacity:0;animation:splFade .3s 1.35s ease-out forwards}
+  @keyframes splDraw{to{stroke-dashoffset:0}}
+  @keyframes splFade{to{opacity:1}}
   #splash .splogo{font-family:"Orbitron","Hiragino Kaku Gothic ProN",sans-serif;font-size:30px;font-weight:900;letter-spacing:.5px;color:#ececee;animation:splIn .45s ease-out}
   [data-theme="light"] #splash .splogo{color:#17171a}
   #splash .splogo span{color:var(--accent)}
@@ -117,7 +123,7 @@
   .phead{display:flex;gap:16px;align-items:flex-start}
   .phead img{width:150px;height:150px;object-fit:cover;border-radius:8px;background:#131316;flex:none}
   @media (max-width:560px){.phead{flex-direction:column}.phead img{width:100%;height:auto;aspect-ratio:1/1}}
-  nav{display:flex;gap:16px;margin-left:10px}
+  header nav{display:flex;gap:16px;margin-left:10px}
   nav a{font-size:13px;color:var(--sub)}
   nav a:hover{color:#fff;text-decoration:none}
   .searchbox{margin-left:auto}
@@ -601,7 +607,7 @@
   .hero-dots button.on{width:22px;background:#fff}
   .card .thumbwrap .rib{font-size:11px;padding:2px 8px;left:8px;bottom:8px}
   body{padding-bottom:96px}
-  .tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(430px,calc(100% - 20px));height:70px;background:transparent;display:flex;align-items:flex-start;justify-content:space-around;padding:9px 10px 0;z-index:60;transition:transform .38s cubic-bezier(.32,1.15,.36,1),opacity .3s}
+  .tabbar{position:fixed;margin:0;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(430px,calc(100% - 20px));height:70px;background:transparent;display:flex;align-items:flex-start;justify-content:space-around;padding:9px 10px 0;z-index:60;transition:transform .38s cubic-bezier(.32,1.15,.36,1),opacity .3s}
   #barShape{position:absolute;left:0;top:-30px;width:100%;height:calc(100% + 30px);overflow:visible;z-index:0;filter:drop-shadow(0 14px 22px rgba(0,0,0,.5));pointer-events:none}
   .tspacer{width:64px;flex:none}
   .tabbar button.fab{position:absolute;left:50%;top:-27px;transform:translateX(-50%);width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#fc4d50,#d63a3e);color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.35);z-index:3;transition:transform .25s cubic-bezier(.34,1.6,.64,1),filter .2s}
@@ -738,7 +744,16 @@
 </head>
 <body>
 <div id="splash" hidden>
-  <img src="favicon-192.png" alt="">
+  <svg viewBox="0 0 120 120" aria-hidden="true">
+    <circle cx="60" cy="60" r="55" fill="#ffffff"/>
+    <circle class="spl-ring" cx="60" cy="60" r="55" fill="none" stroke="#002d6b" stroke-width="7"/>
+    <path class="spl-line" d="M22 80 L46 60 L60 72 L90 44" fill="none" stroke="#e8383c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path class="spl-head" d="M78 40 L94 40 L94 56 L86 48 Z" fill="#e8383c"/>
+    <g class="spl-tag">
+      <rect x="76" y="62" width="13" height="24" rx="5" transform="rotate(18 82 74)" fill="#1b9ec4"/>
+      <circle cx="83.5" cy="68.5" r="2.6" fill="#ffffff"/>
+    </g>
+  </svg>
   <div class="splogo">Boopa<span>DB</span></div>
 </div>
 <script>
@@ -747,6 +762,10 @@
   var standalone = false;
   try { standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) {}
   if (!standalone || !sp) { if (sp) sp.remove(); return; }
+  try {
+    if (sessionStorage.getItem('boopadb_splash')) { sp.remove(); return; }
+    sessionStorage.setItem('boopadb_splash', '1');
+  } catch (e) {}
   sp.hidden = false;
   document.documentElement.classList.add('splock');
   var done = false;

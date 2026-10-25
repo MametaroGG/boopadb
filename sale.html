@@ -20,6 +20,22 @@
   body{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;background:radial-gradient(1200px 520px at 50% -120px,#26262c 0%,rgba(38,38,44,0) 60%),var(--bg);color:var(--text);line-height:1.55;font-size:14px;font-variant-numeric:tabular-nums}
   a{color:inherit;text-decoration:none}
   a:hover{color:#fff}
+  #splash{position:fixed;inset:0;z-index:9999;background:#101012;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .35s ease}
+  [data-theme="light"] #splash{background:#f4f4f5}
+  #splash[hidden]{display:none}
+  #splash.bye{opacity:0;pointer-events:none}
+  #splash svg{width:112px;height:112px;animation:splIn .45s ease-out}
+  #splash .spl-ring{stroke-dasharray:346;stroke-dashoffset:346;animation:splDraw .8s .1s ease-out forwards}
+  #splash .spl-line{stroke-dasharray:130;stroke-dashoffset:130;animation:splDraw .7s .55s ease-out forwards}
+  #splash .spl-head{opacity:0;animation:splFade .25s 1.2s ease-out forwards}
+  #splash .spl-tag{opacity:0;animation:splFade .3s 1.35s ease-out forwards}
+  @keyframes splDraw{to{stroke-dashoffset:0}}
+  @keyframes splFade{to{opacity:1}}
+  #splash .splogo{font-family:"Orbitron","Hiragino Kaku Gothic ProN",sans-serif;font-size:30px;font-weight:900;letter-spacing:.5px;color:#ececee;animation:splIn .45s ease-out}
+  [data-theme="light"] #splash .splogo{color:#17171a}
+  #splash .splogo span{color:var(--accent)}
+  @keyframes splIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+  html.splock,html.splock body{overflow:hidden}
   header{background:linear-gradient(180deg,#1f1f23,#151517);border-bottom:1px solid var(--border);padding:12px 0}
   .hwrap{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .logo{font-family:"Orbitron","Hiragino Kaku Gothic ProN",sans-serif;font-size:21px;font-weight:900;letter-spacing:.5px}
@@ -106,7 +122,7 @@
   .phead{display:flex;gap:16px;align-items:flex-start}
   .phead img{width:150px;height:150px;object-fit:cover;border-radius:8px;background:#131316;flex:none}
   @media (max-width:560px){.phead{flex-direction:column}.phead img{width:100%;height:auto;aspect-ratio:1/1}}
-  nav{display:flex;gap:16px;margin-left:10px}
+  header nav{display:flex;gap:16px;margin-left:10px}
   nav a{font-size:13px;color:var(--sub)}
   nav a:hover{color:#fff;text-decoration:none}
   .searchbox{margin-left:auto}
@@ -590,7 +606,7 @@
   .hero-dots button.on{width:22px;background:#fff}
   .card .thumbwrap .rib{font-size:11px;padding:2px 8px;left:8px;bottom:8px}
   body{padding-bottom:96px}
-  .tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(430px,calc(100% - 20px));height:70px;background:transparent;display:flex;align-items:flex-start;justify-content:space-around;padding:9px 10px 0;z-index:60;transition:transform .38s cubic-bezier(.32,1.15,.36,1),opacity .3s}
+  .tabbar{position:fixed;margin:0;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(430px,calc(100% - 20px));height:70px;background:transparent;display:flex;align-items:flex-start;justify-content:space-around;padding:9px 10px 0;z-index:60;transition:transform .38s cubic-bezier(.32,1.15,.36,1),opacity .3s}
   #barShape{position:absolute;left:0;top:-30px;width:100%;height:calc(100% + 30px);overflow:visible;z-index:0;filter:drop-shadow(0 14px 22px rgba(0,0,0,.5));pointer-events:none}
   .tspacer{width:64px;flex:none}
   .tabbar button.fab{position:absolute;left:50%;top:-27px;transform:translateX(-50%);width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#fc4d50,#d63a3e);color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.35);z-index:3;transition:transform .25s cubic-bezier(.34,1.6,.64,1),filter .2s}
