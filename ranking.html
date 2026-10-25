@@ -123,6 +123,15 @@
   .phead img{width:150px;height:150px;object-fit:cover;border-radius:8px;background:#131316;flex:none}
   @media (max-width:560px){.phead{flex-direction:column}.phead img{width:100%;height:auto;aspect-ratio:1/1}}
   header nav{display:flex;gap:16px;margin-left:10px}
+  @media (max-width:899px){
+    .hwrap{gap:8px;row-gap:10px;padding:0 14px}
+    .logo{order:1;font-size:19px}
+    .langsw{order:2;margin-left:auto}
+    .badge{order:3;flex:none;font-size:9.5px;padding:2px 7px}
+    .themebtn{order:4;width:34px;height:34px}
+    #langBtn{padding:5px 8px;font-size:12px}
+    header nav{order:5;flex-basis:100%;margin-left:0}
+  }
   nav a{font-size:13px;color:var(--sub)}
   nav a:hover{color:#fff;text-decoration:none}
   .searchbox{margin-left:auto}
