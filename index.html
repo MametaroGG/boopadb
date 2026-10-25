@@ -26,10 +26,10 @@
   #splash[hidden]{display:none}
   #splash.bye{opacity:0;pointer-events:none}
   #splash svg{width:112px;height:112px;animation:splIn .45s ease-out}
-  #splash .spl-ring{stroke-dasharray:346;stroke-dashoffset:346;animation:splDraw .8s .1s ease-out forwards}
-  #splash .spl-line{stroke-dasharray:130;stroke-dashoffset:130;animation:splDraw .7s .55s ease-out forwards}
-  #splash .spl-head{opacity:0;animation:splFade .25s 1.2s ease-out forwards}
-  #splash .spl-tag{opacity:0;animation:splFade .3s 1.35s ease-out forwards}
+  #splash .spl-ring{stroke-dasharray:346;stroke-dashoffset:346;animation:splDraw .45s ease-out forwards}
+  #splash .spl-line{stroke-dasharray:130;stroke-dashoffset:130;animation:splDraw .4s .3s ease-out forwards}
+  #splash .spl-head{opacity:0;animation:splFade .18s .62s ease-out forwards}
+  #splash .spl-tag{opacity:0;animation:splFade .22s .72s ease-out forwards}
   @keyframes splDraw{to{stroke-dashoffset:0}}
   @keyframes splFade{to{opacity:1}}
   #splash .splogo{font-family:"Orbitron","Hiragino Kaku Gothic ProN",sans-serif;font-size:30px;font-weight:900;letter-spacing:.5px;color:#ececee;animation:splIn .45s ease-out}
@@ -777,15 +777,19 @@
   } catch (e) {}
   sp.hidden = false;
   document.documentElement.classList.add('splock');
-  var done = false;
+  var t0 = performance.now(), done = false;
   function hide() {
     if (done) return; done = true;
     sp.classList.add('bye');
     document.documentElement.classList.remove('splock');
     setTimeout(function(){ sp.remove(); }, 420);
   }
-  if (document.readyState === 'complete') setTimeout(hide, 350);
-  else addEventListener('load', function(){ setTimeout(hide, 350); });
+  function hideAfterAnim() {
+    var wait = Math.max(0, 1050 - (performance.now() - t0));
+    setTimeout(hide, wait);
+  }
+  if (document.readyState === 'complete') hideAfterAnim();
+  else addEventListener('load', hideAfterAnim);
   setTimeout(hide, 2800);
 })();
 </script>
