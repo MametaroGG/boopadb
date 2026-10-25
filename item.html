@@ -1600,12 +1600,18 @@ function fetchMeta(id){
   return _metaCache.get(id);
 }
 const _relShardCache = {};
+// Parent/child judgments are WITHDRAWN (user decision, 2026-10-25): the
+// refs fallback and the scraper's heuristic base_refs are both unproven.
+// Relations return when AI-judged base_refs land; flip this to enable.
+const RELATIONS_LIVE = false;
 function fetchRelShard(n){
-  if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json?v=20251025-5").then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  if (!RELATIONS_LIVE) return Promise.resolve({});
+  if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json?v=20251025-6").then(r => r.ok ? r.json() : {}).catch(() => ({}));
   return _relShardCache[n];
 }
 const HEART_SVG = '<svg viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.1a5 5 0 1 1 7.5 6.5z"/></svg>';
 function relationParentIds(m){
+  if (!RELATIONS_LIVE) return { ids: [], strict: true };
   if (!m) return { ids: [], strict: false };
   if (Array.isArray(m.base_refs)) return { ids: m.base_refs.map(String), strict: true };
   return { ids: Array.isArray(m.refs) ? m.refs.map(String) : [], strict: false };
