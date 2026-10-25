@@ -2193,7 +2193,7 @@ function dedupeNewest(){
   }
   return out;
 }
-const fmtGain = v => { const n = Number(v) || 0; return n >= 10 ? String(Math.round(n)) : String(Math.round(n * 10) / 10); };
+const fmtGain = v => { const n = Number(v) || 0; return n >= 10 ? Math.round(n).toLocaleString() : String(Math.round(n * 10) / 10); };
 const BTABS = {
   new: () => dedupeNewest().map(x => bNormFeat(x, "new")),
   sale: () => [...LISTS.on_sale].sort((a,b) => b.pct - a.pct).map(bNormSale),

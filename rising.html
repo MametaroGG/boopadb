@@ -954,7 +954,7 @@ function listRow(x, note, cluster){
   return `<a class="brow" href="${itemLink(x.id)}"><span class="bthw">${x.image ? `<img class="bth" src="${esc(x.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(x.id)}</span><span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bsub">${sub}</span></span>${cluster}</a>`;
 }
 
-const fmtGain = v => { const n = Number(v) || 0; return n >= 10 ? String(Math.round(n)) : String(Math.round(n * 10) / 10); };
+const fmtGain = v => { const n = Number(v) || 0; return n >= 10 ? Math.round(n).toLocaleString() : String(Math.round(n * 10) / 10); };
 
 let pgShown = 60, pgItems = [], pgRowFn = null;
 function pgRender(){
