@@ -334,9 +334,10 @@
     .sp-fshow{flex:1;background:var(--accent);border:none;color:#fff;border-radius:9px;padding:12px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit}
   }
   @media (min-width:900px){
+    .sp-inner{padding-left:106px}
     .sp-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:26px;align-items:start}
     .sp-results{grid-column:1;grid-row:1;min-width:0}
-    .sp-side{grid-column:2;grid-row:1;position:sticky;top:0;max-height:calc(100dvh - 236px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+    .sp-side{grid-column:2;grid-row:1;position:sticky;top:0;max-height:calc(100dvh - 150px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
     .sp-side .chips{flex-direction:column;align-items:stretch;flex-wrap:nowrap}
     .sp-side .chip{text-align:left}
     .sp-side .kwrap{flex-direction:column;align-items:stretch}
@@ -1035,6 +1036,7 @@ async function loadFull(){
 }
 
 const PH_ICON = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M3 16l5-4 4 3 3-2 6 4"/></svg>';
+function imgPh(el, cls){ var s = document.createElement('span'); s.className = cls; s.innerHTML = PH_ICON; el.replaceWith(s); }
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const yen = n => n === 0 ? tr("free") : "¥" + Number(n).toLocaleString(LOCALE);
 const itemLink = id => `index.html#item-${id}`;

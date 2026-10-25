@@ -334,9 +334,10 @@
     .sp-fshow{flex:1;background:var(--accent);border:none;color:#fff;border-radius:9px;padding:12px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit}
   }
   @media (min-width:900px){
+    .sp-inner{padding-left:106px}
     .sp-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:26px;align-items:start}
     .sp-results{grid-column:1;grid-row:1;min-width:0}
-    .sp-side{grid-column:2;grid-row:1;position:sticky;top:0;max-height:calc(100dvh - 236px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+    .sp-side{grid-column:2;grid-row:1;position:sticky;top:0;max-height:calc(100dvh - 150px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
     .sp-side .chips{flex-direction:column;align-items:stretch;flex-wrap:nowrap}
     .sp-side .chip{text-align:left}
     .sp-side .kwrap{flex-direction:column;align-items:stretch}
@@ -1043,6 +1044,7 @@ async function loadFull(){
 }
 
 const PH_ICON = '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M3 16l5-4 4 3 3-2 6 4"/></svg>';
+function imgPh(el, cls){ var s = document.createElement('span'); s.className = cls; s.innerHTML = PH_ICON; el.replaceWith(s); }
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const yen = n => n === 0 ? tr("free") : "¥" + Number(n).toLocaleString(LOCALE);
 const itemLink = id => `index.html#item-${id}`;
@@ -1066,7 +1068,7 @@ function clusterCB(cur, base, sale, atLowest){
 const HEART12 = '<svg class="hico" viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.1a5 5 0 1 1 7.5 6.5z"/></svg> ';
 function listRow(x, note, cluster){
   const sub = [esc(x.shop || ""), note || ""].filter(Boolean).join(" · ");
-  return `<a class="brow" href="${itemLink(x.id)}"><span class="bthw">${x.image ? `<img class="bth" src="${esc(x.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(x.id)}</span><span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bsub">${sub}</span></span>${cluster}</a>`;
+  return `<a class="brow" href="${itemLink(x.id)}"><span class="bthw">${x.image ? `<img class="bth" src="${esc(x.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph">${PH_ICON}</span>`}${bmFlag(x.id)}</span><span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bsub">${sub}</span></span>${cluster}</a>`;
 }
 
 document.title = tr("hist_title") + " | BoopaDB";
@@ -1087,7 +1089,7 @@ function histRender(){
   el.innerHTML = all.map(h => {
     const lk = lookup.get(String(h.id));
     const price = lk ? clusterCB(lk.cur, lk.base, lk.sale, lk.at_lowest) : `<span class="bprice"><span class="price">${yen(h.cur)}</span></span>`;
-    return `<div class="brow"><a class="bmrowlink" href="${itemLink(h.id)}">${h.image ? `<img class="bth" src="${esc(h.image)}" alt="" loading="lazy" onerror="this.remove()">` : `<span class="bthph">${PH_ICON}</span>`}<span class="bmain"><span class="bname">${esc(h.name)}</span><span class="bsub">${esc(h.shop || "")}</span></span></a>${price}<button class="bmrm" type="button" data-rm="${h.id}">${tr("bm_remove")}</button></div>`;
+    return `<div class="brow"><a class="bmrowlink" href="${itemLink(h.id)}">${h.image ? `<img class="bth" src="${esc(h.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph">${PH_ICON}</span>`}<span class="bmain"><span class="bname">${esc(h.name)}</span><span class="bsub">${esc(h.shop || "")}</span></span></a>${price}<button class="bmrm" type="button" data-rm="${h.id}">${tr("bm_remove")}</button></div>`;
   }).join("");
   el.querySelectorAll("[data-rm]").forEach(btn => btn.onclick = () => {
     const rest = histLoad().filter(h => String(h.id) !== btn.dataset.rm);
