@@ -1342,6 +1342,7 @@ function heroPos(p, animate){
   const slide = track.children[0];
   if (!slide) return;
   const w = slide.getBoundingClientRect().width;
+  if (!w) { requestAnimationFrame(() => heroPos(p, animate)); return; }
   const center = (track.parentElement.clientWidth - w) / 2;
   if (animate) {
     track.style.transition = "";
@@ -1392,6 +1393,9 @@ function heroStep(dir){
   setTimeout(reset, 820);
 }
 window.addEventListener("resize", () => heroPos(hi + 1, false));
+window.addEventListener("load", () => heroPos(hi + 1, false));
+window.addEventListener("pageshow", () => heroPos(hi + 1, false));
+window.addEventListener("orientationchange", () => { requestAnimationFrame(() => heroPos(hi + 1, false)); setTimeout(() => heroPos(hi + 1, false), 250); });
 function heroPlay(){ heroStop(); heroTimer = setInterval(() => heroStep(1), 4200); }
 function heroStop(){ if (heroTimer) clearInterval(heroTimer); }
 dotsEl.querySelectorAll("button").forEach(d => d.onclick = () => { heroGo(Number(d.dataset.i)); heroPlay(); });
