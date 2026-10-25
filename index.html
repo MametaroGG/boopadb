@@ -1408,7 +1408,7 @@ function fetchMeta(id){
 }
 const _relShardCache = {};
 function fetchRelShard(n){
-  if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json?v=20251025-2").then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json?v=20251025-3").then(r => r.ok ? r.json() : {}).catch(() => ({}));
   return _relShardCache[n];
 }
 const HEART_SVG = '<svg viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.1a5 5 0 1 1 7.5 6.5z"/></svg>';
