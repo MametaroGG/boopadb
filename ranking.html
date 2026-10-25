@@ -319,10 +319,11 @@
   .spsortmi.on{color:#fff}
   .spsortmi.on::after{content:"✓";margin-left:auto;color:#c8ec6e;font-weight:800;padding-left:14px}
   body.spfilter-open .tabbar{opacity:0;pointer-events:none}
-  #searchPage{scrollbar-width:none}
-  #searchPage::-webkit-scrollbar{display:none}
-  #searchPage .sp-side{scrollbar-width:none;padding-right:6px}
-  #searchPage .sp-side::-webkit-scrollbar{display:none}
+  #searchPage::-webkit-scrollbar{width:10px}
+  #searchPage::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
+  #searchPage .sp-side{scrollbar-gutter:stable;padding-right:10px;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+  #searchPage .sp-side::-webkit-scrollbar{width:8px}
+  #searchPage .sp-side::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
   @media (max-width:899px){
     .sp-resbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
     #spFilterBtn{display:inline-flex;align-items:center;background:#17171a;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-weight:600;padding:8px 14px;cursor:pointer;font-family:inherit;white-space:nowrap}

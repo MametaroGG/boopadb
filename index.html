@@ -320,10 +320,11 @@
   .spsortmi.on{color:#fff}
   .spsortmi.on::after{content:"✓";margin-left:auto;color:#c8ec6e;font-weight:800;padding-left:14px}
   body.spfilter-open .tabbar{opacity:0;pointer-events:none}
-  #searchPage{scrollbar-width:none}
-  #searchPage::-webkit-scrollbar{display:none}
-  #searchPage .sp-side{scrollbar-width:none;padding-right:6px}
-  #searchPage .sp-side::-webkit-scrollbar{display:none}
+  #searchPage::-webkit-scrollbar{width:10px}
+  #searchPage::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
+  #searchPage .sp-side{scrollbar-gutter:stable;padding-right:10px;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+  #searchPage .sp-side::-webkit-scrollbar{width:8px}
+  #searchPage .sp-side::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
   @media (max-width:899px){
     .sp-resbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
     #spFilterBtn{display:inline-flex;align-items:center;background:#17171a;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-weight:600;padding:8px 14px;cursor:pointer;font-family:inherit;white-space:nowrap}
@@ -1566,9 +1567,35 @@ let fullIndex = null, fullIndexLoading = false, spCatMap = new Map();
 function spEnrichFromIndex(){
   if (!fullIndex) return;
   const byId = new Map(fullIndex.map(e => [e[0], e]));
-  const fill = x => { const e = byId.get(String(x.id)); if (!e) return; if (x.likes == null) x.likes = e[9]; if (!x.first_date) x.first_date = isoFD(e[11]); if (x.per_day == null) x.per_day = (e[12] || 0) / 10; };
+  const fill = x => { const e = byId.get(String(x.id)); if (!e) return; if (x.likes == null) x.likes = e[9]; if (!x.first_date) x.first_date = isoFD(e[11]); if (x.per_day == null) x.per_day = (e[12] || 0) / 10; if (!x.at_lowest && e[7]) x.at_lowest = true; };
   spIndex.forEach(fill);
   if (FULL_LISTS) for (const k of Object.keys(FULL_LISTS)) { const v = FULL_LISTS[k]; if (Array.isArray(v)) v.forEach(fill); }
+}
+function spEnrichFromLists(){
+  if (!FULL_LISTS) return;
+  const byId = new Map();
+  for (const k of Object.keys(FULL_LISTS)) {
+    const v = FULL_LISTS[k];
+    if (!Array.isArray(v)) continue;
+    for (const x of v) {
+      if (!x || x.id == null) continue;
+      const cur = byId.get(String(x.id)) || {};
+      if (x.likes != null) cur.likes = x.likes;
+      if (x.first_date) cur.first_date = x.first_date;
+      if (x.per_day != null) cur.per_day = x.per_day;
+      if (x.at_lowest) cur.at_lowest = true;
+      byId.set(String(x.id), cur);
+    }
+  }
+  if (!byId.size) return;
+  for (const x of spIndex) {
+    const e = byId.get(String(x.id));
+    if (!e) continue;
+    if (x.likes == null && e.likes != null) x.likes = e.likes;
+    if (!x.first_date && e.first_date) x.first_date = e.first_date;
+    if (x.per_day == null && e.per_day != null) x.per_day = e.per_day;
+    if (!x.at_lowest && e.at_lowest) x.at_lowest = true;
+  }
 }
 let spCatalogCache = { idx: null, hits: null };
 function spCatalogHits(){
@@ -1609,15 +1636,17 @@ function spLandingHits(){
   spLandingCache = { key, hits: out };
   return out;
 }
+let fullIndexFails = 0;
 async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
   try {
-    const rs = await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => fetch("search_index_" + i + ".json?v=20251025-6")));
+    const rs = await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => fetch("search_index_" + i + ".json?v=20251025-7")));
     if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow, cat, likes, img, fd, pd]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow, String(cat || "").toLowerCase().normalize("NFKC"), likes || 0, pxImg(img), fd || 0, pd || 0]); spCatMap = new Map(fullIndex.map(e => [e[0], e[8]])); for (const row of raw) { const c = row[7]; if (c) { const k = String(c).toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, String(c)); } } if (typeof spCatRender === "function") spCatRender(); spEnrichFromIndex(); }
   } catch {}
   fullIndexLoading = false;
-  if (fullIndex && spage.classList.contains("open")) spRender(false);
+  if (fullIndex) { fullIndexFails = 0; if (spage.classList.contains("open")) spRender(false); }
+  else if (fullIndexFails < 2) { fullIndexFails++; setTimeout(loadFullIndex, 3000 * fullIndexFails); }
 }
 function thinPointsJS(rows){
   if (rows.length <= 2) return rows;
@@ -1725,7 +1754,7 @@ const _relShardCache = {};
 const RELATIONS_LIVE = false;
 function fetchRelShard(n){
   if (!RELATIONS_LIVE) return Promise.resolve({});
-  if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json?v=20251025-6").then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json?v=20251025-7").then(r => r.ok ? r.json() : {}).catch(() => ({}));
   return _relShardCache[n];
 }
 const HEART_SVG = '<svg viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.1a5 5 0 1 1 7.5 6.5z"/></svg>';
@@ -2354,9 +2383,11 @@ function renderSale(){
 function makePager(railId, trackId, prevId, nextId, dotsId){
   const st = { page: 0, pages: [0], t: null };
   const el = id => document.getElementById(id);
-  function draw(){
+  function draw(instant){
     const track = el(trackId), dots = el(dotsId);
+    if (instant) track.style.transition = "none";
     track.style.transform = `translateX(${-st.pages[st.page]}px)`;
+    if (instant) { void track.offsetWidth; requestAnimationFrame(() => { track.style.transition = ""; }); }
     dots.innerHTML = st.pages.map((_, i) => `<span class="${i === st.page ? "on" : ""}"></span>`).join("");
   }
   function layout(){
@@ -2382,8 +2413,9 @@ function makePager(railId, trackId, prevId, nextId, dotsId){
   }
   function go(d){
     if (st.pages.length < 2) return;
+    const wrap = (d > 0 && st.page === st.pages.length - 1) || (d < 0 && st.page === 0);
     st.page = (st.page + d + st.pages.length) % st.pages.length;
-    draw();
+    draw(wrap);
   }
   el(prevId).onclick = () => go(-1);
   el(nextId).onclick = () => go(1);
@@ -2583,8 +2615,9 @@ setBTab("new");
 // Full lists swap-in: the home sale section and browse tabs run on the
 // whole catalog once lists_full.json arrives (the sample paints first).
 function loadFullLists(n){
-  fetch("lists_full.json?v=20251025-3").then(r => { if (!r.ok) throw new Error("lists"); return r.json(); }).then(f => {
+  fetch("lists_full.json?v=20251025-4").then(r => { if (!r.ok) throw new Error("lists"); return r.json(); }).then(f => {
   FULL_LISTS = f; FULL_OK = true;
+  spEnrichFromLists();
   if (fullIndex) spEnrichFromIndex();
   if (f.stats) renderStats(f.stats);
   if (f.on_sale && f.on_sale.length) { SALE_HOME = f.on_sale; LISTS.on_sale = f.on_sale; renderSale(); }
