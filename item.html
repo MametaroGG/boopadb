@@ -347,7 +347,16 @@
   .rib.sale{background:#e04347}
   .rib.act{background:#3a3a41}
   .rib.new{background:var(--accent);color:#fff}
-  .hslide .rib{left:-6px;bottom:-6px;border-radius:0;padding:3px 12px 9px 18px;box-shadow:none}
+  .hslide .rib{left:0;bottom:0;border-radius:0;padding:3px 12px;box-shadow:none}
+  @media (min-width:900px){.hslide .rib{border-bottom-left-radius:14px}}
+  .hslide .himg img{border-radius:inherit}
+  .hmeta{display:none}
+  @media (min-width:900px){.hmeta{display:flex;flex-wrap:wrap;gap:6px 7px;align-items:center;margin-top:12px}}
+  .htag{background:#26262c;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:600}
+  a.htag{color:var(--sub);text-decoration:none;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  a.htag:hover{color:var(--text)}
+  .hrel-g{font-size:11px;font-weight:800;color:var(--sub);margin-left:6px}
+  html[data-theme="light"] .htag{background:#ececf1}
   .fnote2{font-size:12px;color:var(--faint);margin:-8px 0 10px}
   .ftag{position:absolute;top:-1px;left:-1px;background:rgba(23,23,26,.88);color:#fff;font-size:11px;line-height:1.3;font-weight:800;letter-spacing:.05em;padding:4px 8px 4px;z-index:2;pointer-events:none}
   .ftag.new{background:#fc4d50}
@@ -369,6 +378,13 @@
   @media (max-width:640px){.pp-top{flex-direction:column}.pp-imgwrap{flex:none;width:100%}}
   .pp-name{font-size:19px;font-weight:800;line-height:1.45}
   .pp-shop{font-size:13px;color:var(--sub);margin-top:3px}
+  .pp-meta{display:flex;align-items:center;gap:7px 8px;flex-wrap:wrap;margin-top:10px}
+  .pp-likes{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;margin-right:6px}
+  .pp-likes svg{width:15px;height:15px;fill:none;stroke:#f2506e;stroke-width:2}
+  .pp-tag{background:#1d1d22;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600}
+  .pp-tag.cat{border-color:rgba(200,236,110,.5);color:#c8ec6e}
+  html[data-theme="light"] .pp-tag{background:#ececf1}
+  html[data-theme="light"] .pp-tag.cat{color:#4c7a1f;border-color:rgba(76,122,31,.5)}
   .pp-actions{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
   .pp-booth{background:#e04347;color:#fff;font-weight:700;font-size:13.5px;padding:9px 18px;border-radius:8px;text-decoration:none}
   .pp-bmbtn{background:#232329;color:var(--text);border:1px solid var(--border2);font-weight:700;font-size:13.5px;line-height:1;padding:9px 16px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:7px;width:200px;box-sizing:border-box}
@@ -713,7 +729,7 @@
       <button class="btab" data-bt="sale" data-i="bt_special">スペシャル</button>
       <button class="btab" data-bt="drop" data-i="bt_drop">値下げ</button>
       <button class="btab" data-bt="free" data-i="free">無料</button>
-      <button class="btab" data-bt="active" data-i="bt_active">価格変更が活発</button>
+      <button class="btab" data-bt="rising" data-i="bt_rising">急上昇</button>
 
     </div>
     <div class="bwrap">
@@ -770,7 +786,7 @@
       <button class="chip" data-f="free" data-i="free">無料</button>
       <button class="chip" data-f="drop" data-i="bt_drop">値下げ</button>
       <button class="chip" data-f="new" data-i="bt_new">新着</button>
-      <button class="chip" data-f="active" data-i="bt_active">価格変更が活発</button>
+      <button class="chip" data-f="rising" data-i="bt_rising">急上昇</button>
     </div>
     <div class="sp-sec" data-i="sp_price_t">価格で絞り込む</div>
     <div class="sp-price"><input type="range" id="spPrice" min="0" max="12" step="1" value="12" data-i-al="sp_price_t" aria-label="価格で絞り込む"><div class="sp-price-val" id="spPriceVal"></div></div>
@@ -800,7 +816,7 @@ ja: {
   chip_all: "すべて", chip_lowest: "過去最安値", rng_1d: "1日", rng_5d: "5日", rng_1m: "1か月", rng_6m: "6か月", rng_ytd: "年来初", rng_1y: "1年", rng_5y: "5年", rng_max: "最大", chip_half: "50%OFF以上", chip_onsale: "セール中",
   empty_none: "該当する商品がありません", more: "もっと見る",
   sale_note: "※ 通常価格は観測期間中の最高価格。セール判定はBoopaの収集データに基づく推定を含みます。",
-  bt_new: "新着", bt_special: "スペシャル", bt_drop: "値下げ", bt_active: "価格変更が活発",
+  bt_new: "新着", bt_special: "スペシャル", bt_drop: "値下げ", bt_active: "価格変更が活発", bt_rising: "急上昇", rising_note: "いいね {likes} · +{g}/日",
   ft_data: "データは Boopa（BOOTH Price Tracker for VRChat）の収集基盤による実データです。価格は観測時点のもので、現在のBOOTH上の価格と異なる場合があります。",
   ft_legal: "BoopaDB は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。",
   ft_terms: "利用規約", ft_priv: "プライバシー",
@@ -833,7 +849,7 @@ en: {
   chip_all: "All", chip_lowest: "Lowest ever", rng_1d: "1D", rng_5d: "5D", rng_1m: "1M", rng_6m: "6M", rng_ytd: "YTD", rng_1y: "1Y", rng_5y: "5Y", rng_max: "Max", chip_half: "50% off or more", chip_onsale: "On sale",
   empty_none: "No matching products", more: "See more",
   sale_note: "* Regular price is the highest observed price. Sale status includes estimates based on Boopa's collected data.",
-  bt_new: "New", bt_special: "Specials", bt_drop: "Price drops", bt_active: "Frequent price changes",
+  bt_new: "New", bt_special: "Specials", bt_drop: "Price drops", bt_active: "Frequent price changes", bt_rising: "Trending", rising_note: "{likes} likes · +{g}/day",
   ft_data: "Data is real, collected by Boopa (BOOTH Price Tracker for VRChat). Prices are as observed and may differ from current BOOTH prices.",
   ft_legal: "BoopaDB is an unofficial project, not affiliated with BOOTH or pixiv Inc. All times are Japan Standard Time (JST).",
   ft_terms: "Terms", ft_priv: "Privacy",
@@ -866,7 +882,7 @@ ko: {
   chip_all: "전체", chip_lowest: "역대 최저가", rng_1d: "1일", rng_5d: "5일", rng_1m: "1개월", rng_6m: "6개월", rng_ytd: "연초부터", rng_1y: "1년", rng_5y: "5년", rng_max: "전체", chip_half: "50% 이상 할인", chip_onsale: "할인 중",
   empty_none: "해당하는 상품이 없습니다", more: "더 보기",
   sale_note: "※ 통상 가격은 관측 기간 중 최고가입니다. 할인 판정은 Boopa의 수집 데이터에 기반한 추정을 포함합니다.",
-  bt_new: "신착", bt_special: "스페셜", bt_drop: "가격 인하", bt_active: "가격 변동 활발",
+  bt_new: "신착", bt_special: "스페셜", bt_drop: "가격 인하", bt_active: "가격 변동 활발", bt_rising: "급상승", rising_note: "좋아요 {likes} · +{g}/일",
   ft_data: "데이터는 Boopa(BOOTH Price Tracker for VRChat)의 수집 인프라로 모은 실제 데이터입니다. 가격은 관측 시점 기준이며 현재 BOOTH 가격과 다를 수 있습니다.",
   ft_legal: "BoopaDB는 BOOTH 및 pixiv 주식회사와 관계없는 비공식 프로젝트입니다. 모든 시간은 일본 시간(JST)입니다.",
   ft_terms: "이용약관", ft_priv: "개인정보",
@@ -899,7 +915,7 @@ ko: {
   chip_all: "全部", chip_lowest: "历史最低", rng_1d: "1天", rng_5d: "5天", rng_1m: "1个月", rng_6m: "6个月", rng_ytd: "年初至今", rng_1y: "1年", rng_5y: "5年", rng_max: "全部", chip_half: "5折及以上", chip_onsale: "促销中",
   empty_none: "没有符合条件的商品", more: "查看更多",
   sale_note: "※ 原价为观测期内的最高价格。促销判定包含基于 Boopa 采集数据的推测。",
-  bt_new: "新品", bt_special: "特价", bt_drop: "降价", bt_active: "价格变动频繁",
+  bt_new: "新品", bt_special: "特价", bt_drop: "降价", bt_active: "价格变动频繁", bt_rising: "急升", rising_note: "{likes} 赞 · +{g}/日",
   ft_data: "数据为 Boopa（BOOTH Price Tracker for VRChat）采集的真实数据。价格为观测时点的价格，可能与 BOOTH 当前价格不同。",
   ft_legal: "BoopaDB 是与 BOOTH 及 pixiv 株式会社无关的非官方项目。所有时间均为日本时间（JST）。",
   ft_terms: "使用条款", ft_priv: "隐私",
@@ -932,7 +948,7 @@ ko: {
   chip_all: "全部", chip_lowest: "歷史最低", rng_1d: "1天", rng_5d: "5天", rng_1m: "1個月", rng_6m: "6個月", rng_ytd: "年初至今", rng_1y: "1年", rng_5y: "5年", rng_max: "全部", chip_half: "5折及以上", chip_onsale: "促銷中",
   empty_none: "沒有符合條件的商品", more: "查看更多",
   sale_note: "※ 原價為觀測期內的最高價格。促銷判定包含基於 Boopa 採集數據的推測。",
-  bt_new: "新品", bt_special: "特價", bt_drop: "降價", bt_active: "價格變動頻繁",
+  bt_new: "新品", bt_special: "特價", bt_drop: "降價", bt_active: "價格變動頻繁", bt_rising: "急升", rising_note: "{likes} 讚 · +{g}/日",
   ft_data: "數據為 Boopa（BOOTH Price Tracker for VRChat）採集的真實數據。價格為觀測時點的價格，可能與 BOOTH 當前價格不同。",
   ft_legal: "BoopaDB 是與 BOOTH 及 pixiv 株式會社無關的非官方項目。所有時間均為日本時間（JST）。",
   ft_terms: "使用條款", ft_priv: "隱私",
@@ -1065,6 +1081,43 @@ const heroItems = [];
 }
 const track = document.getElementById("heroTrack");
 const dotsEl = document.getElementById("heroDots");
+function heroMetaHTML(x){
+  const likes = typeof x.likes === "number" ? `<span class="pp-likes">${HEART_SVG}<span>${x.likes.toLocaleString()}</span></span>` : "";
+  const tags = Array.isArray(x.tags) && x.tags.length ? x.tags.slice(0, 5).map(t => `<span class="htag">${esc(t)}</span>`).join("") : "";
+  return likes + tags;
+}
+function heroRelHTML(parents, kids, kidTotal){
+  let out = "";
+  if (parents.length) out += `<span class="hrel-g">${tr("pp_parents")}</span>` + parents.map(p => `<a class="htag" href="${itemUrl(p.id)}" target="_blank" rel="noopener">${esc(p.name || "")}</a>`).join("");
+  if (kids.length) out += `<span class="hrel-g">${tr("pp_children")}（${kidTotal}）</span>` + kids.map(p => `<a class="htag" href="${itemUrl(p.id)}" target="_blank" rel="noopener">${esc(p.name || "")}</a>`).join("");
+  return out;
+}
+async function fillHeroMetas(){
+  for (const x of heroItems) {
+    const nodes = () => track.querySelectorAll(`[data-hmeta="${x.id}"]`);
+    try {
+      const m = await fetchMeta(x.id);
+      if (!m) continue;
+      if (typeof m.likes === "number") x.likes = m.likes;
+      if (Array.isArray(m.tags)) x.tags = m.tags;
+      let els = nodes(); if (!els.length) continue;
+      els.forEach(el => { el.innerHTML = heroMetaHTML(x); });
+      const parents = [], kidNames = [];
+      let kidTotal = 0;
+      if (Array.isArray(m.refs)) {
+        for (const pid of m.refs.slice(0, 2)) { const pm = await fetchMeta(pid); if (pm && pm.name) parents.push({id: pid, name: pm.name}); }
+      }
+      const shard = await fetchRelShard(Number(x.id) % 8);
+      const ent = shard && shard[String(x.id)];
+      if (ent) {
+        kidTotal = ent[0];
+        for (const cid of (ent[1] || []).slice(0, 2)) { const cm = await fetchMeta(cid); if (cm && cm.name) kidNames.push({id: cid, name: cm.name}); }
+      }
+      els = nodes(); if (!els.length) continue;
+      els.forEach(el => { el.innerHTML = heroMetaHTML(x) + heroRelHTML(parents, kidNames, kidTotal); });
+    } catch (e) {}
+  }
+}
 function heroSlideHTML(x){
   return `
   <div class="hslide">
@@ -1072,6 +1125,7 @@ function heroSlideHTML(x){
     <div class="hbody">
       <div class="hname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="hsub"><span class="hstatus">${x._status}</span>${x.shop ? `<span class="hshop">${esc(x.shop)}</span>` : ""}</div>
+      <div class="hmeta" data-hmeta="${x.id}">${heroMetaHTML(x)}</div>
       <div class="hprice2">${x._disc > 0 ? `<span class="disc">-${x._disc}%</span>` : ""}${x.base > x.cur ? `<span class="was">${yen(x.base)}</span>` : ""}<span class="price${x.cur === 0 ? " free" : ""}">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
     </div>
   </div>`;
@@ -1081,6 +1135,7 @@ function buildHero(items){
   heroItems.length = 0;
   src.forEach(x => heroItems.push(x));
   track.innerHTML = heroItems.map(heroSlideHTML).join("");
+  fillHeroMetas();
   const first = track.children[0], last = track.children[track.children.length - 1];
   if (first && last){
     const cFirst = first.cloneNode(true); cFirst.dataset.clone = "1"; cFirst.classList.remove("active");
@@ -1255,13 +1310,13 @@ const spIndex = (() => {
 })();
 
 // ---- full-catalog search (search_index.json: every tracked product) ----
-let fullIndex = null, fullIndexLoading = false;
+let fullIndex = null, fullIndexLoading = false, spCatMap = new Map();
 async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
   try {
-    const rs = await Promise.all([0, 1, 2, 3, 4, 5].map(i => fetch("search_index_" + i + ".json?v=20251025-2")));
-    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow]); }
+    const rs = await Promise.all([0, 1, 2, 3, 4, 5].map(i => fetch("search_index_" + i + ".json?v=20251025-3")));
+    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow, cat, likes]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow, String(cat || "").toLowerCase().normalize("NFKC"), likes || 0]); spCatMap = new Map(fullIndex.map(e => [e[0], e[8]])); }
   } catch {}
   fullIndexLoading = false;
   if (fullIndex && spage.classList.contains("open")) spRender(false);
@@ -1326,6 +1381,9 @@ async function fetchItemRecord(id){
       rec.image = m.image_resized || m.image || null;
       if (!rec.shop && m.shop) rec.shop = m.shop.name || "";
       if (m.name) rec.name = m.name;
+      if (typeof m.likes === "number") rec.likes = m.likes;
+      if (Array.isArray(m.tags)) rec.tags = m.tags;
+      if (m.category && m.category.name) rec.category = m.category.name;
     }
   }
   return rec;
@@ -1455,11 +1513,11 @@ function chipSet(filter){
   else if (filter === "free") (F.free || []).forEach(s => add({id: s.id, name: s.name, shop: s.shop, image: s.image, base: s.base, cur: 0, pct: 100, at_lowest: true, kind: "free", sale: !!s.on_sale}));
   else if (filter === "drop") (F.drops || []).forEach(d => add({id: d.id, name: d.name, shop: d.shop, image: d.image, base: d.from, cur: d.to, pct: d.from ? Math.round((1 - d.to / d.from) * 100) : 0, at_lowest: d.at_lowest, kind: "drop", sale: !!d.on_sale}));
   else if (filter === "new") (F.newest || []).forEach(a => add({id: a.id, name: a.name, shop: a.shop, image: a.image, base: a.base, cur: a.cur, pct: pctOf(a), at_lowest: a.at_lowest, first_date: a.first_date, kind: "new", sale: !!a.on_sale}));
-  else if (filter === "active") (F.active || []).forEach(a => add({id: a.id, name: a.name, shop: a.shop, image: a.image, base: a.base, cur: a.cur, pct: pctOf(a), at_lowest: a.at_lowest, changes_recent: a.changes_recent, kind: "active", sale: !!a.on_sale}));
+  else if (filter === "rising") (F.rising || []).forEach(a => add({id: a.id, name: a.name, shop: a.shop, image: a.image, base: a.base, cur: a.cur, pct: pctOf(a), at_lowest: a.at_lowest, likes: a.likes, per_day: a.per_day, kind: "rising", sale: !!a.on_sale}));
   else if (filter === "lowest") {
     (F.on_sale || []).forEach(s => { if (s.at_lowest) add({...s, kind: "sale", sale: true}); });
     (F.drops || []).forEach(d => { if (d.at_lowest) add({id: d.id, name: d.name, shop: d.shop, image: d.image, base: d.from, cur: d.to, pct: d.from ? Math.round((1 - d.to / d.from) * 100) : 0, at_lowest: true, kind: "drop", sale: !!d.on_sale}); });
-    (F.active || []).forEach(a => { if (a.at_lowest) add({id: a.id, name: a.name, shop: a.shop, image: a.image, base: a.base, cur: a.cur, pct: pctOf(a), at_lowest: true, changes_recent: a.changes_recent, kind: "active", sale: !!a.on_sale}); });
+    (F.rising || []).forEach(a => { if (a.at_lowest) add({id: a.id, name: a.name, shop: a.shop, image: a.image, base: a.base, cur: a.cur, pct: pctOf(a), at_lowest: true, likes: a.likes, per_day: a.per_day, kind: "rising", sale: !!a.on_sale}); });
     (F.newest || []).forEach(a => { if (a.at_lowest) add({id: a.id, name: a.name, shop: a.shop, image: a.image, base: a.base, cur: a.cur, pct: pctOf(a), at_lowest: true, first_date: a.first_date, kind: "new", sale: !!a.on_sale}); });
   }
   return [...seen.values()];
@@ -1478,12 +1536,32 @@ function buildShopMap(){
     spShopMap.get(k).push(x);
   };
   spIndex.forEach(add);
-  if (FULL_LISTS) ["sale", "free", "drop", "new", "active", "lowest"].forEach(f => { const set = chipSet(f); if (set) set.forEach(add); });
+  if (FULL_LISTS) ["sale", "free", "drop", "new", "rising", "lowest"].forEach(f => { const set = chipSet(f); if (set) set.forEach(add); });
   spShopMapSrc = FULL_LISTS;
 }
 const SP_CAPS = [500, 1000, 1500, 2000, 3000, 5000, 7000, 10000, 15000, 20000, 30000, 50000];
 let spMaxPrice = null, spPriceT = null;
 function spPriceLabel(){ document.getElementById("spPriceVal").textContent = spMaxPrice == null ? tr("sp_price_any") : tr("sp_price_upto", {n: spMaxPrice.toLocaleString(LOCALE)}); }
+let SP_AFF = null;
+function loadAff(){
+  try {
+    const o = store.get("boopadb_cat_aff", {}) || {};
+    const es = Object.entries(o).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    if (!es.length) { SP_AFF = null; return; }
+    const max = es[0][1];
+    SP_AFF = es.map(([c, n]) => [String(c).toLowerCase().normalize("NFKC"), n / max]);
+  } catch (e) { SP_AFF = null; }
+}
+function spAffRatio(cat){
+  if (!cat || !SP_AFF) return 0;
+  let best = 0;
+  for (const [c, r] of SP_AFF) { if (r > best && (cat.includes(c) || c.includes(cat))) best = r; }
+  return best;
+}
+function spRelSort(a, b){
+  const ea = a._rank - 0.35 * spAffRatio(a._cat), eb = b._rank - 0.35 * spAffRatio(b._cat);
+  return (ea - eb) || ((b._likes || 0) - (a._likes || 0));
+}
 function spRender(reset = true){
   if (reset) spShown = 30;
   const q = document.getElementById("spQ").value.trim().toLowerCase().normalize("NFKC");
@@ -1493,34 +1571,36 @@ function spRender(reset = true){
     if (set) {
       hits = set.filter(x => !q || (x.name + " " + (x.shop || "")).toLowerCase().includes(q));
       if (spFilter === "new") hits.sort((a, b) => (b.first_date || "").localeCompare(a.first_date || ""));
-      if (spFilter === "active") hits.sort((a, b) => (b.changes_recent || 0) - (a.changes_recent || 0));
+      if (spFilter === "rising") hits.sort((a, b) => (b.per_day || 0) - (a.per_day || 0));
     }
   }
   if (!hits && q && spFilter === "all" && fullIndex) {
+    loadAff();
     const rich = new Map(spIndex.map(x => [String(x.id), x]));
     hits = [];
-    for (const [id, name, lower, icur, ibase, ilowest, isale, iatlow] of fullIndex) {
+    for (const [id, name, lower, icur, ibase, ilowest, isale, iatlow, icat, ilikes] of fullIndex) {
       const pos = lower.indexOf(q);
-      if (pos < 0) continue;
+      const catHit = pos < 0 && !!icat && icat.indexOf(q) >= 0;
+      if (pos < 0 && !catHit) continue;
       const r = rich.get(id);
-      if (r) hits.push({...r, _rank: pos === 0 ? 0 : 2});
-      else hits.push({id, name, shop: "", image: null, cur: icur, base: ibase, lowest: ilowest, sale: !!isale, pct: ibase > icur ? Math.round((1 - icur / ibase) * 100) : 0, at_lowest: !!iatlow, plain: icur === null || icur === undefined, _rank: pos === 0 ? 1 : 3});
+      if (r) hits.push({...r, _rank: catHit ? 3.5 : (pos === 0 ? 0 : 2), _likes: r.likes || ilikes || 0, _cat: icat});
+      else hits.push({id, name, shop: "", image: null, cur: icur, base: ibase, lowest: ilowest, sale: !!isale, pct: ibase > icur ? Math.round((1 - icur / ibase) * 100) : 0, at_lowest: !!iatlow, plain: icur === null || icur === undefined, _rank: catHit ? 3.5 : (pos === 0 ? 1 : 3), _likes: ilikes || 0, _cat: icat});
     }
-    hits.sort((a, b) => a._rank - b._rank);
+    hits.sort(spRelSort);
     if (hits.length < 50) {
       const tokens = [...new Set(q.split(/[\s　]+/).filter(Boolean))];
       if (tokens.length >= 2) {
         const have = new Set(hits.map(h => String(h.id)));
         const extra = [];
-        for (const [id, name, lower, cur, base, lowest, isale, atlow] of fullIndex) {
+        for (const [id, name, lower, cur, base, lowest, isale, atlow, icat, ilikes] of fullIndex) {
           if (have.has(String(id))) continue;
           let matched = 0;
-          for (const t of tokens) if (lower.includes(t)) matched++;
+          for (const t of tokens) if (lower.includes(t) || (icat && icat.includes(t))) matched++;
           const r = rich.get(String(id));
-          if (matched === tokens.length) extra.push(r ? {...r, _rank: 4} : {id, name, shop: "", image: null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 4});
-          else if (tokens.length >= 3 && matched >= 3 && matched >= tokens.length - 1) extra.push(r ? {...r, _rank: 5} : {id, name, shop: "", image: null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 5});
+          if (matched === tokens.length) extra.push(r ? {...r, _rank: 4, _likes: r.likes || ilikes || 0, _cat: icat} : {id, name, shop: "", image: null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 4, _likes: ilikes || 0, _cat: icat});
+          else if (tokens.length >= 3 && matched >= 3 && matched >= tokens.length - 1) extra.push(r ? {...r, _rank: 5, _likes: r.likes || ilikes || 0, _cat: icat} : {id, name, shop: "", image: null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 5, _likes: ilikes || 0, _cat: icat});
         }
-        if (extra.length) hits = [...hits, ...extra].sort((a, b) => a._rank - b._rank);
+        if (extra.length) hits = [...hits, ...extra].sort(spRelSort);
       }
     }
     if (spShopMapSrc !== FULL_LISTS) buildShopMap();
@@ -1528,9 +1608,9 @@ function spRender(reset = true){
     const shopHits = [];
     for (const [shopLower, items] of spShopMap) {
       if (!shopLower.includes(q)) continue;
-      for (const x of items) { const id = String(x.id); if (!seenIds.has(id)) { seenIds.add(id); shopHits.push({...x, _rank: 1.5}); } }
+      for (const x of items) { const id = String(x.id); if (!seenIds.has(id)) { seenIds.add(id); shopHits.push({...x, _rank: 1.5, _likes: x.likes || 0, _cat: spCatMap.get(id) || ""}); } }
     }
-    if (shopHits.length) hits = [...hits, ...shopHits].sort((a, b) => a._rank - b._rank);
+    if (shopHits.length) hits = [...hits, ...shopHits].sort(spRelSort);
   } else if (!hits && !q && spFilter === "all" && FULL_LISTS && FULL_LISTS.newest && FULL_LISTS.newest.length) {
     // Landing with no query: keep browsing past the curated sample into
     // the full newest list, so scrolling does not dead-end at 41 items.
@@ -1544,11 +1624,11 @@ function spRender(reset = true){
       if (spFilter === "lowest") return !!x.at_lowest;
       if (spFilter === "free") return x.cur === 0;
       if (spFilter === "new") return !!x.first_date;
-      if (spFilter === "active") return (x.changes_recent || 0) >= 3;
+      if (spFilter === "rising") return (x.per_day || 0) > 0;
       return true;
     });
     if (spFilter === "new") hits = hits.sort((a, b) => (b.first_date || "").localeCompare(a.first_date || ""));
-    if (spFilter === "active") hits = hits.sort((a, b) => (b.changes_recent || 0) - (a.changes_recent || 0));
+    if (spFilter === "rising") hits = hits.sort((a, b) => (b.per_day || 0) - (a.per_day || 0));
   }
   if (!hits) hits = spIndex;
   if (spMaxPrice != null) hits = hits.filter(x => x.cur != null && x.cur <= spMaxPrice);
@@ -1926,12 +2006,13 @@ function dedupeNewest(){
   }
   return out;
 }
+const fmtGain = v => { const n = Number(v) || 0; return n >= 10 ? String(Math.round(n)) : String(Math.round(n * 10) / 10); };
 const BTABS = {
   new: () => dedupeNewest().map(x => bNormFeat(x, "new")),
   sale: () => [...LISTS.on_sale].sort((a,b) => b.pct - a.pct).map(bNormSale),
   drop: () => LISTS.drops.map(bNormDrop),
   free: () => (LISTS.free || LISTS.on_sale.filter(s => s.cur === 0)).map(s => ({...bNormSale(s), sale: s.on_sale !== false, note: tr("note_nowfree"), chips: [tr("free"), ...(s.at_lowest ? [tr("chip_lowest")] : [])]})),
-  active: () => (LISTS.active || []).map(x => bNormFeat(x, "active")),
+  rising: () => (LISTS.rising || []).map(x => ({...bNormSale(x), note: tr("rising_note", {likes: (x.likes || 0).toLocaleString(), g: fmtGain(x.per_day)}), chips: [...(x.at_lowest ? [tr("chip_lowest")] : [])]})),
 };
 let bTab = "new", bItems = [], bShown = 7;
 function browHTML(x, i){
@@ -2025,7 +2106,7 @@ function setBTab(t){
   renderBList();
 }
 document.querySelectorAll("#bTabs .btab").forEach(b => { b.onclick = () => setBTab(b.dataset.bt); });
-const BMORE = {new: "new.html", sale: "sale.html", drop: "drops.html", free: "free.html", active: "active.html"};
+const BMORE = {new: "new.html", sale: "sale.html", drop: "drops.html", free: "free.html", rising: "rising.html"};
 document.getElementById("bMore").onclick = () => { location.href = BMORE[bTab] || "sale.html"; };
 setBTab("new");
 // Full lists swap-in: the home sale section and browse tabs run on the
@@ -2037,6 +2118,7 @@ fetch("lists_full.json?v=20251025-2").then(r => r.ok ? r.json() : null).then(f =
   if (f.drops) LISTS.drops = f.drops;
   if (f.active) LISTS.active = f.active;
   if (f.newest) LISTS.newest = f.newest;
+  if (f.rising) LISTS.rising = f.rising;
   renderFeatFromNewest(f.newest);
   renderHeroFromLists(f);
   if (f.free) LISTS.free = f.free;
@@ -2543,6 +2625,7 @@ function renderProdPage(x){
     <div style="flex:1;min-width:0">
       <div class="pp-name">${esc(x.name)}</div>
       <div class="pp-shop">${esc(x.shop || "")}</div>
+      <div class="pp-meta" id="ppMeta">${ppMetaHTML(x)}</div>
       <div class="bpchips">${x.cur === 0 ? `<span class="bpchip">${tr("free")}</span>` : ""}${x.pct > 0 && x.sale ? `<span class="bpchip">${tr("chip_onsale")} -${x.pct}%</span>` : ""}${x.at_lowest ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}</div>
       <div class="pstats" id="ppStats"></div>
       <div class="pp-actions">
@@ -2565,7 +2648,39 @@ function renderProdPage(x){
   document.getElementById("ppSameSec").style.display = same.length ? "" : "none";
   document.getElementById("ppSame").style.display = same.length ? "" : "none";
   loadRelations(x);
+  fillPPMeta(x);
   prodPage.scrollTop = 0;
+}
+function ppMetaHTML(src){
+  const likes = src && typeof src.likes === "number" ? `<span class="pp-likes">${HEART_SVG}<span>${src.likes.toLocaleString()}</span></span>` : "";
+  const cat = src && src.category ? `<span class="pp-tag cat">${esc(src.category)}</span>` : "";
+  const tags = src && Array.isArray(src.tags) && src.tags.length ? src.tags.map(t => `<span class="pp-tag">${esc(t)}</span>`).join("") : "";
+  return likes + cat + tags;
+}
+function bumpCatAff(cat){
+  if (!cat) return;
+  try {
+    const o = store.get("boopadb_cat_aff", {}) || {};
+    o[cat] = (o[cat] || 0) + 1;
+    let total = 0; for (const k in o) total += o[k];
+    if (total > 300) for (const k in o) o[k] = Math.max(1, Math.round(o[k] / 2));
+    const ks = Object.keys(o);
+    if (ks.length > 40) { ks.sort((a, b) => o[b] - o[a]); for (const k of ks.slice(40)) delete o[k]; }
+    store.set("boopadb_cat_aff", o);
+  } catch (e) {}
+}
+function fillPPMeta(x){
+  let bumped = false;
+  if (x.category) { bumpCatAff(x.category); bumped = true; }
+  if (typeof x.likes === "number" && Array.isArray(x.tags) && x.category) return;
+  fetchMeta(x.id).then(m => {
+    if (!m || ppX !== x) return;
+    if (typeof m.likes === "number") x.likes = m.likes;
+    if (Array.isArray(m.tags)) x.tags = m.tags;
+    if (m.category && m.category.name) { x.category = m.category.name; if (!bumped) bumpCatAff(m.category.name); }
+    const el = document.getElementById("ppMeta");
+    if (el) el.innerHTML = ppMetaHTML(x);
+  }).catch(() => {});
 }
 function toggleBm(x){
   if (isBm(x.id)) BMS = BMS.filter(b => String(b.id) !== String(x.id));

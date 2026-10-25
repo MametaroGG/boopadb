@@ -346,7 +346,16 @@
   .rib.sale{background:#e04347}
   .rib.act{background:#3a3a41}
   .rib.new{background:var(--accent);color:#fff}
-  .hslide .rib{left:-6px;bottom:-6px;border-radius:0;padding:3px 12px 9px 18px;box-shadow:none}
+  .hslide .rib{left:0;bottom:0;border-radius:0;padding:3px 12px;box-shadow:none}
+  @media (min-width:900px){.hslide .rib{border-bottom-left-radius:14px}}
+  .hslide .himg img{border-radius:inherit}
+  .hmeta{display:none}
+  @media (min-width:900px){.hmeta{display:flex;flex-wrap:wrap;gap:6px 7px;align-items:center;margin-top:12px}}
+  .htag{background:#26262c;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:600}
+  a.htag{color:var(--sub);text-decoration:none;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  a.htag:hover{color:var(--text)}
+  .hrel-g{font-size:11px;font-weight:800;color:var(--sub);margin-left:6px}
+  html[data-theme="light"] .htag{background:#ececf1}
   .fnote2{font-size:12px;color:var(--faint);margin:-8px 0 10px}
   .ftag{position:absolute;top:-1px;left:-1px;background:rgba(23,23,26,.88);color:#fff;font-size:11px;line-height:1.3;font-weight:800;letter-spacing:.05em;padding:4px 8px 4px;z-index:2;pointer-events:none}
   .ftag.new{background:#fc4d50}
@@ -368,6 +377,13 @@
   @media (max-width:640px){.pp-top{flex-direction:column}.pp-imgwrap{flex:none;width:100%}}
   .pp-name{font-size:19px;font-weight:800;line-height:1.45}
   .pp-shop{font-size:13px;color:var(--sub);margin-top:3px}
+  .pp-meta{display:flex;align-items:center;gap:7px 8px;flex-wrap:wrap;margin-top:10px}
+  .pp-likes{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;margin-right:6px}
+  .pp-likes svg{width:15px;height:15px;fill:none;stroke:#f2506e;stroke-width:2}
+  .pp-tag{background:#1d1d22;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600}
+  .pp-tag.cat{border-color:rgba(200,236,110,.5);color:#c8ec6e}
+  html[data-theme="light"] .pp-tag{background:#ececf1}
+  html[data-theme="light"] .pp-tag.cat{color:#4c7a1f;border-color:rgba(76,122,31,.5)}
   .pp-actions{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
   .pp-booth{background:#e04347;color:#fff;font-weight:700;font-size:13.5px;padding:9px 18px;border-radius:8px;text-decoration:none}
   .pp-bmbtn{background:#232329;color:var(--text);border:1px solid var(--border2);font-weight:700;font-size:13.5px;line-height:1;padding:9px 16px;border-radius:8px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:7px;width:200px;box-sizing:border-box}
@@ -768,7 +784,7 @@ ja: {
   rk_tab_amount: "割引額", rk_tab_pct: "割引率",
   priv_title: "プライバシーポリシー", priv_sub: "BoopaDB のプライバシーポリシー",
   terms_sub: "BoopaDB の利用規約",
-  bt_active: "価格変更が活発", pg_new_sub: "最近収録された商品 · {d} 時点", pg_free_sub: "現在無料の商品（元¥100以上） · {n} 件", pg_drops_sub: "直近3週間の値下げ · {n} 件", pg_active_sub: "直近3週間に価格変更があった商品 · {n} 件", bm_title: "ブックマーク", bm_sub: "このブラウザに保存されたブックマーク · {n} 件", bm_empty: "ブックマークはまだありません。商品ページのブックマークボタンから追加できます。", bm_remove: "解除", bm_search_ph: "名前・ショップ名で検索", bm_nomatch: "一致するブックマークがありません", bm_options: "オプション", al_close: "閉じる", th_toggle: "テーマ切替", al_prev: "前へ", al_next: "次へ", bm_sort_label: "並べ替え条件", bm_sort_added_desc: "追加日（新しい順）", bm_sort_added_asc: "追加日（古い順）", bm_sort_name: "名前", bm_sort_price_asc: "価格（安い順）", bm_sort_price_desc: "価格（高い順）", bm_sort_discount: "割引率", bm_f_discount: "割引", bm_f_all: "すべてのアイテム", bm_f_sale: "セール中のみ", bm_f_50: "50%以上", bm_f_75: "75%以上", bm_f_price_t: "価格", bm_f_free: "無料のみ",  added_on: "{d} 収録", recent3w: "直近3週間で {n} 回の価格変更", dropped_on: "{d} に値下げ", more: "もっと見る", loading: "読み込み中…",
+  bt_active: "価格変更が活発", bt_rising: "急上昇", pg_rising_sub: "新着30日以内でいいねが急上昇中 · {n} 件", rising_note: "いいね {likes} · +{g}/日", pg_new_sub: "最近収録された商品 · {d} 時点", pg_free_sub: "現在無料の商品（元¥100以上） · {n} 件", pg_drops_sub: "直近3週間の値下げ · {n} 件", pg_active_sub: "直近3週間に価格変更があった商品 · {n} 件", bm_title: "ブックマーク", bm_sub: "このブラウザに保存されたブックマーク · {n} 件", bm_empty: "ブックマークはまだありません。商品ページのブックマークボタンから追加できます。", bm_remove: "解除", bm_search_ph: "名前・ショップ名で検索", bm_nomatch: "一致するブックマークがありません", bm_options: "オプション", al_close: "閉じる", th_toggle: "テーマ切替", al_prev: "前へ", al_next: "次へ", bm_sort_label: "並べ替え条件", bm_sort_added_desc: "追加日（新しい順）", bm_sort_added_asc: "追加日（古い順）", bm_sort_name: "名前", bm_sort_price_asc: "価格（安い順）", bm_sort_price_desc: "価格（高い順）", bm_sort_discount: "割引率", bm_f_discount: "割引", bm_f_all: "すべてのアイテム", bm_f_sale: "セール中のみ", bm_f_50: "50%以上", bm_f_75: "75%以上", bm_f_price_t: "価格", bm_f_free: "無料のみ",  added_on: "{d} 収録", recent3w: "直近3週間で {n} 回の価格変更", dropped_on: "{d} に値下げ", more: "もっと見る", loading: "読み込み中…",
   legal_note: "",
 },
 en: {
@@ -791,7 +807,7 @@ en: {
   rk_tab_amount: "Amount saved", rk_tab_pct: "Discount %",
   priv_title: "Privacy Policy", priv_sub: "Privacy policy of BoopaDB",
   terms_sub: "Terms of use of BoopaDB",
-  bt_active: "Frequently repriced", pg_new_sub: "Recently tracked products · as of {d}", pg_free_sub: "Free now (originally ¥100+) · {n} items", pg_drops_sub: "Price drops in the last 3 weeks · {n} items", pg_active_sub: "Products with price changes in the last 3 weeks · {n} items", bm_title: "Bookmarks", bm_sub: "Bookmarks saved in this browser · {n} items", bm_empty: "No bookmarks yet. Add them from the bookmark button on a product page.", bm_remove: "Remove", bm_search_ph: "Search by name or shop", bm_nomatch: "No matching bookmarks.", bm_options: "Options", al_close: "Close", th_toggle: "Toggle theme", al_prev: "Previous", al_next: "Next", bm_sort_label: "Sort by", bm_sort_added_desc: "Date added (newest)", bm_sort_added_asc: "Date added (oldest)", bm_sort_name: "Name", bm_sort_price_asc: "Price (low to high)", bm_sort_price_desc: "Price (high to low)", bm_sort_discount: "Discount", bm_f_discount: "Discount", bm_f_all: "All items", bm_f_sale: "On sale only", bm_f_50: "50% or more", bm_f_75: "75% or more", bm_f_price_t: "Price", bm_f_free: "Free only",  added_on: "Tracked {d}", recent3w: "{n} price changes in the last 3 weeks", dropped_on: "Dropped on {d}", more: "Show more", loading: "Loading…",
+  bt_active: "Frequently repriced", bt_rising: "Trending", pg_rising_sub: "New in the last 30 days, likes rising fast · {n} items", rising_note: "{likes} likes · +{g}/day", pg_new_sub: "Recently tracked products · as of {d}", pg_free_sub: "Free now (originally ¥100+) · {n} items", pg_drops_sub: "Price drops in the last 3 weeks · {n} items", pg_active_sub: "Products with price changes in the last 3 weeks · {n} items", bm_title: "Bookmarks", bm_sub: "Bookmarks saved in this browser · {n} items", bm_empty: "No bookmarks yet. Add them from the bookmark button on a product page.", bm_remove: "Remove", bm_search_ph: "Search by name or shop", bm_nomatch: "No matching bookmarks.", bm_options: "Options", al_close: "Close", th_toggle: "Toggle theme", al_prev: "Previous", al_next: "Next", bm_sort_label: "Sort by", bm_sort_added_desc: "Date added (newest)", bm_sort_added_asc: "Date added (oldest)", bm_sort_name: "Name", bm_sort_price_asc: "Price (low to high)", bm_sort_price_desc: "Price (high to low)", bm_sort_discount: "Discount", bm_f_discount: "Discount", bm_f_all: "All items", bm_f_sale: "On sale only", bm_f_50: "50% or more", bm_f_75: "75% or more", bm_f_price_t: "Price", bm_f_free: "Free only",  added_on: "Tracked {d}", recent3w: "{n} price changes in the last 3 weeks", dropped_on: "Dropped on {d}", more: "Show more", loading: "Loading…",
   legal_note: "This document is provided in Japanese only; the Japanese version is authoritative.",
 },
 ko: {
@@ -814,7 +830,7 @@ ko: {
   rk_tab_amount: "할인액", rk_tab_pct: "할인율",
   priv_title: "개인정보 처리방침", priv_sub: "BoopaDB의 개인정보 처리방침",
   terms_sub: "BoopaDB의 이용약관",
-  bt_active: "가격 변동 활발", pg_new_sub: "최근 수집된 상품 · {d} 기준", pg_free_sub: "현재 무료 상품(기존 ¥100 이상) · {n}건", pg_drops_sub: "최근 3주간 가격 인하 · {n}건", pg_active_sub: "최근 3주간 가격 변동이 있던 상품 · {n}건", bm_title: "북마크", bm_sub: "이 브라우저에 저장된 북마크 · {n}건", bm_empty: "아직 북마크가 없습니다. 상품 페이지의 북마크 버튼으로 추가할 수 있습니다.", bm_remove: "해제", bm_search_ph: "이름·샵 이름으로 검색", bm_nomatch: "일치하는 북마크가 없습니다.", bm_options: "옵션", al_close: "닫기", th_toggle: "테마 전환", al_prev: "이전", al_next: "다음", bm_sort_label: "정렬 조건", bm_sort_added_desc: "추가일(최신순)", bm_sort_added_asc: "추가일(오래된순)", bm_sort_name: "이름", bm_sort_price_asc: "가격(낮은순)", bm_sort_price_desc: "가격(높은순)", bm_sort_discount: "할인율", bm_f_discount: "할인", bm_f_all: "모든 아이템", bm_f_sale: "세일 중만", bm_f_50: "50% 이상", bm_f_75: "75% 이상", bm_f_price_t: "가격", bm_f_free: "무료만",  added_on: "{d} 수집", recent3w: "최근 3주간 가격 변경 {n}회", dropped_on: "{d} 가격 인하", more: "더 보기", loading: "로딩 중…",
+  bt_active: "가격 변동 활발", bt_rising: "급상승", pg_rising_sub: "최근 30일 신착, 좋아요 급상승 · {n}건", rising_note: "좋아요 {likes} · +{g}/일", pg_new_sub: "최근 수집된 상품 · {d} 기준", pg_free_sub: "현재 무료 상품(기존 ¥100 이상) · {n}건", pg_drops_sub: "최근 3주간 가격 인하 · {n}건", pg_active_sub: "최근 3주간 가격 변동이 있던 상품 · {n}건", bm_title: "북마크", bm_sub: "이 브라우저에 저장된 북마크 · {n}건", bm_empty: "아직 북마크가 없습니다. 상품 페이지의 북마크 버튼으로 추가할 수 있습니다.", bm_remove: "해제", bm_search_ph: "이름·샵 이름으로 검색", bm_nomatch: "일치하는 북마크가 없습니다.", bm_options: "옵션", al_close: "닫기", th_toggle: "테마 전환", al_prev: "이전", al_next: "다음", bm_sort_label: "정렬 조건", bm_sort_added_desc: "추가일(최신순)", bm_sort_added_asc: "추가일(오래된순)", bm_sort_name: "이름", bm_sort_price_asc: "가격(낮은순)", bm_sort_price_desc: "가격(높은순)", bm_sort_discount: "할인율", bm_f_discount: "할인", bm_f_all: "모든 아이템", bm_f_sale: "세일 중만", bm_f_50: "50% 이상", bm_f_75: "75% 이상", bm_f_price_t: "가격", bm_f_free: "무료만",  added_on: "{d} 수집", recent3w: "최근 3주간 가격 변경 {n}회", dropped_on: "{d} 가격 인하", more: "더 보기", loading: "로딩 중…",
   legal_note: "이 문서는 일본어로만 제공되며, 일본어 버전이 정본입니다.",
 },
 "zh-Hans": {
@@ -837,7 +853,7 @@ ko: {
   rk_tab_amount: "优惠金额", rk_tab_pct: "折扣率",
   priv_title: "隐私政策", priv_sub: "BoopaDB 的隐私政策",
   terms_sub: "BoopaDB 的使用条款",
-  bt_active: "价格变动频繁", pg_new_sub: "最近收录的商品 · 截至 {d}", pg_free_sub: "当前免费的商品（原价 ¥100 以上）· {n} 件", pg_drops_sub: "近 3 周的降价 · {n} 件", pg_active_sub: "近 3 周有价格变动的商品 · {n} 件", bm_title: "收藏", bm_sub: "保存在此浏览器中的收藏 · {n} 件", bm_empty: "还没有收藏。可在商品页面点击收藏按钮添加。", bm_remove: "取消", bm_search_ph: "按名称·店铺搜索", bm_nomatch: "没有匹配的收藏。", bm_options: "选项", al_close: "关闭", th_toggle: "切换主题", al_prev: "上一个", al_next: "下一个", bm_sort_label: "排序条件", bm_sort_added_desc: "添加日期（最新）", bm_sort_added_asc: "添加日期（最早）", bm_sort_name: "名称", bm_sort_price_asc: "价格（从低到高）", bm_sort_price_desc: "价格（从高到低）", bm_sort_discount: "折扣", bm_f_discount: "折扣", bm_f_all: "全部商品", bm_f_sale: "仅促销中", bm_f_50: "50% 以上", bm_f_75: "75% 以上", bm_f_price_t: "价格", bm_f_free: "仅免费",  added_on: "{d} 收录", recent3w: "近 3 周价格变动 {n} 次", dropped_on: "{d} 降价", more: "查看更多", loading: "加载中…",
+  bt_active: "价格变动频繁", bt_rising: "急升", pg_rising_sub: "近30天新品，点赞急升 · {n} 件", rising_note: "{likes} 赞 · +{g}/日", pg_new_sub: "最近收录的商品 · 截至 {d}", pg_free_sub: "当前免费的商品（原价 ¥100 以上）· {n} 件", pg_drops_sub: "近 3 周的降价 · {n} 件", pg_active_sub: "近 3 周有价格变动的商品 · {n} 件", bm_title: "收藏", bm_sub: "保存在此浏览器中的收藏 · {n} 件", bm_empty: "还没有收藏。可在商品页面点击收藏按钮添加。", bm_remove: "取消", bm_search_ph: "按名称·店铺搜索", bm_nomatch: "没有匹配的收藏。", bm_options: "选项", al_close: "关闭", th_toggle: "切换主题", al_prev: "上一个", al_next: "下一个", bm_sort_label: "排序条件", bm_sort_added_desc: "添加日期（最新）", bm_sort_added_asc: "添加日期（最早）", bm_sort_name: "名称", bm_sort_price_asc: "价格（从低到高）", bm_sort_price_desc: "价格（从高到低）", bm_sort_discount: "折扣", bm_f_discount: "折扣", bm_f_all: "全部商品", bm_f_sale: "仅促销中", bm_f_50: "50% 以上", bm_f_75: "75% 以上", bm_f_price_t: "价格", bm_f_free: "仅免费",  added_on: "{d} 收录", recent3w: "近 3 周价格变动 {n} 次", dropped_on: "{d} 降价", more: "查看更多", loading: "加载中…",
   legal_note: "本文档仅提供日文版，以日文版为准。",
 },
 "zh-Hant": {
@@ -860,7 +876,7 @@ ko: {
   rk_tab_amount: "優惠金額", rk_tab_pct: "折扣率",
   priv_title: "隱私政策", priv_sub: "BoopaDB 的隱私政策",
   terms_sub: "BoopaDB 的使用條款",
-  bt_active: "價格變動頻繁", pg_new_sub: "最近收錄的商品 · 截至 {d}", pg_free_sub: "目前免費的商品（原價 ¥100 以上）· {n} 件", pg_drops_sub: "近 3 週的降價 · {n} 件", pg_active_sub: "近 3 週有價格變動的商品 · {n} 件", bm_title: "收藏", bm_sub: "儲存在此瀏覽器中的收藏 · {n} 件", bm_empty: "還沒有收藏。可在商品頁面點擊收藏按鈕添加。", bm_remove: "取消", bm_search_ph: "按名稱·店鋪搜尋", bm_nomatch: "沒有符合的收藏。", bm_options: "選項", al_close: "關閉", th_toggle: "切換主題", al_prev: "上一個", al_next: "下一個", bm_sort_label: "排序條件", bm_sort_added_desc: "新增日期（最新）", bm_sort_added_asc: "新增日期（最早）", bm_sort_name: "名稱", bm_sort_price_asc: "價格（由低到高）", bm_sort_price_desc: "價格（由高到低）", bm_sort_discount: "折扣", bm_f_discount: "折扣", bm_f_all: "全部商品", bm_f_sale: "僅促銷中", bm_f_50: "50% 以上", bm_f_75: "75% 以上", bm_f_price_t: "價格", bm_f_free: "僅免費",  added_on: "{d} 收錄", recent3w: "近 3 週價格變動 {n} 次", dropped_on: "{d} 降價", more: "查看更多", loading: "載入中…",
+  bt_active: "價格變動頻繁", bt_rising: "急升", pg_rising_sub: "近30天新品，讚數急升 · {n} 件", rising_note: "{likes} 讚 · +{g}/日", pg_new_sub: "最近收錄的商品 · 截至 {d}", pg_free_sub: "目前免費的商品（原價 ¥100 以上）· {n} 件", pg_drops_sub: "近 3 週的降價 · {n} 件", pg_active_sub: "近 3 週有價格變動的商品 · {n} 件", bm_title: "收藏", bm_sub: "儲存在此瀏覽器中的收藏 · {n} 件", bm_empty: "還沒有收藏。可在商品頁面點擊收藏按鈕添加。", bm_remove: "取消", bm_search_ph: "按名稱·店鋪搜尋", bm_nomatch: "沒有符合的收藏。", bm_options: "選項", al_close: "關閉", th_toggle: "切換主題", al_prev: "上一個", al_next: "下一個", bm_sort_label: "排序條件", bm_sort_added_desc: "新增日期（最新）", bm_sort_added_asc: "新增日期（最早）", bm_sort_name: "名稱", bm_sort_price_asc: "價格（由低到高）", bm_sort_price_desc: "價格（由高到低）", bm_sort_discount: "折扣", bm_f_discount: "折扣", bm_f_all: "全部商品", bm_f_sale: "僅促銷中", bm_f_50: "50% 以上", bm_f_75: "75% 以上", bm_f_price_t: "價格", bm_f_free: "僅免費",  added_on: "{d} 收錄", recent3w: "近 3 週價格變動 {n} 次", dropped_on: "{d} 降價", more: "查看更多", loading: "載入中…",
   legal_note: "本文件僅提供日文版，以日文版為準。",
 },
 };
