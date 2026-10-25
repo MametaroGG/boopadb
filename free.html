@@ -1096,5 +1096,76 @@ pgRender();
 loadFull().then(f => { if (f && f.free) { pgItems = f.free; pgShown = 60; document.getElementById("subStats").textContent = tr("pg_free_sub", {n: pgItems.length}); pgRender(); } });
 
 </script>
+<!-- stats snippet: keep the three copies in sync (build_prototype.py, build_pages_extra.py, build_sale.py) -->
+<style>.site-stats{text-align:center;font-size:12px;color:#8b8b94;padding:10px 12px 2px;letter-spacing:.02em}html[data-theme="light"] .site-stats{color:#6d6d76}</style>
+<script>
+(function () {
+  var API = "https://nucbox-m7.tailb48431.ts.net";
+  var vid = null;
+  try {
+    vid = localStorage.getItem("boopadb_vid");
+    if (!vid) {
+      vid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : "v" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("boopadb_vid", vid);
+    }
+  } catch (e) {}
+  function post(path) {
+    try {
+      var body = JSON.stringify({ v: vid });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(API + path, new Blob([body], { type: "text/plain;charset=UTF-8" }));
+      } else {
+        fetch(API + path, { method: "POST", body: body, headers: { "Content-Type": "text/plain" }, keepalive: true }).catch(function () {});
+      }
+    } catch (e) {}
+  }
+  post("/pv");
+  function ping() { if (!document.hidden) post("/ping"); }
+  ping();
+  setInterval(ping, 25000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) ping(); });
+  function markInstall() {
+    try {
+      if (localStorage.getItem("boopadb_installed")) return;
+      localStorage.setItem("boopadb_installed", "1");
+    } catch (e) {}
+    post("/install");
+  }
+  window.addEventListener("appinstalled", markInstall);
+  try {
+    if ((window.matchMedia && matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone) markInstall();
+  } catch (e) {}
+  var L = {
+    ja: ["総アクセス", "今日", "現在オンライン", "インストール"],
+    en: ["Total views", "Today", "Online now", "Installs"],
+    ko: ["총 조회수", "오늘", "현재 접속", "설치"],
+    "zh-Hans": ["总访问量", "今日", "当前在线", "安装"],
+    "zh-Hant": ["總瀏覽量", "今日", "目前線上", "安裝"]
+  };
+  var lang = "ja";
+  try { lang = localStorage.getItem("boopadb_lang") || navigator.language || "ja"; } catch (e) {}
+  if (!L[lang]) {
+    if (lang.indexOf("zh") === 0) lang = (lang.indexOf("TW") > -1 || lang.indexOf("HK") > -1 || lang.indexOf("Hant") > -1) ? "zh-Hant" : "zh-Hans";
+    else lang = L[lang.slice(0, 2)] ? lang.slice(0, 2) : "ja";
+  }
+  var lab = L[lang] || L.ja;
+  function fmt(n) { return Number(n || 0).toLocaleString("en-US"); }
+  function render() {
+    fetch(API + "/stats").then(function (r) { return r.json(); }).then(function (s) {
+      var el = document.getElementById("siteStats");
+      if (!el) {
+        el = document.createElement("div");
+        el.id = "siteStats";
+        el.className = "site-stats";
+        var f = document.querySelector("footer");
+        if (f) f.appendChild(el); else document.body.appendChild(el);
+      }
+      el.textContent = lab[0] + " " + fmt(s.total_pv) + " ・ " + lab[1] + " " + fmt(s.today_pv) + " ・ " + lab[2] + " " + fmt(s.online) + " ・ " + lab[3] + " " + fmt(s.installs);
+    }).catch(function () {});
+  }
+  render();
+  setInterval(render, 60000);
+})();
+</script>
 </body>
 </html>
