@@ -1309,6 +1309,12 @@ function openSearch(){
   setTimeout(() => document.getElementById("spQ").focus(), 380);
 }
 function closeSearch(){
+  // Leaving search clears the relation/category filter modes, so the
+  // next visit starts unfiltered instead of staying trapped in them.
+  if (spRelId || spRelIds || spCatMode) {
+    spRelId = null; spRelIds = null; spRelName = ""; spCatMode = null; spCatSync();
+    try { history.replaceState(null, "", location.pathname); } catch {}
+  }
   spSideSet(false);
   spage.classList.remove("open");
   document.body.style.overflow = "";
