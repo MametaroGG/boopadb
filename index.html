@@ -88,6 +88,7 @@
   .cshop{font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .clikes{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--sub);margin-top:3px}
   .clikes svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2}
+  svg.hico{width:11px;height:11px;fill:none;stroke:#f2506e;stroke-width:2;vertical-align:-1px;margin-right:3px}
   .pp-more{display:block;margin:12px auto 2px;background:none;border:1px solid var(--border);color:var(--text);border-radius:99px;padding:7px 24px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
   .crow{margin-top:auto;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   .crow .price.solo{display:inline-flex;align-items:center;height:26px;background:#26262c;padding:0 8px;font-size:16px;font-weight:600}
@@ -839,7 +840,7 @@ ja: {
   chip_all: "すべて", chip_lowest: "過去最安値", rng_1d: "1日", rng_5d: "5日", rng_1m: "1か月", rng_6m: "6か月", rng_ytd: "年来初", rng_1y: "1年", rng_5y: "5年", rng_max: "最大", chip_half: "50%OFF以上", chip_onsale: "セール中",
   empty_none: "該当する商品がありません", more: "もっと見る",
   sale_note: "※ 通常価格は観測期間中の最高価格。セール判定はBoopaの収集データに基づく推定を含みます。",
-  bt_new: "新着", bt_special: "スペシャル", bt_drop: "値下げ", bt_active: "価格変更が活発", bt_rising: "急上昇", rising_note: "いいね {likes} · +{g}/日",
+  bt_new: "新着", bt_special: "スペシャル", bt_drop: "値下げ", bt_active: "価格変更が活発", bt_rising: "急上昇", rising_note: "{likes} · +{g}/日",
   ft_data: "データは Boopa（BOOTH Price Tracker for VRChat）の収集基盤による実データです。価格は観測時点のもので、現在のBOOTH上の価格と異なる場合があります。",
   ft_legal: "BoopaDB は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。",
   ft_terms: "利用規約", ft_priv: "プライバシー",
@@ -872,7 +873,7 @@ en: {
   chip_all: "All", chip_lowest: "Lowest ever", rng_1d: "1D", rng_5d: "5D", rng_1m: "1M", rng_6m: "6M", rng_ytd: "YTD", rng_1y: "1Y", rng_5y: "5Y", rng_max: "Max", chip_half: "50% off or more", chip_onsale: "On sale",
   empty_none: "No matching products", more: "See more",
   sale_note: "* Regular price is the highest observed price. Sale status includes estimates based on Boopa's collected data.",
-  bt_new: "New", bt_special: "Specials", bt_drop: "Price drops", bt_active: "Frequent price changes", bt_rising: "Trending", rising_note: "{likes} likes · +{g}/day",
+  bt_new: "New", bt_special: "Specials", bt_drop: "Price drops", bt_active: "Frequent price changes", bt_rising: "Trending", rising_note: "{likes} · +{g}/day",
   ft_data: "Data is real, collected by Boopa (BOOTH Price Tracker for VRChat). Prices are as observed and may differ from current BOOTH prices.",
   ft_legal: "BoopaDB is an unofficial project, not affiliated with BOOTH or pixiv Inc. All times are Japan Standard Time (JST).",
   ft_terms: "Terms", ft_priv: "Privacy",
@@ -905,7 +906,7 @@ ko: {
   chip_all: "전체", chip_lowest: "역대 최저가", rng_1d: "1일", rng_5d: "5일", rng_1m: "1개월", rng_6m: "6개월", rng_ytd: "연초부터", rng_1y: "1년", rng_5y: "5년", rng_max: "전체", chip_half: "50% 이상 할인", chip_onsale: "할인 중",
   empty_none: "해당하는 상품이 없습니다", more: "더 보기",
   sale_note: "※ 통상 가격은 관측 기간 중 최고가입니다. 할인 판정은 Boopa의 수집 데이터에 기반한 추정을 포함합니다.",
-  bt_new: "신착", bt_special: "스페셜", bt_drop: "가격 인하", bt_active: "가격 변동 활발", bt_rising: "급상승", rising_note: "좋아요 {likes} · +{g}/일",
+  bt_new: "신착", bt_special: "스페셜", bt_drop: "가격 인하", bt_active: "가격 변동 활발", bt_rising: "급상승", rising_note: "{likes} · +{g}/일",
   ft_data: "데이터는 Boopa(BOOTH Price Tracker for VRChat)의 수집 인프라로 모은 실제 데이터입니다. 가격은 관측 시점 기준이며 현재 BOOTH 가격과 다를 수 있습니다.",
   ft_legal: "BoopaDB는 BOOTH 및 pixiv 주식회사와 관계없는 비공식 프로젝트입니다. 모든 시간은 일본 시간(JST)입니다.",
   ft_terms: "이용약관", ft_priv: "개인정보",
@@ -938,7 +939,7 @@ ko: {
   chip_all: "全部", chip_lowest: "历史最低", rng_1d: "1天", rng_5d: "5天", rng_1m: "1个月", rng_6m: "6个月", rng_ytd: "年初至今", rng_1y: "1年", rng_5y: "5年", rng_max: "全部", chip_half: "5折及以上", chip_onsale: "促销中",
   empty_none: "没有符合条件的商品", more: "查看更多",
   sale_note: "※ 原价为观测期内的最高价格。促销判定包含基于 Boopa 采集数据的推测。",
-  bt_new: "新品", bt_special: "特价", bt_drop: "降价", bt_active: "价格变动频繁", bt_rising: "急升", rising_note: "{likes} 赞 · +{g}/日",
+  bt_new: "新品", bt_special: "特价", bt_drop: "降价", bt_active: "价格变动频繁", bt_rising: "急升", rising_note: "{likes} · +{g}/日",
   ft_data: "数据为 Boopa（BOOTH Price Tracker for VRChat）采集的真实数据。价格为观测时点的价格，可能与 BOOTH 当前价格不同。",
   ft_legal: "BoopaDB 是与 BOOTH 及 pixiv 株式会社无关的非官方项目。所有时间均为日本时间（JST）。",
   ft_terms: "使用条款", ft_priv: "隐私",
@@ -971,7 +972,7 @@ ko: {
   chip_all: "全部", chip_lowest: "歷史最低", rng_1d: "1天", rng_5d: "5天", rng_1m: "1個月", rng_6m: "6個月", rng_ytd: "年初至今", rng_1y: "1年", rng_5y: "5年", rng_max: "全部", chip_half: "5折及以上", chip_onsale: "促銷中",
   empty_none: "沒有符合條件的商品", more: "查看更多",
   sale_note: "※ 原價為觀測期內的最高價格。促銷判定包含基於 Boopa 採集數據的推測。",
-  bt_new: "新品", bt_special: "特價", bt_drop: "降價", bt_active: "價格變動頻繁", bt_rising: "急升", rising_note: "{likes} 讚 · +{g}/日",
+  bt_new: "新品", bt_special: "特價", bt_drop: "降價", bt_active: "價格變動頻繁", bt_rising: "急升", rising_note: "{likes} · +{g}/日",
   ft_data: "數據為 Boopa（BOOTH Price Tracker for VRChat）採集的真實數據。價格為觀測時點的價格，可能與 BOOTH 當前價格不同。",
   ft_legal: "BoopaDB 是與 BOOTH 及 pixiv 株式會社無關的非官方項目。所有時間均為日本時間（JST）。",
   ft_terms: "使用條款", ft_priv: "隱私",
@@ -2140,7 +2141,7 @@ const BTABS = {
   sale: () => [...LISTS.on_sale].sort((a,b) => b.pct - a.pct).map(bNormSale),
   drop: () => LISTS.drops.map(bNormDrop),
   free: () => (LISTS.free || LISTS.on_sale.filter(s => s.cur === 0)).map(s => ({...bNormSale(s), sale: s.on_sale !== false, note: tr("note_nowfree"), chips: [tr("free"), ...(s.at_lowest ? [tr("chip_lowest")] : [])]})),
-  rising: () => (LISTS.rising || []).map(x => ({...bNormSale(x), note: tr("rising_note", {likes: (x.likes || 0).toLocaleString(), g: fmtGain(x.per_day)}), chips: [...(x.at_lowest ? [tr("chip_lowest")] : [])]})),
+  rising: () => (LISTS.rising || []).map(x => ({...bNormSale(x), note: HEART_SVG.replace("<svg", '<svg class="hico"') + tr("rising_note", {likes: (x.likes || 0).toLocaleString(), g: fmtGain(x.per_day)}), chips: [...(x.at_lowest ? [tr("chip_lowest")] : [])]})),
 };
 let bTab = "new", bItems = [], bShown = 7;
 function browHTML(x, i){
