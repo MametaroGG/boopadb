@@ -1642,7 +1642,7 @@ async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
   try {
-    const rs = await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => fetch("search_index_" + i + ".json?v=20251025-7")));
+    const rs = await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => fetch("search_index_" + i + ".json?v=20251025-8")));
     if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow, cat, likes, img, fd, pd]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow, String(cat || "").toLowerCase().normalize("NFKC"), likes || 0, pxImg(img), fd || 0, pd || 0]); spCatMap = new Map(fullIndex.map(e => [e[0], e[8]])); for (const row of raw) { const c = row[7]; if (c) { const k = String(c).toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, String(c)); } } if (typeof spCatRender === "function") spCatRender(); spEnrichFromIndex(); }
   } catch {}
   fullIndexLoading = false;
@@ -1755,7 +1755,7 @@ const _relShardCache = {};
 const RELATIONS_LIVE = false;
 function fetchRelShard(n){
   if (!RELATIONS_LIVE) return Promise.resolve({});
-  if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json?v=20251025-7").then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json?v=20251025-8").then(r => r.ok ? r.json() : {}).catch(() => ({}));
   return _relShardCache[n];
 }
 const HEART_SVG = '<svg viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.1a5 5 0 1 1 7.5 6.5z"/></svg>';
@@ -2627,7 +2627,7 @@ setBTab("new");
 // Full lists swap-in: the home sale section and browse tabs run on the
 // whole catalog once lists_full.json arrives (the sample paints first).
 function loadFullLists(n){
-  fetch("lists_full.json?v=20251025-4").then(r => { if (!r.ok) throw new Error("lists"); return r.json(); }).then(f => {
+  fetch("lists_full.json?v=20251025-5").then(r => { if (!r.ok) throw new Error("lists"); return r.json(); }).then(f => {
   FULL_LISTS = f; FULL_OK = true;
   spEnrichFromLists();
   if (fullIndex) spEnrichFromIndex();
