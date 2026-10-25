@@ -544,6 +544,32 @@
   .down{color:#a4d007;font-weight:700}
   .up{color:#fc4d50;font-weight:700}
   .prow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+  .pmods{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(430px,100%),1fr));gap:28px}
+  .pmod-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .pmod-h h2{margin:0}
+  .bmmore{flex:none;background:#dcdce1;color:#17171a;font-weight:700;font-size:12.5px;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;text-decoration:none;font-family:inherit}
+  .bmmore:hover{background:#fff}
+  html[data-theme="light"] .bmmore{background:#e2e2e8}
+  html[data-theme="light"] .bmmore:hover{background:#d5d5dd}
+  .bmpanel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px}
+  .pmod{min-width:0}
+  .bmgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 12px}
+  .bmgrid>*{min-width:0}
+  .bmgrid.frozen .bmcard:nth-child(n+5){display:none}
+  .bmcard{display:block;text-decoration:none;color:var(--text);min-width:0}
+  .bmcard .bmimg{position:relative;display:block;border-radius:8px;overflow:hidden;background:#131316}
+  .bmcard .bmimg img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+  .bmcard .bmimg .pph{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:16/9;background:#1b1b1f}
+  .bmcard .bmimg .pph svg{width:34px;height:34px;stroke:#2c2c33;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .bmcard .bmflag{top:0;left:0;border-radius:8px 0 0 0}
+  .bmstrip{display:flex;align-items:stretch;height:32px;margin-top:0;min-width:0}
+  .bmstrip .discst{height:32px;font-size:14px;padding:0 9px}
+  .bmstrip .saletag{display:inline-flex;align-items:center;height:32px;background:var(--green-bg);color:#c8ec6e;font-weight:800;font-size:12.5px;padding:0 9px}
+  .bmvals{flex:1;background:#26262c;display:flex;align-items:center;justify-content:flex-end;gap:7px;padding:0 10px;min-width:0}
+  html[data-theme="light"] .bmvals{background:#e8e8ed}
+  .bmvals .was{background:none;padding:0;height:auto;font-size:12.5px}
+  .bmvals .price{font-weight:800;font-size:14.5px;white-space:nowrap}
+  .bmname{display:block;font-size:12px;font-weight:600;line-height:1.35;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .prow::-webkit-scrollbar{height:6px}
   .prow::-webkit-scrollbar-track{background:transparent}
   .prow::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
@@ -953,7 +979,7 @@ ja: {
   note_dropped: "{d} に値下げ", note_nowfree: "現在無料",
   pp_cur: "現在価格", pp_high: "最高価格", pp_avg: "平均価格", pp_saledays: "セール観測日数", pp_days: "観測日数", days_fmt: "{n}日",
   pp_chart: "価格推移", pp_history: "価格変更履歴", pp_same: "同じショップの商品", pp_parents: "親作品", pp_children: "子作品", rel_more: "もっと見る",
-  pp_booth: "BOOTHで見る", pp_bm: "ブックマーク", pp_bmed: "ブックマーク済み", pp_vars: "バリエーション（{n}件）", pp_compare: "価格推移を比較", pp_changes: "価格変更履歴", cmp_others: "ほか{n}件", outlier: "規格外", outlier_n: "▲ 規格外{n}件",
+  pp_booth: "BOOTHで見る", pp_bm: "ブックマーク", pp_bmed: "ブックマーク済み", bm_more: "もっと見る", pp_vars: "バリエーション（{n}件）", pp_compare: "価格推移を比較", pp_changes: "価格変更履歴", cmp_others: "ほか{n}件", outlier: "規格外", outlier_n: "▲ 規格外{n}件",
   pp_nodata: "価格データが不足しています。", pp_nochg: "価格変更は観測されていません。",
   pp_salenote: "ピンクの帯はセール中と推定された期間です。", pp_down: "値下げ", chg_date: "日付", chg_before: "変更前", chg_after: "変更後", chg_rate: "変化率", pp_up: "値上げ",
   sp_count: "{n} 件", sp_total: "全{n}件から検索", sec_recent: "最近見た商品", seen_drop: "見た時より -{v}",
@@ -986,7 +1012,7 @@ en: {
   note_dropped: "Price drop on {d}", note_nowfree: "Free now",
   pp_cur: "Current price", pp_high: "Highest price", pp_avg: "Average price", pp_saledays: "Days on sale (observed)", pp_days: "Days observed", days_fmt: "{n} days",
   pp_chart: "Price history", pp_history: "Price change history", pp_same: "More from this shop", pp_parents: "Parent works", pp_children: "Derivative works", rel_more: "Show more",
-  pp_booth: "View on BOOTH", pp_bm: "Bookmark", pp_bmed: "Bookmarked", pp_vars: "Variations ({n})", pp_compare: "Compare price histories", pp_changes: "Price change history", cmp_others: "+{n} more", outlier: "Outlier", outlier_n: "▲ Outliers: {n}",
+  pp_booth: "View on BOOTH", pp_bm: "Bookmark", pp_bmed: "Bookmarked", bm_more: "See more", pp_vars: "Variations ({n})", pp_compare: "Compare price histories", pp_changes: "Price change history", cmp_others: "+{n} more", outlier: "Outlier", outlier_n: "▲ Outliers: {n}",
   pp_nodata: "Not enough price data yet.", pp_nochg: "No price changes observed.",
   pp_salenote: "Pink bands are periods estimated to be on sale.", pp_down: "Drop", chg_date: "Date", chg_before: "Before", chg_after: "After", chg_rate: "Change", pp_up: "Rise",
   sp_count: "{n} items", sp_total: "Search all {n} products", sec_recent: "Recently viewed", seen_drop: "Down {v} since viewed",
@@ -1019,7 +1045,7 @@ ko: {
   note_dropped: "{d} 가격 인하", note_nowfree: "현재 무료",
   pp_cur: "현재 가격", pp_high: "최고 가격", pp_avg: "평균 가격", pp_saledays: "할인 관측 일수", pp_days: "관측 일수", days_fmt: "{n}일",
   pp_chart: "가격 추이", pp_history: "가격 변동 이력", pp_same: "같은 샵의 상품", pp_parents: "부모 작품", pp_children: "파생 작품", rel_more: "더 보기",
-  pp_booth: "BOOTH에서 보기", pp_bm: "북마크", pp_bmed: "북마크됨", pp_vars: "바리에이션({n}종)", pp_compare: "가격 추이 비교", pp_changes: "가격 변동 내역", cmp_others: "외 {n}개", outlier: "이상치", outlier_n: "▲ 이상치 {n}건",
+  pp_booth: "BOOTH에서 보기", pp_bm: "북마크", pp_bmed: "북마크됨", bm_more: "더 보기", pp_vars: "바리에이션({n}종)", pp_compare: "가격 추이 비교", pp_changes: "가격 변동 내역", cmp_others: "외 {n}개", outlier: "이상치", outlier_n: "▲ 이상치 {n}건",
   pp_nodata: "가격 데이터가 부족합니다.", pp_nochg: "가격 변동이 관측되지 않았습니다.",
   pp_salenote: "분홍색 띠는 할인 중으로 추정되는 기간입니다.", pp_down: "인하", chg_date: "날짜", chg_before: "변경 전", chg_after: "변경 후", chg_rate: "변동률", pp_up: "인상",
   sp_count: "{n}건", sp_total: "전체 {n}건에서 검색", sec_recent: "최근 본 상품", seen_drop: "본 이후 -{v}",
@@ -1052,7 +1078,7 @@ ko: {
   note_dropped: "{d} 降价", note_nowfree: "当前免费",
   pp_cur: "当前价格", pp_high: "最高价格", pp_avg: "平均价格", pp_saledays: "促销观测天数", pp_days: "观测天数", days_fmt: "{n} 天",
   pp_chart: "价格走势", pp_history: "价格变动记录", pp_same: "同店铺的其他商品", pp_parents: "父作品", pp_children: "子作品", rel_more: "查看更多",
-  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "规格（{n}种）", pp_compare: "比较价格走势", pp_changes: "价格变更记录", cmp_others: "+{n} 个", outlier: "离群值", outlier_n: "▲ 离群值{n}条",
+  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", bm_more: "查看更多", pp_vars: "规格（{n}种）", pp_compare: "比较价格走势", pp_changes: "价格变更记录", cmp_others: "+{n} 个", outlier: "离群值", outlier_n: "▲ 离群值{n}条",
   pp_nodata: "价格数据不足。", pp_nochg: "尚未观测到价格变动。",
   pp_salenote: "粉色区间为推测的促销期间。", pp_down: "降价", chg_date: "日期", chg_before: "变更前", chg_after: "变更后", chg_rate: "变化率", pp_up: "涨价",
   sp_count: "{n} 件", sp_total: "从全部 {n} 件中搜索", sec_recent: "最近浏览", seen_drop: "浏览后降了 {v}",
@@ -1085,7 +1111,7 @@ ko: {
   note_dropped: "{d} 降價", note_nowfree: "當前免費",
   pp_cur: "當前價格", pp_high: "最高價格", pp_avg: "平均價格", pp_saledays: "促銷觀測天數", pp_days: "觀測天數", days_fmt: "{n} 天",
   pp_chart: "價格走勢", pp_history: "價格變動記錄", pp_same: "同店舖的其他商品", pp_parents: "父作品", pp_children: "子作品", rel_more: "查看更多",
-  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", pp_vars: "規格（{n}種）", pp_compare: "比較價格走勢", pp_changes: "價格變更記錄", cmp_others: "+{n} 個", outlier: "離群值", outlier_n: "▲ 離群值{n}筆",
+  pp_booth: "在 BOOTH 查看", pp_bm: "收藏", pp_bmed: "已收藏", bm_more: "查看更多", pp_vars: "規格（{n}種）", pp_compare: "比較價格走勢", pp_changes: "價格變更記錄", cmp_others: "+{n} 個", outlier: "離群值", outlier_n: "▲ 離群值{n}筆",
   pp_nodata: "價格數據不足。", pp_nochg: "尚未觀測到價格變動。",
   pp_salenote: "粉色區間為推測的促銷期間。", pp_down: "降價", chg_date: "日期", chg_before: "變更前", chg_after: "變更後", chg_rate: "變化率", pp_up: "漲價",
   sp_count: "{n} 件", sp_total: "從全部 {n} 件中搜尋", sec_recent: "最近瀏覽", seen_drop: "瀏覽後降了 {v}",
@@ -3080,12 +3106,28 @@ function pcardHTML(h){
     <span class="pb"><span class="pn">${esc(h.name)}</span>
     <span class="pp2">${!onSale && drop ? `<span class="vchip">${tr("seen_drop", {v: yen(h.cur - cur)})}</span>` : ""}${priceHTML}</span></span></a>`;
 }
+function bmCardHTML(h){
+  const now = PROD.get(String(h.id));
+  const cur = now ? now.cur : h.cur;
+  const img = h.image || (now ? now.image : "") || "";
+  const onSale = !!(now && now.base > cur && (now.on_sale || now.sale || saleIds().has(String(h.id))));
+  const pct = onSale ? (now.pct != null ? now.pct : Math.round((1 - cur / now.base) * 100)) : 0;
+  const priceTxt = cur === 0 ? `<span class="free">${tr("free")}</span>` : (cur == null ? "—" : yen(cur));
+  const strip = onSale
+    ? `<span class="bmstrip">${pct > 0 ? `<span class="discst">-${pct}%</span>` : `<span class="saletag">${tr("rib_sale")}</span>`}<span class="bmvals"><span class="was">${yen(now.base)}</span><span class="price">${priceTxt}</span></span></span>`
+    : `<span class="bmstrip"><span class="bmvals"><span class="price">${priceTxt}</span></span></span>`;
+  return `<a class="bmcard" href="${itemUrl(h.id)}" title="${esc(h.name)}">
+    <span class="bmimg">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : `<span class="pph">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
+    ${strip}<span class="bmname">${esc(h.name)}</span></a>`;
+}
 function renderPersonal(){
   const el = document.getElementById("personal");
-  let html = "";
-  if (HIST.length) html += `<h2>${tr("sec_recent")}</h2><div class="prow">${HIST.slice(0, 12).map(pcardHTML).join("")}</div>`;
-  if (BMS.length) html += `<h2>${tr("pp_bm")}</h2><div class="prow">${BMS.slice(0, 12).map(pcardHTML).join("")}</div>`;
-  el.innerHTML = html;
+  const mods = [];
+  if (BMS.length) mods.push(`<section class="pmod"><div class="pmod-h"><h2>${tr("pp_bm")}</h2><a class="bmmore" href="bookmarks.html">${tr("bm_more")}</a></div><div class="bmpanel"><div class="bmgrid">${BMS.slice(0, 4).map(bmCardHTML).join("")}</div></div></section>`);
+  if (HIST.length) mods.push(`<section class="pmod"><div class="pmod-h"><h2>${tr("sec_recent")}</h2>${HIST.length > 4 ? `<button class="bmmore" id="histMore" type="button">${tr("bm_more")}</button>` : ""}</div><div class="bmpanel"><div class="bmgrid${HIST.length > 4 ? " frozen" : ""}" id="histGrid">${HIST.slice(0, 12).map(bmCardHTML).join("")}</div></div></section>`);
+  el.innerHTML = mods.length ? `<div class="pmods">${mods.join("")}</div>` : "";
+  const hm = document.getElementById("histMore");
+  if (hm) hm.onclick = () => { document.getElementById("histGrid").classList.remove("frozen"); hm.remove(); };
 }
 /* deep link from other pages: index.html#item-<id> opens the product view */
 const _hm = location.hash.match(/^#item-(\d+)$/);
