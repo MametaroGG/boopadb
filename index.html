@@ -88,7 +88,7 @@
   .cshop{font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .clikes{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--sub);margin-top:3px}
   .clikes svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2}
-  svg.hico{width:11px;height:11px;fill:none;stroke:#f2506e;stroke-width:2;vertical-align:-1px;margin-right:3px}
+  svg.hico{display:inline-block;width:11px;height:11px;fill:none;stroke:#f2506e;stroke-width:2;vertical-align:-1px;margin-right:3px}
   .pp-more{display:block;margin:12px auto 2px;background:none;border:1px solid var(--border);color:var(--text);border-radius:99px;padding:7px 24px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
   .crow{margin-top:auto;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   .crow .price.solo{display:inline-flex;align-items:center;height:26px;background:#26262c;padding:0 8px;font-size:16px;font-weight:600}
@@ -516,6 +516,7 @@
   body::-webkit-scrollbar-track{background:#101012}
   body::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px;border:2px solid #101012}
   .spage{scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+  body.veil header,body.veil main{display:none}
   .spage::-webkit-scrollbar{width:8px}
   .spage::-webkit-scrollbar-track{background:transparent}
   .spage::-webkit-scrollbar-thumb{background:#3d3d44;border-radius:99px}
@@ -1061,14 +1062,17 @@ const BM_FLAG_SVG = '<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l
 const bmFlag = (id, cls) => `<span class="bmflag${cls ? " " + cls : ""}" data-bmflag="${id}"${isBm(id) ? "" : " hidden"}>${BM_FLAG_SVG}</span>`;
 function syncBmFlags(){ document.querySelectorAll("[data-bmflag]").forEach(el => { el.hidden = !isBm(el.dataset.bmflag); }); }
 
-const st = P.stats;
-document.getElementById("stats").innerHTML = [
-  [st.total.toLocaleString(LOCALE), tr("st_total")],
-  [st.sale_now.toLocaleString(LOCALE), tr("st_sale")],
-  [st.free_now.toLocaleString(LOCALE), tr("st_free")],
-  [st.changed.toLocaleString(LOCALE), tr("st_changed")],
-  [st.min_date + " 〜", tr("st_period")],
-].map(([n,l]) => `<div class="stat"><div class="num">${n}</div><div class="lbl">${l}</div></div>`).join("");
+function renderStats(st){
+  if (!st) return;
+  document.getElementById("stats").innerHTML = [
+    [st.total.toLocaleString(LOCALE), tr("st_total")],
+    [st.sale_now.toLocaleString(LOCALE), tr("st_sale")],
+    [st.free_now.toLocaleString(LOCALE), tr("st_free")],
+    [st.changed.toLocaleString(LOCALE), tr("st_changed")],
+    [st.min_date + " \u301C", tr("st_period")],
+  ].map(([n, l]) => `<div class="stat"><div class="num">${n}</div><div class="lbl">${l}</div></div>`).join("");
+}
+renderStats(P.stats);
 
 function ribOf(x){
   if (x.cur === 0) return ["free", tr("free")];
@@ -1298,13 +1302,32 @@ tabBtns.forEach(b => b.onclick = () => {
 // ニュース and ランキング live on their own pages now.
 document.querySelectorAll("#tabbar button[data-href]").forEach(b => b.onclick = () => { location.href = b.dataset.href; });
 const spage = document.getElementById("searchPage");
+// While the search or product overlay is open, the home content leaves
+// the render tree entirely (body.veil): with nothing behind the overlay
+// there is no background scrollbar on any browser, and no background
+// scroll. The home scroll position is saved and restored on close.
+let veilY = null;
+function veilSync(){
+  const anyOpen = spage.classList.contains("open") || prodPage.classList.contains("open");
+  if (anyOpen) {
+    if (veilY === null) veilY = window.scrollY;
+    document.body.classList.add("veil");
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+  } else if (veilY !== null) {
+    document.body.classList.remove("veil");
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
+    const y = veilY; veilY = null;
+    window.scrollTo(0, y);
+  }
+}
 function openSearch(){
   loadFullIndex();
   prodPage.classList.remove("open");
   spage.classList.add("open");
-  document.body.style.overflow = "hidden";
+  veilSync();
   spRender();
-  document.body.style.overflow = "hidden";
   searchBtn.classList.add("on");
   setTimeout(() => document.getElementById("spQ").focus(), 380);
 }
@@ -1317,7 +1340,7 @@ function closeSearch(){
   }
   spSideSet(false);
   spage.classList.remove("open");
-  document.body.style.overflow = "";
+  veilSync();
   searchBtn.classList.remove("on");
 }
 document.getElementById("tabSearch").addEventListener("pointerenter", loadFullIndex);
@@ -2278,6 +2301,7 @@ setBTab("new");
 fetch("lists_full.json?v=20251025-3").then(r => r.ok ? r.json() : null).then(f => {
   if (!f) return;
   FULL_LISTS = f;
+  if (f.stats) renderStats(f.stats);
   if (f.on_sale && f.on_sale.length) { SALE_HOME = f.on_sale; LISTS.on_sale = f.on_sale; renderSale(); }
   if (f.drops) LISTS.drops = f.drops;
   if (f.active) LISTS.active = f.active;
@@ -2865,14 +2889,14 @@ function openProduct(id){
   curProd = x;
   renderProdPage(x);
   prodPage.classList.add("open");
-  document.body.style.overflow = "hidden";
+  veilSync();
   HIST = [{id: x.id, name: x.name, shop: x.shop, image: x.image, cur: x.cur, at: Date.now()}, ...HIST.filter(h => String(h.id) !== String(x.id))].slice(0, 30);
   store.set("boopadb_hist", HIST);
   renderPersonal();
 }
 function closeProduct(){
   prodPage.classList.remove("open");
-  if (!spage.classList.contains("open")) document.body.style.overflow = "";
+  veilSync();
 }
 document.getElementById("ppBack").onclick = closeProduct;
 document.addEventListener("click", e => {
