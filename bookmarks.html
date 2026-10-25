@@ -1205,7 +1205,23 @@ bmRender();
 
 </script>
 <!-- stats snippet: keep the three copies in sync (build_prototype.py, build_pages_extra.py, build_sale.py) -->
-<style>.site-stats{text-align:center;font-size:12px;color:#8b8b94;padding:10px 12px 2px;letter-spacing:.02em}html[data-theme="light"] .site-stats{color:#6d6d76}</style>
+<style>
+.site-stats{display:flex;justify-content:center;padding:14px 12px 4px}
+.site-stats .ss-box{display:inline-flex;background:#151517;border:1px solid #26262c;border-radius:12px;padding:9px 4px}
+.site-stats .ss-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 15px;min-width:66px}
+.site-stats .ss-item + .ss-item{border-left:1px solid #232329}
+.site-stats .ss-label{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:.08em;color:#8b8b94;font-weight:600;white-space:nowrap}
+.site-stats .ss-label svg{width:11px;height:11px;flex:none}
+.site-stats .ss-num{font-family:'Orbitron',sans-serif;font-weight:700;font-size:15px;color:#f2f2f5;line-height:1.3;font-variant-numeric:tabular-nums;white-space:nowrap}
+.site-stats .ss-live{display:inline-block;width:7px;height:7px;border-radius:50%;background:#7ee787;margin-right:5px;vertical-align:2px;animation:ssPulse 2s ease-out infinite}
+@keyframes ssPulse{0%{box-shadow:0 0 0 0 rgba(126,231,135,.45)}70%{box-shadow:0 0 0 6px rgba(126,231,135,0)}100%{box-shadow:0 0 0 0 rgba(126,231,135,0)}}
+@media (prefers-reduced-motion: reduce){.site-stats .ss-live{animation:none}}
+@media (max-width:560px){.site-stats .ss-item{padding:0 9px;min-width:0}.site-stats .ss-num{font-size:13px}}
+html[data-theme="light"] .site-stats .ss-box{background:#ffffff;border-color:#e2e2e8}
+html[data-theme="light"] .site-stats .ss-num{color:#17171c}
+html[data-theme="light"] .site-stats .ss-item + .ss-item{border-left-color:#e7e7ec}
+html[data-theme="light"] .site-stats .ss-label{color:#6d6d76}
+</style>
 <script>
 (function () {
   var API = "https://nucbox-m7.tailb48431.ts.net";
@@ -1257,7 +1273,16 @@ bmRender();
     else lang = L[lang.slice(0, 2)] ? lang.slice(0, 2) : "ja";
   }
   var lab = L[lang] || L.ja;
+  var IC = [
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11m0 0-4-4m4 4 4-4"/><path d="M4 17v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1"/></svg>'
+  ];
   function fmt(n) { return Number(n || 0).toLocaleString("en-US"); }
+  function item(i, numHtml) {
+    return '<div class="ss-item"><span class="ss-label">' + IC[i] + lab[i] + '</span><span class="ss-num">' + numHtml + '</span></div>';
+  }
   function render() {
     fetch(API + "/stats").then(function (r) { return r.json(); }).then(function (s) {
       var el = document.getElementById("siteStats");
@@ -1268,7 +1293,12 @@ bmRender();
         var f = document.querySelector("footer");
         if (f) f.appendChild(el); else document.body.appendChild(el);
       }
-      el.textContent = lab[0] + " " + fmt(s.total_pv) + " ・ " + lab[1] + " " + fmt(s.today_pv) + " ・ " + lab[2] + " " + fmt(s.online) + " ・ " + lab[3] + " " + fmt(s.installs);
+      el.innerHTML = '<div class="ss-box">'
+        + item(0, fmt(s.total_pv))
+        + item(1, fmt(s.today_pv))
+        + item(2, '<span class="ss-live"></span>' + fmt(s.online))
+        + item(3, fmt(s.installs))
+        + '</div>';
     }).catch(function () {});
   }
   render();
