@@ -555,7 +555,7 @@
   html[data-theme="light"] .bmmore:hover{background:#d5d5dd}
   .bmpanel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px}
   .pmod-f{display:flex;justify-content:flex-end;margin-top:10px}
-  .pmod{min-width:0}
+  .pmod{min-width:0;max-width:470px}
   .bmgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 12px}
   .bmgrid>*{min-width:0}
   .bmgrid.frozen .bmcard:nth-child(n+5){display:none}
@@ -691,8 +691,8 @@
   .kw:active{transform:scale(.93)}
   .sp-count{font-size:12.5px;color:var(--faint);margin:16px 0 8px}
   @media (min-width: 900px){
-    body{padding-bottom:40px;padding-left:118px}
-    header{margin-left:-118px;padding-left:118px}
+    body{padding-bottom:40px;padding-left:118px;padding-right:118px}
+    header{margin-left:-118px;padding-left:118px;margin-right:-118px;padding-right:118px}
     .tabbar{left:16px;top:50%;bottom:auto;transform:translateY(-50%);width:74px;height:auto;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;padding:12px 0}
     .tabbar.hide{transform:translateY(-50%) translateX(-180%);opacity:0}
     #barShape{left:0;top:0;width:calc(100% + 30px);height:100%}
