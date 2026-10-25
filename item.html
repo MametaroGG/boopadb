@@ -25,7 +25,8 @@
   [data-theme="light"] #splash{background:#f4f4f5}
   #splash[hidden]{display:none}
   #splash.bye{opacity:0;pointer-events:none}
-  #splash svg{width:112px;height:112px;animation:splIn .45s ease-out}
+  #splash svg{width:112px;height:112px;animation:splIn .45s ease-out;will-change:transform;transform:translateZ(0)}
+  #splash .spl-ring,#splash .spl-line{will-change:stroke-dashoffset}
   #splash .spl-ring{stroke-dasharray:346;stroke-dashoffset:346;animation:splDraw .7s ease-out forwards}
   #splash .spl-line{stroke-dasharray:130;stroke-dashoffset:130;animation:splDraw .55s .5s ease-out forwards}
   #splash .spl-head{opacity:0;animation:splFade .2s .95s ease-out forwards}
@@ -1430,7 +1431,7 @@ function closeSearch(){
   searchBtn.classList.remove("on");
 }
 document.getElementById("tabSearch").addEventListener("pointerenter", loadFullIndex);
-if ("requestIdleCallback" in window) requestIdleCallback(() => loadFullIndex(), {timeout: 5000}); else setTimeout(loadFullIndex, 3500);
+if ("requestIdleCallback" in window) requestIdleCallback(() => loadFullIndex(), {timeout: 9000}); else setTimeout(loadFullIndex, 6000);
 document.getElementById("tabSearch").onclick = () => {
   if (spage.classList.contains("open")) closeSearch(); else openSearch();
 };
