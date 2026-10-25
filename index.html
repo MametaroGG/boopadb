@@ -810,6 +810,12 @@
   <a class="topslot" href="https://chromewebstore.google.com/detail/mllcdeonfeaepajkkidjmgonfkibeokb" target="_blank" rel="noopener"><img src="banner.jpg" alt="Boopa – BOOTH Price Tracker for VRChat"></a>
   <h2 class="heroh" data-i="hero_title">注目＆おすすめ</h2>
   <div class="hero" id="hero"><div class="hero-view"><div class="hero-track" id="heroTrack"></div></div><button class="harrow prev" id="heroPrev" data-i-al="al_prev" aria-label="前へ">‹</button><button class="harrow next" id="heroNext" data-i-al="al_next" aria-label="次へ">›</button></div><div class="hero-dots" id="heroDots"></div>
+  <div id="appPromo" style="display:none;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px 16px;margin:2px 0 20px">
+    <img src="icon-512.png" alt="" style="width:38px;height:38px;border-radius:10px;flex:none">
+    <div style="flex:1;min-width:0"><div style="font-weight:800;font-size:14px" data-i="app_promo_t">BoopaDBをアプリとして使う</div><div style="font-size:12.5px;color:var(--sub)" data-i="app_promo_b">ホーム画面に追加すると、全画面で開けるようになります</div></div>
+    <a href="app.html" style="flex:none;background:#fc4d50;color:#fff;font-weight:800;font-size:13px;padding:9px 14px;border-radius:10px;text-decoration:none" data-i="ft_app">アプリ</a>
+    <button id="appPromoX" type="button" aria-label="close" style="flex:none;background:none;border:none;color:var(--faint);cursor:pointer;padding:6px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+  </div>
   <div class="stats" id="stats"></div>
 
   <div class="shead" id="sale"><h2 style="border:none;margin:0;padding:0" data-i="nav_sale">セール中の商品</h2>
@@ -857,7 +863,7 @@
 <footer>
   <div data-i="ft_data">データは Boopa（BOOTH Price Tracker for VRChat）の収集基盤による実データです。価格は観測時点のもので、現在のBOOTH上の価格と異なる場合があります。</div>
   <div class="flegal">
-    <span data-i="ft_legal">BoopaDB は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。</span><a class="flink" href="terms.html" data-i="ft_terms">利用規約</a> · <a class="flink" href="privacy.html" data-i="ft_priv">プライバシー</a><br>
+    <span data-i="ft_legal">BoopaDB は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。</span><a class="flink" href="terms.html" data-i="ft_terms">利用規約</a> · <a class="flink" href="privacy.html" data-i="ft_priv">プライバシー</a> · <a class="flink" href="app.html" data-i="ft_app">アプリ</a><br>
     <span data-i="ft_tm">BOOTH は pixiv株式会社の商標です。その他の商標および著作物は、各権利者に帰属します。</span>
   </div>
 </footer>
@@ -932,7 +938,7 @@ ja: {
   bt_new: "新着", bt_special: "スペシャル", bt_drop: "値下げ", bt_active: "価格変更が活発", bt_rising: "急上昇", rising_note: "{likes} · +{g}/日",
   ft_data: "データは Boopa（BOOTH Price Tracker for VRChat）の収集基盤による実データです。価格は観測時点のもので、現在のBOOTH上の価格と異なる場合があります。",
   ft_legal: "BoopaDB は BOOTH および pixiv株式会社とは関係のない非公式プロジェクトです。表示される時刻はすべて日本時間（JST）です。",
-  ft_terms: "利用規約", ft_priv: "プライバシー",
+  ft_terms: "利用規約", ft_priv: "プライバシー", ft_app: "アプリ", app_promo_t: "BoopaDBをアプリとして使う", app_promo_b: "ホーム画面に追加すると、全画面で開けるようになります",
   ft_tm: "BOOTH は pixiv株式会社の商標です。その他の商標および著作物は、各権利者に帰属します。",
   pp_title: "商品詳細", sp_title: "商品検索", sp_ph: "商品名・ショップ名で検索", sp_shops: "カテゴリーから探す", sp_filter: "絞り込み", sp_price_t: "価格で絞り込む", sp_price_any: "価格は問わない", sp_reset: "リセット", sp_show_results: "結果を表示", sp_sort_rel: "適合性", sp_sort_new: "新着順", sp_sort_price_asc: "価格の安い順", sp_sort_price_desc: "価格の高い順", sp_sort_pct: "割引率の高い順", sp_sort_name: "名前順", th_toggle: "テーマ切替", sp_price_upto: "¥{n} 以下",
   tab_home: "ホーム", tab_sale: "セール", tab_news: "ニュース", tab_ranking: "ランキング", tab_bm: "ブックマーク",
@@ -965,7 +971,7 @@ en: {
   bt_new: "New", bt_special: "Specials", bt_drop: "Price drops", bt_active: "Frequent price changes", bt_rising: "Trending", rising_note: "{likes} · +{g}/day",
   ft_data: "Data is real, collected by Boopa (BOOTH Price Tracker for VRChat). Prices are as observed and may differ from current BOOTH prices.",
   ft_legal: "BoopaDB is an unofficial project, not affiliated with BOOTH or pixiv Inc. All times are Japan Standard Time (JST).",
-  ft_terms: "Terms", ft_priv: "Privacy",
+  ft_terms: "Terms", ft_priv: "Privacy", ft_app: "App", app_promo_t: "Use BoopaDB as an app", app_promo_b: "Add it to your home screen to open it full-screen",
   ft_tm: "BOOTH is a trademark of pixiv Inc. All other trademarks and works belong to their respective owners.",
   pp_title: "Product details", sp_title: "Search products", sp_ph: "Search by product or shop name", sp_shops: "Browse by category", sp_filter: "Filters", sp_price_t: "Filter by price", sp_price_any: "Any price", sp_reset: "Reset", sp_show_results: "Show results", sp_sort_rel: "Relevance", sp_sort_new: "Newest", sp_sort_price_asc: "Price: low to high", sp_sort_price_desc: "Price: high to low", sp_sort_pct: "Biggest discount", sp_sort_name: "Name", th_toggle: "Toggle theme", sp_price_upto: "Up to ¥{n}",
   tab_home: "Home", tab_sale: "Sale", tab_news: "News", tab_ranking: "Rankings", tab_bm: "Bookmarks",
@@ -998,7 +1004,7 @@ ko: {
   bt_new: "신착", bt_special: "스페셜", bt_drop: "가격 인하", bt_active: "가격 변동 활발", bt_rising: "급상승", rising_note: "{likes} · +{g}/일",
   ft_data: "데이터는 Boopa(BOOTH Price Tracker for VRChat)의 수집 인프라로 모은 실제 데이터입니다. 가격은 관측 시점 기준이며 현재 BOOTH 가격과 다를 수 있습니다.",
   ft_legal: "BoopaDB는 BOOTH 및 pixiv 주식회사와 관계없는 비공식 프로젝트입니다. 모든 시간은 일본 시간(JST)입니다.",
-  ft_terms: "이용약관", ft_priv: "개인정보",
+  ft_terms: "이용약관", ft_priv: "개인정보", ft_app: "앱", app_promo_t: "BoopaDB를 앱으로 사용하기", app_promo_b: "홈 화면에 추가하면 전체 화면으로 열 수 있습니다",
   ft_tm: "BOOTH는 pixiv 주식회사의 상표입니다. 그 밖의 상표 및 저작물은 각 권리자에게 귀속합니다.",
   pp_title: "상품 상세", sp_title: "상품 검색", sp_ph: "상품명·샵 이름으로 검색", sp_shops: "카테고리로 찾기", sp_filter: "필터", sp_price_t: "가격으로 좁히기", sp_price_any: "가격 무관", sp_reset: "초기화", sp_show_results: "결과 표시", sp_sort_rel: "관련도", sp_sort_new: "최신순", sp_sort_price_asc: "가격 낮은 순", sp_sort_price_desc: "가격 높은 순", sp_sort_pct: "할인율 높은 순", sp_sort_name: "이름순", th_toggle: "테마 전환", sp_price_upto: "¥{n} 이하",
   tab_home: "홈", tab_sale: "세일", tab_news: "뉴스", tab_ranking: "랭킹", tab_bm: "북마크",
@@ -1031,7 +1037,7 @@ ko: {
   bt_new: "新品", bt_special: "特价", bt_drop: "降价", bt_active: "价格变动频繁", bt_rising: "急升", rising_note: "{likes} · +{g}/日",
   ft_data: "数据为 Boopa（BOOTH Price Tracker for VRChat）采集的真实数据。价格为观测时点的价格，可能与 BOOTH 当前价格不同。",
   ft_legal: "BoopaDB 是与 BOOTH 及 pixiv 株式会社无关的非官方项目。所有时间均为日本时间（JST）。",
-  ft_terms: "使用条款", ft_priv: "隐私",
+  ft_terms: "使用条款", ft_priv: "隐私", ft_app: "应用", app_promo_t: "将 BoopaDB 作为应用使用", app_promo_b: "添加到主屏幕后可以全屏打开",
   ft_tm: "BOOTH 是 pixiv 株式会社的商标。其他商标及作品归各权利方所有。",
   pp_title: "商品详情", sp_title: "搜索商品", sp_ph: "按商品名或店铺名搜索", sp_shops: "按类别浏览", sp_filter: "筛选", sp_price_t: "按价格筛选", sp_price_any: "不限价格", sp_reset: "重置", sp_show_results: "显示结果", sp_sort_rel: "相关性", sp_sort_new: "最新上架", sp_sort_price_asc: "价格从低到高", sp_sort_price_desc: "价格从高到低", sp_sort_pct: "折扣率最高", sp_sort_name: "名称", th_toggle: "切换主题", sp_price_upto: "¥{n} 以下",
   tab_home: "首页", tab_sale: "促销", tab_news: "动态", tab_ranking: "排行榜", tab_bm: "收藏",
@@ -1064,7 +1070,7 @@ ko: {
   bt_new: "新品", bt_special: "特價", bt_drop: "降價", bt_active: "價格變動頻繁", bt_rising: "急升", rising_note: "{likes} · +{g}/日",
   ft_data: "數據為 Boopa（BOOTH Price Tracker for VRChat）採集的真實數據。價格為觀測時點的價格，可能與 BOOTH 當前價格不同。",
   ft_legal: "BoopaDB 是與 BOOTH 及 pixiv 株式會社無關的非官方項目。所有時間均為日本時間（JST）。",
-  ft_terms: "使用條款", ft_priv: "隱私",
+  ft_terms: "使用條款", ft_priv: "隱私", ft_app: "應用", app_promo_t: "將 BoopaDB 作為應用使用", app_promo_b: "新增到主畫面後可以全螢幕開啟",
   ft_tm: "BOOTH 是 pixiv 株式會社的商標。其他商標及作品歸各權利方所有。",
   pp_title: "商品詳情", sp_title: "搜尋商品", sp_ph: "按商品名或店舖名搜尋", sp_shops: "按類別瀏覽", sp_filter: "篩選", sp_price_t: "按價格篩選", sp_price_any: "不限價格", sp_reset: "重置", sp_show_results: "顯示結果", sp_sort_rel: "相關性", sp_sort_new: "最新上架", sp_sort_price_asc: "價格從低到高", sp_sort_price_desc: "價格從高到低", sp_sort_pct: "折扣率最高", sp_sort_name: "名稱", th_toggle: "切換主題", sp_price_upto: "¥{n} 以下",
   tab_home: "首頁", tab_sale: "促銷", tab_news: "動態", tab_ranking: "排行榜", tab_bm: "收藏",
@@ -3020,6 +3026,13 @@ function renderPersonal(){
 /* deep link from other pages: index.html#item-<id> opens the product view */
 const _hm = location.hash.match(/^#item-(\d+)$/);
 if (_hm) openItemSmart(_hm[1]);
+{ const ap = document.getElementById("appPromo");
+  if (ap) {
+    const standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+    let dismissed = false; try { dismissed = !!localStorage.getItem("boopadb_apppromo_off"); } catch {}
+    if (!standalone && !dismissed) { ap.style.display = "flex"; }
+    document.getElementById("appPromoX").onclick = () => { ap.style.display = "none"; try { localStorage.setItem("boopadb_apppromo_off", "1"); } catch {} };
+  } }
 renderPersonal();
 </script>
 </body>
