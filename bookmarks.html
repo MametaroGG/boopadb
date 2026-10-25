@@ -25,10 +25,10 @@
   #splash[hidden]{display:none}
   #splash.bye{opacity:0;pointer-events:none}
   #splash svg{width:112px;height:112px;animation:splIn .45s ease-out}
-  #splash .spl-ring{stroke-dasharray:346;stroke-dashoffset:346;animation:splDraw .8s .1s ease-out forwards}
-  #splash .spl-line{stroke-dasharray:130;stroke-dashoffset:130;animation:splDraw .7s .55s ease-out forwards}
-  #splash .spl-head{opacity:0;animation:splFade .25s 1.2s ease-out forwards}
-  #splash .spl-tag{opacity:0;animation:splFade .3s 1.35s ease-out forwards}
+  #splash .spl-ring{stroke-dasharray:346;stroke-dashoffset:346;animation:splDraw .45s ease-out forwards}
+  #splash .spl-line{stroke-dasharray:130;stroke-dashoffset:130;animation:splDraw .4s .3s ease-out forwards}
+  #splash .spl-head{opacity:0;animation:splFade .18s .62s ease-out forwards}
+  #splash .spl-tag{opacity:0;animation:splFade .22s .72s ease-out forwards}
   @keyframes splDraw{to{stroke-dashoffset:0}}
   @keyframes splFade{to{opacity:1}}
   #splash .splogo{font-family:"Orbitron","Hiragino Kaku Gothic ProN",sans-serif;font-size:30px;font-weight:900;letter-spacing:.5px;color:#ececee;animation:splIn .45s ease-out}
@@ -38,6 +38,11 @@
   html.splock,html.splock body{overflow:hidden}
   header{background:linear-gradient(180deg,#1f1f23,#151517);border-bottom:1px solid var(--border);padding:12px 0}
   .hwrap{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .hwrap .logo{order:1}
+  .hwrap .badge{order:2}
+  .hwrap nav{order:3}
+  .hwrap .langsw{order:4}
+  .hwrap .themebtn{order:5}
   .logo{font-family:"Orbitron","Hiragino Kaku Gothic ProN",sans-serif;font-size:21px;font-weight:900;letter-spacing:.5px}
   .logo span{color:var(--accent)}
   .langsw{position:relative;margin-left:auto;flex:none}
@@ -125,12 +130,12 @@
   header nav{display:flex;gap:16px;margin-left:10px}
   @media (max-width:899px){
     .hwrap{gap:8px;row-gap:10px;padding:0 14px}
-    .logo{order:1;font-size:19px}
-    .badge{order:2;flex:none;font-size:9.5px;padding:2px 7px}
-    .langsw{order:3;margin-left:auto}
-    .themebtn{order:4;width:34px;height:34px}
+    .hwrap .logo{order:1;font-size:19px}
+    .hwrap .badge{order:2;flex:none;font-size:9.5px;padding:2px 7px}
+    .hwrap .langsw{order:3;margin-left:auto}
+    .hwrap .themebtn{order:4;width:34px;height:34px}
     #langBtn{padding:5px 8px;font-size:12px}
-    header nav{order:5;flex-basis:100%;margin-left:0}
+    .hwrap nav{order:5;flex-basis:100%;margin-left:0}
   }
   nav a{font-size:13px;color:var(--sub)}
   nav a:hover{color:#fff;text-decoration:none}
