@@ -1099,6 +1099,7 @@ html[data-theme="light"] .site-stats .ss-num{color:#17171c}
   ping();
   setInterval(ping, 25000);
   document.addEventListener("visibilitychange", function () { if (!document.hidden) ping(); });
+  window.addEventListener("pagehide", function () { post("/ping"); });
   function markInstall() {
     try {
       if (localStorage.getItem("boopadb_installed")) return;
