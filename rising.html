@@ -1013,6 +1013,11 @@ document.title = tr("bt_rising") + " | BoopaDB";
 document.getElementById("pgH1").textContent = tr("bt_rising");
 document.getElementById("crumbHere").textContent = tr("bt_rising");
 
+Object.assign(I18N.ja, {hist_title: "最近見た商品", hist_sub: "このブラウザの閲覧履歴 · {n} 件", hist_empty: "まだ履歴がありません。商品を見るとここに表示されます。", hist_clear: "履歴をすべて消す"});
+Object.assign(I18N.en, {hist_title: "Recently viewed", hist_sub: "Browsing history in this browser · {n} items", hist_empty: "No history yet. Products you view will appear here.", hist_clear: "Clear all history"});
+Object.assign(I18N.ko, {hist_title: "최근 본 상품", hist_sub: "이 브라우저의 열람 기록 · {n}건", hist_empty: "아직 기록이 없습니다. 상품을 보면 여기에 표시됩니다.", hist_clear: "기록 모두 지우기"});
+Object.assign(I18N["zh-Hans"], {hist_title: "最近浏览", hist_sub: "此浏览器中的浏览记录 · {n} 件", hist_empty: "暂无记录。浏览过的商品会显示在这里。", hist_clear: "清除全部记录"});
+Object.assign(I18N["zh-Hant"], {hist_title: "最近瀏覽", hist_sub: "此瀏覽器中的瀏覽記錄 · {n} 件", hist_empty: "尚無記錄。瀏覽過的商品會顯示在這裡。", hist_clear: "清除全部記錄"});
 const BM_SET = new Set((() => { try { return JSON.parse(localStorage.getItem("boopadb_bm") || "[]").map(b => String(b.id)); } catch { return []; } })());
 const BM_FLAG_SVG = '<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2z"/></svg>';
 const bmFlag = id => BM_SET.has(String(id)) ? `<span class="bmflag">${BM_FLAG_SVG}</span>` : "";

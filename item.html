@@ -3124,7 +3124,7 @@ function openProduct(id){
   renderProdPage(x);
   prodPage.classList.add("open");
   veilSync();
-  HIST = [{id: x.id, name: x.name, shop: x.shop, image: x.image, cur: x.cur, at: Date.now()}, ...HIST.filter(h => String(h.id) !== String(x.id))].slice(0, 30);
+  HIST = [{id: x.id, name: x.name, shop: x.shop, image: x.image, cur: x.cur, at: Date.now()}, ...HIST.filter(h => String(h.id) !== String(x.id))].slice(0, 100);
   store.set("boopadb_hist", HIST);
   renderPersonal();
 }
@@ -3182,10 +3182,8 @@ function renderPersonal(){
   const el = document.getElementById("personal");
   const mods = [];
   if (BMS.length) mods.push(`<section class="pmod"><div class="pmod-h"><h2>${tr("pp_bm")}</h2></div><div class="bmpanel"><div class="bmgrid">${BMS.slice(0, 4).map(bmCardHTML).join("")}</div></div><div class="pmod-f"><a class="bmmore" href="bookmarks.html">${tr("bm_more")}</a></div></section>`);
-  if (HIST.length) mods.push(`<section class="pmod"><div class="pmod-h"><h2>${tr("sec_recent")}</h2></div><div class="bmpanel"><div class="bmgrid${HIST.length > 4 ? " frozen" : ""}" id="histGrid">${HIST.slice(0, 12).map(bmCardHTML).join("")}</div></div>${HIST.length > 4 ? `<div class="pmod-f"><button class="bmmore" id="histMore" type="button">${tr("bm_more")}</button></div>` : ""}</section>`);
+  if (HIST.length) mods.push(`<section class="pmod"><div class="pmod-h"><h2>${tr("sec_recent")}</h2></div><div class="bmpanel"><div class="bmgrid${HIST.length > 4 ? " frozen" : ""}" id="histGrid">${HIST.slice(0, 12).map(bmCardHTML).join("")}</div></div>${HIST.length > 4 ? `<div class="pmod-f"><a class="bmmore" href="history.html">${tr("bm_more")}</a></div>` : ""}</section>`);
   el.innerHTML = mods.length ? `<div class="pmods">${mods.join("")}</div>` : "";
-  const hm = document.getElementById("histMore");
-  if (hm) hm.onclick = () => { document.getElementById("histGrid").classList.remove("frozen"); hm.remove(); };
 }
 /* deep link from other pages: index.html#item-<id> opens the product view */
 const _hm = location.hash.match(/^#item-(\d+)$/);
