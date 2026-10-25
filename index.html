@@ -544,6 +544,8 @@
   .down{color:#a4d007;font-weight:700}
   .up{color:#fc4d50;font-weight:700}
   .prow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:#3d3d44 transparent}
+  #personal{margin:30px 0 38px}
+  #personal:empty{display:none}
   .pmods{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(430px,100%),1fr));gap:28px}
   .pmod-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
   .pmod-h h2{margin:0}
@@ -1122,11 +1124,17 @@ ko: {
 let LANG = "ja";
 try { for (const [o, n] of [["boothdb_bm","boopadb_bm"],["boothdb_hist","boopadb_hist"],["boothdb_lang","boopadb_lang"]]) { const v = localStorage.getItem(o); if (v !== null) { if (localStorage.getItem(n) === null) localStorage.setItem(n, v); localStorage.removeItem(o); } } } catch {}
 try { const s = localStorage.getItem("boopadb_lang"); if (s && I18N[s]) LANG = s; else { const n = (navigator.language || "ja").toLowerCase(); if (n.startsWith("en")) LANG = "en"; else if (n.startsWith("ko")) LANG = "ko"; else if (n.startsWith("zh")) LANG = (n.includes("tw") || n.includes("hk") || n.includes("hant")) ? "zh-Hant" : "zh-Hans"; } } catch {}
-const THEME = document.documentElement.dataset.theme === "light" ? "light" : "dark";
-const C_GRID = THEME === "light" ? "#d5d5dc" : "#26262c";
-const C_AXIS = THEME === "light" ? "#8b8b94" : "#6f6f78";
-const C_SUB = THEME === "light" ? "#5b5b64" : "#a2a2ab";
-const C_NOTE = THEME === "light" ? "#c99700" : "#e8c547";
+let THEME = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+let C_GRID, C_AXIS, C_SUB, C_NOTE, CMP_COLORS;
+function setThemeColors(){
+  const L = THEME === "light";
+  C_GRID = L ? "#d5d5dc" : "#26262c";
+  C_AXIS = L ? "#8b8b94" : "#6f6f78";
+  C_SUB = L ? "#5b5b64" : "#a2a2ab";
+  C_NOTE = L ? "#c99700" : "#e8c547";
+  CMP_COLORS = L ? ["#e04347", "#d97a1f", "#c99700", "#5c8a04", "#0e9594", "#7c4dff", "#d6336c", "#4c6ef5", "#a06a2c", "#2f9e44", "#d64550", "#5a9e3d"] : ["#fc4d50", "#f2994a", "#e8c547", "#a4d007", "#2dcccd", "#b388ff", "#ff7eb6", "#8d9eec", "#c98f4e", "#7fd08a", "#e06c75", "#98c379"];
+}
+setThemeColors();
 const csMeta = document.querySelector('meta[name="color-scheme"]'); if (csMeta) csMeta.content = THEME;
 const LOCALES = { ja: "ja-JP", en: "en-US", ko: "ko-KR", "zh-Hans": "zh-CN", "zh-Hant": "zh-TW" };
 const LOCALE = LOCALES[LANG];
@@ -2164,7 +2172,25 @@ function spCatRender(){
   spCatSync();
 }
 spRender();
-document.getElementById("themeBtn").addEventListener("click", () => { try { localStorage.setItem("boopadb_theme", THEME === "light" ? "dark" : "light"); } catch {} location.reload(); });
+function repaintCharts(){
+  const pp = document.getElementById("prodPage");
+  if (ppX && pp && (pp.classList.contains("open") || location.pathname.endsWith("item.html"))) renderProdPage(ppX);
+  document.querySelectorAll("#featTrack [data-fid]").forEach(ph => {
+    const pr = bpChartCache.get(ph.dataset.fid);
+    if (pr) pr.then(rec => { const ser = rec ? repSeriesOf(rec) : null; if (ser && ph.isConnected) ph.innerHTML = bpChartSVG(ser, 200, 64); });
+  });
+  const bp = document.querySelector("#bPrev [data-fid]");
+  if (bp) { const pr = bpChartCache.get(bp.dataset.fid); if (pr) pr.then(rec => { const ser = rec ? repSeriesOf(rec) : null; if (ser && bp.isConnected) bp.innerHTML = `<div class="cap">${tr("pp_chart")}</div>${bpChartSVG(ser, 340, 118)}`; }); }
+}
+function applyTheme(next){
+  THEME = next;
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("boopadb_theme", next); } catch {}
+  if (csMeta) csMeta.content = next;
+  setThemeColors();
+  repaintCharts();
+}
+document.getElementById("themeBtn").addEventListener("click", () => applyTheme(THEME === "light" ? "dark" : "light"));
 const tabbarEl = document.getElementById("tabbar");
 let lastY = 0, scrollIdle = null;
 function onAnyScroll(y, src){
@@ -2448,6 +2474,7 @@ async function fillFeatCharts(){
   const phs = [...document.querySelectorAll("#featTrack [data-fchart]")];
   for (const ph of phs) {
     const id = ph.getAttribute("data-fchart");
+    ph.dataset.fid = id;
     ph.removeAttribute("data-fchart");
     if (!bpChartCache.has(id)) bpChartCache.set(id, (async () => { try { const r = await fetchItemRecord(id); if (r) regP(r); return r; } catch { return null; } })());
     const rec = await bpChartCache.get(id);
@@ -2469,6 +2496,7 @@ async function fillBpChart(){
   const ser = rec ? repSeriesOf(rec) : null;
   if (ser) cur.innerHTML = `<div class="cap">${tr("pp_chart")}</div>${bpChartSVG(ser, 340, 118)}`;
   else cur.style.display = "none";
+  cur.dataset.fid = id;
   cur.removeAttribute("data-bpchart");
 }
 function bPrevHTML(x){
@@ -2727,7 +2755,6 @@ function renderPPBody(x){
     b.classList.toggle("open", !body.hidden);
   });
 }
-const CMP_COLORS = THEME === "light" ? ["#e04347", "#d97a1f", "#c99700", "#5c8a04", "#0e9594", "#7c4dff", "#d6336c", "#4c6ef5", "#a06a2c", "#2f9e44", "#d64550", "#5a9e3d"] : ["#fc4d50", "#f2994a", "#e8c547", "#a4d007", "#2dcccd", "#b388ff", "#ff7eb6", "#8d9eec", "#c98f4e", "#7fd08a", "#e06c75", "#98c379"];
 let cmpOn = {};
 let cmpOpen = false;
 const CMP_RANGES = {"1d": 1, "5d": 5, "1m": 30, "6m": 182, "1y": 365, "5y": 1825};
