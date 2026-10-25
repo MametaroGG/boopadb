@@ -7,6 +7,12 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="favicon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BoopaDB">
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){})}</script>
 <style>
   :root{--bg:#101012;--panel:#17171a;--card:#1b1b1f;--border:#26262c;--border2:#34343c;--text:#ececee;--sub:#a2a2ab;--faint:#6f6f78;--accent:#fc4d50;--red:#fc4d50;--accent-dim:#e04347;--green:#a4d007;--green-bg:#4c6b22;--amber:#d9a521}
   *{box-sizing:border-box;margin:0;padding:0}
