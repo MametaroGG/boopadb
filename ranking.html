@@ -1193,7 +1193,9 @@ html[data-theme="light"] .site-stats .ss-num{color:#17171c}
     }).catch(function () {});
   }
   render();
-  setInterval(render, 60000);
+  setTimeout(render, 3000);
+  setInterval(render, 20000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) render(); });
 })();
 </script>
 </body>
