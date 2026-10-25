@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101012"><meta name="color-scheme" content="dark"><script>try{var t=localStorage.getItem("boopadb_theme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=t;}catch(e){document.documentElement.dataset.theme="dark"}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <title>新着 | BoopaDB</title>
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="icon" type="image/png" href="favicon-192.png" sizes="192x192">
+<link rel="icon" href="favicon.ico?v=2" sizes="any">
+<link rel="icon" type="image/png" href="favicon-192.png?v=2" sizes="192x192">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
@@ -774,7 +774,9 @@
   html[data-theme="light"] .kind.k-lowest,html[data-theme="light"] .rankno.top{color:#4c7a1f}
   html[data-theme="light"] .kind.k-drop{color:#d64550}
   html[data-theme="light"] .doc a{color:#1c6fd1}
-  .stabs{position:relative;display:inline-flex;gap:2px;border-bottom:1px solid var(--border)}
+  .stabs{position:relative;display:inline-flex;gap:2px;border-bottom:1px solid var(--border);max-width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .stabs::-webkit-scrollbar{display:none}
+  .stabs button{flex:none}
   .stabs button{position:relative;z-index:1;background:none;border:none;color:var(--sub);font-size:13px;padding:7px 13px;cursor:pointer;font-family:inherit;transition:color .2s;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
   .stabs button.on{color:#fff;font-weight:700;border-bottom-color:var(--accent)}
   @media (max-width:899px){.ptitle h1{font-size:31px}}
