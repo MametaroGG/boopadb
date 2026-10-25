@@ -298,7 +298,7 @@
   @media (min-width:900px){
     .sp-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:26px;align-items:start}
     .sp-results{grid-column:1;grid-row:1;min-width:0}
-    .sp-side{grid-column:2;grid-row:1;position:sticky;top:0}
+    .sp-side{grid-column:2;grid-row:1;position:sticky;top:0;max-height:calc(100dvh - 236px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
     .sp-side .chips{flex-direction:column;align-items:stretch;flex-wrap:nowrap}
     .sp-side .chip{text-align:left}
     .sp-side .kwrap{flex-direction:column;align-items:stretch}
