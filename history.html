@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101012"><meta name="color-scheme" content="dark"><script>try{var t=localStorage.getItem("boopadb_theme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=t;}catch(e){document.documentElement.dataset.theme="dark"}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101012"><meta name="color-scheme" content="dark"><script>try{var t=localStorage.getItem("boopadb_theme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=t;}catch(e){document.documentElement.dataset.theme="dark"}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet"><link rel="preconnect" href="https://booth.pximg.net">
 <title>最近見た商品 | BoopaDB</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" type="image/png" href="favicon-192.png?v=2" sizes="192x192">
@@ -1088,7 +1088,7 @@ function clusterCB(cur, base, sale, atLowest){
 const HEART12 = '<svg class="hico" viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.1a5 5 0 1 1 7.5 6.5z"/></svg> ';
 function listRow(x, note, cluster){
   const sub = [esc(x.shop || ""), note || ""].filter(Boolean).join(" · ");
-  return `<a class="brow" href="${itemLink(x.id)}"><span class="bthw">${x.image ? `<img class="bth" src="${esc(x.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${x.id}">${PH_ICON}</span>`}${bmFlag(x.id)}</span><span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bsub">${sub}</span></span>${cluster}</a>`;
+  return `<a class="brow" href="${itemLink(x.id)}"><span class="bthw">${x.image ? `<img decoding="async" class="bth" src="${esc(x.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${x.id}">${PH_ICON}</span>`}${bmFlag(x.id)}</span><span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bsub">${sub}</span></span>${cluster}</a>`;
 }
 const META_BASE = "https://mametarogg.github.io/booth-vrc-price-tracker/meta/";
 const _metaCache = new Map();
@@ -1135,7 +1135,7 @@ function histRender(){
   el.innerHTML = all.map(h => {
     const lk = lookup.get(String(h.id));
     const price = lk ? clusterCB(lk.cur, lk.base, lk.sale, lk.at_lowest) : `<span class="bprice"><span class="price">${yen(h.cur)}</span></span>`;
-    return `<div class="brow"><a class="bmrowlink" href="${itemLink(h.id)}">${h.image ? `<img class="bth" src="${esc(h.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${h.id}">${PH_ICON}</span>`}<span class="bmain"><span class="bname">${esc(h.name)}</span><span class="bsub">${esc(h.shop || "")}</span></span></a>${price}<button class="bmrm" type="button" data-rm="${h.id}">${tr("bm_remove")}</button></div>`;
+    return `<div class="brow"><a class="bmrowlink" href="${itemLink(h.id)}">${h.image ? `<img decoding="async" class="bth" src="${esc(h.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${h.id}">${PH_ICON}</span>`}<span class="bmain"><span class="bname">${esc(h.name)}</span><span class="bsub">${esc(h.shop || "")}</span></span></a>${price}<button class="bmrm" type="button" data-rm="${h.id}">${tr("bm_remove")}</button></div>`;
   }).join("");
   el.querySelectorAll("[data-rm]").forEach(btn => btn.onclick = () => {
     const rest = histLoad().filter(h => String(h.id) !== btn.dataset.rm);

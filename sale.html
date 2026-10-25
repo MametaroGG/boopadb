@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101012"><meta name="color-scheme" content="dark"><script>try{var t=localStorage.getItem("boopadb_theme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=t;}catch(e){document.documentElement.dataset.theme="dark"}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101012"><meta name="color-scheme" content="dark"><script>try{var t=localStorage.getItem("boopadb_theme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=t;}catch(e){document.documentElement.dataset.theme="dark"}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet"><link rel="preconnect" href="https://booth.pximg.net">
 <title>セール中の商品 | BoopaDB</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" type="image/png" href="favicon-192.png?v=2" sizes="192x192">
@@ -1101,7 +1101,7 @@ const BM_FLAG_SVG = '<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l
 const bmFlag = (id, cls) => BM_SET.has(String(id)) ? `<span class="bmflag${cls ? " " + cls : ""}">${BM_FLAG_SVG}</span>` : "";
 function mosaicCell(s, i){
   return `<a class="card mcell m${i + 1}" href="${itemLink(s.id)}">
-    <span class="mimg">${s.image ? `<img src="${s.image}" alt="" loading="lazy" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}</span>
+    <span class="mimg">${s.image ? `<img decoding="async" src="${s.image}" alt="" loading="lazy" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}</span>
     ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : (s.cur === 0 ? '<span class="mlab">' + tr("free") + '</span>' : "")}
     ${bmFlag(s.id, (s.at_lowest || s.cur === 0) ? "u2" : "")}
     <span class="scrim"><span class="discst">-${s.pct}%</span><span class="was${wCls(s.base)}"><span class="wasx">${yen(s.base)}</span></span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span>
@@ -1109,7 +1109,7 @@ function mosaicCell(s, i){
 }
 function capCard(s){
   return `<div class="card">
-    <a class="capimg" href="${itemLink(s.id)}">${s.image ? `<img src="${s.image}" alt="" loading="lazy" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}</a>
+    <a class="capimg" href="${itemLink(s.id)}">${s.image ? `<img decoding="async" src="${s.image}" alt="" loading="lazy" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}</a>
     <div class="capbody">
       <div class="capname"><a href="${itemLink(s.id)}">${esc(s.name)}</a></div>
       <div class="capshop">${esc(s.shop || "")}</div>
@@ -1260,7 +1260,7 @@ function renderSaleList(){
     .filter(s => s.base > 0 && s.base <= 100000)
     .sort((a, b) => (b.base - b.cur) - (a.base - a.cur) || b.pct - a.pct);
   document.getElementById("spSaleList").innerHTML = arr.slice(0, listShown).map(s =>
-  `<a class="brow" href="${itemLink(s.id)}">${s.image ? `<img class="bth" src="${esc(s.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}<span class="bmain"><span class="bname">${esc(s.name)}</span><span class="bsub">${esc(s.shop || "")}${s.at_lowest ? " · " + tr("chip_lowest") : ""}</span></span><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span></span></a>`
+  `<a class="brow" href="${itemLink(s.id)}">${s.image ? `<img decoding="async" class="bth" src="${esc(s.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}<span class="bmain"><span class="bname">${esc(s.name)}</span><span class="bsub">${esc(s.shop || "")}${s.at_lowest ? " · " + tr("chip_lowest") : ""}</span></span><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></span></span></a>`
   ).join("");
   document.getElementById("spListMore").style.display = arr.length > listShown ? "" : "none";
 }

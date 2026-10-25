@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#101012"><script>try{var t=localStorage.getItem("boopadb_theme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=t;}catch(e){document.documentElement.dataset.theme="dark"}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#101012"><script>try{var t=localStorage.getItem("boopadb_theme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=t;}catch(e){document.documentElement.dataset.theme="dark"}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet"><link rel="preconnect" href="https://booth.pximg.net">
 <meta name="color-scheme" content="dark">
 <title>BoopaDB — BOOTHのVRChat向け価格データベース（プロトタイプ）</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
@@ -858,11 +858,11 @@
   </div>
 </header>
 <main>
-  <a class="topslot" href="https://chromewebstore.google.com/detail/mllcdeonfeaepajkkidjmgonfkibeokb" target="_blank" rel="noopener"><img src="banner.jpg" alt="Boopa – BOOTH Price Tracker for VRChat"></a>
+  <a class="topslot" href="https://chromewebstore.google.com/detail/mllcdeonfeaepajkkidjmgonfkibeokb" target="_blank" rel="noopener"><img decoding="async" src="banner.jpg" alt="Boopa – BOOTH Price Tracker for VRChat"></a>
   <h2 class="heroh" data-i="hero_title">注目＆おすすめ</h2>
   <div class="hero" id="hero"><div class="hero-view"><div class="hero-track" id="heroTrack"></div></div><button class="harrow prev" id="heroPrev" data-i-al="al_prev" aria-label="前へ">‹</button><button class="harrow next" id="heroNext" data-i-al="al_next" aria-label="次へ">›</button></div><div class="hero-dots" id="heroDots"></div>
   <div id="appPromo" style="display:none;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px 16px;margin:2px 0 20px">
-    <img src="icon-512.png" alt="" style="width:38px;height:38px;border-radius:10px;flex:none">
+    <img decoding="async" src="icon-512.png" alt="" style="width:38px;height:38px;border-radius:10px;flex:none">
     <div style="flex:1;min-width:0"><div style="font-weight:800;font-size:14px" data-i="app_promo_t">BoopaDBをアプリとして使う</div><div style="font-size:12.5px;color:var(--sub)" data-i="app_promo_b">ホーム画面に追加すると、全画面で開けるようになります</div></div>
     <a href="app.html" style="flex:none;background:#fc4d50;color:#fff;font-weight:800;font-size:13px;padding:9px 14px;border-radius:10px;text-decoration:none" data-i="ft_app">アプリ</a>
     <button id="appPromoX" type="button" aria-label="close" style="flex:none;background:none;border:none;color:var(--faint);cursor:pointer;padding:6px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
@@ -1266,7 +1266,7 @@ function heroMetaHTML(x){
   return likes + tags;
 }
 function heroRelHTML(parents, kids, kidTotal){
-  const thumbs = list => `<span class="hthumbs">` + list.map(p => `<a class="hthumb" href="${itemUrl(p.id)}" target="_blank" rel="noopener" title="${esc(p.name || "")}">${p.img ? `<img src="${p.img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}</a>`).join("") + `</span>`;
+  const thumbs = list => `<span class="hthumbs">` + list.map(p => `<a class="hthumb" href="${itemUrl(p.id)}" target="_blank" rel="noopener" title="${esc(p.name || "")}">${p.img ? `<img decoding="async" src="${p.img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}</a>`).join("") + `</span>`;
   let out = "";
   if (parents.length) out += `<div class="hrelrow"><span class="hrel-g">${tr("pp_parents")}</span>` + thumbs(parents) + `</div>`;
   if (kids.length) out += `<div class="hrelrow"><span class="hrel-g">${tr("pp_children")}（${kidTotal}）</span>` + thumbs(kids) + `</div>`;
@@ -1303,10 +1303,10 @@ async function fillHeroMetas(){
     } catch (e) {}
   }
 }
-function heroSlideHTML(x){
+function heroSlideHTML(x, i){
   return `
   <div class="hslide">
-    <a class="himg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img class="hbg" src="${x.image}" alt="" aria-hidden="true" referrerpolicy="no-referrer" onerror="const w = this.closest('.himg'); if (w) w.querySelectorAll('img').forEach(i => i.remove())"><img class="hfg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="const w = this.closest('.himg'); if (w) w.querySelectorAll('img').forEach(i => i.remove())">` : ""}<span class="rib ${x._rib[0]}">${x._rib[1]}</span></a>${bmFlag(x.id)}
+    <a class="himg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img decoding="async"${i ? ' loading="lazy"' : ''} class="hbg" src="${x.image}" alt="" aria-hidden="true" referrerpolicy="no-referrer" onerror="const w = this.closest('.himg'); if (w) w.querySelectorAll('img').forEach(i => i.remove())"><img decoding="async"${i ? ' loading="lazy"' : ' fetchpriority="high"'} class="hfg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="const w = this.closest('.himg'); if (w) w.querySelectorAll('img').forEach(i => i.remove())">` : ""}<span class="rib ${x._rib[0]}">${x._rib[1]}</span></a>${bmFlag(x.id)}
     <div class="hbody">
       <div class="hname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="hsub"><span class="hstatus">${x._status}</span>${x.shop ? `<span class="hshop">${esc(x.shop)}</span>` : ""}</div>
@@ -1783,7 +1783,7 @@ function relCard(id, m, i){
   const shop = m && m.shop ? (m.shop.name || "") : "";
   const likes = m && typeof m.likes === "number" ? `<div class="clikes">${HEART_SVG}${m.likes.toLocaleString()}</div>` : "";
   return `<div class="card" style="animation-delay:${((i || 0) % 30) * 45}ms">
-    <a class="thumbwrap" href="${itemUrl(id)}" target="_blank" rel="noopener">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${id}">${PH_ICON}</span>`}${bmFlag(id)}</a>
+    <a class="thumbwrap" href="${itemUrl(id)}" target="_blank" rel="noopener">${img ? `<img decoding="async" src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${id}">${PH_ICON}</span>`}${bmFlag(id)}</a>
     <div class="cbody">
       <div class="cname"><a href="${itemUrl(id)}" target="_blank" rel="noopener">${esc(m ? m.name : "")}</a></div>
       <div class="cshop">${esc(shop)}</div>
@@ -2329,7 +2329,7 @@ function saleCard(s, i){
   return `
   <div class="card" style="animation-delay:${((i || 0) % 30) * 45}ms" data-pct="${s.pct}" data-free="${s.cur === 0 ? 1 : 0}" data-lowest="${s.at_lowest ? 1 : 0}" data-text="${esc((s.name + " " + (s.shop || "")).toLowerCase())}">
     <a class="thumbwrap" href="${itemUrl(s.id)}" target="_blank" rel="noopener">
-      ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}
+      ${s.image ? `<img decoding="async" src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}
       ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + "</span>" : ""}
       ${bmFlag(s.id, s.at_lowest ? "u2" : "")}
     </a>
@@ -2350,7 +2350,7 @@ function saleHit(s){
 }
 function mosaicCell(s, i){
   return `<a class="card mcell m${i + 1}" href="${itemUrl(s.id)}" target="_blank" rel="noopener">
-    ${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}
+    ${s.image ? `<img decoding="async" src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}
     ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : (s.cur === 0 ? '<span class="mlab">' + tr("free") + '</span>' : "")}
     ${bmFlag(s.id, (s.at_lowest || s.cur === 0) ? "u2" : "")}
     <span class="scrim"><span class="discst">-${s.pct}%</span><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span>
@@ -2358,7 +2358,7 @@ function mosaicCell(s, i){
 }
 function steamCap(s){
   return `<div class="card">
-    <a class="capimg" href="${itemUrl(s.id)}" target="_blank" rel="noopener">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}</a>
+    <a class="capimg" href="${itemUrl(s.id)}" target="_blank" rel="noopener">${s.image ? `<img decoding="async" src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}</a>
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(s.id)}" target="_blank" rel="noopener">${esc(s.name)}</a></div>
       <div class="capshop">${esc(s.shop || "")}</div>
@@ -2476,7 +2476,7 @@ function railTile(s, sm){
   const strip = sm
     ? `<span class="pstrip"><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack">${s.base > s.cur ? `<span class="was${wCls(s.base)}">${yen(s.base)}</span>` : ""}<span class="price">${priceIn}</span></span></span></span>`
     : `<span class="pstrip"><span class="discst">-${s.pct}%</span>${s.base > s.cur ? `<span class="pwas"><span class="wasx">${yen(s.base)}</span></span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${priceIn}</span></span>`;
-  return `<a class="rtile${sm ? " sm" : ""}" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, s.at_lowest ? "u2" : "")}</span>${strip}</a>`;
+  return `<a class="rtile${sm ? " sm" : ""}" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img decoding="async" src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, s.at_lowest ? "u2" : "")}</span>${strip}</a>`;
 }
 const tabsEl = document.getElementById("sortTabs");
 const ind = tabsEl.querySelector(".pill-ind");
@@ -2530,7 +2530,7 @@ const BTABS = {
 let bTab = "new", bItems = [], bShown = 7, FULL_OK = false;
 function browHTML(x, i){
   return `<a class="brow${i === 0 ? " sel" : ""}" data-i="${i}" href="${itemUrl(x.id)}" target="_blank" rel="noopener">
-    <span class="bthw">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${x.id}">${PH_ICON}</span>`}${bmFlag(x.id)}</span>
+    <span class="bthw">${x.image ? `<img decoding="async" src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${x.id}">${PH_ICON}</span>`}${bmFlag(x.id)}</span>
     <span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bshop">${esc(x.shop || "")}</span><span class="bnote">${x.note || ""}</span></span>
     <span class="bprice">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="bstack"><span class="was${wCls(x.base)}">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</span>
   </a>`;
@@ -2598,7 +2598,7 @@ function bPrevHTML(x){
   return `<div class="bpname">${esc(x.name)}</div>
     <div class="bpmeta">${esc(x.shop || "")}</div>
     <div class="bpchips">${(x.chips || []).map(c => `<span class="bpchip">${esc(c)}</span>`).join("")}</div>
-    ${x.image ? `<img class="bpimg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}
+    ${x.image ? `<img decoding="async" class="bpimg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}
     ${repSeriesOf(x) ? `<div class="bpspark bpchart"><div class="cap">${tr("pp_chart")}</div>${bpChartSVG(repSeriesOf(x), 340, 118)}</div>` : `<div class="bpspark bpchart" data-bpchart="${x.id}"><div class="cap">${tr("pp_chart")}</div><div class="bpchart-load"></div></div>`}
     <div class="bprow">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="was${wCls(x.base)}">${yen(x.base)}</span>` : ""}<span class="price">${yen(x.cur)}</span>${x.at_lowest ? '<span class="lowest">' + tr("chip_lowest") + '</span>' : ""}</div>`;
 }
@@ -2677,7 +2677,7 @@ function featCap(x, tag, meta, cls){
   const pct = x.base > x.cur ? Math.round((1 - x.cur / x.base) * 100) : 0;
   const fser = repSeriesOf(x);
   return `<div class="card">
-    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${x.id}">${PH_ICON}</span>`}${bmFlag(x.id, (cls || "").includes("new") ? "" : "u2")}</a>${(cls || "").includes("new") ? "" : `<span class="ftag${cls || ""}">${tag}</span>`}
+    <a class="capimg" href="${itemUrl(x.id)}" target="_blank" rel="noopener">${x.image ? `<img decoding="async" src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${x.id}">${PH_ICON}</span>`}${bmFlag(x.id, (cls || "").includes("new") ? "" : "u2")}</a>${(cls || "").includes("new") ? "" : `<span class="ftag${cls || ""}">${tag}</span>`}
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
@@ -3140,7 +3140,7 @@ function renderProdPage(x){
   ppKeys = keys;
   document.getElementById("ppBody").innerHTML = `
   <div class="pp-top">
-    <div class="pp-imgwrap">${x.image ? `<img class="hbg" src="${x.image}" alt="" aria-hidden="true" referrerpolicy="no-referrer"><img class="hfg" src="${x.image}" alt="" referrerpolicy="no-referrer">` : ""}</div>
+    <div class="pp-imgwrap">${x.image ? `<img decoding="async" class="hbg" src="${x.image}" alt="" aria-hidden="true" referrerpolicy="no-referrer"><img decoding="async" class="hfg" src="${x.image}" alt="" referrerpolicy="no-referrer">` : ""}</div>
     <div style="flex:1;min-width:0">
       <div class="pp-name">${esc(x.name)}</div>
       <div class="pp-shop">${esc(x.shop || "")}</div>
@@ -3257,7 +3257,7 @@ function pcardHTML(h){
     ? `<span class="bprice"><span class="discst">-${pct}%</span><span class="bstack"><span class="was${wCls(now.base)}">${yen(now.base)}</span><span class="price">${cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(cur)}</span></span></span>`
     : `<span class="price solo">${cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(cur)}</span>`;
   return `<a class="pcard" href="${itemUrl(h.id)}">
-    <span class="pimgw">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'pph')">` : `<span class="pph" data-fill="${h.id}">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
+    <span class="pimgw">${img ? `<img decoding="async" src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'pph')">` : `<span class="pph" data-fill="${h.id}">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
     <span class="pb"><span class="pn">${esc(h.name)}</span>
     <span class="pp2">${!onSale && drop ? `<span class="vchip">${tr("seen_drop", {v: yen(h.cur - cur)})}</span>` : ""}${priceHTML}</span></span></a>`;
 }
@@ -3272,7 +3272,7 @@ function bmCardHTML(h){
     ? `<span class="bmstrip">${pct > 0 ? `<span class="discst">-${pct}%</span>` : `<span class="saletag">${tr("rib_sale")}</span>`}<span class="bmvals"><span class="was${wCls(now.base)}">${yen(now.base)}</span><span class="price${wCls(cur)}">${priceTxt}</span></span></span>`
     : `<span class="bmstrip"><span class="bmvals"><span class="price${wCls(cur)}">${priceTxt}</span></span></span>`;
   return `<a class="bmcard" href="${itemUrl(h.id)}" title="${esc(h.name)}">
-    <span class="bmimg">${img ? `<img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'pph')">` : `<span class="pph" data-fill="${h.id}">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
+    <span class="bmimg">${img ? `<img decoding="async" src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'pph')">` : `<span class="pph" data-fill="${h.id}">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
     ${strip}<span class="bmname">${esc(h.name)}</span></a>`;
 }
 function renderPersonal(){
