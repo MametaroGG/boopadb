@@ -634,6 +634,17 @@
   .browse2{margin-top:28px}
   .btabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);scrollbar-width:none}
   .catsec{margin:36px 0 8px}
+  .catwrap{position:relative}
+  .catbtn{position:absolute;top:50%;transform:translateY(-50%);z-index:6;width:44px;height:44px;border-radius:50%;background:var(--panel);border:1px solid var(--border2);color:var(--text);cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.35);font-family:inherit}
+  .catbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .catbtn.prev{left:-14px}
+  .catbtn.next{right:-14px}
+  .catbtn.off{opacity:.35;pointer-events:none}
+  @media (min-width:900px){.catbtn{display:flex}}
+  .catslider{position:relative;height:6px;border-radius:99px;background:#26262c;margin:4px 2px 0;cursor:pointer;touch-action:none}
+  .catsthumb{position:absolute;top:0;left:0;height:100%;border-radius:99px;background:#55555f;min-width:36px;cursor:grab}
+  html[data-theme="light"] .catslider{background:#e2e2e8}
+  html[data-theme="light"] .catsthumb{background:#b9b9c4}
   .catrail{display:flex;gap:12px;overflow-x:auto;padding:8px 2px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   .catrail::-webkit-scrollbar{display:none}
   .catcard{position:relative;flex:0 0 auto;width:172px;aspect-ratio:4/5;border:none;padding:0;border-radius:14px;overflow:hidden;cursor:pointer;background:var(--panel);font-family:inherit}
@@ -942,7 +953,12 @@
 
   <section class="catsec">
     <h2 data-i="cat_title">カテゴリー別に閲覧</h2>
-    <div class="catrail" id="catRail"></div>
+    <div class="catwrap">
+      <button class="catbtn prev" id="catPrev" data-i-al="al_prev" aria-label="前へ"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="catrail" id="catRail"></div>
+      <button class="catbtn next" id="catNext" data-i-al="al_next" aria-label="次へ"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="catslider" id="catSlider"><div class="catsthumb" id="catSThumb"></div></div>
   </section>
 
 </main>
@@ -2327,8 +2343,46 @@ function loadCatCards(){
       return `<button class="catcard" data-cat="${esc(raw)}" style="--h:${HUES[ci % HUES.length]}"><span class="ccflat n${items.length}">${imgs}</span><span class="cctint"></span><span class="cclabel">${esc(catLabel(raw))}</span></button>`;
     }).join("");
     host.querySelectorAll(".catcard").forEach(c => { c.onclick = () => openSearchCat(c.dataset.cat); });
+    requestAnimationFrame(catNavUpdate);
   }).catch(() => {});
 }
+function catNavUpdate(){
+  const rail = document.getElementById("catRail"), th = document.getElementById("catSThumb");
+  const pv = document.getElementById("catPrev"), nx = document.getElementById("catNext");
+  const track = document.getElementById("catSlider");
+  if (!rail || !th || !track) return;
+  const sw = rail.scrollWidth, cw = rail.clientWidth, max = sw - cw;
+  track.style.display = max > 0 ? "" : "none";
+  if (max <= 0) { if (pv) pv.classList.add("off"); if (nx) nx.classList.add("off"); return; }
+  const wfrac = cw / sw;
+  th.style.width = (wfrac * 100) + "%";
+  th.style.left = (rail.scrollLeft / max) * (1 - wfrac) * 100 + "%";
+  if (pv) pv.classList.toggle("off", rail.scrollLeft <= 2);
+  if (nx) nx.classList.toggle("off", rail.scrollLeft >= max - 2);
+}
+(function(){
+  const rail = document.getElementById("catRail");
+  if (!rail) return;
+  const step = () => Math.max(220, rail.clientWidth * 0.85);
+  document.getElementById("catPrev").onclick = () => rail.scrollBy({ left: -step(), behavior: "smooth" });
+  document.getElementById("catNext").onclick = () => rail.scrollBy({ left: step(), behavior: "smooth" });
+  rail.addEventListener("scroll", () => requestAnimationFrame(catNavUpdate), { passive: true });
+  addEventListener("resize", catNavUpdate);
+  const track = document.getElementById("catSlider"), th = document.getElementById("catSThumb");
+  const seek = clientX => {
+    const r = track.getBoundingClientRect(), max = rail.scrollWidth - rail.clientWidth;
+    if (max <= 0 || r.width <= th.offsetWidth) return;
+    const x = Math.min(Math.max(clientX - r.left - th.offsetWidth / 2, 0), r.width - th.offsetWidth);
+    rail.scrollLeft = x / (r.width - th.offsetWidth) * max;
+  };
+  track.addEventListener("pointerdown", e => {
+    track.setPointerCapture(e.pointerId);
+    seek(e.clientX);
+    const mv = ev => seek(ev.clientX);
+    track.addEventListener("pointermove", mv);
+    track.addEventListener("pointerup", () => track.removeEventListener("pointermove", mv), { once: true });
+  });
+})();
 (function(){
   const host = document.getElementById("catRail");
   if (!host) return;

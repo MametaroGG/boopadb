@@ -633,6 +633,17 @@
   .browse2{margin-top:28px}
   .btabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);scrollbar-width:none}
   .catsec{margin:36px 0 8px}
+  .catwrap{position:relative}
+  .catbtn{position:absolute;top:50%;transform:translateY(-50%);z-index:6;width:44px;height:44px;border-radius:50%;background:var(--panel);border:1px solid var(--border2);color:var(--text);cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.35);font-family:inherit}
+  .catbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .catbtn.prev{left:-14px}
+  .catbtn.next{right:-14px}
+  .catbtn.off{opacity:.35;pointer-events:none}
+  @media (min-width:900px){.catbtn{display:flex}}
+  .catslider{position:relative;height:6px;border-radius:99px;background:#26262c;margin:4px 2px 0;cursor:pointer;touch-action:none}
+  .catsthumb{position:absolute;top:0;left:0;height:100%;border-radius:99px;background:#55555f;min-width:36px;cursor:grab}
+  html[data-theme="light"] .catslider{background:#e2e2e8}
+  html[data-theme="light"] .catsthumb{background:#b9b9c4}
   .catrail{display:flex;gap:12px;overflow-x:auto;padding:8px 2px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   .catrail::-webkit-scrollbar{display:none}
   .catcard{position:relative;flex:0 0 auto;width:172px;aspect-ratio:4/5;border:none;padding:0;border-radius:14px;overflow:hidden;cursor:pointer;background:var(--panel);font-family:inherit}
