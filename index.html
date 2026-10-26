@@ -1616,6 +1616,12 @@ function isoFD(n){ if (!n) return ""; const t = String(n); return t.slice(0, 4) 
 // ---- full-catalog search (search_index.json: every tracked product) ----
 let fullIndex = null, fullIndexLoading = false, spCatMap = new Map();
 const SP_CATS = ["3D衣装 3Dモデル", "3D小道具 3Dモデル", "3Dテクスチャ 3Dモデル", "3D装飾品 3Dモデル", "3Dモデル（その他） 3Dモデル", "3Dキャラクター 3Dモデル", "3D環境・ワールド 3Dモデル", "VRoid 3Dモデル", "3Dツール・システム 3Dモデル", "3Dモーション・アニメーション 3Dモデル", "3D髪型 3Dモデル", "ソフトウェア ソフトウェア・ハードウェア", "3D靴 3Dモデル", "素材（その他） 素材データ", "ゲーム関連商品 ゲーム", "ヘアアクセサリー アクセサリー", "イラスト（その他） イラスト"];
+/* BOOTH's official category names: BOOTH localizes them into English only
+   (the ko/zh BOOTH sites show the English names too), so every non-ja
+   display language uses these. Verified per category id on booth.pm/en. */
+const CAT_EN = {"3D衣装":"3D Clothing","3D小道具":"3D Props","3Dテクスチャ":"3D Textures","3D装飾品":"3D Accessories","3Dモデル（その他）":"3D Models (Other)","3Dキャラクター":"3D Characters","3D環境・ワールド":"3D Environments / World","VRoid":"VRoid","3Dツール・システム":"3D Tools & Systems","3Dモーション・アニメーション":"3D Motion & Animation","3D髪型":"3D Hair","ソフトウェア":"Software","3D靴":"3D Shoes","素材（その他）":"Materials (Other)","ゲーム関連商品":"Game-related Items","ヘアアクセサリー":"Hair Accessories","イラスト（その他）":"Illustration (Other)"};
+function catNameL(child){ return LANG !== "ja" && CAT_EN[child] ? CAT_EN[child] : child; }
+function catLabelL(raw){ return catNameL(catLabel(raw)); }
 function spEnrichFromIndex(){
   if (!fullIndex) return;
   const byId = new Map(fullIndex.map(e => [e[0], e]));
@@ -2202,7 +2208,7 @@ function spModeSync(n){
   if (!bar) return;
   let label = "";
   if (spRelIds) label = (spRelName ? spRelName + " \u2014 " : "") + tr("pp_children");
-  else if (spCatMode) label = catLabel(spCatMode);
+  else if (spCatMode) label = catLabelL(spCatMode);
   if (label && n != null) label += "\uFF08" + n + "\uFF09";
   bar.hidden = !label;
   const cnt = document.getElementById("spCount");
@@ -2340,7 +2346,7 @@ function loadCatCards(){
       const filled = [];
       for (let k = 0; k < 9; k++) filled.push(items[k % items.length]);
       const imgs = filled.map(x => `<img loading="lazy" src="${esc(pxImg(x.i))}" alt="" onerror="imgPh(this)">`).join("");
-      return `<button class="catcard" data-cat="${esc(raw)}" style="--h:${HUES[ci % HUES.length]}"><span class="ccflat n${items.length}">${imgs}</span><span class="cctint"></span><span class="cclabel">${esc(catLabel(raw))}</span></button>`;
+      return `<button class="catcard" data-cat="${esc(raw)}" style="--h:${HUES[ci % HUES.length]}"><span class="ccflat n${items.length}">${imgs}</span><span class="cctint"></span><span class="cclabel">${esc(catLabelL(raw))}</span></button>`;
     }).join("");
     host.querySelectorAll(".catcard").forEach(c => { c.onclick = () => openSearchCat(c.dataset.cat); });
     requestAnimationFrame(catNavUpdate);
@@ -2417,7 +2423,7 @@ function spCatRender(){
     raws = SP_CATS;
     for (const raw of raws) { const k = raw.toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, raw); }
   }
-  host.innerHTML = raws.map(raw => `<button class="kw" data-cat="${esc(raw)}">${esc(catLabel(raw))}</button>`).join("");
+  host.innerHTML = raws.map(raw => `<button class="kw" data-cat="${esc(raw)}">${esc(catLabelL(raw))}</button>`).join("");
   host.querySelectorAll(".kw").forEach(k => {
     k.onclick = () => {
       if (!fullIndex) loadFullIndex();
@@ -3349,7 +3355,7 @@ function renderProdPage(x){
 }
 function ppMetaHTML(src){
   const likes = src && typeof src.likes === "number" ? `<span class="pp-likes">${HEART_SVG}<span>${src.likes.toLocaleString()}</span></span>` : "";
-  const cat = src && src.category ? `<span class="pp-tag cat">${esc(src.category)}</span>` : "";
+  const cat = src && src.category ? `<span class="pp-tag cat">${esc(catNameL(src.category))}</span>` : "";
   const tags = src && Array.isArray(src.tags) && src.tags.length ? src.tags.map(t => `<span class="pp-tag">${esc(t)}</span>`).join("") : "";
   return likes + cat + tags;
 }
