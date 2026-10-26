@@ -1090,6 +1090,46 @@ async function fillImgs(){
   } finally { window._filling = false; if (document.querySelector("[data-fill]")) fillImgs(); }
 }
 new MutationObserver(() => { if (document.querySelector("[data-fill]")) fillImgs(); }).observe(document.body, {childList: true, subtree: true});
+// ---- image stall watchdog: a hung image request never fires load or
+// error, leaving a half-painted or blank image forever (seen on iPad).
+// A pximg image that stays incomplete 9s+ while near the viewport is
+// restarted by swapping in a fresh clone of itself. Elements sharing one
+// URL join the same fetch, so a plain restart can rejoin the hung fetch;
+// the second restart therefore fetches under a throwaway query key,
+// which forces a genuinely new request. At most 2 restarts.
+if (!window.__wdOn) {
+  window.__wdOn = 1;
+  const _wdImgs = new Map();
+  function wdReg(img){
+    if (_wdImgs.has(img)) return;
+    const s = img.getAttribute && img.getAttribute("src");
+    if (s && s.includes("pximg.net")) _wdImgs.set(img, { t: Date.now(), n: 0 });
+  }
+  function wdScanAll(root){
+    if (!root || root.nodeType !== 1) return;
+    if (root.tagName === "IMG") wdReg(root);
+    if (root.querySelectorAll) root.querySelectorAll("img").forEach(wdReg);
+  }
+  setInterval(() => {
+    const now = Date.now(), vh = innerHeight || 900;
+    _wdImgs.forEach((st, img) => {
+      if (!img.isConnected || img.complete) { _wdImgs.delete(img); return; }
+      if (now - st.t < 9000 || st.n >= 2) return;
+      const r = img.getBoundingClientRect();
+      if (r.bottom < -vh || r.top > vh * 2 || r.width === 0) return;
+      const c = img.cloneNode(false);
+      if (st.n >= 1) {
+        const s = c.getAttribute("src");
+        if (s && !s.includes("wd=1")) c.setAttribute("src", s + (s.includes("?") ? "&" : "?") + "wd=1");
+      }
+      st.n++; st.t = now;
+      _wdImgs.delete(img); _wdImgs.set(c, st);
+      img.replaceWith(c);
+    });
+  }, 3000);
+  new MutationObserver(ms => { for (const m of ms) if (m.addedNodes) m.addedNodes.forEach(wdScanAll); }).observe(document.documentElement, { childList: true, subtree: true });
+  wdScanAll(document.body);
+}
 
 let pgShown = 60, pgItems = [], pgRowFn = null;
 function pgRender(){
@@ -1098,6 +1138,46 @@ function pgRender(){
 }
 document.getElementById("pgMore").textContent = tr("more");
 document.getElementById("pgMore").onclick = () => { pgShown += 60; pgRender(); };
+// ---- image stall watchdog: a hung image request never fires load or
+// error, leaving a half-painted or blank image forever (seen on iPad).
+// A pximg image that stays incomplete 9s+ while near the viewport is
+// restarted by swapping in a fresh clone of itself. Elements sharing one
+// URL join the same fetch, so a plain restart can rejoin the hung fetch;
+// the second restart therefore fetches under a throwaway query key,
+// which forces a genuinely new request. At most 2 restarts.
+if (!window.__wdOn) {
+  window.__wdOn = 1;
+  const _wdImgs = new Map();
+  function wdReg(img){
+    if (_wdImgs.has(img)) return;
+    const s = img.getAttribute && img.getAttribute("src");
+    if (s && s.includes("pximg.net")) _wdImgs.set(img, { t: Date.now(), n: 0 });
+  }
+  function wdScanAll(root){
+    if (!root || root.nodeType !== 1) return;
+    if (root.tagName === "IMG") wdReg(root);
+    if (root.querySelectorAll) root.querySelectorAll("img").forEach(wdReg);
+  }
+  setInterval(() => {
+    const now = Date.now(), vh = innerHeight || 900;
+    _wdImgs.forEach((st, img) => {
+      if (!img.isConnected || img.complete) { _wdImgs.delete(img); return; }
+      if (now - st.t < 9000 || st.n >= 2) return;
+      const r = img.getBoundingClientRect();
+      if (r.bottom < -vh || r.top > vh * 2 || r.width === 0) return;
+      const c = img.cloneNode(false);
+      if (st.n >= 1) {
+        const s = c.getAttribute("src");
+        if (s && !s.includes("wd=1")) c.setAttribute("src", s + (s.includes("?") ? "&" : "?") + "wd=1");
+      }
+      st.n++; st.t = now;
+      _wdImgs.delete(img); _wdImgs.set(c, st);
+      img.replaceWith(c);
+    });
+  }, 3000);
+  new MutationObserver(ms => { for (const m of ms) if (m.addedNodes) m.addedNodes.forEach(wdScanAll); }).observe(document.documentElement, { childList: true, subtree: true });
+  wdScanAll(document.body);
+}
 
 pgRowFn = x => listRow(x, tr("added_on", {d: x.first_date}), clusterCB(x.cur, x.base, !!x.on_sale, x.at_lowest));
 pgItems = P.newest || [];
