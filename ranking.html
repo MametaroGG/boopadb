@@ -462,6 +462,11 @@
   .pp-meta{display:flex;align-items:center;gap:7px 8px;flex-wrap:wrap;margin-top:10px}
   .pp-likes{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;margin-right:6px}
   .pp-likes svg{width:15px;height:15px;fill:none;stroke:#f2506e;stroke-width:2}
+  #ppSameSec{display:flex;align-items:center;gap:10px}
+  .pp-more{margin-left:auto;background:none;border:1px solid var(--line);color:var(--sub);border-radius:999px;padding:3px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+  .cshop[data-shop],.pp-shop[data-shop]{cursor:pointer}
+  .cshop[data-shop]:hover,.pp-shop[data-shop]:hover{text-decoration:underline}
+  button.srow{background:none;border:none;padding:0;font:inherit;cursor:pointer;text-align:left}
   .pp-tag{background:#1d1d22;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
   .pp-tag.cat{position:relative;background:linear-gradient(90deg,#4a6f92,#5b7f5e);border:1px solid rgba(255,255,255,.55);color:#fff;border-radius:6px;padding:4px 11px 4px 18px;font-weight:800;letter-spacing:.05em}
   .pp-tag.cat::before{content:"";position:absolute;left:5px;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:var(--bg);border:1.5px solid rgba(255,255,255,.8)}
@@ -1156,7 +1161,7 @@ function rkCluster(s){
   return `<span class="bprice">${badge}${stack}</span>`;
 }
 function rkRow2(s, i, note){
-  const sub = [esc(s.shop || ""), note || ""].filter(Boolean).join(" · ");
+  const sub = [s.shop ? `<span data-shop="${esc(s.shop)}">${esc(s.shop)}</span>` : "", note || ""].filter(Boolean).join(" · ");
   return `<a class="brow" href="${itemLink(s.id)}"><span class="rankno${i < 3 ? " top" : ""}">${i + 1}</span><span class="bthw">${s.image ? `<img decoding="async" class="bth" src="${esc(s.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}</span><span class="bmain"><span class="bname">${esc(s.name)}</span><span class="bsub">${sub}</span></span>${rkCluster(s)}</a>`;
 }
 const byAmount = (a, b) => (b.base - b.cur) - (a.base - a.cur) || b.pct - a.pct;
