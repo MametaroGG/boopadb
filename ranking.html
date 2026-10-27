@@ -1258,7 +1258,8 @@ loadFull().then(f => { if (!f) return; if (f.on_sale) SALE = f.on_sale; if (f.po
 // URL join the same fetch, so a plain restart can rejoin the hung fetch;
 // the second restart therefore fetches under a throwaway query key,
 // which forces a genuinely new request. At most 2 restarts.
-if (!window.__wdOn) {
+(function startImageWatchdog(){
+  if (window.__wdOn) return;
   window.__wdOn = 1;
   const _wdImgs = new Map();
   function wdReg(img){
@@ -1290,7 +1291,7 @@ if (!window.__wdOn) {
   }, 3000);
   new MutationObserver(ms => { for (const m of ms) if (m.addedNodes) m.addedNodes.forEach(wdScanAll); }).observe(document.documentElement, { childList: true, subtree: true });
   wdScanAll(document.body);
-}
+})();
 
 </script>
 <!-- stats snippet: keep the three copies in sync (build_prototype.py, build_pages_extra.py, build_sale.py) -->

@@ -1269,7 +1269,8 @@ new MutationObserver(() => { if (document.querySelector("[data-fill]")) fillImgs
 // URL join the same fetch, so a plain restart can rejoin the hung fetch;
 // the second restart therefore fetches under a throwaway query key,
 // which forces a genuinely new request. At most 2 restarts.
-if (!window.__wdOn) {
+(function startImageWatchdog(){
+  if (window.__wdOn) return;
   window.__wdOn = 1;
   const _wdImgs = new Map();
   function wdReg(img){
@@ -1301,7 +1302,7 @@ if (!window.__wdOn) {
   }, 3000);
   new MutationObserver(ms => { for (const m of ms) if (m.addedNodes) m.addedNodes.forEach(wdScanAll); }).observe(document.documentElement, { childList: true, subtree: true });
   wdScanAll(document.body);
-}
+})();
 
 document.title = tr("hist_title") + " | BoopaDB";
 document.getElementById("pgH1").textContent = tr("hist_title");
