@@ -650,7 +650,9 @@
   .updrail::-webkit-scrollbar{display:none}
   .ucard{flex:0 0 236px;width:236px;background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;text-decoration:none;color:var(--text);display:flex;flex-direction:column}
   .ucard .uimg{position:relative;display:block;aspect-ratio:16/10;background:var(--panel2);overflow:hidden}
-  .ucard .uimg img{width:100%;height:100%;object-fit:cover;display:block}
+  .ucard .uimg img{position:absolute;inset:0;width:100%;height:100%}
+  .ucard .uimg .ubg{object-fit:cover;filter:blur(22px) brightness(.55);transform:scale(1.3)}
+  .ucard .uimg .ufg{object-fit:contain;object-position:center}
   .ucard .ubody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
   .ucard .uname{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ucard .ushop{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
