@@ -347,6 +347,8 @@
   .lv-note{margin:14px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--sub);font-size:13px;text-align:center}
   .lv-note[hidden]{display:none}
   .lv-results{padding:10px 12px 28px}
+  #lvResults{grid-template-columns:repeat(2,1fr);gap:10px}
+  @media (min-width:900px){#lvResults{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}}
   .lv-sheet{position:absolute;left:0;right:0;bottom:0;height:34px;background:var(--panel);border-top:1px solid var(--line);border-radius:16px 16px 0 0;display:flex;flex-direction:column;z-index:8;box-shadow:0 -6px 24px rgba(0,0,0,.35)}
   .lv-sheet.anim{transition:height .3s cubic-bezier(.2,.8,.25,1)}
   .lv-grab{flex:none;height:26px;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none}
