@@ -641,10 +641,6 @@
   .catbtn.next{right:-14px}
   .catbtn.off{opacity:.35;pointer-events:none}
   @media (min-width:900px){.catbtn{display:flex}}
-  .catslider{position:relative;height:6px;border-radius:99px;background:#26262c;margin:4px 2px 0;cursor:pointer;touch-action:none}
-  .catsthumb{position:absolute;top:0;left:0;height:100%;border-radius:99px;background:#55555f;min-width:36px;cursor:grab}
-  html[data-theme="light"] .catslider{background:#e2e2e8}
-  html[data-theme="light"] .catsthumb{background:#b9b9c4}
   .catrail{display:flex;gap:12px;overflow-x:auto;padding:8px 2px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   .catrail::-webkit-scrollbar{display:none}
   .updrail{display:flex;gap:12px;overflow-x:auto;padding:8px 2px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -987,7 +983,7 @@
       <div class="catrail" id="catRail"></div>
       <button class="catbtn next" id="catNext" data-i-al="al_next" aria-label="次へ"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
     </div>
-    <div class="catslider" id="catSlider"><div class="catsthumb" id="catSThumb"></div></div>
+    <div class="upddots" id="catDots"></div>
   </section>
 
   <section class="catsec" id="updSec" hidden>
@@ -2381,18 +2377,28 @@ function loadCatCards(){
   }).catch(() => {});
 }
 function catNavUpdate(){
-  const rail = document.getElementById("catRail"), th = document.getElementById("catSThumb");
+  const rail = document.getElementById("catRail");
   const pv = document.getElementById("catPrev"), nx = document.getElementById("catNext");
-  const track = document.getElementById("catSlider");
-  if (!rail || !th || !track) return;
-  const sw = rail.scrollWidth, cw = rail.clientWidth, max = sw - cw;
-  track.style.display = max > 0 ? "" : "none";
-  if (max <= 0) { if (pv) pv.classList.add("off"); if (nx) nx.classList.add("off"); return; }
-  const wfrac = cw / sw;
-  th.style.width = (wfrac * 100) + "%";
-  th.style.left = (rail.scrollLeft / max) * (1 - wfrac) * 100 + "%";
+  if (!rail) return;
+  const max = rail.scrollWidth - rail.clientWidth;
   if (pv) pv.classList.toggle("off", rail.scrollLeft <= 2);
-  if (nx) nx.classList.toggle("off", rail.scrollLeft >= max - 2);
+  if (nx) nx.classList.toggle("off", max <= 0 || rail.scrollLeft >= max - 2);
+  catDotsSync();
+}
+function catDotsSync(){
+  const rail = document.getElementById("catRail"), dots = document.getElementById("catDots");
+  if (!rail || !dots) return;
+  const step = Math.max(220, rail.clientWidth * 0.85);
+  const max = rail.scrollWidth - rail.clientWidth;
+  const pages = max > 0 ? Math.round(max / step) + 1 : 1;
+  if (pages <= 1) { dots.innerHTML = ""; dots.style.display = "none"; return; }
+  dots.style.display = "";
+  const cur = Math.min(pages - 1, Math.round(rail.scrollLeft / step));
+  if (dots.childElementCount !== pages) {
+    dots.innerHTML = Array.from({ length: pages }, (_, i) => `<button type="button" data-p="${i}" aria-label="${i + 1}"></button>`).join("");
+    dots.querySelectorAll("button").forEach(b => { b.onclick = () => rail.scrollTo({ left: Number(b.dataset.p) * step, behavior: "smooth" }); });
+  }
+  dots.querySelectorAll("button").forEach((b, i) => b.classList.toggle("on", i === cur));
 }
 (function(){
   const rail = document.getElementById("catRail");
@@ -2402,20 +2408,6 @@ function catNavUpdate(){
   document.getElementById("catNext").onclick = () => rail.scrollBy({ left: step(), behavior: "smooth" });
   rail.addEventListener("scroll", () => requestAnimationFrame(catNavUpdate), { passive: true });
   addEventListener("resize", catNavUpdate);
-  const track = document.getElementById("catSlider"), th = document.getElementById("catSThumb");
-  const seek = clientX => {
-    const r = track.getBoundingClientRect(), max = rail.scrollWidth - rail.clientWidth;
-    if (max <= 0 || r.width <= th.offsetWidth) return;
-    const x = Math.min(Math.max(clientX - r.left - th.offsetWidth / 2, 0), r.width - th.offsetWidth);
-    rail.scrollLeft = x / (r.width - th.offsetWidth) * max;
-  };
-  track.addEventListener("pointerdown", e => {
-    track.setPointerCapture(e.pointerId);
-    seek(e.clientX);
-    const mv = ev => seek(ev.clientX);
-    track.addEventListener("pointermove", mv);
-    track.addEventListener("pointerup", () => track.removeEventListener("pointermove", mv), { once: true });
-  });
 })();
 (function(){
   const host = document.getElementById("catRail");
