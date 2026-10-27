@@ -2381,8 +2381,8 @@ function catNavUpdate(){
   const pv = document.getElementById("catPrev"), nx = document.getElementById("catNext");
   if (!rail) return;
   const max = rail.scrollWidth - rail.clientWidth;
-  if (pv) pv.classList.toggle("off", rail.scrollLeft <= 2);
-  if (nx) nx.classList.toggle("off", max <= 0 || rail.scrollLeft >= max - 2);
+  if (pv) pv.classList.toggle("off", max <= 0);
+  if (nx) nx.classList.toggle("off", max <= 0);
   catDotsSync();
 }
 function catDotsSync(){
@@ -2404,8 +2404,16 @@ function catDotsSync(){
   const rail = document.getElementById("catRail");
   if (!rail) return;
   const step = () => Math.max(220, rail.clientWidth * 0.85);
-  document.getElementById("catPrev").onclick = () => rail.scrollBy({ left: -step(), behavior: "smooth" });
-  document.getElementById("catNext").onclick = () => rail.scrollBy({ left: step(), behavior: "smooth" });
+  document.getElementById("catPrev").onclick = () => {
+    const max = rail.scrollWidth - rail.clientWidth;
+    if (rail.scrollLeft <= 2 && max > 0) rail.scrollTo({ left: max, behavior: "instant" });
+    else rail.scrollBy({ left: -step(), behavior: "smooth" });
+  };
+  document.getElementById("catNext").onclick = () => {
+    const max = rail.scrollWidth - rail.clientWidth;
+    if (rail.scrollLeft >= max - 2 && max > 0) rail.scrollTo({ left: 0, behavior: "instant" });
+    else rail.scrollBy({ left: step(), behavior: "smooth" });
+  };
   rail.addEventListener("scroll", () => requestAnimationFrame(catNavUpdate), { passive: true });
   addEventListener("resize", catNavUpdate);
 })();
@@ -2464,8 +2472,8 @@ function updNavUpdate(){
   const pv = document.getElementById("updPrev"), nx = document.getElementById("updNext");
   if (!rail || !pv || !nx) return;
   const max = rail.scrollWidth - rail.clientWidth;
-  pv.classList.toggle("off", rail.scrollLeft <= 2);
-  nx.classList.toggle("off", max <= 0 || rail.scrollLeft >= max - 2);
+  pv.classList.toggle("off", max <= 0);
+  nx.classList.toggle("off", max <= 0);
   updDotsSync();
 }
 function updDotsSync(){
@@ -2487,8 +2495,16 @@ function updDotsSync(){
   const rail = document.getElementById("updRail");
   if (!rail) return;
   const step = () => Math.max(220, rail.clientWidth * 0.85);
-  document.getElementById("updPrev").onclick = () => rail.scrollBy({ left: -step(), behavior: "smooth" });
-  document.getElementById("updNext").onclick = () => rail.scrollBy({ left: step(), behavior: "smooth" });
+  document.getElementById("updPrev").onclick = () => {
+    const max = rail.scrollWidth - rail.clientWidth;
+    if (rail.scrollLeft <= 2 && max > 0) rail.scrollTo({ left: max, behavior: "instant" });
+    else rail.scrollBy({ left: -step(), behavior: "smooth" });
+  };
+  document.getElementById("updNext").onclick = () => {
+    const max = rail.scrollWidth - rail.clientWidth;
+    if (rail.scrollLeft >= max - 2 && max > 0) rail.scrollTo({ left: 0, behavior: "instant" });
+    else rail.scrollBy({ left: step(), behavior: "smooth" });
+  };
   const um = document.getElementById("updMore");
   if (um) um.onclick = updMore;
   rail.addEventListener("scroll", () => requestAnimationFrame(updNavUpdate), { passive: true });
