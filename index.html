@@ -331,7 +331,8 @@
   .lv-head img{width:30px;height:30px;border-radius:7px;object-fit:cover;background:#2a2a30}
   .lv-title{font-weight:800;font-size:15px}
   .lv-count{margin-left:auto;color:var(--sub);font-size:12.5px;text-align:right}
-  .lv-stage{position:relative;display:flex;justify-content:center;align-items:center;padding:0;height:min(62svh,600px);overflow:hidden;flex:none}
+  .lv-stage{position:relative;display:flex;justify-content:center;align-items:center;padding:0;overflow:hidden;flex:1 1 auto;min-height:180px}
+  .lv-hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5;background:rgba(0,0,0,.55);color:#fff;font-size:12px;padding:5px 12px;border-radius:99px;pointer-events:none;max-width:92%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .lv-fitbtn{position:absolute;right:10px;bottom:10px;z-index:6;background:rgba(20,20,24,.82);backdrop-filter:blur(4px)}
   .lv-fitbtn[hidden]{display:none}
   .lv-wrap{position:relative;display:inline-block;touch-action:none;max-width:100%;will-change:transform}
@@ -342,13 +343,12 @@
   .lv-border{filter:drop-shadow(0 0 5px rgba(255,255,255,.35))}
   .lv-bracket{fill:none;stroke:#fff;stroke-linecap:round;filter:drop-shadow(0 1px 2px rgba(0,0,0,.55))}
   .lv-tick{fill:#fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
-  .lv-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px 2px}
-  .lv-hint{color:var(--sub);font-size:12.5px;flex:1;min-width:180px}
+  .lv-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;flex:none}
   .lv-tbtns{display:flex;gap:8px}
   .lv-note{margin:14px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--sub);font-size:13px;text-align:center}
   .lv-note[hidden]{display:none}
   .lv-results{padding:10px 12px 28px}
-  .lv-sheet{position:absolute;left:0;right:0;bottom:0;height:118px;background:var(--panel);border-top:1px solid var(--line);border-radius:16px 16px 0 0;display:flex;flex-direction:column;z-index:8;box-shadow:0 -6px 24px rgba(0,0,0,.35)}
+  .lv-sheet{position:absolute;left:0;right:0;bottom:0;height:34px;background:var(--panel);border-top:1px solid var(--line);border-radius:16px 16px 0 0;display:flex;flex-direction:column;z-index:8;box-shadow:0 -6px 24px rgba(0,0,0,.35)}
   .lv-sheet.anim{transition:height .3s cubic-bezier(.2,.8,.25,1)}
   .lv-grab{flex:none;height:26px;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none}
   .lv-grabbar{width:38px;height:4.5px;border-radius:99px;background:var(--sub);opacity:.55}
@@ -1116,8 +1116,8 @@
 </nav>
 <div id="lensView" hidden>
   <div class="lv-head"><button id="lvBack" class="igs-x" type="button" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><img id="lvThumb" alt=""><div class="lv-title" data-i="img_search">画像検索</div><div class="lv-count" id="lvCount"></div></div>
-  <div class="lv-stage" id="lvStage"><div class="lv-wrap" id="lvWrap"><img id="lvImg" alt=""><svg id="lvSvg"></svg><canvas id="lvDraw"></canvas></div><button id="lvFitBtn" class="igs-btn lv-fitbtn" type="button" hidden data-i="lv_fit">全体を表示</button></div>
-  <div class="lv-tools" id="lvTools"><span class="lv-hint" data-i="img_trace_hint">探したいものを指やマウスでなぞって囲んでください</span><span class="lv-tbtns"><button id="lvWhole" class="igs-btn" type="button" data-i="img_use_whole">画像全体で検索</button><button id="lvRetake" class="igs-btn" type="button" data-i="img_retake">選び直す</button></span></div>
+  <div class="lv-stage" id="lvStage"><div class="lv-wrap" id="lvWrap"><img id="lvImg" alt=""><svg id="lvSvg"></svg><canvas id="lvDraw"></canvas></div><button id="lvFitBtn" class="igs-btn lv-fitbtn" type="button" hidden data-i="lv_fit">全体を表示</button><span class="lv-hint" id="lvHint" data-i="img_trace_hint">探したいものを指やマウスでなぞって囲んでください</span></div>
+  <div class="lv-tools" id="lvTools"><span class="lv-tbtns"><button id="lvWhole" class="igs-btn" type="button" data-i="img_use_whole">画像全体で検索</button><button id="lvRetake" class="igs-btn" type="button" data-i="img_retake">選び直す</button></span></div>
   <div class="lv-sheet" id="lvSheet"><div class="lv-grab" id="lvGrab"><span class="lv-grabbar"></span></div><div class="lv-sheetbody" id="lvSheetBody"><div class="lv-note" id="lvNote" hidden></div><div class="grid lv-results" id="lvResults"></div></div></div>
 </div>
 <div class="spage" id="searchPage">
@@ -3936,6 +3936,7 @@ async function imgSimilar(x){
   img.src = x.image || "";
   document.getElementById("lvThumb").src = x.image || "";
   document.getElementById("lvTools").style.display = "none";
+  const _hint2 = document.getElementById("lvHint"); if (_hint2) _hint2.style.display = "none";
   lvOpen(); lvStageMode("results"); lvSetState("loading");
   try {
     const res = await fetch(IMG_API + "/similar/" + encodeURIComponent(x.id));
@@ -4043,24 +4044,49 @@ function lvSettle(bbox){
     cv.style.opacity = String(1 - k);
     lvRenderSvg();
     if (k < 1) requestAnimationFrame(tick);
-    else { const ctx = cv.getContext("2d"); ctx.clearRect(0, 0, cv.width, cv.height); cv.style.opacity = ""; lvMaybeSearch(); }
+    else { lvCvClear(); cv.style.opacity = ""; lvMaybeSearch(); }
   };
   requestAnimationFrame(tick);
 }
-function lvDrawTrail(pts){
-  const cv = lvEl("lvDraw");
+function lvCvSetup(){
+  const cv = lvEl("lvDraw"), wrap = lvEl("lvWrap");
+  if (!cv || !wrap) return;
+  const dpr = Math.min(3, window.devicePixelRatio || 1);
+  cv.width = Math.max(1, Math.round(wrap.clientWidth * dpr));
+  cv.height = Math.max(1, Math.round(wrap.clientHeight * dpr));
+  cv.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+function lvCvClear(){
+  const cv = lvEl("lvDraw"), wrap = lvEl("lvWrap");
+  if (!cv || !wrap) return;
   const ctx = cv.getContext("2d");
-  ctx.clearRect(0, 0, cv.width, cv.height);
+  ctx.clearRect(0, 0, wrap.clientWidth, wrap.clientHeight);
+}
+function lvDrawTrail(pts){
+  const cv = lvEl("lvDraw"), wrap = lvEl("lvWrap");
+  if (!cv || !wrap) return;
+  const ctx = cv.getContext("2d");
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  ctx.clearRect(0, 0, W, H);
   if (pts.length < 2) return;
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   for (const q of pts) { x0 = Math.min(x0, q.x); y0 = Math.min(y0, q.y); x1 = Math.max(x1, q.x); y1 = Math.max(y1, q.y); }
-  const g = ctx.createLinearGradient(x0 * cv.width, y0 * cv.height, x1 * cv.width, y1 * cv.height);
+  const g = ctx.createLinearGradient(x0 * W, y0 * H, x1 * W, y1 * H);
   g.addColorStop(0, "#7ab8ff"); g.addColorStop(0.5, "#7dffce"); g.addColorStop(1, "#ffe27a");
   ctx.lineJoin = "round"; ctx.lineCap = "round";
-  ctx.beginPath();
-  pts.forEach((q, i) => { const X = q.x * cv.width, Y = q.y * cv.height; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); });
-  ctx.strokeStyle = g; ctx.globalAlpha = 0.5; ctx.lineWidth = 13; ctx.stroke();
-  ctx.globalAlpha = 0.95; ctx.strokeStyle = "rgba(255,255,255,.92)"; ctx.lineWidth = 3.5; ctx.stroke();
+  const P = pts.map(q => [q.x * W, q.y * H]);
+  const path = () => {
+    ctx.beginPath();
+    ctx.moveTo(P[0][0], P[0][1]);
+    for (let i = 1; i < P.length - 1; i++) {
+      const mx = (P[i][0] + P[i + 1][0]) / 2, my = (P[i][1] + P[i + 1][1]) / 2;
+      ctx.quadraticCurveTo(P[i][0], P[i][1], mx, my);
+    }
+    ctx.lineTo(P[P.length - 1][0], P[P.length - 1][1]);
+  };
+  path(); ctx.strokeStyle = g; ctx.globalAlpha = 0.32; ctx.lineWidth = 17; ctx.stroke();
+  path(); ctx.strokeStyle = g; ctx.globalAlpha = 0.78; ctx.lineWidth = 9; ctx.stroke();
+  path(); ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.globalAlpha = 0.95; ctx.lineWidth = 3; ctx.stroke();
   ctx.globalAlpha = 1;
 }
 async function lvCropBlob(img, r){
@@ -4088,11 +4114,12 @@ async function lvRunSearch(){
     lvShowResults(imgHitsFromApi(j.results));
   } catch { lvSetState("error"); }
 }
+function lvPeekH(){ return lvSearched || lvEl("lvResults").children.length ? 118 : 34; }
 function lvSheetSet(mode){
   const sh = lvEl("lvSheet"); if (!sh) return;
   const view = lvEl("lensView");
   const maxH = Math.max(200, view.clientHeight - 56);
-  const h = mode === "max" ? maxH : mode === "mid" ? Math.round(view.clientHeight * 0.52) : 118;
+  const h = mode === "max" ? maxH : mode === "mid" ? Math.round(view.clientHeight * 0.52) : lvPeekH();
   sh.classList.add("anim");
   sh.style.height = h + "px";
   setTimeout(() => sh.classList.remove("anim"), 330);
@@ -4104,9 +4131,11 @@ function lvSetState(state){
     note.hidden = true; cnt.textContent = tr("img_searching");
     res.innerHTML = '<div class="lv-skel"></div>'.repeat(6);
     lvStageMode("results");
+    lvSheetSet("peek");
     return;
   }
   res.innerHTML = ""; cnt.textContent = "";
+  lvSheetSet("peek");
   note.hidden = false;
   note.textContent = tr(state === "limit" ? "img_limit" : state === "notindexed" ? "img_notindexed" : "img_error");
   lvStageMode("results");
@@ -4125,12 +4154,14 @@ function lvOpenUpload(file){
   if (lvUrl) URL.revokeObjectURL(lvUrl);
   lvUrl = URL.createObjectURL(file);
   lvRemote = false; lvRect = null; lvShown = null; lvSearched = null; lvDrag = null; lvZoomReset();
+  lvEl("lvResults").innerHTML = ""; lvEl("lvNote").hidden = true; lvEl("lvCount").textContent = "";
   const img = lvEl("lvImg");
   img.onload = () => { lvOpen(); lvStageMode("select"); lvSetState("idle"); lvFitLoop(); lvRenderSvg(); };
   img.src = lvUrl;
   lvEl("lvThumb").src = lvUrl;
   lvEl("lvTools").style.display = "";
   lvSheetSet("peek");
+  const _hint = lvEl("lvHint"); if (_hint) _hint.style.display = "";
   const sb = lvEl("lvSheetBody"); if (sb) sb.scrollTop = 0;
 }
 let lvZoom = { s: 1, tx: 0, ty: 0 };
@@ -4187,7 +4218,7 @@ function lvBind(){
       lvDrag = null;
       const a = [...ptrs.values()];
       pinch = { d: Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y), s: lvZoom.s, tx: lvZoom.tx, ty: lvZoom.ty, mx: (a[0].x + a[1].x) / 2, my: (a[0].y + a[1].y) / 2 };
-      cv.getContext("2d").clearRect(0, 0, cv.width, cv.height);
+      lvCvClear();
       return;
     }
     e.preventDefault();
@@ -4197,9 +4228,9 @@ function lvBind(){
     if (z === "trace" && lvZoom.s > 1.02) {
       lvDrag = { mode: "pan", sx: e.clientX, sy: e.clientY, tx: lvZoom.tx, ty: lvZoom.ty };
     } else if (z === "trace") {
-      lvDrag = { mode: "trace", pts: [p] };
-      cv.width = wrap.clientWidth; cv.height = wrap.clientHeight;
-      cv.getContext("2d").clearRect(0, 0, cv.width, cv.height);
+      lvDrag = { mode: "trace", pts: [p], lx: e.clientX, ly: e.clientY };
+      lvCvSetup();
+      lvCvClear();
     } else {
       lvDrag = { mode: z, start: p, orig: {...lvRect} };
     }
@@ -4223,7 +4254,13 @@ function lvBind(){
       return;
     }
     const p = pt(e);
-    if (lvDrag.mode === "trace") { lvDrag.pts.push(p); lvDrawTrail(lvDrag.pts); return; }
+    if (lvDrag.mode === "trace") {
+      if (Math.hypot(e.clientX - lvDrag.lx, e.clientY - lvDrag.ly) >= 1.5 || lvDrag.pts.length < 2) {
+        lvDrag.pts.push(p); lvDrag.lx = e.clientX; lvDrag.ly = e.clientY;
+      }
+      lvDrawTrail(lvDrag.pts);
+      return;
+    }
     const o = lvDrag.orig, dx = p.x - lvDrag.start.x, dy = p.y - lvDrag.start.y;
     let r = {...o};
     if (lvDrag.mode === "move") {
@@ -4256,7 +4293,7 @@ function lvBind(){
       for (const q of pts) { x0 = Math.min(x0, q.x); y0 = Math.min(y0, q.y); x1 = Math.max(x1, q.x); y1 = Math.max(y1, q.y); }
       if (x1 - x0 >= 0.025 && y1 - y0 >= 0.025) lvSettle({ x0, y0, x1, y1 });
       else {
-        cv.getContext("2d").clearRect(0, 0, cv.width, cv.height);
+        lvCvClear();
         if (performance.now() - downT < 280 && pts.length <= 3) {
           if (lvZoom.s > 1.02) lvZoomReset(); else lvZoomTo(2.4, pts[0]);
         }
@@ -4286,7 +4323,7 @@ lvEl("lvFitBtn").addEventListener("click", lvZoomReset);
   grab.addEventListener("pointermove", e => {
     if (!drag) return;
     const maxH = Math.max(200, view.clientHeight - 56);
-    const h = Math.max(96, Math.min(maxH, drag.h + (drag.y - e.clientY)));
+    const h = Math.max(34, Math.min(maxH, drag.h + (drag.y - e.clientY)));
     if (Math.abs(h - drag.h) > 4) drag.moved = true;
     sh.style.height = h + "px";
   });
@@ -4294,9 +4331,9 @@ lvEl("lvFitBtn").addEventListener("click", lvZoomReset);
     if (!drag) return;
     const maxH = Math.max(200, view.clientHeight - 56);
     if (!drag.moved) {
-      lvSheetSet(sh.clientHeight > 140 ? "peek" : "max");
+      lvSheetSet(sh.clientHeight > lvPeekH() + 22 ? "peek" : "max");
     } else {
-      lvSheetSet(sh.clientHeight > (96 + maxH) / 2 ? "max" : "peek");
+      lvSheetSet(sh.clientHeight > (lvPeekH() + maxH) / 2 ? "max" : "peek");
     }
     drag = null;
   };

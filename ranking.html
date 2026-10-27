@@ -330,7 +330,8 @@
   .lv-head img{width:30px;height:30px;border-radius:7px;object-fit:cover;background:#2a2a30}
   .lv-title{font-weight:800;font-size:15px}
   .lv-count{margin-left:auto;color:var(--sub);font-size:12.5px;text-align:right}
-  .lv-stage{position:relative;display:flex;justify-content:center;align-items:center;padding:0;height:min(62svh,600px);overflow:hidden;flex:none}
+  .lv-stage{position:relative;display:flex;justify-content:center;align-items:center;padding:0;overflow:hidden;flex:1 1 auto;min-height:180px}
+  .lv-hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5;background:rgba(0,0,0,.55);color:#fff;font-size:12px;padding:5px 12px;border-radius:99px;pointer-events:none;max-width:92%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .lv-fitbtn{position:absolute;right:10px;bottom:10px;z-index:6;background:rgba(20,20,24,.82);backdrop-filter:blur(4px)}
   .lv-fitbtn[hidden]{display:none}
   .lv-wrap{position:relative;display:inline-block;touch-action:none;max-width:100%;will-change:transform}
@@ -341,13 +342,12 @@
   .lv-border{filter:drop-shadow(0 0 5px rgba(255,255,255,.35))}
   .lv-bracket{fill:none;stroke:#fff;stroke-linecap:round;filter:drop-shadow(0 1px 2px rgba(0,0,0,.55))}
   .lv-tick{fill:#fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
-  .lv-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px 2px}
-  .lv-hint{color:var(--sub);font-size:12.5px;flex:1;min-width:180px}
+  .lv-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;flex:none}
   .lv-tbtns{display:flex;gap:8px}
   .lv-note{margin:14px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--sub);font-size:13px;text-align:center}
   .lv-note[hidden]{display:none}
   .lv-results{padding:10px 12px 28px}
-  .lv-sheet{position:absolute;left:0;right:0;bottom:0;height:118px;background:var(--panel);border-top:1px solid var(--line);border-radius:16px 16px 0 0;display:flex;flex-direction:column;z-index:8;box-shadow:0 -6px 24px rgba(0,0,0,.35)}
+  .lv-sheet{position:absolute;left:0;right:0;bottom:0;height:34px;background:var(--panel);border-top:1px solid var(--line);border-radius:16px 16px 0 0;display:flex;flex-direction:column;z-index:8;box-shadow:0 -6px 24px rgba(0,0,0,.35)}
   .lv-sheet.anim{transition:height .3s cubic-bezier(.2,.8,.25,1)}
   .lv-grab{flex:none;height:26px;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none}
   .lv-grabbar{width:38px;height:4.5px;border-radius:99px;background:var(--sub);opacity:.55}
