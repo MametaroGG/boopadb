@@ -381,8 +381,6 @@
   .sp-search.has-query .sp-imgbtn{right:54px}
   .sp-search input#spQ{flex:1 1 0%;width:0;min-width:0;padding-right:58px}
   .sp-search.has-query input#spQ{padding-right:104px}
-  .image-search-entry{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0 20px;padding:12px 18px;border:1px solid var(--border2);border-radius:12px;background:var(--panel);color:var(--text);font:inherit;text-decoration:none}
-  .image-search-entry:hover{border-color:var(--accent,#f0444b)}
   .sp-mode-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .sp-mode-x{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid transparent;background:rgba(255,255,255,.22);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
   .sp-mode-x svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
@@ -1154,7 +1152,6 @@
   <div class="sp-head"><button class="sp-back" id="spBack" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><div class="sp-title" data-i="sp_title">商品検索</div></div>
   <div class="sp-inner">
     <div class="sp-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg><input id="spQ" type="text" data-i-ph="sp_ph" placeholder="商品名・ショップ名で検索" autocomplete="off"><button id="spClear" class="sp-clear" type="button" data-i-al="al_close" aria-label="閉じる" hidden><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button><button id="spImgBtn" class="sp-clear sp-imgbtn" type="button" data-i-al="img_search" aria-label="画像検索"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5-5-7 7"/></svg></button><input type="file" id="spImgFile" accept="image/*" hidden></div>
-    <a class="image-search-entry" id="spImageSearchEntry" href="image-search.html" data-i="img_page_entry">画像から商品を探す →</a>
     <div class="sp-main"><div class="sp-side">
     <div class="sp-sidehead"><span data-i="sp_filter">絞り込み</span><button id="spSideX" class="sp-sidex" type="button" data-i-al="al_close" aria-label="閉じる"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
     <div class="sp-sec" data-i="sp_filter">絞り込み</div>

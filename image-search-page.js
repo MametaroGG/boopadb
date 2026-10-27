@@ -16,7 +16,9 @@ function applyImageLocale(){
  document.documentElement.lang=LANG;document.title=tr('img_search')+' | BoopaDB';
  document.querySelectorAll('[data-i]').forEach(n=>n.textContent=tr(n.dataset.i));
  document.querySelectorAll('[data-i-al]').forEach(n=>n.setAttribute('aria-label',tr(n.dataset.iAl)));
- el('imageLang').value=LANG;
+ const labels={ja:'日本語',en:'English',ko:'한국어','zh-Hans':'简体中文','zh-Hant':'繁體中文'};
+ el('langCur').textContent=labels[LANG];
+ el('langMenu').innerHTML=Object.entries(labels).map(([code,name])=>'<button type="button" data-lang="'+code+'" class="'+(code===LANG?'on':'')+'">'+name+'</button>').join('');
  const copy=window.IMAGE_SEARCH_FAQ && (window.IMAGE_SEARCH_FAQ[LANG] || window.IMAGE_SEARCH_FAQ.ja);
  if(copy){
   el('imageExplain').innerHTML=copy.cards.map(c=>'<article><h2>'+esc(c.title)+'</h2><p>'+esc(c.body)+'</p></article>').join('');
@@ -25,15 +27,18 @@ function applyImageLocale(){
 }
 function applyImageTheme(){document.documentElement.dataset.theme=THEME;document.querySelector('meta[name="color-scheme"]').content=THEME;}
 applyImageLocale();applyImageTheme();
-el('imageLang').addEventListener('change',()=>{LANG=el('imageLang').value;try{localStorage.setItem('boopadb_lang',LANG);}catch{}applyImageLocale();renderCurrentResults();});
-el('imageTheme').addEventListener('click',()=>{THEME=THEME==='dark'?'light':'dark';try{localStorage.setItem('boopadb_theme',THEME);}catch{}applyImageTheme();});
-el('imageSearchClose').addEventListener('click',()=>{
- // Browser Back restores the previous search scroll/filter state when possible.
- try { const from=new URL(document.referrer); const home=new URL('index.html',location.href);
-  if(from.origin===home.origin && (from.pathname===home.pathname || from.pathname===home.pathname.replace(/index\.html$/,'')) && history.length>1){history.back();return;}
- }catch{}
- location.href='index.html';
-});
+function imageLanguageMenu(open){el('langMenu').classList.toggle('open',open);el('langBtn').setAttribute('aria-expanded',String(open));}
+el('langBtn').addEventListener('click',e=>{e.stopPropagation();imageLanguageMenu(!el('langMenu').classList.contains('open'));});
+el('langMenu').addEventListener('click',e=>{const button=e.target.closest('[data-lang]');if(!button)return;LANG=button.dataset.lang;try{localStorage.setItem('boopadb_lang',LANG);}catch{}applyImageLocale();renderCurrentResults();imageLanguageMenu(false);el('langBtn').focus();});
+document.addEventListener('click',e=>{if(!e.target.closest('.langsw'))imageLanguageMenu(false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&el('langMenu').classList.contains('open')){imageLanguageMenu(false);el('langBtn').focus();}});
+function imageChromeForLens(open){
+ imageLanguageMenu(false);
+ document.querySelectorAll('body > header, body > footer').forEach(node=>{node.toggleAttribute('inert',open);if(open)node.setAttribute('aria-hidden','true');else node.removeAttribute('aria-hidden');});
+}
+window.addEventListener('boopa:lens-open',()=>imageChromeForLens(true));
+window.addEventListener('boopa:lens-close',()=>imageChromeForLens(false));
+el('themeBtn').addEventListener('click',()=>{THEME=THEME==='dark'?'light':'dark';try{localStorage.setItem('boopadb_theme',THEME);}catch{}applyImageTheme();});
 function veilSync(){document.body.style.overflow=el('lensView').hidden?'':'hidden';}
 function isoFD(n){if(!n)return '';const s=String(n);return s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8);}
 function pxImg(v){return !v?'':String(v).includes('://')?String(v):'https://booth.pximg.net/c/620x620/'+v+'_base_resized.jpg';}

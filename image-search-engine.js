@@ -21,8 +21,8 @@ async function imgSimilar(x){
 let lvUrl = null, lvRect = null, lvShown = null, lvDrag = null, lvSearched = null, lvAnim = null, lvRemote = false, lvSettleGen = 0;
 const lvEl = id => document.getElementById(id);
 let lvReturnFocus = null;
-function lvOpen(){ if (lvEl("lensView").hidden) lvReturnFocus = document.activeElement; lvEl("lensView").hidden = false; if (lvEl("imageSearchPage")) lvEl("imageSearchPage").setAttribute("aria-hidden", "true"); document.body.style.overflow = "hidden"; lvEl("lvBack").focus(); }
-function lvClose(){ lvEl("lensView").hidden = true; if (lvEl("imageSearchPage")) lvEl("imageSearchPage").removeAttribute("aria-hidden"); document.body.style.overflow = ""; if (lvAnim) { cancelAnimationFrame(lvAnim); lvAnim = null; } lvZoomReset(); veilSync(); if (document.getElementById("imageSearchPage")) document.getElementById("spImgDrop").focus(); else if (lvReturnFocus && lvReturnFocus.isConnected) lvReturnFocus.focus(); }
+function lvOpen(){ if (lvEl("lensView").hidden) lvReturnFocus = document.activeElement; lvEl("lensView").hidden = false; if (lvEl("imageSearchPage")) lvEl("imageSearchPage").setAttribute("aria-hidden", "true"); document.body.style.overflow = "hidden"; window.dispatchEvent(new Event("boopa:lens-open")); lvEl("lvBack").focus(); }
+function lvClose(){ lvEl("lensView").hidden = true; window.dispatchEvent(new Event("boopa:lens-close")); if (lvEl("imageSearchPage")) lvEl("imageSearchPage").removeAttribute("aria-hidden"); document.body.style.overflow = ""; if (lvAnim) { cancelAnimationFrame(lvAnim); lvAnim = null; } lvZoomReset(); veilSync(); if (document.getElementById("imageSearchPage")) document.getElementById("spImgDrop").focus(); else if (lvReturnFocus && lvReturnFocus.isConnected) lvReturnFocus.focus(); }
 function lvStageMode(mode){ lvFitLoop(); }
 function lvFitBox(){
   const stage = lvEl("lvStage"), img = lvEl("lvImg"), wrap = lvEl("lvWrap");
