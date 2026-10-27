@@ -3970,7 +3970,7 @@ function lvRenderSvg(){
   if (!lvShown) return;
   const NS = "http://www.w3.org/2000/svg";
   const x = lvShown.x0 * W, y = lvShown.y0 * H, w = (lvShown.x1 - lvShown.x0) * W, h = (lvShown.y1 - lvShown.y0) * H;
-  const r = Math.max(4, Math.min(18, w / 2, h / 2));
+  const r = Math.max(3, Math.min(18, Math.min(w, h) * 0.16, w / 2, h / 2));
   const rr = (x, y, w, h, r) => "M " + (x + r) + " " + y + " H " + (x + w - r) + " A " + r + " " + r + " 0 0 1 " + (x + w) + " " + (y + r) + " V " + (y + h - r) + " A " + r + " " + r + " 0 0 1 " + (x + w - r) + " " + (y + h) + " H " + (x + r) + " A " + r + " " + r + " 0 0 1 " + x + " " + (y + h - r) + " V " + (y + r) + " A " + r + " " + r + " 0 0 1 " + (x + r) + " " + y + " Z";
   const dim = document.createElementNS(NS, "path");
   dim.setAttribute("d", "M 0 0 H " + W + " V " + H + " H 0 Z " + rr(x, y, w, h, r));
@@ -3981,26 +3981,27 @@ function lvRenderSvg(){
   bd.setAttribute("fill", "none"); bd.setAttribute("stroke", "rgba(255,255,255,.96)"); bd.setAttribute("stroke-width", "2");
   bd.setAttribute("class", "lv-border");
   svg.appendChild(bd);
-  const R = r + 7, ex = 11;
+  const off = Math.max(3, r * 0.4), R = r + off, ex = Math.max(5, r * 0.65);
   const brackets = [
-    "M " + (x - 7 - ex) + " " + (y + r) + " L " + (x - 7) + " " + (y + r) + " A " + R + " " + R + " 0 0 1 " + (x + r) + " " + (y - 7) + " L " + (x + r) + " " + (y - 7 - ex),
-    "M " + (x + w - r) + " " + (y - 7 - ex) + " L " + (x + w - r) + " " + (y - 7) + " A " + R + " " + R + " 0 0 1 " + (x + w + 7) + " " + (y + r) + " L " + (x + w + 7 + ex) + " " + (y + r),
-    "M " + (x + w + 7 + ex) + " " + (y + h - r) + " L " + (x + w + 7) + " " + (y + h - r) + " A " + R + " " + R + " 0 0 1 " + (x + w - r) + " " + (y + h + 7) + " L " + (x + w - r) + " " + (y + h + 7 + ex),
-    "M " + (x + r) + " " + (y + h + 7 + ex) + " L " + (x + r) + " " + (y + h + 7) + " A " + R + " " + R + " 0 0 1 " + (x - 7) + " " + (y + h - r) + " L " + (x - 7 - ex) + " " + (y + h - r)
+    "M " + (x - off - ex) + " " + (y + r) + " L " + (x - off) + " " + (y + r) + " A " + R + " " + R + " 0 0 1 " + (x + r) + " " + (y - off) + " L " + (x + r) + " " + (y - off - ex),
+    "M " + (x + w - r) + " " + (y - off - ex) + " L " + (x + w - r) + " " + (y - off) + " A " + R + " " + R + " 0 0 1 " + (x + w + off) + " " + (y + r) + " L " + (x + w + off + ex) + " " + (y + r),
+    "M " + (x + w + off + ex) + " " + (y + h - r) + " L " + (x + w + off) + " " + (y + h - r) + " A " + R + " " + R + " 0 0 1 " + (x + w - r) + " " + (y + h + off) + " L " + (x + w - r) + " " + (y + h + off + ex),
+    "M " + (x + r) + " " + (y + h + off + ex) + " L " + (x + r) + " " + (y + h + off) + " A " + R + " " + R + " 0 0 1 " + (x - off) + " " + (y + h - r) + " L " + (x - off - ex) + " " + (y + h - r)
   ];
   for (const d of brackets) {
     const b = document.createElementNS(NS, "path");
     b.setAttribute("d", d); b.setAttribute("class", "lv-bracket");
     svg.appendChild(b);
   }
+  const TL = Math.max(10, Math.min(26, Math.min(w, h) * 0.22));
   const ticks = [
-    [x + w / 2 - 13, y - 2.5], [x + w / 2 - 13, y + h - 2.5],
-    [x - 2.5, y + h / 2 - 13], [x + w - 2.5, y + h / 2 - 13]
+    [x + w / 2 - TL / 2, y - 2.5], [x + w / 2 - TL / 2, y + h - 2.5],
+    [x - 2.5, y + h / 2 - TL / 2], [x + w - 2.5, y + h / 2 - TL / 2]
   ];
   ticks.forEach((t, i) => {
     const tEl = document.createElementNS(NS, "rect");
     tEl.setAttribute("x", t[0]); tEl.setAttribute("y", t[1]);
-    tEl.setAttribute("width", i < 2 ? 26 : 5); tEl.setAttribute("height", i < 2 ? 5 : 26);
+    tEl.setAttribute("width", i < 2 ? TL : 5); tEl.setAttribute("height", i < 2 ? 5 : TL);
     tEl.setAttribute("rx", 2.5); tEl.setAttribute("class", "lv-tick");
     svg.appendChild(tEl);
   });
@@ -4059,7 +4060,7 @@ function lvDrawTrail(pts){
 async function lvCropBlob(img, r){
   const sx = Math.round(r.x0 * img.naturalWidth), sy = Math.round(r.y0 * img.naturalHeight);
   const sw = Math.max(8, Math.round((r.x1 - r.x0) * img.naturalWidth)), sh = Math.max(8, Math.round((r.y1 - r.y0) * img.naturalHeight));
-  const scale = Math.min(1, 1280 / Math.max(sw, sh));
+  const scale = Math.min(1, 768 / Math.max(sw, sh));
   const cv = document.createElement("canvas");
   cv.width = Math.max(1, Math.round(sw * scale)); cv.height = Math.max(1, Math.round(sh * scale));
   cv.getContext("2d").drawImage(img, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
@@ -4124,13 +4125,18 @@ function lvBind(){
   const zone = p => {
     if (!lvRect) return "trace";
     const b = lvEl("lvImg").getBoundingClientRect();
-    const m = 30 / (b.width || 300), mY = 30 / (b.height || 300);
-    if (p.x < lvRect.x0 - m || p.x > lvRect.x1 + m || p.y < lvRect.y0 - mY || p.y > lvRect.y1 + mY) return "trace";
-    const nL = Math.abs(p.x - lvRect.x0) <= m, nR = Math.abs(p.x - lvRect.x1) <= m;
-    const nT = Math.abs(p.y - lvRect.y0) <= mY, nB = Math.abs(p.y - lvRect.y1) <= mY;
-    if (nL && nT) return "nw"; if (nR && nT) return "ne";
-    if (nL && nB) return "sw"; if (nR && nB) return "se";
-    if (nT) return "n"; if (nB) return "s"; if (nL) return "w"; if (nR) return "e";
+    const px = p.x * b.width, py = p.y * b.height;
+    const x0 = lvRect.x0 * b.width, x1 = lvRect.x1 * b.width, y0 = lvRect.y0 * b.height, y1 = lvRect.y1 * b.height;
+    const M = 26;
+    if (px < x0 - M || px > x1 + M || py < y0 - M || py > y1 + M) return "trace";
+    const corners = [["nw", x0, y0], ["ne", x1, y0], ["sw", x0, y1], ["se", x1, y1]];
+    let best = null, bd = 1e9;
+    for (const c of corners) { const d = Math.hypot(px - c[1], py - c[2]); if (d < bd) { bd = d; best = c[0]; } }
+    if (bd <= M * 1.15) return best;
+    if (Math.abs(py - y0) <= M * 0.7) return "n";
+    if (Math.abs(py - y1) <= M * 0.7) return "s";
+    if (Math.abs(px - x0) <= M * 0.7) return "w";
+    if (Math.abs(px - x1) <= M * 0.7) return "e";
     return "move";
   };
   wrap.addEventListener("pointerdown", e => {
@@ -4161,8 +4167,8 @@ function lvBind(){
       if (lvDrag.mode.includes("e")) r.x1 = p.x;
       if (lvDrag.mode.includes("n")) r.y0 = p.y;
       if (lvDrag.mode.includes("s")) r.y1 = p.y;
-      if (r.x1 - r.x0 < 0.05) { if (lvDrag.mode.includes("w")) r.x0 = r.x1 - 0.05; else r.x1 = r.x0 + 0.05; }
-      if (r.y1 - r.y0 < 0.05) { if (lvDrag.mode.includes("n")) r.y0 = r.y1 - 0.05; else r.y1 = r.y0 + 0.05; }
+      if (r.x1 - r.x0 < 0.03) { if (lvDrag.mode.includes("w")) r.x0 = r.x1 - 0.03; else r.x1 = r.x0 + 0.03; }
+      if (r.y1 - r.y0 < 0.03) { if (lvDrag.mode.includes("n")) r.y0 = r.y1 - 0.03; else r.y1 = r.y0 + 0.03; }
       r.x0 = Math.max(0, Math.min(1, r.x0)); r.y0 = Math.max(0, Math.min(1, r.y0));
       r.x1 = Math.max(0, Math.min(1, r.x1)); r.y1 = Math.max(0, Math.min(1, r.y1));
     }
@@ -4176,7 +4182,7 @@ function lvBind(){
       const pts = lvDrag.pts;
       let x0 = 1, y0 = 1, x1 = 0, y1 = 0;
       for (const q of pts) { x0 = Math.min(x0, q.x); y0 = Math.min(y0, q.y); x1 = Math.max(x1, q.x); y1 = Math.max(y1, q.y); }
-      if (x1 - x0 >= 0.04 && y1 - y0 >= 0.04) lvSettle({ x0, y0, x1, y1 });
+      if (x1 - x0 >= 0.025 && y1 - y0 >= 0.025) lvSettle({ x0, y0, x1, y1 });
       else cv.getContext("2d").clearRect(0, 0, cv.width, cv.height);
     } else {
       lvGlideStart();
