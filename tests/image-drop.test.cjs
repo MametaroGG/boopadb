@@ -48,7 +48,7 @@ test('drag cancellation resets highlight',()=>{
 
 function uploadHarness(){
  const fs=require('node:fs'), vm=require('node:vm');
- const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
+ const html=fs.readFileSync(require('node:path').join(__dirname,'../image-search-engine.js'),'utf8');
  const upload=html.slice(html.indexOf('function lvOpenUpload(file)'),html.indexOf('let lvZoom ='));
  const similar=html.slice(html.indexOf('async function imgSimilar(x)'),html.indexOf('let lvUrl ='));
  const nodes={},errors=[],revoked=[];let n=0;

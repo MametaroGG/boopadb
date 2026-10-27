@@ -33,7 +33,10 @@ test('search shell stays border-box and bounded, with shrinkable text input', ()
   assert.ok(document.querySelector('#spQ').parentElement.contains(document.querySelector('#spImgBtn')));
 });
 test('camera offset outranks the later generic clear-button offset', () => {
-  assert.equal(rule('.sp-search .sp-imgbtn').right, '54px');
+  assert.equal(rule('.sp-search .sp-imgbtn').right, '8px');
+  assert.equal(rule('.sp-search.has-query .sp-imgbtn').right, '54px');
+  assert.equal(rule('.sp-search input#spQ')['padding-right'], '58px');
+  assert.equal(rule('.sp-search.has-query input#spQ')['padding-right'], '104px');
   assert.equal(rule('.sp-clear').right, '8px');
 });
 test('CSS box-budget at phone, iPad portrait/landscape and desktop widths', () => {
@@ -42,8 +45,8 @@ test('CSS box-budget at phone, iPad portrait/landscape and desktop widths', () =
   const search = rule('.sp-search');
   const horizontalPadding = px(search.padding.split(' ')[1]);
   const icon = px(rule('.sp-search svg').width), gap = px(search.gap);
-  const reservedControls = px(rule('.sp-search input#spQ')['padding-right']);
-  const camera = rule('.sp-search .sp-imgbtn'), clear = rule('.sp-clear');
+  const reservedControls = px(rule('.sp-search.has-query input#spQ')['padding-right']);
+  const camera = rule('.sp-search.has-query .sp-imgbtn'), clear = rule('.sp-clear');
   const controlWidth = px(clear.width);
   for (const viewport of [320,375,768,810,899,900,1080,1194,1280,1920]) {
     // Model these declared CSS constraints only, not actual WebKit rendering.
