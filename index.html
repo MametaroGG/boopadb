@@ -1586,7 +1586,9 @@ function buildHero(items, preserveCurrent = false){
   heroItems.length = 0;
   src.forEach(x => heroItems.push(x));
   track.innerHTML = heroItems.map(heroSlideHTML).join("");
-  fillHeroMetas();
+  // Enrichment depends on caches/constants declared later in this script.
+  // Defer until initialization finishes; otherwise its catch hides TDZ errors.
+  Promise.resolve().then(fillHeroMetas);
   const first = track.children[0], last = track.children[track.children.length - 1];
   if (first && last){
     const cFirst = first.cloneNode(true); cFirst.dataset.clone = "1"; cFirst.classList.remove("active");

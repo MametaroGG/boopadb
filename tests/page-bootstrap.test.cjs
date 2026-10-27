@@ -5,14 +5,21 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const {JSDOM, VirtualConsole} = require('jsdom');
-test('complete home page starts with six hero products and no runtime errors', async () => {
-  const html = fs.readFileSync(process.env.HERO_TEST_HTML || path.join(__dirname, '..', 'index.html'), 'utf8');
-  const errors = [], observers = [];
+test('complete home page starts and enriches hero metadata without initialization errors', async () => {
+  let html = fs.readFileSync(process.env.HERO_TEST_HTML || path.join(__dirname, '..', 'index.html'), 'utf8');
+  const errors = [], observers = [], caught = [];
+  // Observe swallowed exceptions too; leave the original catch body intact.
+  html = html.replace(/catch\s*\((\w+)\)\s*\{/g, (all, name) =>
+    all + ` window.__recordCaughtBootstrapError(${name});`);
+  html = html.replace(/catch\s*\{/g, 'catch (__caught) { window.__recordCaughtBootstrapError(__caught);');
   const vc = new VirtualConsole(); vc.on('jsdomError', e => errors.push(e.message));
   const dom = new JSDOM(html, {runScripts:'dangerously', url:'https://mametarogg.github.io/boopadb/',
     pretendToBeVisual:true, virtualConsole:vc, beforeParse(w){
-      // Keep network pending: first paint must work before any JSON response.
-      w.fetch = () => new Promise(() => {});
+      w.__recordCaughtBootstrapError = e => caught.push(String(e));
+      // Full catalog stays pending; hero enrichment must work after script init.
+      w.fetch = url => String(url).includes('/meta/')
+        ? Promise.resolve({ok:true, json:async () => ({likes:123456, tags:['startup-meta-test']})})
+        : new Promise(() => {});
       w.matchMedia = () => ({matches:false, addEventListener(){}, addListener(){}});
       w.ResizeObserver = class {observe(){} disconnect(){}};
       w.IntersectionObserver = class {observe(){} disconnect(){} unobserve(){}};
@@ -23,6 +30,7 @@ test('complete home page starts with six hero products and no runtime errors', a
   try {
     await new Promise(resolve => setTimeout(resolve, 30));
     assert.deepEqual(errors, []);
+    assert.deepEqual(caught, []);
     const d = dom.window.document;
     assert.equal(d.querySelectorAll('#heroTrack .hslide:not([data-clone])').length, 6);
     assert.equal(d.querySelectorAll('#heroTrack .hslide').length, 8);
@@ -30,5 +38,9 @@ test('complete home page starts with six hero products and no runtime errors', a
     assert.equal(d.querySelectorAll('#heroTrack .pp-likes').length, 8);
     assert.ok(d.querySelector('#heroTrack .hname').textContent.trim());
     assert.ok(d.querySelector('#saleTrack').children.length > 0);
+    for (const el of d.querySelectorAll('#heroTrack .hmeta')) {
+      assert.ok(el.textContent.includes('123,456'));
+      assert.ok(el.textContent.includes('startup-meta-test'));
+    }
   } finally { observers.forEach(o => o.disconnect()); dom.window.close(); }
 });
