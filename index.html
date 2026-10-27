@@ -1,7 +1,54 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
+<script id="boopadb-diagnostics">
+// Opt-in, local-only troubleshooting. No storage, cookies, or telemetry.
+(function () {
+  if (new URLSearchParams(location.search).get('diagnostics') !== '1') return;
+  var errors = [], panel;
+  function record(message, line) {
+    if (errors.length < 4) errors.push(String(message).slice(0, 180) + (line ? ' @' + line : ''));
+    render();
+  }
+  window.addEventListener('error', function (e) {
+    if (e.message) record(e.message, e.lineno);
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    record(e.reason && e.reason.message || 'Unhandled promise rejection');
+  });
+  function size(el) {
+    if (!el) return 'missing';
+    var r = el.getBoundingClientRect(), s = getComputedStyle(el);
+    return Math.round(r.width) + 'x' + Math.round(r.height) + ' display=' + s.display + ' opacity=' + s.opacity + ' visibility=' + s.visibility;
+  }
+  function render() {
+    if (!panel) return;
+    var lines = ['BoopaDB diagnostics v1 (local only)', navigator.userAgent,
+      'viewport=' + innerWidth + 'x' + innerHeight + ' screen=' + screen.width + 'x' + screen.height,
+      'document=' + document.readyState + ' online=' + navigator.onLine,
+      'SW=' + !!(navigator.serviceWorker && navigator.serviceWorker.controller),
+      'errors=' + errors.length];
+    errors.forEach(function (e) { lines.push(e); });
+    ['heroTrack', 'saleTrack', 'featTrack', 'bList', 'bPrev', 'catRail'].forEach(function (id) {
+      var el = document.getElementById(id);
+      lines.push(id + ': count=' + (el ? el.children.length : '-') + ' ' + size(el));
+      if (el && el.firstElementChild) lines.push('  first: ' + size(el.firstElementChild));
+    });
+    panel.textContent = lines.join('\n');
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var box = document.createElement('aside');
+    box.style.cssText = 'position:fixed;z-index:2147483647;left:8px;right:8px;top:8px;max-height:65vh;overflow:auto;padding:10px;background:#fff;color:#111;border:2px solid #147;font:12px/1.4 monospace;text-align:left;box-shadow:0 2px 12px #0008';
+    var refresh = document.createElement('button'); refresh.textContent = '診断を更新'; refresh.onclick = render;
+    var close = document.createElement('button'); close.textContent = '閉じる'; close.onclick = function () { box.remove(); };
+    panel = document.createElement('pre'); panel.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 0;font:inherit';
+    box.appendChild(refresh); box.appendChild(close); box.appendChild(panel); document.body.appendChild(box);
+    render(); setTimeout(render, 2000); setTimeout(render, 10000);
+  });
+})();
+</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#101012"><script>try{var t=localStorage.getItem("boopadb_theme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=t;}catch(e){document.documentElement.dataset.theme="dark"}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet"><link rel="preconnect" href="https://booth.pximg.net"><link rel="preconnect" href="https://nucbox-m7.tailb48431.ts.net:8443">
 <meta name="color-scheme" content="dark">
 <title>BoopaDB — BOOTHのVRChat向け価格データベース（プロトタイプ）</title>
