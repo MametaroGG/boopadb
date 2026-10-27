@@ -1523,6 +1523,7 @@ const heroItems = normalizeHeroEntries(HERO_BOOTSTRAP);
 let heroRenderedSignature = "";
 const track = document.getElementById("heroTrack");
 const dotsEl = document.getElementById("heroDots");
+const HEART_SVG = '<svg viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.1a5 5 0 1 1 7.5 6.5z"/></svg>';
 function heroMetaHTML(x){
   const likes = typeof x.likes === "number" ? `<span class="pp-likes">${HEART_SVG}<span>${x.likes.toLocaleString()}</span></span>` : "";
   const tags = Array.isArray(x.tags) && x.tags.length ? x.tags.slice(0, 5).map(t => `<span class="htag">${esc(t)}</span>`).join("") : "";
@@ -2077,7 +2078,6 @@ function fetchRelShard(n){
   if (!_relShardCache[n]) _relShardCache[n] = fetch("relations_children_" + n + ".json?v=20251025-9").then(r => r.ok ? r.json() : {}).catch(() => ({}));
   return _relShardCache[n];
 }
-const HEART_SVG = '<svg viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.1a5 5 0 1 1 7.5 6.5z"/></svg>';
 function relationParentIds(m){
   if (!RELATIONS_LIVE) return { ids: [], strict: true };
   if (!m) return { ids: [], strict: false };
