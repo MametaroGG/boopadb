@@ -667,6 +667,30 @@
   html[data-theme="light"] .ucard .upr{background:#eeeef1;color:#1c1c21}
   html[data-theme="light"] .ucard .uwas{background:#eeeef1;color:#83838c}
   html[data-theme="light"] .ucard .upr.free{color:#4c6b22}
+  .shcard{flex:0 0 300px;scroll-snap-align:start;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;text-align:left}
+  .shcard .simg{position:relative;display:block;aspect-ratio:16/10;overflow:hidden;background:#26262c;flex:0 0 auto}
+  .shcard .simg img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center}
+  .shcard .simg .sbg{object-fit:cover;filter:blur(22px) brightness(.55);transform:scale(1.3)}
+  .shcard .sbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:7px;flex:1}
+  .shcard .srow{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;min-width:0}
+  .shcard .sava{flex:0 0 auto;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;overflow:hidden}
+  .shcard .sava img{width:100%;height:100%;object-fit:cover}
+  .shcard .snm{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shcard .scnt{font-size:11px;color:var(--sub)}
+  .shcard .snew{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shcard .snew .stag{color:var(--gold);font-weight:700;margin-right:5px}
+  .shcard .stop{margin-top:auto;border-top:1px solid var(--line);padding-top:8px;text-decoration:none;color:inherit;display:block}
+  .shcard .stop .tnm{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
+  .shcard .spr{display:flex;align-items:stretch;border-radius:8px;overflow:hidden;background:#26262c;color:#f2f2f5;font-size:12.5px;font-weight:700}
+  .shcard .spr .sg{background:var(--green);color:#0c1a05;display:flex;align-items:center;padding:5px 7px}
+  .shcard .spr .sgt{color:var(--green);display:flex;align-items:center;padding:5px 8px}
+  .shcard .spr .scur{margin-left:auto;display:flex;align-items:center;padding:5px 9px;font-size:13.5px}
+  .shcard .spr .swas{position:relative;color:#9a9aa2;font-size:11px;font-weight:400;display:flex;align-items:center;padding:5px 2px 5px 8px}
+  .shcard .spr .swas .ww{position:relative;display:inline-block}
+  .shcard .spr .swas .ww::after{content:"";position:absolute;left:-2px;right:-2px;top:50%;height:2px;background:currentColor;transform:rotate(-11deg);border-radius:1px}
+  .shcard .spr.solo .scur{margin-left:0}
+  html[data-theme="light"] .shcard .spr{background:#eeeef1;color:#1c1c21}
+  html[data-theme="light"] .shcard .spr .swas{color:#83838c}
   .upddots{display:flex;gap:6px;justify-content:center;margin:8px 0 0}
   .upddots button{width:8px;height:8px;border-radius:99px;border:none;background:rgba(255,255,255,.45);cursor:pointer;padding:0;transition:all .4s cubic-bezier(.34,1.5,.64,1)}
   .upddots button.on{width:22px;background:#fff}
@@ -997,6 +1021,16 @@
     <div class="smore" id="updMoreWrap" hidden><button id="updMore" type="button" data-i="more">もっと見る</button></div>
   </section>
 
+  <section class="catsec" id="shopSec" hidden>
+    <h2 data-i="shops_title">知っているショップの作品</h2>
+    <div class="catwrap">
+      <button class="catbtn prev" id="shopPrev" data-i-al="al_prev" aria-label="前へ"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="updrail" id="shopRail"></div>
+      <button class="catbtn next" id="shopNext" data-i-al="al_next" aria-label="次へ"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="upddots" id="shopDots"></div>
+  </section>
+
 </main>
 <footer>
   <div data-i="ft_data">データは Boopa（BOOTH Price Tracker for VRChat）の収集基盤による実データです。価格は観測時点のもので、現在のBOOTH上の価格と異なる場合があります。</div>
@@ -1064,7 +1098,7 @@ const LANGS = [["ja", "日本語"], ["en", "English"], ["ko", "한국어"], ["zh
 const I18N = {
 ja: {
   doc_title: "BoopaDB — BOOTHのVRChat向け価格データベース（プロトタイプ）",
-  nav_sale: "セール中の商品", nav_feat: "注目の商品", nav_browse: "新着・値下げ", cat_title: "カテゴリー別に閲覧", upd_title: "最近のアップデート", upd_newvar: "新バリエーション",
+  nav_sale: "セール中の商品", nav_feat: "注目の商品", nav_browse: "新着・値下げ", cat_title: "カテゴリー別に閲覧", upd_title: "最近のアップデート", upd_newvar: "新バリエーション", shops_title: "知っているショップの作品", shops_n: "{n} 商品",
   hero_title: "注目＆おすすめ",
   feat_note: "セール中かどうかではなく、価格の動きの活発さと新着から選んでいます。",
   sort_pct: "割引率順", sort_amount: "割引額順", sort_cheap: "安い順", sort_pop: "人気順", sort_new: "新着順",
@@ -1097,7 +1131,7 @@ ja: {
 },
 en: {
   doc_title: "BoopaDB — BOOTH Price Database for VRChat (Prototype)",
-  nav_sale: "On Sale", nav_feat: "Featured", nav_browse: "New & Price Drops", cat_title: "Browse by Category", upd_title: "Recent Updates", upd_newvar: "New variation",
+  nav_sale: "On Sale", nav_feat: "Featured", nav_browse: "New & Price Drops", cat_title: "Browse by Category", upd_title: "Recent Updates", upd_newvar: "New variation", shops_title: "Works from Shops You Know", shops_n: "{n} items",
   hero_title: "Featured & Recommended",
   feat_note: "Chosen for active price movement and freshness, not just whether they are on sale.",
   sort_pct: "By discount %", sort_amount: "By amount saved", sort_cheap: "Price: low to high", sort_pop: "Most popular", sort_new: "Newest",
@@ -1130,7 +1164,7 @@ en: {
 },
 ko: {
   doc_title: "BoopaDB — BOOTH의 VRChat용 가격 데이터베이스(프로토타입)",
-  nav_sale: "할인 중인 상품", nav_feat: "주목 상품", nav_browse: "신착·가격 인하", cat_title: "카테고리별 둘러보기", upd_title: "최근 업데이트", upd_newvar: "새 배리에이션",
+  nav_sale: "할인 중인 상품", nav_feat: "주목 상품", nav_browse: "신착·가격 인하", cat_title: "카테고리별 둘러보기", upd_title: "최근 업데이트", upd_newvar: "새 배리에이션", shops_title: "아는 숍의 작품", shops_n: "{n}개 상품",
   hero_title: "주목 & 추천",
   feat_note: "할인 여부가 아니라 가격 변동의 활발함과 신착을 기준으로 골랐습니다.",
   sort_pct: "할인율순", sort_amount: "할인액순", sort_cheap: "가격 낮은순", sort_pop: "인기순", sort_new: "최신순",
@@ -1163,7 +1197,7 @@ ko: {
 },
 "zh-Hans": {
   doc_title: "BoopaDB — BOOTH 的 VRChat 价格数据库（原型）",
-  nav_sale: "促销中的商品", nav_feat: "精选商品", nav_browse: "新品·降价", cat_title: "按类别浏览", upd_title: "最近更新", upd_newvar: "新增规格",
+  nav_sale: "促销中的商品", nav_feat: "精选商品", nav_browse: "新品·降价", cat_title: "按类别浏览", upd_title: "最近更新", upd_newvar: "新增规格", shops_title: "认识的店铺作品", shops_n: "{n} 件商品",
   hero_title: "精选与推荐",
   feat_note: "并非按是否促销，而是按价格变动活跃度和上新来挑选。",
   sort_pct: "按折扣率", sort_amount: "按优惠金额", sort_cheap: "价格从低到高", sort_pop: "按人气", sort_new: "最新上架",
@@ -1196,7 +1230,7 @@ ko: {
 },
 "zh-Hant": {
   doc_title: "BoopaDB — BOOTH 的 VRChat 價格數據庫（原型）",
-  nav_sale: "促銷中的商品", nav_feat: "精選商品", nav_browse: "新品·降價", cat_title: "按類別瀏覽", upd_title: "最近更新", upd_newvar: "新增規格",
+  nav_sale: "促銷中的商品", nav_feat: "精選商品", nav_browse: "新品·降價", cat_title: "按類別瀏覽", upd_title: "最近更新", upd_newvar: "新增規格", shops_title: "認識的店鋪作品", shops_n: "{n} 件商品",
   hero_title: "精選與推薦",
   feat_note: "並非按是否促銷，而是按價格變動活躍度和上新來挑選。",
   sort_pct: "按折扣率", sort_amount: "按優惠金額", sort_cheap: "價格從低到高", sort_pop: "按人氣", sort_new: "最新上架",
@@ -2498,6 +2532,113 @@ function updDotsSync(){
   rail.addEventListener("scroll", () => requestAnimationFrame(updNavUpdate), { passive: true });
   addEventListener("resize", updNavUpdate);
 })();
+
+/* ---------- Shops you know (from bookmarks + recommends) ---------- */
+let SHOP_DIGEST = null, shopLoadP = null;
+function shopHue(s){ let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; }
+function shopPriceHTML(t){
+  if (t.cur == null) return "";
+  if (t.on_sale && t.cur === 0) return `<div class="spr"><span class="sgt">${tr("free")}</span><span class="scur">¥0</span></div>`;
+  if (t.on_sale && t.base && t.base > t.cur){
+    const pct = Math.round((1 - t.cur / t.base) * 100);
+    if (pct > 0) return `<div class="spr"><span class="sg">−${pct}%</span><span class="swas"><span class="ww">${yen(t.base)}</span></span><span class="scur">${yen(t.cur)}</span></div>`;
+    return `<div class="spr"><span class="sgt">${tr("sp_sale")}</span><span class="scur">${yen(t.cur)}</span></div>`;
+  }
+  if (t.on_sale) return `<div class="spr"><span class="sgt">${tr("sp_sale")}</span><span class="scur">${yen(t.cur)}</span></div>`;
+  if (t.cur === 0) return `<div class="spr solo"><span class="scur">${tr("free")}</span></div>`;
+  return `<div class="spr solo"><span class="scur">${yen(t.cur)}</span></div>`;
+}
+function shopCardHTML(c){
+  const t = c.top, img = t.image || "";
+  const cover = img ? `<img class="sbg" src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this)"><img src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this)">` : `<span class="phcard" data-fill="${t.id}">${PH_ICON}</span>`;
+  const cnt = c.n ? `<div class="scnt">${tr("shops_n", { n: c.n })}</div>` : "";
+  const newl = c.new ? `<div class="snew"><span class="stag">${tr("bt_new")}</span>${esc(c.new.name)}</div>` : "";
+  return `<div class="shcard"><a class="simg" href="${esc(c.url)}" target="_blank" rel="noopener">${cover}</a><div class="sbody"><a class="srow" href="${esc(c.url)}" target="_blank" rel="noopener"><span class="sava" style="background:hsl(${shopHue(c.key)} 45% 42%)">${esc((c.name || "?").slice(0, 1))}</span><span style="min-width:0"><span class="snm">${esc(c.name)}</span>${cnt}</span></a>${newl}<a class="stop" href="${itemUrl(t.id)}" target="_blank" rel="noopener"><div class="tnm">${esc(t.name)}</div>${shopPriceHTML(t)}</a></div></div>`;
+}
+function shopStep(){ const rail = document.getElementById("shopRail"); return Math.max(220, rail.clientWidth * 0.85); }
+function shopDotsSync(){
+  const rail = document.getElementById("shopRail"), dots = document.getElementById("shopDots");
+  if (!rail || !dots) return;
+  const max = rail.scrollWidth - rail.clientWidth, st = shopStep();
+  const pages = max > 4 ? Math.round(max / st) + 1 : 1, cur = Math.min(pages - 1, Math.round(rail.scrollLeft / st));
+  if (dots.children.length !== pages) dots.innerHTML = Array.from({ length: pages }, () => "<button type=\"button\" tabindex=\"-1\"></button>").join("");
+  [...dots.children].forEach((b, i) => { b.classList.toggle("on", i === cur); b.onclick = () => rail.scrollTo({ left: i * st, behavior: "smooth" }); });
+}
+function shopNavUpdate(){
+  const rail = document.getElementById("shopRail"); if (!rail) return;
+  const over = rail.scrollWidth - rail.clientWidth > 4;
+  document.getElementById("shopPrev").classList.toggle("off", !over);
+  document.getElementById("shopNext").classList.toggle("off", !over);
+  shopDotsSync();
+}
+function renderShopSec(cards){
+  const sec = document.getElementById("shopSec"), rail = document.getElementById("shopRail");
+  if (!cards.length) { sec.hidden = true; return; }
+  rail.innerHTML = cards.map(shopCardHTML).join("");
+  sec.hidden = false;
+  fillImgs();
+  requestAnimationFrame(shopNavUpdate);
+}
+async function ensureShopDigest(){
+  if (!SHOP_DIGEST) { try { SHOP_DIGEST = await fetch("shop_digest.json?v=20251025-6").then(r => r.ok ? r.json() : {}); } catch { SHOP_DIGEST = {}; } }
+  return SHOP_DIGEST;
+}
+function loadShopSec(){
+  if (shopLoadP) return shopLoadP;
+  shopLoadP = (async () => {
+    const srcIds = [], seenId = new Set();
+    const push = id => { id = String(id); if (id && !seenId.has(id)) { seenId.add(id); srcIds.push(id); } };
+    (BMS || []).forEach(b => push(b.id));
+    try {
+      const v = recVid();
+      if (v) { const r = await fetch(REC_API + "/rec?v=" + encodeURIComponent(v)).then(x => x.json()); (r.items || []).forEach(push); }
+    } catch {}
+    if (!srcIds.length) return;
+    const bmById = {}; (BMS || []).forEach(b => { bmById[String(b.id)] = b; });
+    const scan = srcIds.slice(0, 160);
+    const metasP = Promise.all(scan.map(id => fetchMeta(id).then(m => [id, m]).catch(() => [id, null])));
+    await ensureShopDigest();
+    const metas = await metasP;
+    const cards = [], seenShop = new Set();
+    for (const [id, m] of metas) {
+      if (cards.length >= 24) break;
+      const sh = (m && m.shop) || {};
+      const sub = sh.subdomain || "";
+      const name = sh.name || (bmById[id] && bmById[id].shop) || "";
+      if (!name && !sub) continue;
+      const key = sub || ("n:" + name);
+      if (seenShop.has(key)) continue;
+      seenShop.add(key);
+      const d = sub ? SHOP_DIGEST[sub] : null;
+      if (d) {
+        cards.push({ key, name: d[0] || name, n: d[1], url: "https://" + sub + ".booth.pm/",
+          top: { id: d[2][0], name: d[2][1], image: pxImg(d[2][2]), cur: d[2][3], base: d[2][4], on_sale: !!d[2][5] },
+          new: d[3] ? { id: d[3][0], name: d[3][1] } : null });
+      } else {
+        const bm = bmById[id];
+        cards.push({ key, name, n: 0, url: sub ? "https://" + sub + ".booth.pm/" : itemUrl(id),
+          top: { id: isNaN(+id) ? id : +id, name: (m && m.name) || (bm && bm.name) || "", image: (bm && bm.image) || (m && m.image) || "", cur: bm ? bm.cur : null, base: null, on_sale: false }, new: null });
+      }
+    }
+    renderShopSec(cards);
+  })();
+  return shopLoadP;
+}
+(function(){
+  const rail = document.getElementById("shopRail");
+  document.getElementById("shopPrev").onclick = () => {
+    const max = rail.scrollWidth - rail.clientWidth;
+    if (rail.scrollLeft <= 2 && max > 0) rail.scrollTo({ left: max, behavior: "instant" });
+    else rail.scrollBy({ left: -shopStep(), behavior: "smooth" });
+  };
+  document.getElementById("shopNext").onclick = () => {
+    const max = rail.scrollWidth - rail.clientWidth;
+    if (rail.scrollLeft >= max - 2 && max > 0) rail.scrollTo({ left: 0, behavior: "instant" });
+    else rail.scrollBy({ left: shopStep(), behavior: "smooth" });
+  };
+  rail.addEventListener("scroll", () => requestAnimationFrame(shopNavUpdate), { passive: true });
+  addEventListener("resize", shopNavUpdate);
+})();
 document.getElementById("spQ").addEventListener("input", spRender);
 document.getElementById("spChips").querySelectorAll(".chip").forEach(ch => {
   ch.onclick = () => {
@@ -2922,6 +3063,8 @@ function loadFullLists(n){
   }).catch(() => { if (n < 2) setTimeout(() => loadFullLists(n + 1), 2500); else { FULL_OK = true; setBTab(bTab); } });
 }
 loadFullLists(0);
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => loadShopSec());
+else loadShopSec();
 
 function renderHeroFromLists(f){
   const gate = x => x.image && typeof x.likes === "number" && x.base <= 100000;
@@ -3451,9 +3594,53 @@ function renderProdPage(x){
   document.getElementById("ppSame").innerHTML = same.map(y => saleCard(y, 0)).join("");
   document.getElementById("ppSameSec").style.display = same.length ? "" : "none";
   document.getElementById("ppSame").style.display = same.length ? "" : "none";
+  fillSameShop(x, same.length);
   loadRelations(x);
   fillPPMeta(x);
   prodPage.scrollTop = 0;
+}
+async function fillSameShop(x, initialCount){
+  /* The synchronous pass above only sees items already loaded into PROD
+     (home lists, search results seen this session), so most shops showed
+     nothing. The shop digest covers the full catalog: merge its top item
+     (and newest item, priced from its data file) in, deterministically. */
+  try {
+    const m = await fetchMeta(x.id);
+    const sub = m && m.shop && m.shop.subdomain;
+    if (!sub) return;
+    const dg = await ensureShopDigest();
+    const d = dg && dg[sub];
+    if (!d) return;
+    const have = new Map();
+    [...PROD.values()].filter(y => y.shop && y.shop === x.shop && String(y.id) !== String(x.id)).forEach(y => have.set(String(y.id), y));
+    const t = d[2];
+    if (String(t[0]) !== String(x.id) && !have.has(String(t[0])))
+      have.set(String(t[0]), { id: t[0], name: t[1], shop: d[0], image: pxImg(t[2]), cur: t[3], base: t[4], pct: t[4] > t[3] ? Math.round((1 - t[3] / t[4]) * 100) : 0, sale: !!t[5] });
+    if (d[3] && String(d[3][0]) !== String(x.id) && !have.has(String(d[3][0]))) {
+      const nid = String(d[3][0]);
+      let cur = null, sale = false;
+      try {
+        const dd = await fetch(DATA_BASE + nid.slice(0, 3) + "/" + nid + ".json").then(r => r.ok ? r.json() : null);
+        if (dd && dd.variations) {
+          let best = null;
+          for (const k in dd.variations) { const s = dd.variations[k]; if (s && s.length && (!best || s.length > best.length)) best = s; }
+          if (best) { const last = best[best.length - 1]; cur = last.price; sale = !!last.is_sale; }
+        }
+      } catch {}
+      if (cur != null) {
+        const nm = await fetchMeta(nid);
+        have.set(nid, { id: d[3][0], name: d[3][1], shop: d[0], image: (nm && (nm.image_resized || nm.image)) || "", cur, base: cur, pct: 0, sale });
+      }
+    }
+    if (have.size <= initialCount) return;
+    if (!curProd || String(curProd.id) !== String(x.id)) return;
+    const grid = document.getElementById("ppSame"), sec = document.getElementById("ppSameSec");
+    if (!grid || !sec) return;
+    const same = [...have.values()].slice(0, 4);
+    grid.innerHTML = same.map(y => saleCard(y, 0)).join("");
+    sec.style.display = ""; grid.style.display = "";
+    fillImgs();
+  } catch {}
 }
 function ppMetaHTML(src){
   const likes = src && typeof src.likes === "number" ? `<span class="pp-likes">${HEART_SVG}<span>${src.likes.toLocaleString()}</span></span>` : "";
@@ -3532,7 +3719,7 @@ function toggleRec(x){
   const on = !(btn && btn.classList.contains("on"));
   fetch(REC_API + "/rec", { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ v, item: String(x.id), on }) })
     .then(r => r.json())
-    .then(st => { if (curProd && String(curProd.id) === String(x.id)) paintRec(st); })
+    .then(st => { if (curProd && String(curProd.id) === String(x.id)) paintRec(st); shopLoadP = null; loadShopSec(); })
     .catch(() => {});
 }
 function toggleBm(x){
@@ -3547,6 +3734,7 @@ function toggleBm(x){
     btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2z"/></svg>${on ? tr("pp_bmed") : tr("pp_bm")}`;
   }
   renderPersonal();
+  shopLoadP = null; loadShopSec();
 }
 function openProduct(id){
   const x = PROD.get(String(id));

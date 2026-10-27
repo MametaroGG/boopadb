@@ -666,6 +666,30 @@
   html[data-theme="light"] .ucard .upr{background:#eeeef1;color:#1c1c21}
   html[data-theme="light"] .ucard .uwas{background:#eeeef1;color:#83838c}
   html[data-theme="light"] .ucard .upr.free{color:#4c6b22}
+  .shcard{flex:0 0 300px;scroll-snap-align:start;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;text-align:left}
+  .shcard .simg{position:relative;display:block;aspect-ratio:16/10;overflow:hidden;background:#26262c;flex:0 0 auto}
+  .shcard .simg img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center}
+  .shcard .simg .sbg{object-fit:cover;filter:blur(22px) brightness(.55);transform:scale(1.3)}
+  .shcard .sbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:7px;flex:1}
+  .shcard .srow{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;min-width:0}
+  .shcard .sava{flex:0 0 auto;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;overflow:hidden}
+  .shcard .sava img{width:100%;height:100%;object-fit:cover}
+  .shcard .snm{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shcard .scnt{font-size:11px;color:var(--sub)}
+  .shcard .snew{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shcard .snew .stag{color:var(--gold);font-weight:700;margin-right:5px}
+  .shcard .stop{margin-top:auto;border-top:1px solid var(--line);padding-top:8px;text-decoration:none;color:inherit;display:block}
+  .shcard .stop .tnm{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
+  .shcard .spr{display:flex;align-items:stretch;border-radius:8px;overflow:hidden;background:#26262c;color:#f2f2f5;font-size:12.5px;font-weight:700}
+  .shcard .spr .sg{background:var(--green);color:#0c1a05;display:flex;align-items:center;padding:5px 7px}
+  .shcard .spr .sgt{color:var(--green);display:flex;align-items:center;padding:5px 8px}
+  .shcard .spr .scur{margin-left:auto;display:flex;align-items:center;padding:5px 9px;font-size:13.5px}
+  .shcard .spr .swas{position:relative;color:#9a9aa2;font-size:11px;font-weight:400;display:flex;align-items:center;padding:5px 2px 5px 8px}
+  .shcard .spr .swas .ww{position:relative;display:inline-block}
+  .shcard .spr .swas .ww::after{content:"";position:absolute;left:-2px;right:-2px;top:50%;height:2px;background:currentColor;transform:rotate(-11deg);border-radius:1px}
+  .shcard .spr.solo .scur{margin-left:0}
+  html[data-theme="light"] .shcard .spr{background:#eeeef1;color:#1c1c21}
+  html[data-theme="light"] .shcard .spr .swas{color:#83838c}
   .upddots{display:flex;gap:6px;justify-content:center;margin:8px 0 0}
   .upddots button{width:8px;height:8px;border-radius:99px;border:none;background:rgba(255,255,255,.45);cursor:pointer;padding:0;transition:all .4s cubic-bezier(.34,1.5,.64,1)}
   .upddots button.on{width:22px;background:#fff}
