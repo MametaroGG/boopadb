@@ -3688,7 +3688,7 @@ function renderProdPage(x){
   ${keys.length > 1 ? `<div class="pp-varlabel">${tr("pp_vars", {n: keys.length})}</div><div id="ppCompare"></div>` : ""}
   <div id="ppChart"></div>
   <div class="pp-sec" id="ppSameSec">${tr("pp_same")}<button type="button" class="pp-more" id="ppSameMore" hidden>${tr("rel_more")}</button></div>
-  <div class="capgrid" id="ppSame"></div>`;
+  <div class="relrow" id="ppSame"></div>`;
   renderPPBody(x);
   wireBlockHovers(x);
   document.getElementById("ppBmBtn").onclick = () => toggleBm(x);
@@ -3696,7 +3696,7 @@ function renderProdPage(x){
   const _sb2 = document.getElementById("ppSimilarBtn"); if (_sb2) _sb2.onclick = () => imgSimilar(x);
   document.getElementById("ppRecBtn").onclick = () => toggleRec(x);
   loadRec(x.id);
-  const same = [...PROD.values()].filter(y => y.shop && y.shop === x.shop && String(y.id) !== String(x.id)).slice(0, 4);
+  const same = [...PROD.values()].filter(y => y.shop && y.shop === x.shop && String(y.id) !== String(x.id)).slice(0, 24);
   document.getElementById("ppSame").innerHTML = same.map(y => saleCard(y, 0)).join("");
   document.getElementById("ppSameSec").style.display = same.length ? "" : "none";
   document.getElementById("ppSame").style.display = same.length ? "" : "none";
@@ -3736,17 +3736,50 @@ async function fillGallery(x){
     if (cnt) cnt.textContent = (+b.dataset.gi + 1) + " / " + list.length;
   }));
 }
+const _shopShardCache = {};
+function shopShardIdx(sub){
+  let h = 5381;
+  for (let i = 0; i < sub.length; i++) h = (Math.imul(h, 33) ^ sub.charCodeAt(i)) >>> 0;
+  return h % 24;
+}
+async function ensureShopItems(sub){
+  const idx = shopShardIdx(sub);
+  if (!_shopShardCache[idx]) {
+    try { _shopShardCache[idx] = await fetch("shop_items_" + idx + ".json?v=20251028-1").then(r => r.ok ? r.json() : {}); }
+    catch { _shopShardCache[idx] = {}; }
+  }
+  return _shopShardCache[idx][sub] || null;
+}
 async function fillSameShop(x, initialCount){
-  /* The synchronous pass above only sees items already loaded into PROD
-     (home lists, search results seen this session), so most shops showed
-     nothing. The shop digest covers the full catalog: merge its top item
-     (and newest item, priced from its data file) in, deterministically. */
+  /* Same-shop rail: the sync pass only sees items already loaded into PROD.
+     The per-shop shard (full catalog, likes order) fills the rail properly;
+     the shop digest merge below stays as the fallback if the shard fails. */
   try {
     const m = await fetchMeta(x.id);
     const sub = m && m.shop && m.shop.subdomain;
     if (!sub) return;
     const dg = await ensureShopDigest();
     const d = dg && dg[sub];
+    const shopName = (d && d[0]) || x.shop || "";
+    let rows = null;
+    try { rows = await ensureShopItems(sub); } catch {}
+    if (!curProd || String(curProd.id) !== String(x.id)) return;
+    const grid = document.getElementById("ppSame"), sec = document.getElementById("ppSameSec");
+    if (!grid || !sec) return;
+    if (rows && rows.length) {
+      const same = rows.filter(r => String(r[0]) !== String(x.id)).slice(0, 24).map(r => ({
+        id: r[0], name: r[1], shop: shopName, image: pxImg(r[2]), cur: r[3], base: r[4],
+        pct: r[4] > r[3] ? Math.round((1 - r[3] / r[4]) * 100) : 0, sale: !!r[5], at_lowest: !!r[6]
+      }));
+      if (same.length) {
+        grid.innerHTML = same.map(y => saleCard(y, 0)).join("");
+        sec.style.display = ""; grid.style.display = "";
+        sec.dataset.shop = shopName;
+        const mb = document.getElementById("ppSameMore"); if (mb) mb.hidden = !(((d && d[1]) || rows.length) > same.length + 1);
+        fillImgs();
+      }
+      return;
+    }
     if (!d) return;
     const have = new Map();
     [...PROD.values()].filter(y => y.shop && y.shop === x.shop && String(y.id) !== String(x.id)).forEach(y => have.set(String(y.id), y));
@@ -3771,13 +3804,11 @@ async function fillSameShop(x, initialCount){
     }
     if (have.size <= initialCount) return;
     if (!curProd || String(curProd.id) !== String(x.id)) return;
-    const grid = document.getElementById("ppSame"), sec = document.getElementById("ppSameSec");
-    if (!grid || !sec) return;
-    const same = [...have.values()].slice(0, 4);
+    const same = [...have.values()].slice(0, 24);
     grid.innerHTML = same.map(y => saleCard(y, 0)).join("");
     sec.style.display = ""; grid.style.display = "";
     sec.dataset.shop = d[0];
-    const _mb2 = document.getElementById("ppSameMore"); if (_mb2) _mb2.hidden = !(d[1] > same.length);
+    const _mb2 = document.getElementById("ppSameMore"); if (_mb2) _mb2.hidden = !(d[1] > same.length + 1);
     fillImgs();
   } catch {}
 }
