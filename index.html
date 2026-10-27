@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#101012"><script>try{var t=localStorage.getItem("boopadb_theme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=t;}catch(e){document.documentElement.dataset.theme="dark"}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet"><link rel="preconnect" href="https://booth.pximg.net">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#101012"><script>try{var t=localStorage.getItem("boopadb_theme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=t;}catch(e){document.documentElement.dataset.theme="dark"}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet"><link rel="preconnect" href="https://booth.pximg.net"><link rel="preconnect" href="https://nucbox-m7.tailb48431.ts.net:8443">
 <meta name="color-scheme" content="dark">
 <title>BoopaDB — BOOTHのVRChat向け価格データベース（プロトタイプ）</title>
 <meta property="og:type" content="website">
@@ -325,14 +325,13 @@
   .igs-x{width:36px;height:36px;border-radius:50%;background:none;border:none;color:var(--sub);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none}
   .igs-x svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .igs-btn{background:none;border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
-  #lensView{position:fixed;inset:0;z-index:120;background:var(--bg);overflow-y:auto;overscroll-behavior:contain}
+  #lensView{position:fixed;inset:0;z-index:120;background:var(--bg);overflow:hidden;display:flex;flex-direction:column}
   #lensView[hidden]{display:none}
   .lv-head{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-bottom:1px solid var(--line)}
   .lv-head img{width:30px;height:30px;border-radius:7px;object-fit:cover;background:#2a2a30}
   .lv-title{font-weight:800;font-size:15px}
   .lv-count{margin-left:auto;color:var(--sub);font-size:12.5px;text-align:right}
-  .lv-stage{position:relative;display:flex;justify-content:center;align-items:center;padding:0;height:min(68svh,660px);transition:height .38s cubic-bezier(.2,.8,.25,1);overflow:hidden}
-  .lv-stage.compact{height:min(34svh,330px)}
+  .lv-stage{position:relative;display:flex;justify-content:center;align-items:center;padding:0;height:min(62svh,600px);overflow:hidden;flex:none}
   .lv-fitbtn{position:absolute;right:10px;bottom:10px;z-index:6;background:rgba(20,20,24,.82);backdrop-filter:blur(4px)}
   .lv-fitbtn[hidden]{display:none}
   .lv-wrap{position:relative;display:inline-block;touch-action:none;max-width:100%;will-change:transform}
@@ -348,7 +347,12 @@
   .lv-tbtns{display:flex;gap:8px}
   .lv-note{margin:14px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--sub);font-size:13px;text-align:center}
   .lv-note[hidden]{display:none}
-  .lv-results{padding:12px 14px 90px}
+  .lv-results{padding:10px 12px 28px}
+  .lv-sheet{position:absolute;left:0;right:0;bottom:0;height:118px;background:var(--panel);border-top:1px solid var(--line);border-radius:16px 16px 0 0;display:flex;flex-direction:column;z-index:8;box-shadow:0 -6px 24px rgba(0,0,0,.35)}
+  .lv-sheet.anim{transition:height .3s cubic-bezier(.2,.8,.25,1)}
+  .lv-grab{flex:none;height:26px;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none}
+  .lv-grabbar{width:38px;height:4.5px;border-radius:99px;background:var(--sub);opacity:.55}
+  .lv-sheetbody{flex:1;overflow-y:auto;overscroll-behavior:contain}
   .lv-skel{border-radius:12px;background:linear-gradient(100deg,#1d1d22 40%,#26262c 50%,#1d1d22 60%);background-size:200% 100%;animation:lvsh 1.2s infinite;min-height:190px}
   @keyframes lvsh{to{background-position:-200% 0}}
   .sp-mode-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1114,8 +1118,7 @@
   <div class="lv-head"><button id="lvBack" class="igs-x" type="button" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><img id="lvThumb" alt=""><div class="lv-title" data-i="img_search">画像検索</div><div class="lv-count" id="lvCount"></div></div>
   <div class="lv-stage" id="lvStage"><div class="lv-wrap" id="lvWrap"><img id="lvImg" alt=""><svg id="lvSvg"></svg><canvas id="lvDraw"></canvas></div><button id="lvFitBtn" class="igs-btn lv-fitbtn" type="button" hidden data-i="lv_fit">全体を表示</button></div>
   <div class="lv-tools" id="lvTools"><span class="lv-hint" data-i="img_trace_hint">探したいものを指やマウスでなぞって囲んでください</span><span class="lv-tbtns"><button id="lvWhole" class="igs-btn" type="button" data-i="img_use_whole">画像全体で検索</button><button id="lvRetake" class="igs-btn" type="button" data-i="img_retake">選び直す</button></span></div>
-  <div class="lv-note" id="lvNote" hidden></div>
-  <div class="grid lv-results" id="lvResults"></div>
+  <div class="lv-sheet" id="lvSheet"><div class="lv-grab" id="lvGrab"><span class="lv-grabbar"></span></div><div class="lv-sheetbody" id="lvSheetBody"><div class="lv-note" id="lvNote" hidden></div><div class="grid lv-results" id="lvResults"></div></div></div>
 </div>
 <div class="spage" id="searchPage">
   <div class="sp-head"><button class="sp-back" id="spBack" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><div class="sp-title" data-i="sp_title">商品検索</div></div>
@@ -3947,7 +3950,7 @@ let lvUrl = null, lvRect = null, lvShown = null, lvDrag = null, lvSearched = nul
 const lvEl = id => document.getElementById(id);
 function lvOpen(){ lvEl("lensView").hidden = false; document.body.style.overflow = "hidden"; }
 function lvClose(){ lvEl("lensView").hidden = true; document.body.style.overflow = ""; if (lvAnim) { cancelAnimationFrame(lvAnim); lvAnim = null; } lvZoomReset(); }
-function lvStageMode(mode){ lvEl("lvStage").classList.toggle("compact", mode === "results"); lvFitLoop(); }
+function lvStageMode(mode){ lvFitLoop(); }
 function lvFitBox(){
   const stage = lvEl("lvStage"), img = lvEl("lvImg"), wrap = lvEl("lvWrap");
   if (!stage || !img || !img.naturalWidth) return;
@@ -4085,6 +4088,15 @@ async function lvRunSearch(){
     lvShowResults(imgHitsFromApi(j.results));
   } catch { lvSetState("error"); }
 }
+function lvSheetSet(mode){
+  const sh = lvEl("lvSheet"); if (!sh) return;
+  const view = lvEl("lensView");
+  const maxH = Math.max(200, view.clientHeight - 56);
+  const h = mode === "max" ? maxH : mode === "mid" ? Math.round(view.clientHeight * 0.52) : 118;
+  sh.classList.add("anim");
+  sh.style.height = h + "px";
+  setTimeout(() => sh.classList.remove("anim"), 330);
+}
 function lvSetState(state){
   const note = lvEl("lvNote"), res = lvEl("lvResults"), cnt = lvEl("lvCount");
   if (state === "idle") { note.hidden = true; res.innerHTML = ""; cnt.textContent = ""; return; }
@@ -4100,6 +4112,7 @@ function lvSetState(state){
   lvStageMode("results");
 }
 function lvShowResults(hits){
+  lvSheetSet("mid");
   lvEl("lvNote").hidden = true;
   lvEl("lvCount").textContent = tr("sp_count", {n: hits.length});
   lvEl("lvResults").innerHTML = hits.length ? hits.map((x2, i) => saleCard(x2, i)).join("") : "";
@@ -4117,6 +4130,8 @@ function lvOpenUpload(file){
   img.src = lvUrl;
   lvEl("lvThumb").src = lvUrl;
   lvEl("lvTools").style.display = "";
+  lvSheetSet("peek");
+  const sb = lvEl("lvSheetBody"); if (sb) sb.scrollTop = 0;
 }
 let lvZoom = { s: 1, tx: 0, ty: 0 };
 function lvApplyZoom(){
@@ -4258,6 +4273,36 @@ function lvBind(){
 }
 lvEl("lvBack").addEventListener("click", lvClose);
 lvEl("lvFitBtn").addEventListener("click", lvZoomReset);
+(function(){
+  const grab = lvEl("lvGrab"), sh = lvEl("lvSheet"), view = lvEl("lensView");
+  if (!grab || !sh) return;
+  let drag = null;
+  grab.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    try { grab.setPointerCapture(e.pointerId); } catch {}
+    drag = { y: e.clientY, h: sh.clientHeight, moved: false };
+    sh.classList.remove("anim");
+  });
+  grab.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const maxH = Math.max(200, view.clientHeight - 56);
+    const h = Math.max(96, Math.min(maxH, drag.h + (drag.y - e.clientY)));
+    if (Math.abs(h - drag.h) > 4) drag.moved = true;
+    sh.style.height = h + "px";
+  });
+  const end = () => {
+    if (!drag) return;
+    const maxH = Math.max(200, view.clientHeight - 56);
+    if (!drag.moved) {
+      lvSheetSet(sh.clientHeight > 140 ? "peek" : "max");
+    } else {
+      lvSheetSet(sh.clientHeight > (96 + maxH) / 2 ? "max" : "peek");
+    }
+    drag = null;
+  };
+  grab.addEventListener("pointerup", end);
+  grab.addEventListener("pointercancel", end);
+})();
 lvEl("spImgBtn").addEventListener("click", () => lvEl("spImgFile").click());
 lvEl("spImgFile").addEventListener("change", e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; lvOpenUpload(f); });
 lvEl("lvWhole").addEventListener("click", () => { lvRect = null; lvShown = null; lvRenderSvg(); lvSearched = null; lvRunSearch(); });
