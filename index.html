@@ -2464,6 +2464,11 @@ function updMore(){
   rail.insertAdjacentHTML("beforeend", next.map(updCard).join(""));
   updShown += next.length;
   updMoreSync();
+  const first = rail.children[updShown - next.length];
+  if (first) {
+    const rr = rail.getBoundingClientRect(), cr = first.getBoundingClientRect();
+    rail.scrollTo({ left: rail.scrollLeft + (cr.left - rr.left) - 2, behavior: "smooth" });
+  }
   requestAnimationFrame(updNavUpdate);
 }
 function updNavUpdate(){
