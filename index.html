@@ -1568,6 +1568,21 @@ function heroStep(dir){
 window.addEventListener("resize", () => heroPos(hi + 1, false));
 window.addEventListener("load", () => heroPos(hi + 1, false));
 window.addEventListener("pageshow", () => heroPos(hi + 1, false));
+document.addEventListener("visibilitychange", () => { if (!document.hidden) heroPos(hi + 1, false); });
+// iPad Safari can settle its viewport/layout AFTER boot without firing any of
+// the events above (chrome settling, returning to a frozen tab), leaving the
+// hero positioned from a stale width — slides bleeding into each other until
+// a reload. Refit on any hero-view size change and on a short timer ladder.
+if (window.ResizeObserver) {
+  let _heroRoT = null;
+  const _heroRo = new ResizeObserver(() => {
+    if (_heroRoT) return;
+    _heroRoT = setTimeout(() => { _heroRoT = null; heroPos(hi + 1, false); }, 60);
+  });
+  _heroRo.observe(track.parentElement);
+}
+setTimeout(() => heroPos(hi + 1, false), 500);
+setTimeout(() => heroPos(hi + 1, false), 1600);
 window.addEventListener("orientationchange", () => { requestAnimationFrame(() => heroPos(hi + 1, false)); setTimeout(() => heroPos(hi + 1, false), 250); });
 function heroPlay(){ heroStop(); heroTimer = setInterval(() => heroStep(1), 4200); }
 function heroStop(){ if (heroTimer) clearInterval(heroTimer); }
