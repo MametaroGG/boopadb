@@ -34,3 +34,28 @@ Tests: `node --test tests/freshness.test.cjs`. Browser regression script:
 not executable in the supplied sandbox: Chromium socket creation was blocked,
 and the approved-launch wrapper failed to create its sessions mount. Real iPad
 Safari/Chrome and BFCache behaviour remain unverified.
+
+## Stable initial hero (reload flash)
+
+The home hero must use the same six ranked products on first paint and after
+`lists_full.json` arrives. Preserve these changes in `build_prototype.py`:
+
+1. Keep `selectHeroEntries` (between `HERO_SELECTOR_START/END`) as the single
+   selection rule: newest and sale by likes, alternating, unique IDs, maximum six.
+2. Keep the `HERO_BOOTSTRAP_DATA` marker, normalization, immutable rendered
+   signature, and `renderHeroFromLists` comparison. Do not restore the old
+   sample-sale/active five-item initial hero or the ID-only comparison.
+3. After generating **both** index.html and lists_full.json, run
+   `node scripts/embed-hero.cjs`, then `node scripts/embed-hero.cjs --check`.
+   Publish the two outputs together. The script uses the browser's actual selector
+   and safely escapes embedded JSON. It embeds only six products (~2.3 KB), not
+   the full catalog, so first paint does not wait for a multi-megabyte fetch.
+4. Keep `buildHero(items, preserveCurrent)` so genuine data updates retain the
+   selected product if it remains present. Unchanged data must not rebuild DOM,
+   discard loaded images/metadata, reset navigation, or restart the timer.
+
+Verification: `node --test tests/hero-bootstrap.test.cjs` covers initial/fetched
+parity, enrichment without rebuild, unchanged DOM/position/timer, changed prices
+and text for the same IDs, ranking changes, removal fallback, duplicate filtering,
+and the six-item limit. These are Node/DOM-double regressions, not a real mobile
+browser run; actual iPad/Android visual confirmation remains necessary.

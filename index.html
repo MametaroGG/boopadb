@@ -1492,12 +1492,35 @@ function heroNormNew(x){
   return {...x, _pct: pct, _disc: x.on_sale ? pct : 0, _rib: rib, _tags: [tr("bt_new")],
     _status: tr("bt_new"), _reason: ""};
 }
-const heroItems = [];
-{
-  const S = P.on_sale.slice(0, 3).map(heroNormSale);
-  const A = (P.active || []).slice(0, 2).map(heroNormActive);
-  [S[0], A[0], S[1], A[1], S[2]].forEach(x => { if (x) heroItems.push(x); });
+// HERO_SELECTOR_START: shared by the browser and scripts/embed-hero.cjs.
+function selectHeroEntries(f){
+  const gate = x => x.image && typeof x.likes === "number" && x.base <= 100000;
+  const A = [...(f.newest || [])].filter(gate).sort((a, b) => b.likes - a.likes);
+  const B = [...(f.on_sale || [])].filter(gate).sort((a, b) => b.likes - a.likes);
+  const picks = [], seen = new Set();
+  const push = (item, kind) => {
+    if (item && picks.length < 6 && !seen.has(String(item.id))) {
+      seen.add(String(item.id)); picks.push({kind, item});
+    }
+  };
+  for (let i = 0; picks.length < 6 && (A[i] || B[i]); i++) {
+    push(A[i], "new"); push(B[i], "sale");
+  }
+  return picks;
 }
+// HERO_SELECTOR_END
+// Regenerate together with lists_full.json; no full-catalog fetch needed to paint.
+const HERO_BOOTSTRAP = [{"kind":"new","item":{"id":"7627582","name":"Sale🎃 GothicBoneDress 2.0+","image":"https://booth.pximg.net/c/620x620/c490c3ad-5c85-4253-9c0f-2adda5e04f6b/i/7627582/9bd2326f-c642-470e-8f85-1efcf619aed7_base_resized.jpg","shop":"Ameli3","likes":10635,"cur":1600,"base":1600,"lowest":1400,"at_lowest":false,"on_sale":true,"first_date":"2026-09-28"}},{"kind":"sale","item":{"id":"6571299","name":"【半額セール中】ミルフィ Milfy / オリジナル3Dモデル","image":"https://booth.pximg.net/c/620x620/1ae5d9f5-29a4-4574-ab86-a316c22db92a/i/6571299/7bda05bb-f9d5-45a8-811a-b95ac555beb8_base_resized.jpg","shop":"ぷらすわん","likes":30114,"cur":3000,"base":6000,"lowest":3000,"pct":50,"at_lowest":true,"date":"2026-10-26"}},{"kind":"new","item":{"id":"8890992","name":"🍔CANDY POP DINER🍔【25アバター対応】","image":"https://booth.pximg.net/c/620x620/2bbfc6cd-c88d-4f80-8d45-2066fcd51c78/i/8890992/b83689ed-dd59-467f-b51b-d7da47c608f9_base_resized.jpg","shop":"てんぱすおおもり","likes":9630,"cur":3800,"base":3800,"lowest":2890,"at_lowest":false,"on_sale":false,"first_date":"2026-09-28"}},{"kind":"sale","item":{"id":"5007531","name":"【半額セール中】真冬 Mafuyu / オリジナル3Dモデル","image":"https://booth.pximg.net/c/620x620/1ae5d9f5-29a4-4574-ab86-a316c22db92a/i/5007531/dfdc2835-e4db-44f8-85ed-20bf607ad64e_base_resized.jpg","shop":"ぷらすわん","likes":28785,"cur":3000,"base":6000,"lowest":3000,"pct":50,"at_lowest":true,"date":"2026-10-27"}},{"kind":"new","item":{"id":"8995820","name":"UNSEAL ME ─ 私の封印を解いて ─【12アバター対応】","image":"https://booth.pximg.net/c/620x620/9379e01d-3508-4e77-ad2c-c6a3b3771447/i/8995820/5211eca1-d73e-4a81-8d85-b2c41a37e247_base_resized.jpg","shop":"BITE","likes":9475,"cur":700,"base":700,"lowest":0,"at_lowest":false,"on_sale":false,"first_date":"2026-10-17"}},{"kind":"sale","item":{"id":"7502898","name":"🎂1周年記念セール🎂 10月31日24時まで💎オリジナル3Dアバター『ルミナ - LUMINA』💎","image":"https://booth.pximg.net/c/620x620/87b70515-e32e-4a2e-bf41-317cf2c2177c/i/7502898/a2c93b99-de64-49f4-a76b-30ff769a5021_base_resized.jpg","shop":"EXTENSION CLOTHING","likes":24404,"cur":4200,"base":6000,"lowest":4200,"pct":30,"at_lowest":true,"date":"2026-10-26"}}]; // HERO_BOOTSTRAP_DATA
+function normalizeHeroEntries(entries){
+  return entries.map(x => x.kind === "sale" ? heroNormSale(x.item) : heroNormNew(x.item));
+}
+function heroSignature(items){
+  // Keep an immutable render snapshot: fillHeroMetas enriches items asynchronously.
+  return JSON.stringify(items.map(x => [String(x.id), x.name, x.image, x.shop,
+    x.base, x.cur, x.likes, x.tags, x._rib, x._status, x._disc]));
+}
+const heroItems = normalizeHeroEntries(HERO_BOOTSTRAP);
+let heroRenderedSignature = "";
 const track = document.getElementById("heroTrack");
 const dotsEl = document.getElementById("heroDots");
 function heroMetaHTML(x){
@@ -1555,8 +1578,10 @@ function heroSlideHTML(x, i){
     </div>
   </div>`;
 }
-function buildHero(items){
+function buildHero(items, preserveCurrent = false){
+  const currentId = preserveCurrent && heroItems[hi] ? String(heroItems[hi].id) : null;
   const src = [...items];
+  heroRenderedSignature = heroSignature(src);
   heroItems.length = 0;
   src.forEach(x => heroItems.push(x));
   track.innerHTML = heroItems.map(heroSlideHTML).join("");
@@ -1571,9 +1596,9 @@ function buildHero(items){
   dotsEl.innerHTML = heroItems.map((_, i) => `<button data-i="${i}" aria-label="${tr("al_slide")} ${i + 1}"></button>`).join("");
   dotsEl.querySelectorAll("button").forEach(d => d.onclick = () => { heroGo(Number(d.dataset.i)); heroPlay(); });
   HN = heroItems.length;
-  hi = 0;
-  heroPos(1, false);
-  dotsEl.querySelectorAll("button").forEach((d, j) => d.classList.toggle("on", j === 0));
+  hi = Math.max(0, heroItems.findIndex(x => String(x.id) === currentId));
+  heroPos(hi + 1, false);
+  dotsEl.querySelectorAll("button").forEach((d, j) => d.classList.toggle("on", j === hi));
 }
 document.getElementById("heroPrev").onclick = () => { heroStep(-1); heroPlay(); };
 document.getElementById("heroNext").onclick = () => { heroStep(1); heroPlay(); };
@@ -3242,18 +3267,11 @@ if (document.readyState === "loading") document.addEventListener("DOMContentLoad
 else loadShopSec();
 
 function renderHeroFromLists(f){
-  const gate = x => x.image && typeof x.likes === "number" && x.base <= 100000;
-  const A = [...(f.newest || [])].filter(gate).sort((a, b) => b.likes - a.likes);
-  const B = [...(f.on_sale || [])].filter(gate).sort((a, b) => b.likes - a.likes);
-  const picks = [], seen = new Set();
-  const push = (x, norm) => { if (x && !seen.has(String(x.id))) { seen.add(String(x.id)); picks.push(norm(x)); } };
-  for (let i = 0; i < 3; i++){ push(A[i], heroNormNew); push(B[i], heroNormSale); }
-  for (let i = 3; picks.length < 6 && (A[i] || B[i]); i++){ push(A[i], heroNormNew); push(B[i], heroNormSale); }
-  if (picks.length >= 3) {
-    // Rebuilding the hero destroys every in-flight image load and
-    // restarts them all at once; skip it when the picks are unchanged.
-    const same = picks.length === heroItems.length && picks.every((x, i) => String(x.id) === String(heroItems[i].id));
-    if (!same) buildHero(picks);
+  const picks = normalizeHeroEntries(selectHeroEntries(f));
+  if (picks.length >= 3 && heroSignature(picks) !== heroRenderedSignature) {
+    // Preserve a user's current product when genuine data changes; unchanged
+    // data must not replace image nodes, reset the slide, or restart animation.
+    buildHero(picks, true);
   }
 }
 function renderFeatFromNewest(list){
