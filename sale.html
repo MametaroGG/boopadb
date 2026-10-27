@@ -646,6 +646,25 @@
   html[data-theme="light"] .catsthumb{background:#b9b9c4}
   .catrail{display:flex;gap:12px;overflow-x:auto;padding:8px 2px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   .catrail::-webkit-scrollbar{display:none}
+  .updrail{display:flex;gap:12px;overflow-x:auto;padding:8px 2px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .updrail::-webkit-scrollbar{display:none}
+  .ucard{flex:0 0 236px;width:236px;background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;text-decoration:none;color:var(--text);display:flex;flex-direction:column}
+  .ucard .uimg{position:relative;display:block;aspect-ratio:16/10;background:var(--panel2);overflow:hidden}
+  .ucard .uimg img{width:100%;height:100%;object-fit:cover;display:block}
+  .ucard .ubody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+  .ucard .uname{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ucard .ushop{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ucard .uupd{margin-top:5px;display:flex;align-items:center;gap:6px;min-width:0}
+  .ucard .uchip{flex:0 0 auto;font-size:10.5px;font-weight:800;color:#fff;background:#4c6b22;padding:2px 7px;border-radius:4px;letter-spacing:.03em}
+  .ucard .uvar{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ucard .umore{flex:0 0 auto;font-size:11px;font-weight:700;color:var(--sub)}
+  .ucard .udate{font-size:11px;color:var(--sub)}
+  .ucard .uprice{margin-top:auto;padding-top:8px;display:flex;align-items:stretch;gap:0}
+  .ucard .udisc{font-size:12.5px;font-weight:800;color:#fff;background:#4c6b22;display:inline-flex;align-items:center;padding:4px 7px}
+  .ucard .uwas{background:#26262c;color:var(--faint);font-size:12.5px;display:inline-flex;align-items:center;padding:4px 2px 4px 8px}
+  .ucard .upr{background:#26262c;color:#f2f2f5;font-size:15.5px;font-weight:700;display:inline-flex;align-items:center;padding:4px 9px 4px 5px;flex:1}
+  .ucard .upr.free{color:#9ecb45}
+  .ucard .upr.solo{padding-left:9px}
   .catcard{position:relative;flex:0 0 auto;width:172px;aspect-ratio:4/5;border:none;padding:0;border-radius:14px;overflow:hidden;cursor:pointer;background:var(--panel);font-family:inherit}
   .catcard .ccflat{position:absolute;left:-50%;top:-82%;width:200%;height:245%;transform:perspective(360px) rotateX(57deg) rotateZ(-11deg);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:1.2%}
   .catcard .ccflat img{width:100%;height:100%;object-fit:cover;display:block;border-radius:6px}

@@ -647,6 +647,25 @@
   html[data-theme="light"] .catsthumb{background:#b9b9c4}
   .catrail{display:flex;gap:12px;overflow-x:auto;padding:8px 2px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   .catrail::-webkit-scrollbar{display:none}
+  .updrail{display:flex;gap:12px;overflow-x:auto;padding:8px 2px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .updrail::-webkit-scrollbar{display:none}
+  .ucard{flex:0 0 236px;width:236px;background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;text-decoration:none;color:var(--text);display:flex;flex-direction:column}
+  .ucard .uimg{position:relative;display:block;aspect-ratio:16/10;background:var(--panel2);overflow:hidden}
+  .ucard .uimg img{width:100%;height:100%;object-fit:cover;display:block}
+  .ucard .ubody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+  .ucard .uname{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ucard .ushop{font-size:11.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ucard .uupd{margin-top:5px;display:flex;align-items:center;gap:6px;min-width:0}
+  .ucard .uchip{flex:0 0 auto;font-size:10.5px;font-weight:800;color:#fff;background:#4c6b22;padding:2px 7px;border-radius:4px;letter-spacing:.03em}
+  .ucard .uvar{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ucard .umore{flex:0 0 auto;font-size:11px;font-weight:700;color:var(--sub)}
+  .ucard .udate{font-size:11px;color:var(--sub)}
+  .ucard .uprice{margin-top:auto;padding-top:8px;display:flex;align-items:stretch;gap:0}
+  .ucard .udisc{font-size:12.5px;font-weight:800;color:#fff;background:#4c6b22;display:inline-flex;align-items:center;padding:4px 7px}
+  .ucard .uwas{background:#26262c;color:var(--faint);font-size:12.5px;display:inline-flex;align-items:center;padding:4px 2px 4px 8px}
+  .ucard .upr{background:#26262c;color:#f2f2f5;font-size:15.5px;font-weight:700;display:inline-flex;align-items:center;padding:4px 9px 4px 5px;flex:1}
+  .ucard .upr.free{color:#9ecb45}
+  .ucard .upr.solo{padding-left:9px}
   .catcard{position:relative;flex:0 0 auto;width:172px;aspect-ratio:4/5;border:none;padding:0;border-radius:14px;overflow:hidden;cursor:pointer;background:var(--panel);font-family:inherit}
   .catcard .ccflat{position:absolute;left:-50%;top:-82%;width:200%;height:245%;transform:perspective(360px) rotateX(57deg) rotateZ(-11deg);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:1.2%}
   .catcard .ccflat img{width:100%;height:100%;object-fit:cover;display:block;border-radius:6px}
@@ -961,6 +980,16 @@
     <div class="catslider" id="catSlider"><div class="catsthumb" id="catSThumb"></div></div>
   </section>
 
+  <section class="catsec" id="updSec" hidden>
+    <h2 data-i="upd_title">最近のアップデート</h2>
+    <div class="catwrap">
+      <button class="catbtn prev" id="updPrev" data-i-al="al_prev" aria-label="前へ"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="updrail" id="updRail"></div>
+      <button class="catbtn next" id="updNext" data-i-al="al_next" aria-label="次へ"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="smore" id="updMoreWrap" hidden><button id="updMore" type="button" data-i="more">もっと見る</button></div>
+  </section>
+
 </main>
 <footer>
   <div data-i="ft_data">データは Boopa（BOOTH Price Tracker for VRChat）の収集基盤による実データです。価格は観測時点のもので、現在のBOOTH上の価格と異なる場合があります。</div>
@@ -1028,7 +1057,7 @@ const LANGS = [["ja", "日本語"], ["en", "English"], ["ko", "한국어"], ["zh
 const I18N = {
 ja: {
   doc_title: "BoopaDB — BOOTHのVRChat向け価格データベース（プロトタイプ）",
-  nav_sale: "セール中の商品", nav_feat: "注目の商品", nav_browse: "新着・値下げ", cat_title: "カテゴリー別に閲覧",
+  nav_sale: "セール中の商品", nav_feat: "注目の商品", nav_browse: "新着・値下げ", cat_title: "カテゴリー別に閲覧", upd_title: "最近のアップデート", upd_newvar: "新バリエーション",
   hero_title: "注目＆おすすめ",
   feat_note: "セール中かどうかではなく、価格の動きの活発さと新着から選んでいます。",
   sort_pct: "割引率順", sort_amount: "割引額順", sort_cheap: "安い順", sort_pop: "人気順", sort_new: "新着順",
@@ -1061,7 +1090,7 @@ ja: {
 },
 en: {
   doc_title: "BoopaDB — BOOTH Price Database for VRChat (Prototype)",
-  nav_sale: "On Sale", nav_feat: "Featured", nav_browse: "New & Price Drops", cat_title: "Browse by Category",
+  nav_sale: "On Sale", nav_feat: "Featured", nav_browse: "New & Price Drops", cat_title: "Browse by Category", upd_title: "Recent Updates", upd_newvar: "New variation",
   hero_title: "Featured & Recommended",
   feat_note: "Chosen for active price movement and freshness, not just whether they are on sale.",
   sort_pct: "By discount %", sort_amount: "By amount saved", sort_cheap: "Price: low to high", sort_pop: "Most popular", sort_new: "Newest",
@@ -1094,7 +1123,7 @@ en: {
 },
 ko: {
   doc_title: "BoopaDB — BOOTH의 VRChat용 가격 데이터베이스(프로토타입)",
-  nav_sale: "할인 중인 상품", nav_feat: "주목 상품", nav_browse: "신착·가격 인하", cat_title: "카테고리별 둘러보기",
+  nav_sale: "할인 중인 상품", nav_feat: "주목 상품", nav_browse: "신착·가격 인하", cat_title: "카테고리별 둘러보기", upd_title: "최근 업데이트", upd_newvar: "새 배리에이션",
   hero_title: "주목 & 추천",
   feat_note: "할인 여부가 아니라 가격 변동의 활발함과 신착을 기준으로 골랐습니다.",
   sort_pct: "할인율순", sort_amount: "할인액순", sort_cheap: "가격 낮은순", sort_pop: "인기순", sort_new: "최신순",
@@ -1127,7 +1156,7 @@ ko: {
 },
 "zh-Hans": {
   doc_title: "BoopaDB — BOOTH 的 VRChat 价格数据库（原型）",
-  nav_sale: "促销中的商品", nav_feat: "精选商品", nav_browse: "新品·降价", cat_title: "按类别浏览",
+  nav_sale: "促销中的商品", nav_feat: "精选商品", nav_browse: "新品·降价", cat_title: "按类别浏览", upd_title: "最近更新", upd_newvar: "新增规格",
   hero_title: "精选与推荐",
   feat_note: "并非按是否促销，而是按价格变动活跃度和上新来挑选。",
   sort_pct: "按折扣率", sort_amount: "按优惠金额", sort_cheap: "价格从低到高", sort_pop: "按人气", sort_new: "最新上架",
@@ -1160,7 +1189,7 @@ ko: {
 },
 "zh-Hant": {
   doc_title: "BoopaDB — BOOTH 的 VRChat 價格數據庫（原型）",
-  nav_sale: "促銷中的商品", nav_feat: "精選商品", nav_browse: "新品·降價", cat_title: "按類別瀏覽",
+  nav_sale: "促銷中的商品", nav_feat: "精選商品", nav_browse: "新品·降價", cat_title: "按類別瀏覽", upd_title: "最近更新", upd_newvar: "新增規格",
   hero_title: "精選與推薦",
   feat_note: "並非按是否促銷，而是按價格變動活躍度和上新來挑選。",
   sort_pct: "按折扣率", sort_amount: "按優惠金額", sort_cheap: "價格從低到高", sort_pop: "按人氣", sort_new: "最新上架",
@@ -2397,6 +2426,62 @@ function catNavUpdate(){
     io.observe(host);
   } else loadCatCards();
 })();
+function updCard(s){
+  const pct = s.base > s.cur ? Math.round((1 - s.cur / s.base) * 100) : 0;
+  let price;
+  if (s.on_sale && pct > 0) price = `<span class="udisc">-${pct}%</span><span class="uwas"><span class="was">${yen(s.base)}</span></span><span class="upr">${yen(s.cur)}</span>`;
+  else if (s.cur === 0) price = `<span class="upr solo free">${tr("free")}</span>`;
+  else price = `<span class="upr solo">${yen(s.cur)}</span>`;
+  const a0 = (s.added || [])[0] || {};
+  const more = s.added_n > 1 ? `<span class="umore">+${s.added_n - 1}</span>` : "";
+  return `<a class="ucard" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="uimg">${s.image ? `<img loading="lazy" src="${s.image}" alt="" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}</span><span class="ubody"><span class="uname">${esc(s.name)}</span><span class="ushop">${esc(s.shop || "")}</span><span class="uupd"><span class="uchip">${tr("upd_newvar")}</span><span class="uvar">${esc(a0.name || "")}</span>${more}</span><span class="udate">${tr("added_on", {d: s.date})}</span><span class="uprice">${price}</span></span></a>`;
+}
+const UPD_PAGE = 12;
+let updShown = 0;
+function renderUpdates(){
+  const sec = document.getElementById("updSec"), rail = document.getElementById("updRail");
+  if (!sec || !rail) return;
+  const list = LISTS.updates || [];
+  if (!list.length) { sec.hidden = true; return; }
+  sec.hidden = false;
+  updShown = Math.min(UPD_PAGE, list.length);
+  rail.innerHTML = list.slice(0, updShown).map(updCard).join("");
+  updMoreSync();
+  requestAnimationFrame(updNavUpdate);
+}
+function updMoreSync(){
+  const wrap = document.getElementById("updMoreWrap");
+  if (wrap) wrap.hidden = updShown >= (LISTS.updates || []).length;
+}
+function updMore(){
+  const list = LISTS.updates || [];
+  const rail = document.getElementById("updRail");
+  if (!rail || updShown >= list.length) return;
+  const next = list.slice(updShown, updShown + UPD_PAGE);
+  rail.insertAdjacentHTML("beforeend", next.map(updCard).join(""));
+  updShown += next.length;
+  updMoreSync();
+  requestAnimationFrame(updNavUpdate);
+}
+function updNavUpdate(){
+  const rail = document.getElementById("updRail");
+  const pv = document.getElementById("updPrev"), nx = document.getElementById("updNext");
+  if (!rail || !pv || !nx) return;
+  const max = rail.scrollWidth - rail.clientWidth;
+  pv.classList.toggle("off", rail.scrollLeft <= 2);
+  nx.classList.toggle("off", max <= 0 || rail.scrollLeft >= max - 2);
+}
+(function(){
+  const rail = document.getElementById("updRail");
+  if (!rail) return;
+  const step = () => Math.max(220, rail.clientWidth * 0.85);
+  document.getElementById("updPrev").onclick = () => rail.scrollBy({ left: -step(), behavior: "smooth" });
+  document.getElementById("updNext").onclick = () => rail.scrollBy({ left: step(), behavior: "smooth" });
+  const um = document.getElementById("updMore");
+  if (um) um.onclick = updMore;
+  rail.addEventListener("scroll", () => requestAnimationFrame(updNavUpdate), { passive: true });
+  addEventListener("resize", updNavUpdate);
+})();
 document.getElementById("spQ").addEventListener("input", spRender);
 document.getElementById("spChips").querySelectorAll(".chip").forEach(ch => {
   ch.onclick = () => {
@@ -2815,6 +2900,7 @@ function loadFullLists(n){
   try { renderFeatFromNewest(f.newest); } catch {}
   try { renderHeroFromLists(f); } catch {}
   if (f.free) LISTS.free = f.free;
+  if (f.updates) { LISTS.updates = f.updates; try { renderUpdates(); } catch {} }
   setBTab(bTab);
   if (spage.classList.contains("open")) spRender(false);
   }).catch(() => { if (n < 2) setTimeout(() => loadFullLists(n + 1), 2500); else { FULL_OK = true; setBTab(bTab); } });
