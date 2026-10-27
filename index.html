@@ -4072,9 +4072,12 @@ function lvDrawTrail(pts){
   ctx.clearRect(0, 0, W, H);
   if (pts.length < 2) return;
   const P = pts.map(q => [q.x * W, q.y * H]);
-  const cum = [0];
-  for (let i = 1; i < P.length; i++) cum.push(cum[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]));
-  const L = cum[cum.length - 1];
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, L = 0;
+  for (let i = 0; i < P.length; i++) {
+    x0 = Math.min(x0, P[i][0]); y0 = Math.min(y0, P[i][1]);
+    x1 = Math.max(x1, P[i][0]); y1 = Math.max(y1, P[i][1]);
+    if (i) L += Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]);
+  }
   if (L < 2) return;
   const PAL = [[122, 184, 255], [125, 255, 206], [255, 226, 122], [255, 150, 130]];
   const pal = t => {
@@ -4084,41 +4087,37 @@ function lvDrawTrail(pts){
     return [Math.round(a[0] + (b[0] - a[0]) * f), Math.round(a[1] + (b[1] - a[1]) * f), Math.round(a[2] + (b[2] - a[2]) * f)];
   };
   ctx.lineJoin = "round"; ctx.lineCap = "round";
-  const strokeRange = (from, to, width, style, alpha) => {
-    if (to <= from) return;
+  const fullPath = () => {
     ctx.beginPath();
-    ctx.moveTo(P[from][0], P[from][1]);
-    for (let i = from + 1; i <= to; i++) ctx.lineTo(P[i][0], P[i][1]);
-    ctx.strokeStyle = style; ctx.globalAlpha = alpha; ctx.lineWidth = width; ctx.stroke();
+    ctx.moveTo(P[0][0], P[0][1]);
+    for (let i = 1; i < P.length - 1; i++) {
+      const mx = (P[i][0] + P[i + 1][0]) / 2, my = (P[i][1] + P[i + 1][1]) / 2;
+      ctx.quadraticCurveTo(P[i][0], P[i][1], mx, my);
+    }
+    ctx.lineTo(P[P.length - 1][0], P[P.length - 1][1]);
   };
-  // faint remnant of the whole trail
-  strokeRange(0, P.length - 1, 18, "rgb(150,190,255)", 0.08);
-  // recent window: one smooth gradient stroke that brightens toward the pen tip
-  const WIN = Math.min(L, 190), startLen = L - WIN;
-  let i0 = 0;
-  while (i0 < P.length - 2 && cum[i0 + 1] < startLen) i0++;
-  const tipP = P[P.length - 1];
-  const gg = ctx.createLinearGradient(P[i0][0], P[i0][1], tipP[0], tipP[1]);
-  const stop = (t, a) => { const c = pal(t); gg.addColorStop(t, "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")"); };
-  stop(0, 0.05); stop(0.45, 0.16); stop(0.75, 0.30); stop(1, 0.48);
-  ctx.globalCompositeOperation = "lighter";
-  strokeRange(i0, P.length - 1, 16, gg, 1);
-  ctx.globalCompositeOperation = "source-over";
-  // bright core only on the freshest stretch
-  const coreStart = L - Math.min(L, 110);
-  let ci = 0; while (ci < P.length - 2 && cum[ci + 1] < coreStart) ci++;
-  strokeRange(ci, P.length - 1, 3.2, "#ffffff", 0.95);
-  // soft haze blob following the tip
+  // blurred gradient halo around the whole line (layered widths + canvas blur where supported)
+  const g = ctx.createLinearGradient(x0, y0, x1, y1);
+  const stop = (t, a) => { const c = pal(t); g.addColorStop(t, "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")"); };
+  stop(0, 1); stop(0.5, 1); stop(1, 1);
+  try { ctx.filter = "blur(5px)"; } catch (e) {}
+  fullPath(); ctx.strokeStyle = g; ctx.globalAlpha = 0.13; ctx.lineWidth = 26; ctx.stroke();
+  fullPath(); ctx.strokeStyle = g; ctx.globalAlpha = 0.18; ctx.lineWidth = 16; ctx.stroke();
+  try { ctx.filter = "none"; } catch (e) {}
+  fullPath(); ctx.strokeStyle = g; ctx.globalAlpha = 0.22; ctx.lineWidth = 9; ctx.stroke();
+  // soft haze blob following the pen tip
   const tip = P[P.length - 1], rad = 46;
   const tc = pal(0.85);
   const rg = ctx.createRadialGradient(tip[0], tip[1], 0, tip[0], tip[1], rad);
-  rg.addColorStop(0, "rgba(" + tc[0] + "," + tc[1] + "," + tc[2] + ",0.5)");
-  rg.addColorStop(0.55, "rgba(" + tc[0] + "," + tc[1] + "," + tc[2] + ",0.20)");
+  rg.addColorStop(0, "rgba(" + tc[0] + "," + tc[1] + "," + tc[2] + ",0.42)");
+  rg.addColorStop(0.55, "rgba(" + tc[0] + "," + tc[1] + "," + tc[2] + ",0.16)");
   rg.addColorStop(1, "rgba(" + tc[0] + "," + tc[1] + "," + tc[2] + ",0)");
   ctx.globalCompositeOperation = "lighter";
-  ctx.fillStyle = rg;
+  ctx.fillStyle = rg; ctx.globalAlpha = 1;
   ctx.fillRect(tip[0] - rad, tip[1] - rad, rad * 2, rad * 2);
   ctx.globalCompositeOperation = "source-over";
+  // the white line itself — kept along the whole stroke
+  fullPath(); ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.globalAlpha = 0.95; ctx.lineWidth = 3; ctx.stroke();
   ctx.globalAlpha = 1;
 }
 async function lvCropBlob(img, r){
