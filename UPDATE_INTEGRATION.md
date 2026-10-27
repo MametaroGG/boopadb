@@ -59,3 +59,18 @@ parity, enrichment without rebuild, unchanged DOM/position/timer, changed prices
 and text for the same IDs, ranking changes, removal fallback, duplicate filtering,
 and the six-item limit. These are Node/DOM-double regressions, not a real mobile
 browser run; actual iPad/Android visual confirmation remains necessary.
+
+## Touch activation / iPad navigation
+
+Preserve in the home and item builders:
+- Browse-row previews use `pointerenter` only when `pointerType === "mouse"`.
+  Do not restore `mouseenter` DOM replacement: touch compatibility mouse events
+  can alter content before the native click. Pen/touch still use normal links.
+- Keep navigation visible while a pointer is down on it and for 400 ms after
+  release so late momentum-scroll events cannot move the hit target away.
+  Cancel/blur release the lock. Events remain passive and native; no synthetic
+  touch clicks or global prevention of scrolling/zooming.
+- `tests/tap-response.test.cjs` executes both complete HTML pages and covers
+  compatibility mouseenter, mouse preview, late scroll, repeat taps, cancel/blur.
+  This is DOM/event regression coverage, not real iPad/WebKit validation. The
+  user's unspecified button symptom still needs on-device confirmation.

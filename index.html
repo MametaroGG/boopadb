@@ -2874,7 +2874,27 @@ function applyTheme(next){
 document.getElementById("themeBtn").addEventListener("click", () => applyTheme(THEME === "light" ? "dark" : "light"));
 const tabbarEl = document.getElementById("tabbar");
 let lastY = 0, scrollIdle = null;
+// A late momentum-scroll event must not move the navigation out from under
+// a finger. Keep the native click path; do not synthesize clicks on touchend.
+const navPointers = new Set();
+let navTapUntil = 0;
+function navTapPending(){ return navPointers.size > 0 || Date.now() < navTapUntil; }
+tabbarEl.addEventListener("pointerdown", e => {
+  navPointers.add(e.pointerId);
+  navTapUntil = 0;
+  clearTimeout(scrollIdle);
+  tabbarEl.classList.remove("hide");
+}, {passive: true});
+window.addEventListener("pointerup", e => {
+  if (!navPointers.delete(e.pointerId)) return;
+  if (!navPointers.size) navTapUntil = Date.now() + 400;
+}, {passive: true});
+window.addEventListener("pointercancel", e => {
+  if (navPointers.delete(e.pointerId) && !navPointers.size) navTapUntil = 0;
+}, {passive: true});
+window.addEventListener("blur", () => { navPointers.clear(); navTapUntil = 0; });
 function onAnyScroll(y, src){
+  if (navTapPending()) { lastY = y; return; }
   if (spyLock) {
     clearTimeout(spyLockTimer);
     spyLockTimer = setTimeout(() => { spyLock = false; }, 300);
@@ -2898,7 +2918,7 @@ document.addEventListener("scroll", e => {
 let touchY = null;
 document.addEventListener("touchstart", e => { touchY = e.touches[0].clientY; }, {passive: true});
 document.addEventListener("touchmove", e => {
-  if (touchY === null || spage.classList.contains("open")) return;
+  if (touchY === null || navTapPending() || spage.classList.contains("open")) return;
   const dy = touchY - e.touches[0].clientY;
   if (dy > 26) { tabbarEl.classList.add("hide"); touchY = e.touches[0].clientY; clearTimeout(scrollIdle); scrollIdle = setTimeout(() => tabbarEl.classList.remove("hide"), 1100); }
   else if (dy < -14) { tabbarEl.classList.remove("hide"); touchY = e.touches[0].clientY; }
@@ -3198,7 +3218,9 @@ function renderBList(){
   document.getElementById("bMore").style.display = "";
   document.getElementById("bPrev").innerHTML = bPrevHTML(bItems[0]); setTimeout(fillBpChart, 0);
   list.querySelectorAll(".brow").forEach(r => {
-    r.addEventListener("mouseenter", () => {
+    // Touch compatibility mouse events must not replace preview DOM before click.
+    r.addEventListener("pointerenter", e => {
+      if (e.pointerType !== "mouse") return;
       list.querySelectorAll(".brow").forEach(y => y.classList.toggle("sel", y === r));
       document.getElementById("bPrev").innerHTML = bPrevHTML(bItems[+r.dataset.i]); setTimeout(fillBpChart, 0);
     });
