@@ -1453,36 +1453,24 @@ function heroPos(p, animate){
 }
 function heroGo(i){
   i = ((i % HN) + HN) % HN;
-  // Jumping between the last and first slides goes through the clone so it
-  // keeps moving in the same direction instead of sweeping across all slides.
+  // Jumping between the last and first slides wraps instantly (no sweep
+  // across all slides, no rewind animation).
   if (HN > 1 && hi === HN - 1 && i === 0) { heroStep(1); return; }
   if (HN > 1 && hi === 0 && i === HN - 1) { heroStep(-1); return; }
   hi = i;
   heroPos(hi + 1, true);
   dotsEl.querySelectorAll("button").forEach((d, j) => d.classList.toggle("on", j === hi));
 }
-let wrapPending = false;
 function heroStep(dir){
   const target = hi + dir;
   if (target >= 0 && target < HN) { heroGo(target); return; }
-  if (wrapPending) return;
-  wrapPending = true;
-  heroPos(dir > 0 ? HN + 1 : 0, true);
+  // Loop wrap: jump straight to the other end with NO animation. The old
+  // clone-and-snap route still produced a visible rewind sweep on some
+  // mobile browsers (the snap-back animated anyway), so the wrap is an
+  // instant cut now.
   hi = ((target % HN) + HN) % HN;
+  heroPos(hi + 1, false);
   dotsEl.querySelectorAll("button").forEach((d, j) => d.classList.toggle("on", j === hi));
-  // Reset to the real slide the moment the wrap animation actually ends
-  // (a fixed timer can fire mid-animation on a busy main thread).
-  let done = false;
-  const reset = () => {
-    if (done) return;
-    done = true;
-    wrapPending = false;
-    track.removeEventListener("transitionend", onEnd);
-    heroPos(hi + 1, false);
-  };
-  const onEnd = e => { if (e.propertyName === "transform") reset(); };
-  track.addEventListener("transitionend", onEnd);
-  setTimeout(reset, 820);
 }
 window.addEventListener("resize", () => heroPos(hi + 1, false));
 window.addEventListener("load", () => heroPos(hi + 1, false));
