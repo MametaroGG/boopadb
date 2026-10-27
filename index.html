@@ -30,6 +30,15 @@
       'SW=' + !!(navigator.serviceWorker && navigator.serviceWorker.controller),
       'errors=' + errors.length];
     errors.forEach(function (e) { lines.push(e); });
+    var vv = window.visualViewport;
+    if (vv) lines.push('visualViewport=' + Math.round(vv.width) + 'x' + Math.round(vv.height) + ' offset=' + Math.round(vv.offsetLeft) + ',' + Math.round(vv.offsetTop) + ' scale=' + vv.scale);
+    ['#searchPage', '#searchPage .sp-inner', '#searchPage .sp-search', '#spQ', '#spImgBtn', '#spClear', '#spImgDrop', '#searchPage .sp-main'].forEach(function (selector) {
+      var el = document.querySelector(selector);
+      if (!el) return;
+      var r = el.getBoundingClientRect(), s = getComputedStyle(el);
+      lines.push(selector + ': x=' + Math.round(r.left) + '..' + Math.round(r.right) + ' w=' + Math.round(r.width) + ' client/scroll=' + el.clientWidth + '/' + el.scrollWidth + ' minW=' + s.minWidth + ' box=' + s.boxSizing + ' display=' + s.display);
+    });
+
     ['heroTrack', 'saleTrack', 'featTrack', 'bList', 'bPrev', 'catRail'].forEach(function (id) {
       var el = document.getElementById(id);
       lines.push(id + ': count=' + (el ? el.children.length : '-') + ' ' + size(el));
@@ -368,10 +377,33 @@
   .sp-mode[hidden]{display:none}
   #spModeImg{width:26px;height:26px;border-radius:6px;object-fit:cover;flex:none}
   #spModeImg[hidden]{display:none}
-  .sp-imgbtn{right:54px}
-  .sp-search input#spQ{padding-right:104px}
+  .sp-search .sp-imgbtn{right:54px}
+  .sp-search input#spQ{flex:1 1 0%;width:0;min-width:0;padding-right:104px}
   .image-drop{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:92px;margin:16px 0;padding:20px;border:2px dashed var(--line);border-radius:14px;background:var(--bg);color:var(--sub);font:inherit;cursor:pointer;transition:border-color .15s,background .15s}
   .image-drop:hover,.image-drop:focus-visible,.image-drop.is-dragging{border-color:var(--accent,#f0444b);background:rgba(240,68,75,.07);outline-offset:4px}
+
+  .image-search-entry{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0 20px;padding:12px 18px;border:1px solid var(--border2);border-radius:12px;background:var(--panel);color:var(--text);font:inherit;text-decoration:none}
+  .image-search-entry:hover{border-color:var(--accent,#f0444b)}
+  #imageSearchPage{position:fixed;inset:0;z-index:110;overflow-y:auto;overscroll-behavior:contain;background:var(--bg);padding:24px max(20px,env(safe-area-inset-right)) max(32px,env(safe-area-inset-bottom));box-sizing:border-box}
+  #imageSearchPage[hidden]{display:none}
+  .image-search-shell{width:100%;max-width:1100px;margin:0 auto;min-width:0}
+  .image-search-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .image-search-brand{font-size:18px;font-weight:800;letter-spacing:-.03em}
+  .image-search-head button{border:1px solid var(--border2);border-radius:999px;background:var(--panel);color:var(--text);padding:10px 16px;font:inherit;cursor:pointer}
+  .image-search-intro{text-align:center;margin:64px auto 44px;max-width:700px}
+  .image-search-intro h1{font-size:clamp(32px,5vw,56px);line-height:1.2;letter-spacing:-.04em;margin:0 0 22px;color:var(--text)}
+  .image-search-intro p{font-size:16px;line-height:1.9;color:var(--sub);margin:0;overflow-wrap:anywhere}
+  .image-upload-card{background:var(--panel);border:1px solid var(--border2);border-radius:24px;padding:16px 24px 28px;text-align:center}
+  .image-upload-card .image-drop{flex-direction:column;gap:18px;min-height:300px;margin:0;padding:40px 24px;background:transparent;border:2px dashed transparent;color:var(--text);border-radius:18px;box-sizing:border-box}
+  .image-upload-card .image-drop:hover,.image-upload-card .image-drop:focus-visible,.image-upload-card .image-drop.is-dragging{border-color:var(--accent,#f0444b);background:rgba(240,68,75,.07)}
+  .image-upload-icon{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:rgba(240,68,75,.12);color:var(--accent,#f0444b)}
+  .image-upload-icon svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .image-upload-title{font-size:clamp(22px,3vw,30px);font-weight:700}
+  .image-upload-hint{font-size:15px;line-height:1.7;color:var(--sub)}
+  .image-upload-formats{font-size:13px;color:var(--sub);line-height:1.7}
+  .image-search-legal{margin:16px 0 0;color:var(--sub);font-size:12px;line-height:1.8}
+  .image-search-legal a{color:inherit;text-underline-offset:3px}
+  @media(max-width:600px){#imageSearchPage{padding-top:16px}.image-search-intro{margin:40px auto 28px}.image-search-intro p{font-size:14px}.image-upload-card{padding:10px 12px 22px;border-radius:20px}.image-upload-card .image-drop{min-height:280px;padding:28px 12px}.image-upload-hint{font-size:14px}}
   .image-drop-error{position:fixed;z-index:1000;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:16px;width:max-content;max-width:calc(100vw - 32px);padding:14px 18px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);font-size:14px;box-shadow:0 4px 24px #0005}
   .image-drop-error[hidden]{display:none}
   .image-drop-error button{flex:none;background:none;color:inherit;border:0;font-size:22px;cursor:pointer}
@@ -892,8 +924,8 @@
   .sp-title{font-size:19px;font-weight:800}
   .sp-share{background:var(--panel);border:1px solid var(--border2);color:var(--text);width:44px;height:44px;border-radius:50%;cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;margin-left:auto}
   .sp-share svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-  .sp-inner{max-width:1080px;margin:0 auto}
-  .sp-search{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--border2);border-radius:99px;padding:12px 18px;margin:16px 0 4px;position:relative}
+  .sp-inner{width:100%;max-width:1080px;min-width:0;margin:0 auto}
+  .sp-search{display:flex;min-width:0;max-width:100%;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--border2);border-radius:99px;padding:12px 18px;margin:16px 0 4px;position:relative}
   .sp-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:none;border:none;color:var(--sub);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
   .sp-clear svg{width:19px;height:19px;stroke:currentColor}
   .sp-clear[hidden]{display:none}
@@ -1172,7 +1204,22 @@
   <button id="tabSearch" class="fab" data-i-al="al_search" aria-label="検索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg></button>
 </nav>
 <div id="spImgDropError" class="image-drop-error" hidden><span id="spImgDropErrorText" role="status" aria-live="polite"></span><button id="spImgDropErrorClose" type="button" data-i-al="al_close" aria-label="閉じる">×</button></div>
-<div id="lensView" hidden>
+<section id="imageSearchPage" hidden role="dialog" aria-modal="true" aria-labelledby="imageSearchTitle">
+  <div class="image-search-shell">
+    <div class="image-search-head"><span class="image-search-brand">BoopaDB <span data-i="img_search">画像検索</span></span><button id="imageSearchClose" type="button" data-i="img_page_back">戻る</button></div>
+    <div class="image-search-intro"><h1 id="imageSearchTitle" tabindex="-1" data-i="img_page_title">画像から、気になる商品を。</h1><p data-i="img_page_intro">画像を選んで、似ているBOOTH商品を探しましょう。画像全体でも、気になる部分を囲んでも検索できます。</p></div>
+    <div class="image-upload-card">
+      <button type="button" class="image-drop" id="spImgDrop" aria-describedby="imageUploadFormats spImgDropErrorText">
+        <span class="image-upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5"/></svg></span>
+        <span class="image-upload-title" data-i="img_page_upload">画像をアップロード</span>
+        <span class="image-upload-hint" data-i="img_page_hint">ここにドラッグ＆ドロップ、またはクリックして選択</span>
+        <span class="image-upload-formats" id="imageUploadFormats" data-i="img_page_formats">PNG・JPEG・WebPなどの画像 ／ 1枚・20MBまで</span>
+      </button>
+      <p class="image-search-legal"><a href="terms.html" data-i="ft_terms">利用規約</a> · <a href="privacy.html" data-i="ft_priv">プライバシー</a></p>
+    </div>
+  </div>
+</section>
+<div id="lensView" hidden role="dialog" aria-modal="true" aria-label="画像検索" data-i-al="img_search">
   <div class="lv-head"><button id="lvBack" class="igs-x" type="button" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><img id="lvThumb" alt=""><div class="lv-title" data-i="img_search">画像検索</div><div class="lv-count" id="lvCount"></div></div>
   <div class="lv-stage" id="lvStage"><div class="lv-wrap" id="lvWrap"><img id="lvImg" alt=""><svg id="lvSvg"></svg><canvas id="lvDraw"></canvas></div><button id="lvFitBtn" class="igs-btn lv-fitbtn" type="button" hidden data-i="lv_fit">全体を表示</button><span class="lv-hint" id="lvHint" data-i="img_trace_hint">探したいものを指やマウスでなぞって囲んでください</span></div>
   <div class="lv-tools" id="lvTools"><span class="lv-tbtns"><button id="lvWhole" class="igs-btn" type="button" data-i="img_use_whole">画像全体で検索</button><button id="lvRetake" class="igs-btn" type="button" data-i="img_retake">選び直す</button></span></div>
@@ -1182,7 +1229,7 @@
   <div class="sp-head"><button class="sp-back" id="spBack" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><div class="sp-title" data-i="sp_title">商品検索</div></div>
   <div class="sp-inner">
     <div class="sp-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg><input id="spQ" type="text" data-i-ph="sp_ph" placeholder="商品名・ショップ名で検索" autocomplete="off"><button id="spClear" class="sp-clear" type="button" data-i-al="al_close" aria-label="閉じる" hidden><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button><button id="spImgBtn" class="sp-clear sp-imgbtn" type="button" data-i-al="img_search" aria-label="画像検索"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5-5-7 7"/></svg></button><input type="file" id="spImgFile" accept="image/*" hidden></div>
-    <button type="button" class="image-drop" id="spImgDrop" aria-describedby="spImgDropError" data-i="img_drop">画像をここにドロップ、またはクリックして選択（1枚・20MBまで）</button>
+    <a class="image-search-entry" id="spImageSearchEntry" href="#image-search" data-i="img_page_entry">画像から商品を探す →</a>
     <div class="sp-main"><div class="sp-side">
     <div class="sp-sidehead"><span data-i="sp_filter">絞り込み</span><button id="spSideX" class="sp-sidex" type="button" data-i-al="al_close" aria-label="閉じる"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
     <div class="sp-sec" data-i="sp_filter">絞り込み</div>
@@ -1217,7 +1264,7 @@ const LANGS = [["ja", "日本語"], ["en", "English"], ["ko", "한국어"], ["zh
 const I18N = {
 ja: {
   doc_title: "BoopaDB — BOOTHのVRChat向け価格データベース（プロトタイプ）",
-  nav_sale: "セール中の商品", nav_feat: "注目の商品", nav_browse: "新着・値下げ", cat_title: "カテゴリー別に閲覧", upd_title: "最近のアップデート", img_search: "画像検索", img_drop: "画像をここにドロップ、またはクリックして選択（1枚・20MBまで）", img_file_empty: "画像ファイルを1枚選択してください", img_file_one: "一度に選択できる画像は1枚です", img_file_type: "画像ファイルを選択してください", img_file_size: "画像は空でない20MB以下のファイルを選択してください", img_file_decode: "この画像を読み込めません。PNG・JPEG・WebPなど別の形式で試してください", img_similar: "似た画像を探す", img_trace_hint: "探したいものを指やマウスでなぞって囲んでください", img_use_area: "この範囲で検索", img_use_whole: "画像全体で検索", img_retake: "選び直す", img_searching: "画像で検索中…", img_limit: "本日の無料上限（5回）に達しました。明日また利用できます", img_error: "画像検索に失敗しました。時間をおいてお試しください", img_notindexed: "この商品の画像はまだ収録されていません", lv_fit: "全体を表示", upd_newvar: "新バリエーション", shops_title: "知っているショップの作品", shops_n: "{n} 商品",
+  nav_sale: "セール中の商品", nav_feat: "注目の商品", nav_browse: "新着・値下げ", cat_title: "カテゴリー別に閲覧", upd_title: "最近のアップデート", img_search: "画像検索", img_page_entry: "画像から商品を探す →", img_page_back: "戻る", img_page_title: "画像から、気になる商品を。", img_page_intro: "画像を選んで、似ているBOOTH商品を探しましょう。画像全体でも、気になる部分を囲んでも検索できます。", img_page_upload: "画像をアップロード", img_page_hint: "ここにドラッグ＆ドロップ、またはクリックして選択", img_page_formats: "PNG・JPEG・WebPなどの画像 ／ 1枚・20MBまで", img_drop: "画像をここにドロップ、またはクリックして選択（1枚・20MBまで）", img_file_empty: "画像ファイルを1枚選択してください", img_file_one: "一度に選択できる画像は1枚です", img_file_type: "画像ファイルを選択してください", img_file_size: "画像は空でない20MB以下のファイルを選択してください", img_file_decode: "この画像を読み込めません。PNG・JPEG・WebPなど別の形式で試してください", img_similar: "似た画像を探す", img_trace_hint: "探したいものを指やマウスでなぞって囲んでください", img_use_area: "この範囲で検索", img_use_whole: "画像全体で検索", img_retake: "選び直す", img_searching: "画像で検索中…", img_limit: "本日の無料上限（5回）に達しました。明日また利用できます", img_error: "画像検索に失敗しました。時間をおいてお試しください", img_notindexed: "この商品の画像はまだ収録されていません", lv_fit: "全体を表示", upd_newvar: "新バリエーション", shops_title: "知っているショップの作品", shops_n: "{n} 商品",
   hero_title: "注目＆おすすめ",
   feat_note: "セール中かどうかではなく、価格の動きの活発さと新着から選んでいます。",
   sort_pct: "割引率順", sort_amount: "割引額順", sort_cheap: "安い順", sort_pop: "人気順", sort_new: "新着順",
@@ -1250,7 +1297,7 @@ ja: {
 },
 en: {
   doc_title: "BoopaDB — BOOTH Price Database for VRChat (Prototype)",
-  nav_sale: "On Sale", nav_feat: "Featured", nav_browse: "New & Price Drops", cat_title: "Browse by Category", upd_title: "Recent Updates", img_search: "Image Search", img_drop: "Drop an image here, or click to choose (one image, up to 20 MB)", img_file_empty: "Choose one image file", img_file_one: "Choose only one image at a time", img_file_type: "Please choose an image file", img_file_size: "Choose a non-empty image up to 20 MB", img_file_decode: "This image could not be opened. Try PNG, JPEG or WebP", img_similar: "Find Similar Images", img_trace_hint: "Trace around what you're looking for", img_use_area: "Search This Area", img_use_whole: "Search Whole Image", img_retake: "Choose Another", img_searching: "Searching by image…", img_limit: "You've reached today's free limit (5). Please try again tomorrow", img_error: "Image search failed. Please try again later", img_notindexed: "This item's images aren't indexed yet", lv_fit: "Show all", upd_newvar: "New variation", shops_title: "Works from Shops You Know", shops_n: "{n} items",
+  nav_sale: "On Sale", nav_feat: "Featured", nav_browse: "New & Price Drops", cat_title: "Browse by Category", upd_title: "Recent Updates", img_search: "Image Search", img_page_entry: "Search products by image →", img_page_back: "Back", img_page_title: "Find your next discovery by image.", img_page_intro: "Choose an image to find similar BOOTH products. Search the whole image or draw around the part you like.", img_page_upload: "Upload an image", img_page_hint: "Drag and drop here, or click to choose", img_page_formats: "Images such as PNG, JPEG and WebP / one image, up to 20 MB", img_drop: "Drop an image here, or click to choose (one image, up to 20 MB)", img_file_empty: "Choose one image file", img_file_one: "Choose only one image at a time", img_file_type: "Please choose an image file", img_file_size: "Choose a non-empty image up to 20 MB", img_file_decode: "This image could not be opened. Try PNG, JPEG or WebP", img_similar: "Find Similar Images", img_trace_hint: "Trace around what you're looking for", img_use_area: "Search This Area", img_use_whole: "Search Whole Image", img_retake: "Choose Another", img_searching: "Searching by image…", img_limit: "You've reached today's free limit (5). Please try again tomorrow", img_error: "Image search failed. Please try again later", img_notindexed: "This item's images aren't indexed yet", lv_fit: "Show all", upd_newvar: "New variation", shops_title: "Works from Shops You Know", shops_n: "{n} items",
   hero_title: "Featured & Recommended",
   feat_note: "Chosen for active price movement and freshness, not just whether they are on sale.",
   sort_pct: "By discount %", sort_amount: "By amount saved", sort_cheap: "Price: low to high", sort_pop: "Most popular", sort_new: "Newest",
@@ -1283,7 +1330,7 @@ en: {
 },
 ko: {
   doc_title: "BoopaDB — BOOTH의 VRChat용 가격 데이터베이스(프로토타입)",
-  nav_sale: "할인 중인 상품", nav_feat: "주목 상품", nav_browse: "신착·가격 인하", cat_title: "카테고리별 둘러보기", upd_title: "최근 업데이트", img_search: "이미지 검색", img_drop: "이미지를 여기에 놓거나 클릭하여 선택 (1개, 최대 20MB)", img_file_empty: "이미지 파일을 선택해 주세요", img_file_one: "한 번에 이미지 1개만 선택해 주세요", img_file_type: "이미지 파일을 선택해 주세요", img_file_size: "비어 있지 않은 20MB 이하 이미지를 선택해 주세요", img_file_decode: "이미지를 열 수 없어요. PNG, JPEG, WebP 등으로 시도해 주세요", img_similar: "비슷한 이미지 찾기", img_trace_hint: "찾고 싶은 것을 손가락으로 따라 그어 주세요", img_use_area: "이 범위로 검색", img_use_whole: "이미지 전체로 검색", img_retake: "다시 선택", img_searching: "이미지로 검색 중…", img_limit: "오늘의 무료 한도(5회)에 도달했어요. 내일 다시 이용해 주세요", img_error: "이미지 검색에 실패했어요. 잠시 후 다시 시도해 주세요", img_notindexed: "이 상품의 이미지는 아직 수록되지 않았어요", lv_fit: "전체 보기", upd_newvar: "새 배리에이션", shops_title: "아는 숍의 작품", shops_n: "{n}개 상품",
+  nav_sale: "할인 중인 상품", nav_feat: "주목 상품", nav_browse: "신착·가격 인하", cat_title: "카테고리별 둘러보기", upd_title: "최근 업데이트", img_search: "이미지 검색", img_page_entry: "이미지로 상품 찾기 →", img_page_back: "뒤로", img_page_title: "이미지로 마음에 드는 상품을.", img_page_intro: "이미지와 비슷한 BOOTH 상품을 찾아보세요. 전체 이미지 또는 원하는 부분을 둘러싸서 검색할 수 있어요.", img_page_upload: "이미지 업로드", img_page_hint: "여기로 끌어 놓거나 클릭하여 선택", img_page_formats: "PNG, JPEG, WebP 등의 이미지 / 1개, 최대 20MB", img_drop: "이미지를 여기에 놓거나 클릭하여 선택 (1개, 최대 20MB)", img_file_empty: "이미지 파일을 선택해 주세요", img_file_one: "한 번에 이미지 1개만 선택해 주세요", img_file_type: "이미지 파일을 선택해 주세요", img_file_size: "비어 있지 않은 20MB 이하 이미지를 선택해 주세요", img_file_decode: "이미지를 열 수 없어요. PNG, JPEG, WebP 등으로 시도해 주세요", img_similar: "비슷한 이미지 찾기", img_trace_hint: "찾고 싶은 것을 손가락으로 따라 그어 주세요", img_use_area: "이 범위로 검색", img_use_whole: "이미지 전체로 검색", img_retake: "다시 선택", img_searching: "이미지로 검색 중…", img_limit: "오늘의 무료 한도(5회)에 도달했어요. 내일 다시 이용해 주세요", img_error: "이미지 검색에 실패했어요. 잠시 후 다시 시도해 주세요", img_notindexed: "이 상품의 이미지는 아직 수록되지 않았어요", lv_fit: "전체 보기", upd_newvar: "새 배리에이션", shops_title: "아는 숍의 작품", shops_n: "{n}개 상품",
   hero_title: "주목 & 추천",
   feat_note: "할인 여부가 아니라 가격 변동의 활발함과 신착을 기준으로 골랐습니다.",
   sort_pct: "할인율순", sort_amount: "할인액순", sort_cheap: "가격 낮은순", sort_pop: "인기순", sort_new: "최신순",
@@ -1316,7 +1363,7 @@ ko: {
 },
 "zh-Hans": {
   doc_title: "BoopaDB — BOOTH 的 VRChat 价格数据库（原型）",
-  nav_sale: "促销中的商品", nav_feat: "精选商品", nav_browse: "新品·降价", cat_title: "按类别浏览", upd_title: "最近更新", img_search: "图像搜索", img_drop: "将图片拖到这里，或点击选择（1张，最大20MB）", img_file_empty: "请选择一张图片", img_file_one: "一次只能选择一张图片", img_file_type: "请选择图片文件", img_file_size: "请选择非空且不超过20MB的图片", img_file_decode: "无法打开这张图片，请尝试PNG、JPEG或WebP格式", img_similar: "查找相似图片", img_trace_hint: "用手指圈出要查找的物品", img_use_area: "搜索此区域", img_use_whole: "搜索整张图片", img_retake: "重新选择", img_searching: "正在用图像搜索…", img_limit: "已达到今日免费上限（5次），请明天再试", img_error: "图像搜索失败，请稍后再试", img_notindexed: "此商品的图片尚未收录", lv_fit: "显示全部", upd_newvar: "新增规格", shops_title: "认识的店铺作品", shops_n: "{n} 件商品",
+  nav_sale: "促销中的商品", nav_feat: "精选商品", nav_browse: "新品·降价", cat_title: "按类别浏览", upd_title: "最近更新", img_search: "图像搜索", img_page_entry: "以图搜索商品 →", img_page_back: "返回", img_page_title: "用图片，寻找心仪商品。", img_page_intro: "选择图片以寻找相似的 BOOTH 商品。可搜索整张图片，也可圈选感兴趣的部分。", img_page_upload: "上传图片", img_page_hint: "拖放到这里，或点击选择", img_page_formats: "PNG、JPEG、WebP 等图片 / 1张，最大20MB", img_drop: "将图片拖到这里，或点击选择（1张，最大20MB）", img_file_empty: "请选择一张图片", img_file_one: "一次只能选择一张图片", img_file_type: "请选择图片文件", img_file_size: "请选择非空且不超过20MB的图片", img_file_decode: "无法打开这张图片，请尝试PNG、JPEG或WebP格式", img_similar: "查找相似图片", img_trace_hint: "用手指圈出要查找的物品", img_use_area: "搜索此区域", img_use_whole: "搜索整张图片", img_retake: "重新选择", img_searching: "正在用图像搜索…", img_limit: "已达到今日免费上限（5次），请明天再试", img_error: "图像搜索失败，请稍后再试", img_notindexed: "此商品的图片尚未收录", lv_fit: "显示全部", upd_newvar: "新增规格", shops_title: "认识的店铺作品", shops_n: "{n} 件商品",
   hero_title: "精选与推荐",
   feat_note: "并非按是否促销，而是按价格变动活跃度和上新来挑选。",
   sort_pct: "按折扣率", sort_amount: "按优惠金额", sort_cheap: "价格从低到高", sort_pop: "按人气", sort_new: "最新上架",
@@ -1349,7 +1396,7 @@ ko: {
 },
 "zh-Hant": {
   doc_title: "BoopaDB — BOOTH 的 VRChat 價格數據庫（原型）",
-  nav_sale: "促銷中的商品", nav_feat: "精選商品", nav_browse: "新品·降價", cat_title: "按類別瀏覽", upd_title: "最近更新", img_search: "圖片搜尋", img_drop: "將圖片拖到這裡，或點擊選擇（1張，最大20MB）", img_file_empty: "請選擇一張圖片", img_file_one: "一次只能選擇一張圖片", img_file_type: "請選擇圖片檔案", img_file_size: "請選擇非空且不超過20MB的圖片", img_file_decode: "無法開啟這張圖片，請嘗試PNG、JPEG或WebP格式", img_similar: "尋找相似圖片", img_trace_hint: "用手指圈出要尋找的物品", img_use_area: "搜尋此區域", img_use_whole: "搜尋整張圖片", img_retake: "重新選擇", img_searching: "正在用圖片搜尋…", img_limit: "已達到今日免費上限（5次），請明天再試", img_error: "圖片搜尋失敗，請稍後再試", img_notindexed: "此商品的圖片尚未收錄", lv_fit: "顯示全部", upd_newvar: "新增規格", shops_title: "認識的店鋪作品", shops_n: "{n} 件商品",
+  nav_sale: "促銷中的商品", nav_feat: "精選商品", nav_browse: "新品·降價", cat_title: "按類別瀏覽", upd_title: "最近更新", img_search: "圖片搜尋", img_page_entry: "以圖搜尋商品 →", img_page_back: "返回", img_page_title: "用圖片，尋找心儀商品。", img_page_intro: "選擇圖片以尋找相似的 BOOTH 商品。可搜尋整張圖片，也可圈選感興趣的部分。", img_page_upload: "上傳圖片", img_page_hint: "拖放到這裡，或點擊選擇", img_page_formats: "PNG、JPEG、WebP 等圖片 / 1張，最大20MB", img_drop: "將圖片拖到這裡，或點擊選擇（1張，最大20MB）", img_file_empty: "請選擇一張圖片", img_file_one: "一次只能選擇一張圖片", img_file_type: "請選擇圖片檔案", img_file_size: "請選擇非空且不超過20MB的圖片", img_file_decode: "無法開啟這張圖片，請嘗試PNG、JPEG或WebP格式", img_similar: "尋找相似圖片", img_trace_hint: "用手指圈出要尋找的物品", img_use_area: "搜尋此區域", img_use_whole: "搜尋整張圖片", img_retake: "重新選擇", img_searching: "正在用圖片搜尋…", img_limit: "已達到今日免費上限（5次），請明天再試", img_error: "圖片搜尋失敗，請稍後再試", img_notindexed: "此商品的圖片尚未收錄", lv_fit: "顯示全部", upd_newvar: "新增規格", shops_title: "認識的店鋪作品", shops_n: "{n} 件商品",
   hero_title: "精選與推薦",
   feat_note: "並非按是否促銷，而是按價格變動活躍度和上新來挑選。",
   sort_pct: "按折扣率", sort_amount: "按優惠金額", sort_cheap: "價格從低到高", sort_pop: "按人氣", sort_new: "最新上架",
@@ -1759,7 +1806,7 @@ const spage = document.getElementById("searchPage");
 // scroll. The home scroll position is saved and restored on close.
 let veilY = null;
 function veilSync(){
-  const anyOpen = spage.classList.contains("open") || prodPage.classList.contains("open");
+  const anyOpen = spage.classList.contains("open") || prodPage.classList.contains("open") || !document.getElementById("imageSearchPage").hidden;
   if (anyOpen) {
     if (veilY === null) veilY = window.scrollY;
     document.body.classList.add("veil");
@@ -1780,7 +1827,7 @@ function openSearch(){
   veilSync();
   spRender();
   searchBtn.classList.add("on");
-  setTimeout(() => document.getElementById("spQ").focus(), 380);
+  setTimeout(() => { if (document.getElementById("imageSearchPage").hidden && spage.classList.contains("open")) document.getElementById("spQ").focus(); }, 380);
 }
 function closeSearch(){
   // Leaving search clears the relation/category filter modes, so the
@@ -4077,8 +4124,9 @@ async function imgSimilar(x){
 }
 let lvUrl = null, lvRect = null, lvShown = null, lvDrag = null, lvSearched = null, lvAnim = null, lvRemote = false, lvSettleGen = 0;
 const lvEl = id => document.getElementById(id);
-function lvOpen(){ lvEl("lensView").hidden = false; document.body.style.overflow = "hidden"; }
-function lvClose(){ lvEl("lensView").hidden = true; document.body.style.overflow = ""; if (lvAnim) { cancelAnimationFrame(lvAnim); lvAnim = null; } lvZoomReset(); }
+let lvReturnFocus = null;
+function lvOpen(){ if (lvEl("lensView").hidden) lvReturnFocus = document.activeElement; lvEl("lensView").hidden = false; lvEl("imageSearchPage").setAttribute("aria-modal", "false"); document.body.style.overflow = "hidden"; lvEl("lvBack").focus(); }
+function lvClose(){ lvEl("lensView").hidden = true; lvEl("imageSearchPage").setAttribute("aria-modal", "true"); document.body.style.overflow = ""; if (lvAnim) { cancelAnimationFrame(lvAnim); lvAnim = null; } lvZoomReset(); veilSync(); if (!document.getElementById("imageSearchPage").hidden) document.getElementById("spImgDrop").focus(); else if (lvReturnFocus && lvReturnFocus.isConnected) lvReturnFocus.focus(); }
 function lvStageMode(mode){ lvFitLoop(); }
 function lvFitBox(){
   const stage = lvEl("lvStage"), img = lvEl("lvImg"), wrap = lvEl("lvWrap");
@@ -4503,7 +4551,63 @@ lvEl("lvFitBtn").addEventListener("click", lvZoomReset);
   grab.addEventListener("pointerup", end);
   grab.addEventListener("pointercancel", end);
 })();
-lvEl("spImgBtn").addEventListener("click", () => lvEl("spImgFile").click());
+// Dedicated, directly linkable image-search screen. Keep the existing lens engine.
+let imageSearchReturnURL = null, imageSearchReturnFocus = null;
+function imageSearchSync(){
+  const page = lvEl("imageSearchPage"), opening = location.hash === "#image-search";
+  if (page.hidden === !opening) return;
+  page.hidden = !opening;
+  if (opening) {
+    imageSearchReturnFocus = document.activeElement;
+    lvEl("imageSearchTitle").focus();
+  } else {
+    lvClose();
+    // Invalidate pending decode callbacks when leaving the dedicated page.
+    if (!lvRemote && lvUrl) { URL.revokeObjectURL(lvUrl); lvUrl = null; }
+    lvUploadError("");
+    if (imageSearchReturnFocus && imageSearchReturnFocus.isConnected) imageSearchReturnFocus.focus();
+  }
+  veilSync();
+}
+function openImageSearchPage(e){
+  if (e) e.preventDefault();
+  if (location.hash !== "#image-search") {
+    imageSearchReturnURL = location.pathname + location.search + location.hash;
+    history.pushState(null, "", "#image-search");
+  }
+  imageSearchSync();
+}
+function closeImageSearchPage(){
+  // Replace this view without navigating a direct-link visitor away from BoopaDB.
+  history.replaceState(null, "", imageSearchReturnURL || location.pathname + location.search);
+  imageSearchReturnURL = null;
+  imageSearchSync();
+}
+lvEl("spImgBtn").addEventListener("click", openImageSearchPage);
+lvEl("spImageSearchEntry").addEventListener("click", openImageSearchPage);
+lvEl("imageSearchClose").addEventListener("click", closeImageSearchPage);
+window.addEventListener("hashchange", imageSearchSync);
+window.addEventListener("popstate", imageSearchSync);
+document.addEventListener("keydown", e => {
+  const lensOpen = !lvEl("lensView").hidden;
+  if (lvEl("imageSearchPage").hidden && !lensOpen) return;
+  if (e.key === "Tab") {
+    const activeView = lvEl(lensOpen ? "lensView" : "imageSearchPage");
+    const items = [...activeView.querySelectorAll('button, a[href], [tabindex="0"]')].filter(el => {
+      if (el.disabled) return false;
+      for (let node = el; node && node !== activeView; node = node.parentElement) {
+        if (node.hidden || getComputedStyle(node).display === "none" || getComputedStyle(node).visibility === "hidden") return false;
+      }
+      return true;
+    });
+    const first = items[0], last = items[items.length - 1];
+    if (first && e.shiftKey && (document.activeElement === first || !items.includes(document.activeElement))) { e.preventDefault(); last.focus(); }
+    else if (first && !e.shiftKey && (document.activeElement === last || !activeView.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
+  }
+  if (e.key !== "Escape") return;
+  if (lensOpen) lvClose(); else closeImageSearchPage();
+});
+imageSearchSync();
 function lvUploadError(key){
   lvEl("spImgDropError").hidden = !key;
   lvEl("spImgDropErrorText").textContent = key ? tr(key) : "";
@@ -4535,7 +4639,7 @@ document.addEventListener("click", e => {
   const sl = a.closest(".hslide");
   if (sl && !sl.classList.contains("active")) { e.preventDefault(); heroGo([...track.children].indexOf(sl) - 1); heroPlay(); return; }
   const m = (a.getAttribute("href") || "").match(/items\/(\d+)/);
-  if (m) { e.preventDefault(); openItemSmart(m[1]); }
+  if (m) { e.preventDefault(); if (!lvEl("imageSearchPage").hidden) closeImageSearchPage(); openItemSmart(m[1]); }
 });
 
 // ---- personal strips (history / bookmarks) ----
