@@ -1716,7 +1716,7 @@ function spEnrichFromLists(){
 let spCatalogCache = { idx: null, hits: null };
 function spCatalogHits(){
   if (spCatalogCache.idx !== fullIndex) {
-    spCatalogCache = { idx: fullIndex, hits: fullIndex.map(e => ({id: e[0], name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10})) };
+    spCatalogCache = { idx: fullIndex, hits: fullIndex.map(e => ({id: e[0], name: e[1], shop: e[13] || "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10})) };
   }
   return spCatalogCache.hits;
 }
@@ -1726,7 +1726,7 @@ function spLandingHits(){
   if (spLandingCache.key === key) return spLandingCache.hits;
   const byIdF = new Map(fullIndex.map(e => [e[0], e]));
   const rich = new Map(spIndex.map(x => [String(x.id), x]));
-  const plainOf = e => ({id: e[0], name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
+  const plainOf = e => ({id: e[0], name: e[1], shop: e[13] || "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
   const objOf = id => rich.get(String(id)) || (byIdF.has(String(id)) ? plainOf(byIdF.get(String(id))) : null);
   const seen = new Set(), out = [];
   const push = x => { if (x && !seen.has(String(x.id))) { seen.add(String(x.id)); out.push(x); } };
@@ -1757,8 +1757,8 @@ async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
   try {
-    const rs = await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => fetch("search_index_" + i + ".json?v=20251025-9")));
-    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow, cat, likes, img, fd, pd]) => [String(id), name, String(name).toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow, String(cat || "").toLowerCase().normalize("NFKC"), likes || 0, pxImg(img), fd || 0, pd || 0]); spCatMap = new Map(fullIndex.map(e => [e[0], e[8]])); for (const row of raw) { const c = row[7]; if (c) { const k = String(c).toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, String(c)); } } if (typeof spCatRender === "function") spCatRender(); spEnrichFromIndex(); }
+    const rs = await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => fetch("search_index_" + i + ".json?v=20251027-1")));
+    if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow, cat, likes, img, fd, pd, shop]) => [String(id), name, String(name).toLowerCase().normalize("NFKC") + "\u0001" + String(shop || "").toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow, String(cat || "").toLowerCase().normalize("NFKC"), likes || 0, pxImg(img), fd || 0, pd || 0, shop || ""]); spCatMap = new Map(fullIndex.map(e => [e[0], e[8]])); for (const row of raw) { const c = row[7]; if (c) { const k = String(c).toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, String(c)); } } if (typeof spCatRender === "function") spCatRender(); spEnrichFromIndex(); }
   } catch {}
   fullIndexLoading = false;
   if (fullIndex) { fullIndexFails = 0; if (spage.classList.contains("open")) spRender(false); }
@@ -2139,7 +2139,7 @@ function spRender(reset = true){
     for (const e of fullIndex) {
       if (e[8] !== target) continue;
       const r = rich.get(e[0]);
-      hits.push(r ? {...r, _likes: r.likes || e[9] || 0, likes: r.likes || e[9] || 0, first_date: r.first_date || isoFD(e[11]), per_day: r.per_day != null ? r.per_day : (e[12] || 0) / 10} : {id: e[0], name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, _likes: e[9] || 0, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
+      hits.push(r ? {...r, _likes: r.likes || e[9] || 0, likes: r.likes || e[9] || 0, first_date: r.first_date || isoFD(e[11]), per_day: r.per_day != null ? r.per_day : (e[12] || 0) / 10} : {id: e[0], name: e[1], shop: e[13] || "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, _likes: e[9] || 0, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
     }
     hits.sort((a, b) => (b._likes || 0) - (a._likes || 0));
   }
@@ -2152,7 +2152,7 @@ function spRender(reset = true){
       if (r) { hits.push(r); continue; }
       const e = byId.get(id);
       if (!e) continue;
-      hits.push({id, name: e[1], shop: "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
+      hits.push({id, name: e[1], shop: e[13] || "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
     }
   }
   if (!hits && !q && spFilter === "all" && !spCatMode && !spRelIds && spSort !== "rel") {
@@ -2163,13 +2163,13 @@ function spRender(reset = true){
     loadAff();
     const rich = new Map(spIndex.map(x => [String(x.id), x]));
     hits = [];
-    for (const [id, name, lower, icur, ibase, ilowest, isale, iatlow, icat, ilikes, iimg, ifd, ipd] of fullIndex) {
+    for (const [id, name, lower, icur, ibase, ilowest, isale, iatlow, icat, ilikes, iimg, ifd, ipd, ishop] of fullIndex) {
       const pos = lower.indexOf(q);
       const catHit = pos < 0 && !!icat && icat.indexOf(q) >= 0;
       if (pos < 0 && !catHit) continue;
       const r = rich.get(id);
       if (r) hits.push({...r, _rank: catHit ? 3.5 : (pos === 0 ? 0 : 2), _likes: r.likes || ilikes || 0, _cat: icat, likes: r.likes || ilikes || 0, first_date: r.first_date || isoFD(ifd), per_day: r.per_day != null ? r.per_day : (ipd || 0) / 10});
-      else hits.push({id, name, shop: "", image: iimg || null, cur: icur, base: ibase, lowest: ilowest, sale: !!isale, pct: ibase > icur ? Math.round((1 - icur / ibase) * 100) : 0, at_lowest: !!iatlow, plain: icur === null || icur === undefined, _rank: catHit ? 3.5 : (pos === 0 ? 1 : 3), _likes: ilikes || 0, _cat: icat, likes: ilikes || 0, first_date: isoFD(ifd), per_day: (ipd || 0) / 10});
+      else hits.push({id, name, shop: ishop || "", image: iimg || null, cur: icur, base: ibase, lowest: ilowest, sale: !!isale, pct: ibase > icur ? Math.round((1 - icur / ibase) * 100) : 0, at_lowest: !!iatlow, plain: icur === null || icur === undefined, _rank: catHit ? 3.5 : (pos === 0 ? 1 : 3), _likes: ilikes || 0, _cat: icat, likes: ilikes || 0, first_date: isoFD(ifd), per_day: (ipd || 0) / 10});
     }
     hits.sort(spRelSort);
     if (hits.length < 50) {
@@ -2177,13 +2177,13 @@ function spRender(reset = true){
       if (tokens.length >= 2) {
         const have = new Set(hits.map(h => String(h.id)));
         const extra = [];
-        for (const [id, name, lower, cur, base, lowest, isale, atlow, icat, ilikes, img, ifd, ipd] of fullIndex) {
+        for (const [id, name, lower, cur, base, lowest, isale, atlow, icat, ilikes, img, ifd, ipd, ishop] of fullIndex) {
           if (have.has(String(id))) continue;
           let matched = 0;
           for (const t of tokens) if (lower.includes(t) || (icat && icat.includes(t))) matched++;
           const r = rich.get(String(id));
-          if (matched === tokens.length) extra.push(r ? {...r, _rank: 4, _likes: r.likes || ilikes || 0, _cat: icat, likes: r.likes || ilikes || 0, first_date: r.first_date || isoFD(ifd), per_day: r.per_day != null ? r.per_day : (ipd || 0) / 10} : {id, name, shop: "", image: img || null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 4, _likes: ilikes || 0, _cat: icat, likes: ilikes || 0, first_date: isoFD(ifd), per_day: (ipd || 0) / 10});
-          else if (tokens.length >= 3 && matched >= 3 && matched >= tokens.length - 1) extra.push(r ? {...r, _rank: 5, _likes: r.likes || ilikes || 0, _cat: icat, likes: r.likes || ilikes || 0, first_date: r.first_date || isoFD(ifd), per_day: r.per_day != null ? r.per_day : (ipd || 0) / 10} : {id, name, shop: "", image: img || null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 5, _likes: ilikes || 0, _cat: icat, likes: ilikes || 0, first_date: isoFD(ifd), per_day: (ipd || 0) / 10});
+          if (matched === tokens.length) extra.push(r ? {...r, _rank: 4, _likes: r.likes || ilikes || 0, _cat: icat, likes: r.likes || ilikes || 0, first_date: r.first_date || isoFD(ifd), per_day: r.per_day != null ? r.per_day : (ipd || 0) / 10} : {id, name, shop: ishop || "", image: img || null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 4, _likes: ilikes || 0, _cat: icat, likes: ilikes || 0, first_date: isoFD(ifd), per_day: (ipd || 0) / 10});
+          else if (tokens.length >= 3 && matched >= 3 && matched >= tokens.length - 1) extra.push(r ? {...r, _rank: 5, _likes: r.likes || ilikes || 0, _cat: icat, likes: r.likes || ilikes || 0, first_date: r.first_date || isoFD(ifd), per_day: r.per_day != null ? r.per_day : (ipd || 0) / 10} : {id, name, shop: ishop || "", image: img || null, cur, base, lowest, sale: !!isale, pct: base > cur ? Math.round((1 - cur / base) * 100) : 0, at_lowest: !!atlow, plain: cur == null, _rank: 5, _likes: ilikes || 0, _cat: icat, likes: ilikes || 0, first_date: isoFD(ifd), per_day: (ipd || 0) / 10});
         }
         if (extra.length) hits = [...hits, ...extra].sort(spRelSort);
       }
