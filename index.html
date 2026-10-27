@@ -143,13 +143,15 @@
   header nav{display:flex;gap:16px;margin-left:10px}
   @media (max-width:899px){
     .hwrap{gap:8px;row-gap:10px;padding:0 14px}
-    .hwrap .logo{order:1;font-size:19px}
-    .hwrap .badge{order:2;flex:none;font-size:9.5px;padding:2px 7px}
-    .hwrap .langsw{order:3;margin-left:auto}
-    .hwrap .themebtn{order:4;width:34px;height:34px}
-    #langBtn{padding:5px 8px;font-size:12px}
+    .hwrap .logo{order:1;font-size:18px;letter-spacing:0;flex:none}
+    .hwrap .badge{order:2;flex:none;font-size:9px;padding:1px 6px;letter-spacing:.04em}
+    .hwrap .langsw{order:3;margin-left:auto;min-width:0}
+    .hwrap .themebtn{order:4;width:32px;height:32px;flex:none}
+    #langBtn{padding:5px 8px;font-size:12px;gap:5px;max-width:100%}
+    #langCur{display:inline-block;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
     .hwrap nav{order:5;flex-basis:100%;margin-left:0}
   }
+  @media (max-width:359px){.hwrap .badge{display:none}}
   nav a{font-size:13px;color:var(--sub)}
   nav a:hover{color:#fff;text-decoration:none}
   .searchbox{margin-left:auto}
@@ -3949,7 +3951,7 @@ async function imgSimilar(x){
     lvShowResults(imgHitsFromApi(j.results));
   } catch { lvSetState("error"); }
 }
-let lvUrl = null, lvRect = null, lvShown = null, lvDrag = null, lvSearched = null, lvAnim = null, lvRemote = false;
+let lvUrl = null, lvRect = null, lvShown = null, lvDrag = null, lvSearched = null, lvAnim = null, lvRemote = false, lvSettleGen = 0;
 const lvEl = id => document.getElementById(id);
 function lvOpen(){ lvEl("lensView").hidden = false; document.body.style.overflow = "hidden"; }
 function lvClose(){ lvEl("lensView").hidden = true; document.body.style.overflow = ""; if (lvAnim) { cancelAnimationFrame(lvAnim); lvAnim = null; } lvZoomReset(); }
@@ -4039,8 +4041,10 @@ function lvSettle(bbox){
   const target = { x0: Math.max(0, bbox.x0 - pad), y0: Math.max(0, bbox.y0 - pad), x1: Math.min(1, bbox.x1 + pad), y1: Math.min(1, bbox.y1 + pad) };
   lvRect = target;
   if (!lvShown) lvShown = {...bbox};
+  const gen = ++lvSettleGen;
   const from = {...lvShown}, t0 = performance.now(), cv = lvEl("lvDraw");
   const tick = t => {
+    if (gen !== lvSettleGen) return;
     const k = Math.min(1, (t - t0) / 240), e = 1 - Math.pow(1 - k, 3);
     for (const key of ["x0", "y0", "x1", "y1"]) lvShown[key] = from[key] + (target[key] - from[key]) * e;
     cv.style.opacity = String(1 - k);
@@ -4259,6 +4263,8 @@ function lvBind(){
     if (z === "trace" && lvZoom.s > 1.02) {
       lvDrag = { mode: "pan", sx: e.clientX, sy: e.clientY, tx: lvZoom.tx, ty: lvZoom.ty };
     } else if (z === "trace") {
+      lvSettleGen++;
+      cv.style.opacity = "";
       lvDrag = { mode: "trace", pts: [p], lx: e.clientX, ly: e.clientY };
       lvCvSetup();
       lvCvClear();

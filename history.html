@@ -142,13 +142,15 @@
   header nav{display:flex;gap:16px;margin-left:10px}
   @media (max-width:899px){
     .hwrap{gap:8px;row-gap:10px;padding:0 14px}
-    .hwrap .logo{order:1;font-size:19px}
-    .hwrap .badge{order:2;flex:none;font-size:9.5px;padding:2px 7px}
-    .hwrap .langsw{order:3;margin-left:auto}
-    .hwrap .themebtn{order:4;width:34px;height:34px}
-    #langBtn{padding:5px 8px;font-size:12px}
+    .hwrap .logo{order:1;font-size:18px;letter-spacing:0;flex:none}
+    .hwrap .badge{order:2;flex:none;font-size:9px;padding:1px 6px;letter-spacing:.04em}
+    .hwrap .langsw{order:3;margin-left:auto;min-width:0}
+    .hwrap .themebtn{order:4;width:32px;height:32px;flex:none}
+    #langBtn{padding:5px 8px;font-size:12px;gap:5px;max-width:100%}
+    #langCur{display:inline-block;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
     .hwrap nav{order:5;flex-basis:100%;margin-left:0}
   }
+  @media (max-width:359px){.hwrap .badge{display:none}}
   nav a{font-size:13px;color:var(--sub)}
   nav a:hover{color:#fff;text-decoration:none}
   .searchbox{margin-left:auto}
