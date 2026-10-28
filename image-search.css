@@ -66,6 +66,9 @@
    Dynamic viewport units remain CSS-owned: no visualViewport pixel sizes or zoom lock. */
 .spage.open,#lensView{width:100%;height:100%}
 @supports (width:100dvw) and (height:100dvh){.spage.open,#lensView{width:100dvw;height:100dvh}}
-#lvResults .cbody{display:flex;flex-direction:column;flex:1;min-width:0}
-#lvResults .lv-bookmark{width:100%;min-height:44px;margin-top:10px;white-space:normal}
-#lvResults .lv-bookmark[aria-pressed="true"]{color:var(--accent)}
+.image-result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}.image-result{display:flex;flex-direction:column;min-width:0;border:1px solid var(--border2);border-radius:12px;background:var(--card);overflow:hidden}.image-result img{width:100%;aspect-ratio:1;object-fit:cover;display:block}.image-result-body{display:flex;flex-direction:column;flex:1;min-width:0;padding:12px}.image-result h3{font-size:14px;line-height:1.5;margin:0 0 8px;overflow-wrap:anywhere}.image-result p{font-size:12px;color:var(--sub);margin:6px 0}.image-result button{font:inherit;background:var(--panel);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:8px;cursor:pointer}.image-result button[aria-pressed=true]{color:var(--accent)}.image-result-price{margin-top:auto;font-weight:700;font-size:16px}.image-result a{text-decoration:none}
+@media(max-width:650px){.image-result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.image-result-price del{font-size:12px;font-weight:400;color:var(--sub)}.image-result-price small{color:var(--accent)}
+/* Grid rows stretch cards; keep metadata intact and anchor actions to the bottom. */
+.image-result > a{flex:none}
+.image-result-body > button{width:100%;min-height:44px}

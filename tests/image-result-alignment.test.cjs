@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {JSDOM}=require('jsdom');
-const css=fs.readFileSync(path.join(__dirname,'../image-search-page.css'),'utf8');
+const css=fs.readFileSync(path.join(__dirname,'../image-search.css'),'utf8');
 test('result cards stretch their content and anchor the price/action group without truncating titles',()=>{
  for(const lang of ['ja','en','ko','zh-Hans','zh-Hant'])for(const theme of ['dark','light']){
   const title={ja:'長い商品名と対応アバターについての説明',en:'A long descriptive product title with supported avatars',ko:'지원 아바타에 관한 설명이 포함된 긴 상품명','zh-Hans':'包含支持角色说明的较长商品名称','zh-Hant':'包含支援角色說明的較長商品名稱'}[lang];

@@ -42,31 +42,30 @@ el('themeBtn').addEventListener('click',()=>{THEME=THEME==='dark'?'light':'dark'
 function veilSync(){document.body.style.overflow=el('lensView').hidden?'':'hidden';}
 function isoFD(n){if(!n)return '';const s=String(n);return s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8);}
 function pxImg(v){return !v?'':String(v).includes('://')?String(v):'https://booth.pximg.net/c/620x620/'+v+'_base_resized.jpg';}
+let catalogFailures=0;
 let fullIndex=null, indexPromise=null, currentApiResults=[], resultRecords=new Map();
 function loadImageCatalog(){
+ if(typeof imageCatalogShard!=='function')return Promise.resolve(null);
  if(indexPromise)return indexPromise;
- indexPromise=Promise.all(Array.from({length:24},(_,i)=>fetch('search_index_'+i+'.json').then(r=>{if(!r.ok)throw new Error('catalog');return r.json();}))).then(parts=>{
+ indexPromise=Promise.all(Array.from({length:24},(_,i)=>imageCatalogShard('search_index_'+i+'.json'))).then(parts=>{
   fullIndex=parts.flat().map(([id,name,cur,base,lowest,sale,atlow,cat,likes,img,fd,pd,shop])=>[String(id),name,'',cur,base,lowest,sale,atlow,cat,likes,pxImg(img),fd,pd,shop]);
-  if(currentApiResults.length)renderCurrentResults();return fullIndex;
- }).catch(()=>{indexPromise=null;return null;});return indexPromise;
+  window.dispatchEvent(new Event('boopa:catalog-ready'));return fullIndex;
+ }).catch(()=>{indexPromise=null;if(catalogFailures++<2)setTimeout(loadImageCatalog,1500*catalogFailures);return null;});return indexPromise;
 }
 function imgHitsFromApi(results){
  currentApiResults=Array.isArray(results)?results:[];
  const byId=new Map((fullIndex||[]).map(e=>[e[0],e]));
  const hits=currentApiResults.filter(r=>/^\d+$/.test(String(r.item_id))).map(r=>{
   const id=String(r.item_id),e=byId.get(id);
-  return {id,name:e?e[1]:'BOOTH #'+id,shop:e?e[13]||'':'',image:r.image||(e&&e[10])||'',cur:e?e[3]:null,base:e?e[4]:null,sale:e?!!e[6]:false,at_lowest:e?!!e[7]:false};
+  return {id,name:e?e[1]:'BOOTH #'+id,shop:e?e[13]||'':'',image:r.image||(e&&e[10])||'',_catalog:!!e,cur:e?e[3]:null,base:e?e[4]:null,sale:e?!!e[6]:false,at_lowest:e?!!e[7]:false};
  });resultRecords=new Map(hits.map(h=>[h.id,h]));return hits;
 }
 function savedBookmarks(){const b=readStore('boopadb_bm',[]);return Array.isArray(b)?b:[];}
-function safeImage(url){try{const u=new URL(url);return /^https?:$/.test(u.protocol)?u.href:'';}catch{return '';}}
-function saleCard(x){
- const saved=savedBookmarks().some(b=>String(b.id)===x.id),image=safeImage(x.image),price=x.cur==null?'':new Intl.NumberFormat(LANG,{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(x.cur);
- return '<article class="image-result" data-id="'+esc(x.id)+'"><a href="index.html#item-'+encodeURIComponent(x.id)+'">'+(image?'<img src="'+esc(image)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'')+'</a><div class="image-result-body"><h3><a href="index.html#item-'+encodeURIComponent(x.id)+'">'+esc(x.name)+'</a></h3><p>'+esc(x.shop)+'</p><div class="image-result-price">'+(x.base>x.cur&&x.cur!=null?'<del>'+esc(new Intl.NumberFormat(LANG,{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(x.base))+'</del> ':'')+esc(price)+(x.base>x.cur&&x.cur!=null?' <small>−'+Math.round((1-x.cur/x.base)*100)+'%</small>':'')+'</div><p><a href="https://booth.pm/'+LANG+'/items/'+encodeURIComponent(x.id)+'" target="_blank" rel="noopener">'+esc(tr('pp_booth'))+' ↗</a></p><button type="button" data-bookmark="'+esc(x.id)+'" aria-pressed="'+saved+'">'+esc(tr(saved?'pp_bmed':'pp_bm'))+'</button></div></article>';
-}
+function lvResultCard(x){return imageResultCard(x,savedBookmarks().some(b=>String(b.id)===String(x.id)),'index.html#item-'+encodeURIComponent(x.id));}
 function fillCardPrice(){} // Standalone result renderer already includes catalog prices.
-function fillImgs(){if(!fullIndex)loadImageCatalog();}
-function renderCurrentResults(){if(!currentApiResults.length)return;const hits=imgHitsFromApi(currentApiResults);el('lvResults').innerHTML=hits.map(saleCard).join('');el('lvCount').textContent=tr('sp_count',{n:hits.length});}
+function lvLoadCatalog(){if(!fullIndex){catalogFailures=0;loadImageCatalog();}}
+function fillImgs(){}
+function renderCurrentResults(){if(typeof lvRefreshCatalog==='function')lvRefreshCatalog();}
 el('lvResults').addEventListener('click',e=>{
  const button=e.target.closest('[data-bookmark]');if(!button)return;
  const id=button.dataset.bookmark,record=resultRecords.get(id);if(!record)return;

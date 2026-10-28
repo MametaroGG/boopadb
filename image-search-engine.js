@@ -1,6 +1,7 @@
 // Shared image-search lens. Host initializes catalog, localization and card adapters first.
 async function imgSimilar(x){
   const requestId = ++lvRequestId;
+  if (typeof lvLoadCatalog === "function") lvLoadCatalog();
   lvRemote = true; lvRect = null; lvShown = null; lvSearched = null; lvZoomReset();
   const img = document.getElementById("lvImg");
   img.onerror = null; // Do not retain a previous local-upload error handler.
@@ -18,9 +19,37 @@ async function imgSimilar(x){
     if (!res.ok) return lvSetState("error");
     const j = await res.json();
     if (requestId !== lvRequestId) return;
-    lvShowResults(imgHitsFromApi(j.results));
+    lvAcceptResults(j.results, requestId);
   } catch { if (requestId === lvRequestId) lvSetState("error"); }
 }
+// One result-card template for both uploaded and similar-image searches.
+function imageResultSafeUrl(url){if(typeof url!=='string'||!/^https?:\/\//i.test(url))return '';try{const u=new URL(url);return /^https?:$/.test(u.protocol)?u.href:'';}catch{return '';}}
+function imageResultCard(x, saved, detailUrl){
+ const image=imageResultSafeUrl(x.image),price=x.cur==null?'':new Intl.NumberFormat(LANG,{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(x.cur);
+ return '<article class="image-result" data-id="'+esc(x.id)+'"><a href="'+esc(detailUrl)+'">'+(image?'<img src="'+esc(image)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'')+'</a><div class="image-result-body"><h3><a href="'+esc(detailUrl)+'">'+esc(x.name)+'</a></h3><p>'+esc(x.shop)+'</p><div class="image-result-price">'+(x.base>x.cur&&x.cur!=null?'<del>'+esc(new Intl.NumberFormat(LANG,{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(x.base))+'</del> ':'')+esc(price)+(x.base>x.cur&&x.cur!=null?' <small>−'+Math.round((1-x.cur/x.base)*100)+'%</small>':'')+'</div><p><a data-ext href="https://booth.pm/'+LANG+'/items/'+encodeURIComponent(x.id)+'" target="_blank" rel="noopener">'+esc(tr('pp_booth'))+' ↗</a></p><button type="button" data-bookmark="'+esc(x.id)+'" aria-pressed="'+saved+'">'+esc(tr(saved?'pp_bmed':'pp_bm'))+'</button></div></article>';
+}
+
+// Fetch includes JSON decoding in the timeout; a stalled shard cannot pin retry forever.
+async function imageCatalogShard(url){
+ const controller=new AbortController();let timer;
+ try{return await Promise.race([fetch(url,{signal:controller.signal}).then(r=>{if(!r.ok)throw new Error('catalog');return r.json();}),new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new Error('catalog timeout'));},10000);})]);}
+ finally{clearTimeout(timer);}
+}
+let lvRawResults=[], lvResultsRequest=-1;
+function lvAcceptResults(results, requestId){
+ if(requestId!==lvRequestId)return;
+ lvRawResults=Array.isArray(results)?results:[];lvResultsRequest=requestId;
+ lvShowResults(imgHitsFromApi(lvRawResults));
+}
+function lvRefreshCatalog(){
+ if(lvResultsRequest!==lvRequestId || lvEl('lensView').hidden)return;
+ const scroll=lvEl('lvSheetBody').scrollTop;
+ const focus=document.activeElement && document.activeElement.dataset.bookmark;
+ lvRenderResults(imgHitsFromApi(lvRawResults));
+ lvEl('lvSheetBody').scrollTop=scroll;
+ if(focus){const button=[...lvEl('lvResults').querySelectorAll('[data-bookmark]')].find(b=>b.dataset.bookmark===focus);if(button)button.focus({preventScroll:true});}
+}
+
 let lvRequestId = 0;
 let lvUrl = null, lvRect = null, lvShown = null, lvDrag = null, lvSearched = null, lvAnim = null, lvRemote = false, lvSettleGen = 0;
 const lvEl = id => document.getElementById(id);
@@ -207,6 +236,7 @@ async function lvCropBlob(img, r){
 }
 async function lvRunSearch(){
   const requestId = ++lvRequestId;
+  if (typeof lvLoadCatalog === "function") lvLoadCatalog();
   const img = lvEl("lvImg");
   const r = lvRect ? {...lvRect} : { x0: 0, y0: 0, x1: 1, y1: 1 };
   lvSearched = {...r};
@@ -222,7 +252,7 @@ async function lvRunSearch(){
     if (!res.ok) return lvSetState("error");
     const j = await res.json();
     if (requestId !== lvRequestId) return;
-    lvShowResults(imgHitsFromApi(j.results));
+    lvAcceptResults(j.results, requestId);
   } catch { if (requestId === lvRequestId) lvSetState("error"); }
 }
 function lvPeekH(){ return lvSearched || lvEl("lvResults").children.length ? 118 : 34; }
@@ -255,12 +285,32 @@ function lvShowResults(hits){
   lvSheetSet("mid");
   lvEl("lvNote").hidden = true;
   lvEl("lvCount").textContent = tr("sp_count", {n: hits.length});
-  lvEl("lvResults").innerHTML = hits.length ? hits.map((x2, i) => x2.cur == null && typeof plainCard === "function" ? plainCard(x2, i) : saleCard(x2, i)).join("") : "";
+  lvRenderResults(hits);
+}
+function imageEnrichCatalogBookmarks(){
+ try{
+  const saved=JSON.parse(localStorage.getItem('boopadb_bm')||'[]');if(!Array.isArray(saved))return;
+  const rows=new Map((fullIndex||[]).map(row=>[String(row[0]),row]));
+  imageEnrichBookmarks(saved.flatMap(b=>{const row=rows.get(String(b.id));return row?[{id:String(b.id),_catalog:true,name:row[1],shop:row[13]||'',image:b.image||row[10]||'',cur:row[3]}]:[];}));
+ }catch{ /* Optional metadata refresh must not interrupt search. */ }
+}
+// Upgrade metadata of already-saved results, without resurrecting removed bookmarks.
+function imageEnrichBookmarks(hits){
+ try{
+  const saved=JSON.parse(localStorage.getItem('boopadb_bm')||'[]');if(!Array.isArray(saved))return;
+  const enriched=new Map(hits.filter(h=>h._catalog).map(h=>[String(h.id),h]));
+  const next=saved.map(b=>{const h=enriched.get(String(b.id));return h?{...b,name:h.name,shop:h.shop,image:h.image,cur:h.cur}:b;});
+  if(JSON.stringify(next)!==JSON.stringify(saved))localStorage.setItem('boopadb_bm',JSON.stringify(next));
+ }catch{ /* Restricted storage must not hide search results. */ }
+}
+function lvRenderResults(hits){
+  lvEl("lvCount").textContent = tr("sp_count", {n:hits.length});
+  imageEnrichBookmarks(hits);
+  lvEl("lvResults").innerHTML = hits.map(lvResultCard).join("");
   if (!hits.length) { lvEl("lvNote").hidden = false; lvEl("lvNote").textContent = tr("empty_none"); }
   if (typeof lvDecorateResults === "function") lvDecorateResults(hits);
-  fillImgs();
-  hits.forEach(h => { if (h.cur !== null && h.cur !== undefined) fillCardPrice(h); });
 }
+
 function lvOpenUpload(file){
   if (!file) return;
   ++lvRequestId;
@@ -432,6 +482,11 @@ function lvUploadError(key){
 
 // Called only after the host has initialized all of its own declarations.
 function initImageLens(){
+window.addEventListener("boopa:catalog-ready",()=>{
+  imageEnrichCatalogBookmarks();
+  if(typeof lvCatalogUpdated === "function")lvCatalogUpdated();
+  lvRefreshCatalog();
+});
 lvEl("lvBack").addEventListener("click", lvClose);
 lvEl("lvFitBtn").addEventListener("click", lvZoomReset);
 (function(){

@@ -163,7 +163,7 @@ test('detail→similar→back preserves modal lock, scroll/focus and supports bo
   const id=s.w.eval('[...PROD.keys()][0]');s.w.openProduct(id);
   const opener=s.el('ppSimilarBtn'), originalBookmark=s.el('ppBmBtn').innerHTML;opener.focus();
   s.el('prodPage').scrollTop=210;await s.w.imgSimilar({id,image:'https://example.test/x.png'});
-  const button=s.el('lvResults').querySelector('[data-lv-bookmark="123"]');assert.ok(button);assert.equal(button.closest('a'),null);button.click();
+  const button=s.el('lvResults').querySelector('[data-bookmark="123"]');assert.ok(button);assert.equal(button.closest('a'),null);button.click();
   assert.equal(button.getAttribute('aria-pressed'),'true');assert.ok(JSON.parse(s.w.localStorage.getItem('boopadb_bm')).some(x=>x.id==='123'));assert.equal(s.el('ppBmBtn').innerHTML,originalBookmark);
   button.click();assert.equal(button.getAttribute('aria-pressed'),'false');
   const writes=[],style=s.d.body.style,desc=Object.getOwnPropertyDescriptor(s.w.CSSStyleDeclaration.prototype,'overflow');
@@ -179,9 +179,9 @@ test('detail→similar→back preserves modal lock, scroll/focus and supports bo
 test('priced similar cards keep bookmark controls and synchronize existing storage across locales',()=>{
  for(const lang of ['ja','en','ko','zh-Hans','zh-Hant']){const s=setup({home:true,lang});try{
   const hit={id:'123',name:'商品 / long product',shop:'Shop',image:'https://example.test/x.png',cur:1500,base:2000,pct:25,sale:true,at_lowest:false};
-  s.w.lvShowResults([hit]);const button=s.el('lvResults').querySelector('[data-lv-bookmark]');assert.ok(button);assert.equal(button.closest('a'),null);button.click();assert.equal(button.getAttribute('aria-pressed'),'true');
-  s.w.lvShowResults([{...hit,name:'Updated title'}]);assert.equal(s.el('lvResults').querySelector('[data-lv-bookmark]').getAttribute('aria-pressed'),'true');
-  s.w.localStorage.setItem('boopadb_bm','[]');s.w.dispatchEvent(new s.w.StorageEvent('storage',{key:'boopadb_bm'}));assert.equal(s.el('lvResults').querySelector('[data-lv-bookmark]').getAttribute('aria-pressed'),'false');assert.deepEqual(s.errors,[]);
+  s.w.lvShowResults([hit]);const button=s.el('lvResults').querySelector('[data-bookmark]');assert.ok(button);assert.equal(button.closest('a'),null);button.click();assert.equal(button.getAttribute('aria-pressed'),'true');
+  s.w.lvShowResults([{...hit,name:'Updated title'}]);assert.equal(s.el('lvResults').querySelector('[data-bookmark]').getAttribute('aria-pressed'),'true');
+  s.w.localStorage.setItem('boopadb_bm','[]');s.w.dispatchEvent(new s.w.StorageEvent('storage',{key:'boopadb_bm'}));assert.equal(s.el('lvResults').querySelector('[data-bookmark]').getAttribute('aria-pressed'),'false');assert.deepEqual(s.errors,[]);
  }finally{s.dom.window.close();}}
 });
 test('closed or superseded similar requests cannot repaint newer results',async()=>{
@@ -189,9 +189,9 @@ test('closed or superseded similar requests cannot repaint newer results',async(
   const first=s.w.imgSimilar({id:'1'}),second=s.w.imgSimilar({id:'2'});
   pending[1]({ok:true,json:async()=>({results:[{item_id:'222'}]})});await second;
   pending[0]({ok:true,json:async()=>({results:[{item_id:'111'}]})});await first;
-  assert.ok(s.el('lvResults').querySelector('[data-lv-bookmark="222"]'));assert.equal(s.el('lvResults').querySelector('[data-lv-bookmark="111"]'),null);
+  assert.ok(s.el('lvResults').querySelector('[data-bookmark="222"]'));assert.equal(s.el('lvResults').querySelector('[data-bookmark="111"]'),null);
   const third=s.w.imgSimilar({id:'3'});s.w.lvClose();pending[2]({ok:true,json:async()=>({results:[{item_id:'333'}]})});await third;
-  assert.equal(s.el('lensView').hidden,true);assert.equal(s.el('lvResults').querySelector('[data-lv-bookmark="333"]'),null);assert.deepEqual(s.errors,[]);
+  assert.equal(s.el('lensView').hidden,true);assert.equal(s.el('lvResults').querySelector('[data-bookmark="333"]'),null);assert.deepEqual(s.errors,[]);
  }finally{s.dom.window.close();}
 });
 test('overlay sizing is CSS viewport-owned and focus restoration does not scroll',()=>{
@@ -204,8 +204,77 @@ test('choosing a similar result opens detail without unlocking the underlying ov
  const s=setup({home:true,captureCaught:true});try{
   const ids=s.w.eval('[...PROD.keys()].slice(0,2)');s.w.openProduct(ids[0]);s.w.lvOpen();
   const hit=s.w.eval('PROD.get('+JSON.stringify(ids[1])+')');s.w.lvShowResults([hit]);
-  const link=s.el('lvResults').querySelector('.thumbwrap');assert.ok(link);link.click();
+  const link=s.el('lvResults').querySelector('.image-result > a');assert.ok(link);link.click();
   await new Promise(r=>setTimeout(r,0));assert.equal(s.el('lensView').hidden,true);assert.equal(s.el('prodPage').classList.contains('open'),true);assert.equal(s.d.body.style.overflow,'hidden');
   assert.equal(s.w.eval('String(curProd.id)'),String(ids[1]));assert.deepEqual(s.errors,[]);assert.deepEqual(s.caught,[]);
  }finally{s.dom.window.close();}
+});
+
+const tick=()=>new Promise(r=>setTimeout(r,0));
+function catalogRow(id,name='Catalog title'){return [id,name,1200,1500,1000,true,false,'avatar',12,'https://example.test/catalog.jpg',20260101,20,'Catalog shop'];}
+test('upload and similar cards share one template and CSS, across five locales and both themes',()=>{
+ for(const lang of ['ja','en','ko','zh-Hans','zh-Hant'])for(const theme of ['dark','light']){
+  const home=setup({home:true,lang,theme}),page=setup({lang,theme});try{
+   const hit={id:'123',name:'Long title 商品名',shop:'Shop',cur:1200,base:1500,image:'https://example.test/x.jpg'};
+   home.w.lvShowResults([hit]);page.w.lvShowResults([hit]);
+   const clean=s=>{const card=s.el('lvResults').firstElementChild.cloneNode(true);card.querySelectorAll('a:not([data-ext])').forEach(a=>a.href='https://example.test/detail');return card.outerHTML;};
+   assert.equal(clean(home),clean(page));assert.equal(home.el('lvResults').className,page.el('lvResults').className);
+   for(const s of [home,page]){assert.equal(s.el('lvResults').querySelector('.htags,.mlab,.bprice,.igs-btn'),null);assert.equal(s.w.getComputedStyle(s.el('lvResults').querySelector('button')).borderRadius,'8px');assert.deepEqual(s.errors,[]);}
+  }finally{home.dom.window.close();page.dom.window.close();}
+ }
+});
+test('catalog arriving after API enriches current results and saved metadata in both hosts',async()=>{
+ for(const home of [true,false]){
+  const pending=[];const s=setup({home,captureCaught:true,fetch:url=>{
+   if(String(url).includes('search_index_'))return new Promise(resolve=>pending.push({url:String(url),resolve}));
+   if(String(url).includes('/similar/'))return Promise.resolve({ok:true,json:async()=>({results:[{item_id:'123',image:'https://example.test/x.jpg'}]})});
+   return new Promise(()=>{});
+  }});try{
+   await s.w.imgSimilar({id:'1'});assert.match(s.el('lvResults').textContent,/BOOTH #123/);
+   s.el('lvResults').querySelector('[data-bookmark]').click();s.el('lvSheetBody').scrollTop=73;
+   assert.equal(pending.length,24);pending.forEach(({url,resolve})=>resolve({ok:true,json:async()=>url.includes('search_index_0.json')?[catalogRow('123')]:[]}));await tick();await tick();
+   assert.match(s.el('lvResults').textContent,/Catalog title/);assert.match(s.el('lvResults').textContent,/Catalog shop/);assert.match(s.el('lvResults').textContent,/1,200/);
+   assert.equal(s.el('lvSheetBody').scrollTop,73);assert.equal(JSON.parse(s.w.localStorage.getItem('boopadb_bm'))[0].name,'Catalog title');
+   const b=s.el('lvResults').querySelector('[data-bookmark]');assert.equal(b.getAttribute('aria-pressed'),'true');b.click();assert.deepEqual(JSON.parse(s.w.localStorage.getItem('boopadb_bm')),[]);
+   assert.deepEqual(s.errors,[]);assert.deepEqual(s.caught,[]);
+  }finally{s.dom.window.close();}
+ }
+});
+test('catalog arriving first is used immediately; enrichment after close or next search cannot revive older results',async()=>{
+ for(const home of [true,false]){
+  const apis=[];const s=setup({home,captureCaught:true,fetch:url=>{
+   if(String(url).includes('search_index_'))return Promise.resolve({ok:true,json:async()=>String(url).includes('search_index_0.json')?[catalogRow('123')]:[]});
+   if(String(url).includes('/similar/'))return new Promise(resolve=>apis.push(resolve));return new Promise(()=>{});
+  }});try{
+   const one=s.w.imgSimilar({id:'1'});await tick();apis[0]({ok:true,json:async()=>({results:[{item_id:'123'}]})});await one;assert.match(s.el('lvResults').textContent,/Catalog title/);
+   const two=s.w.imgSimilar({id:'2'});s.w.dispatchEvent(new s.w.Event('boopa:catalog-ready'));assert.equal(s.el('lvResults').querySelector('.image-result'),null);
+   apis[1]({ok:true,json:async()=>({results:[{item_id:'456'}]})});await two;s.w.lvClose();const before=s.el('lvResults').innerHTML;s.w.dispatchEvent(new s.w.Event('boopa:catalog-ready'));assert.equal(s.el('lvResults').innerHTML,before);
+   assert.deepEqual(s.errors,[]);assert.deepEqual(s.caught,[]);
+  }finally{s.dom.window.close();}
+ }
+});
+test('catalog failure retries and a hung shard has a bounded timeout',async()=>{
+ for(const home of [true,false]){
+  let failures=1;const s=setup({home,fetch:url=>{
+   if(String(url).includes('search_index_')){if(String(url).includes('search_index_0.json')&&failures-->0)return Promise.reject(new Error('temporary'));return Promise.resolve({ok:true,json:async()=>String(url).includes('search_index_0.json')?[catalogRow('123')]:[]});}
+   if(String(url).includes('/similar/'))return Promise.resolve({ok:true,json:async()=>({results:[{item_id:'123'}]})});return new Promise(()=>{});
+  }});try{
+   const original=s.w.setTimeout.bind(s.w);s.w.setTimeout=(fn,ms,...args)=>original(fn,ms>=1000?5:ms,...args);
+   await s.w.imgSimilar({id:'1'});await new Promise(r=>setTimeout(r,40));assert.match(s.el('lvResults').textContent,/Catalog title/);
+   let aborted=false;s.w.fetch=(_url,init)=>{init.signal.addEventListener('abort',()=>aborted=true);return new Promise(()=>{});};
+   await assert.rejects(s.w.imageCatalogShard('hung.json'),/timeout/);assert.equal(aborted,true);assert.deepEqual(s.errors,[]);
+  }finally{s.dom.window.close();}
+ }
+});
+test('late catalog upgrades saved metadata after lens closes without repainting or reviving removed saves',async()=>{
+ for(const home of [true,false]){
+  const pending=[];const s=setup({home,fetch:url=>{
+   if(String(url).includes('search_index_'))return new Promise(resolve=>pending.push({url:String(url),resolve}));
+   if(String(url).includes('/similar/'))return Promise.resolve({ok:true,json:async()=>({results:[{item_id:'123'},{item_id:'456'}]})});return new Promise(()=>{});
+  }});try{
+   await s.w.imgSimilar({id:'1'});s.el('lvResults').querySelector('[data-bookmark="123"]').click();s.el('lvResults').querySelector('[data-bookmark="456"]').click();s.el('lvResults').querySelector('[data-bookmark="456"]').click();s.w.lvClose();const before=s.el('lvResults').innerHTML;
+   pending.forEach(({url,resolve})=>resolve({ok:true,json:async()=>url.includes('search_index_0.json')?[catalogRow('123'),catalogRow('456')]:[]}));await tick();await tick();
+   const saved=JSON.parse(s.w.localStorage.getItem('boopadb_bm'));assert.equal(saved.length,1);assert.equal(saved[0].id,'123');assert.equal(saved[0].name,'Catalog title');if(home){s.w.toggleBm({id:'789',name:'Other'});assert.equal(JSON.parse(s.w.localStorage.getItem('boopadb_bm')).find(b=>b.id==='123').name,'Catalog title');}assert.equal(s.el('lvResults').innerHTML,before);assert.deepEqual(s.errors,[]);
+  }finally{s.dom.window.close();}
+ }
 });

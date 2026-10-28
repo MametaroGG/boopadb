@@ -1146,7 +1146,7 @@
   <div class="lv-head"><button id="lvBack" class="igs-x" type="button" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><img id="lvThumb" alt=""><div class="lv-title" data-i="img_search">画像検索</div><div class="lv-count" id="lvCount"></div></div>
   <div class="lv-stage" id="lvStage"><div class="lv-wrap" id="lvWrap"><img id="lvImg" alt=""><svg id="lvSvg"></svg><canvas id="lvDraw"></canvas></div><button id="lvFitBtn" class="igs-btn lv-fitbtn" type="button" hidden data-i="lv_fit">全体を表示</button><span class="lv-hint" id="lvHint" data-i="img_trace_hint">探したいものを指やマウスでなぞって囲んでください</span></div>
   <div class="lv-tools" id="lvTools"><span class="lv-tbtns"><button id="lvWhole" class="igs-btn" type="button" data-i="img_use_whole">画像全体で検索</button><button id="lvRetake" class="igs-btn" type="button" data-i="img_retake">選び直す</button></span></div>
-  <div class="lv-sheet" id="lvSheet"><div class="lv-grab" id="lvGrab"><span class="lv-grabbar"></span></div><div class="lv-sheetbody" id="lvSheetBody"><div class="lv-note" id="lvNote" hidden></div><div class="grid lv-results" id="lvResults"></div></div></div>
+  <div class="lv-sheet" id="lvSheet"><div class="lv-grab" id="lvGrab"><span class="lv-grabbar"></span></div><div class="lv-sheetbody" id="lvSheetBody"><div class="lv-note" id="lvNote" hidden></div><div class="image-result-grid lv-results" id="lvResults"></div></div></div>
 </div>
 <div class="spage" id="searchPage">
   <div class="sp-head"><button class="sp-back" id="spBack" data-i-al="al_back" aria-label="戻る"><svg viewBox="0 0 24 24"><path d="M19 12H5m6 7-7-7 7-7"/></svg></button><div class="sp-title" data-i="sp_title">商品検索</div></div>
@@ -1898,11 +1898,11 @@ async function loadFullIndex(){
   if (fullIndex || fullIndexLoading) return;
   fullIndexLoading = true;
   try {
-    const rs = await Promise.all([...Array(24).keys()].map(i => fetch("search_index_" + i + ".json?v=20251027-2")));
+    const rs = await Promise.all([...Array(24).keys()].map(i => (typeof imageCatalogShard === "function" ? imageCatalogShard("search_index_" + i + ".json?v=20251027-2").then(data=>({ok:true,json:async()=>data})) : fetch("search_index_" + i + ".json?v=20251027-2"))));
     if (rs.every(r => r.ok)) { const parts = await Promise.all(rs.map(r => r.json())); const raw = parts.flat(); fullIndex = raw.map(([id, name, cur, base, lowest, sale, atlow, cat, likes, img, fd, pd, shop, tags]) => [String(id), name, String(name).toLowerCase().normalize("NFKC") + "\u0001" + String(shop || "").toLowerCase().normalize("NFKC") + "\u0001" + String(tags || "").toLowerCase().normalize("NFKC"), cur, base, lowest, sale, atlow, String(cat || "").toLowerCase().normalize("NFKC"), likes || 0, pxImg(img), fd || 0, pd || 0, shop || ""]); spCatMap = new Map(fullIndex.map(e => [e[0], e[8]])); for (const row of raw) { const c = row[7]; if (c) { const k = String(c).toLowerCase().normalize("NFKC"); if (!spCatNames.has(k)) spCatNames.set(k, String(c)); } } if (typeof spCatRender === "function") spCatRender(); spEnrichFromIndex(); }
   } catch {}
   fullIndexLoading = false;
-  if (fullIndex) { fullIndexFails = 0; if (spage.classList.contains("open")) spRender(false); }
+  if (fullIndex) { window.dispatchEvent(new Event("boopa:catalog-ready")); fullIndexFails = 0; if (spage.classList.contains("open")) spRender(false); }
   else if (fullIndexFails < 2) { fullIndexFails++; setTimeout(loadFullIndex, 3000 * fullIndexFails); }
 }
 function thinPointsJS(rows){
@@ -4043,8 +4043,8 @@ function imgHitsFromApi(results){
   if (fullIndex) for (const e of fullIndex) byId.set(e[0], e);
   return (results || []).map(r => {
     const e = byId.get(String(r.item_id));
-    if (e) return {id: e[0], name: e[1], shop: e[13] || "", image: r.image || e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, _likes: e[9] || 0, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10, _score: r.score};
-    return {id: String(r.item_id), name: "", shop: "", image: r.image || null, cur: null, base: null, lowest: null, sale: false, pct: 0, at_lowest: false, plain: true, _likes: 0, likes: 0, first_date: "", per_day: 0, _score: r.score};
+    if (e) return {_catalog:true,id: e[0], name: e[1], shop: e[13] || "", image: r.image || e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, _likes: e[9] || 0, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10, _score: r.score};
+    return {id: String(r.item_id), name: "BOOTH #" + String(r.item_id), shop: "", image: r.image || null, cur: null, base: null, lowest: null, sale: false, pct: 0, at_lowest: false, plain: true, _likes: 0, likes: 0, first_date: "", per_day: 0, _score: r.score};
   });
 }
 function imgSetMode(label, thumb){
@@ -4059,31 +4059,28 @@ function imgSetMode(label, thumb){
   openSearch();
   spRender(); imgNoteUpdate();
 }
-// Similar results use home cards, but share the same bookmark storage as uploads.
+// Both hosts use the shared image-result template; bookmark storage stays unchanged.
 let lvBookmarkHits = new Map();
+function lvLoadCatalog(){loadFullIndex();}
+function lvCatalogUpdated(){BMS=store.get("boopadb_bm",[]);lvSyncBookmarkButtons();}
+function lvResultCard(x){return imageResultCard(x,isBm(x.id),itemUrl(x.id));}
 function lvSyncBookmarkButtons(){
-  document.querySelectorAll('#lvResults [data-lv-bookmark]').forEach(button => {
-    const saved = isBm(button.dataset.lvBookmark);
+  document.querySelectorAll('#lvResults [data-bookmark]').forEach(button => {
+    const saved = isBm(button.dataset.bookmark);
     button.setAttribute("aria-pressed", String(saved));
     button.textContent = tr(saved ? "pp_bmed" : "pp_bm");
   });
 }
 function lvDecorateResults(hits){
+  BMS = store.get("boopadb_bm", []);
   lvBookmarkHits = new Map(hits.map(x => [String(x.id), x]));
-  [...document.getElementById("lvResults").children].forEach((card, i) => {
-    if (!hits[i]) return;
-    const body = card.querySelector(".cbody"); if (!body) return;
-    const button = document.createElement("button");
-    button.type = "button"; button.className = "igs-btn lv-bookmark";
-    button.dataset.lvBookmark = String(hits[i].id); body.appendChild(button);
-  });
   lvSyncBookmarkButtons();
 }
 document.getElementById("lvResults").addEventListener("click", e => {
-  const button = e.target.closest('[data-lv-bookmark]'); if (!button) return;
+  const button = e.target.closest('[data-bookmark]'); if (!button) return;
   e.preventDefault(); e.stopPropagation();
-  const id = button.dataset.lvBookmark, hit = lvBookmarkHits.get(id); if (!hit) return;
-  toggleBm(PROD.get(id) || hit);
+  const id = button.dataset.bookmark, hit = lvBookmarkHits.get(id); if (!hit) return;
+  toggleBm(hit._catalog ? hit : (PROD.get(id) || hit));
 });
 window.addEventListener("storage", e => { if (e.key === "boopadb_bm") { BMS = store.get("boopadb_bm", []); syncBmFlags(); lvSyncBookmarkButtons(); } });
 if (typeof initImageLens === "function") initImageLens();
