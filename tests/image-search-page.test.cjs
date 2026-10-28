@@ -261,5 +261,5 @@ test('closed and superseded results never repaint on late per-item metadata; sav
  }
 });
 test('both documents pin the same image runtime/style revision and include resume updater',()=>{
- for(const name of ['index.html','image-search.html']){const html=fs.readFileSync(path.join(root,name),'utf8');assert.match(html,/image-search-engine\.js\?v=20261028-results-v3/);assert.match(html,/image-search\.css\?v=20261028-results-v3/);assert.match(html,/site-update\.js\?v=20261028-results-v3/);}
+ for(const name of ['index.html','image-search.html']){const html=fs.readFileSync(path.join(root,name),'utf8');assert.match(html,/image-search-engine\.js\?v=20261028-results-v3/);assert.match(html,/image-search\.css\?v=20261028-results-v3/);assert.match(html,/site-update\.js\?v=20261028-search-v4/);}
 });

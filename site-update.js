@@ -24,6 +24,9 @@
   function isEditing() {
     const lens=document.getElementById('lensView');
     if(lens && !lens.hidden)return true;
+    const search=document.getElementById('searchPage'),catalog=document.getElementById('spCatalogStatus');
+    if(search && search.classList && search.classList.contains('open'))return true;
+    if(catalog && catalog.dataset && catalog.dataset.loading==='true')return true;
     const el = document.activeElement;
     return el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
   }
@@ -70,6 +73,8 @@
   }
   window.addEventListener('pageshow', check);
   window.addEventListener('boopa:lens-close', check);
+  window.addEventListener('boopa:search-close', check);
+  window.addEventListener('boopa:catalog-ready', check);
   window.addEventListener('online', check);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
   setInterval(check, 120000);
