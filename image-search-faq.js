@@ -18,7 +18,7 @@ window.IMAGE_SEARCH_FAQ = {
     "items": [
       {
         "q": "どこから商品を探しますか？",
-        "a": "BoopaDBの画像検索用カタログに登録されたBOOTH商品が対象です。インターネット上のすべての画像や、BOOTHのすべての商品を検索するものではありません。"
+        "a": "BoopaDBの画像検索用カタログに登録されたBOOTH商品が対象です。インターネット上のすべての画像や、BOOTHのすべての商品を検索するものではありません。画像検索にはGoogleのEmbeddingGemma 2を使用し、運営者のサーバーで画像の特徴を比較します。この画像検索処理のために、画像をGoogleの外部AI APIへ送信することはありません。"
       },
       {
         "q": "どんな画像が使えますか？",
@@ -69,7 +69,7 @@ window.IMAGE_SEARCH_FAQ = {
     "items": [
       {
         "q": "Which products are searched?",
-        "a": "Search covers BOOTH products registered in BoopaDB’s image-search catalogue. It does not search every image on the internet or every product on BOOTH."
+        "a": "Search covers BOOTH products registered in BoopaDB’s image-search catalogue. It does not search every image on the internet or every product on BOOTH. Image search uses Google's EmbeddingGemma 2 to compare image features on the operator's server. Images are not sent to Google's external AI APIs for this image-search processing."
       },
       {
         "q": "Which images can I use?",
@@ -120,7 +120,7 @@ window.IMAGE_SEARCH_FAQ = {
     "items": [
       {
         "q": "어떤 상품을 검색하나요?",
-        "a": "BoopaDB의 이미지 검색 카탈로그에 등록된 BOOTH 상품을 검색합니다. 인터넷의 모든 이미지나 BOOTH의 모든 상품을 검색하는 것은 아닙니다."
+        "a": "BoopaDB의 이미지 검색 카탈로그에 등록된 BOOTH 상품을 검색합니다. 인터넷의 모든 이미지나 BOOTH의 모든 상품을 검색하는 것은 아닙니다. 이미지 검색에는 Google의 EmbeddingGemma 2를 사용하며, 운영자의 서버에서 이미지 특징을 비교합니다. 이 이미지 검색 처리를 위해 이미지를 Google의 외부 AI API로 전송하지 않습니다."
       },
       {
         "q": "어떤 이미지를 사용할 수 있나요?",
@@ -171,7 +171,7 @@ window.IMAGE_SEARCH_FAQ = {
     "items": [
       {
         "q": "会搜索哪些商品？",
-        "a": "搜索范围为 BoopaDB 图片搜索目录中收录的 BOOTH 商品，并非互联网上的所有图片或 BOOTH 上的所有商品。"
+        "a": "搜索范围为 BoopaDB 图片搜索目录中收录的 BOOTH 商品，并非互联网上的所有图片或 BOOTH 上的所有商品。图片搜索使用 Google 的 EmbeddingGemma 2，在运营者的服务器上比较图片特征。进行此图片搜索处理时，不会将图片发送到 Google 的外部 AI API。"
       },
       {
         "q": "可以使用什么图片？",
@@ -222,7 +222,7 @@ window.IMAGE_SEARCH_FAQ = {
     "items": [
       {
         "q": "會搜尋哪些商品？",
-        "a": "搜尋範圍為 BoopaDB 圖片搜尋目錄中收錄的 BOOTH 商品，並非網際網路上的所有圖片或 BOOTH 上的所有商品。"
+        "a": "搜尋範圍為 BoopaDB 圖片搜尋目錄中收錄的 BOOTH 商品，並非網際網路上的所有圖片或 BOOTH 上的所有商品。圖片搜尋使用 Google 的 EmbeddingGemma 2，在營運者的伺服器上比較圖片特徵。進行此圖片搜尋處理時，不會將圖片傳送到 Google 的外部 AI API。"
       },
       {
         "q": "可以使用什麼圖片？",
