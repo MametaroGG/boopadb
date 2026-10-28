@@ -3,7 +3,7 @@ const {JSDOM,VirtualConsole}=require('jsdom');const root=path.join(__dirname,'..
 function setup(opts={}){
  const errors=[],revoked=[],requests=[],caught=[];let seq=0;
  let source=fs.readFileSync(path.join(root,opts.home?'index.html':'image-search.html'),'utf8');
- if(opts.omitEngine)source=source.replace(/<script src="image-search-engine.js"[^>]*><\/script>/,'');
+ if(opts.omitEngine)source=source.replace(/<script src="image-search-engine.js(?:\?[^"]*)?"[^>]*><\/script>/,'');
  let html=require('./fixtures/inline-local-scripts.cjs')(source,root);
  if(opts.captureCaught)html=html.replace(/catch\s*\((\w+)\)\s*\{/g,(all,name)=>all+`window.__recordCaught(${name});`).replace(/catch\s*\{/g,'catch(__e){window.__recordCaught(__e);');
  const vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e.message));
@@ -40,7 +40,7 @@ test('picker cancel and retake cancel keep dedicated landing; selection alone ne
  const s=setup();try{
   s.pick([]);assert.equal(s.el('spImgDropError').hidden,true);assert.equal(s.el('lensView').hidden,true);
   s.pick([new s.w.File(['png'],'a.png',{type:'image/png'})]);assert.equal(s.el('lvImg').src,'blob:test-1');
-  assert.ok(s.requests.every(u=>!String(u).includes(':8443')));
+  assert.ok(s.requests.every(u=>!String(u).includes(':8443')));assert.equal(s.requests.some(u=>String(u).includes('search_index_')),false);
   s.w.lvOpen();s.el('lvRetake').click();s.pick([]);assert.equal(s.el('lensView').hidden,true);assert.equal(s.d.activeElement,s.el('spImgDrop'));assert.deepEqual(s.errors,[]);
  }finally{s.dom.window.close();}
 });
@@ -223,58 +223,43 @@ test('upload and similar cards share one template and CSS, across five locales a
   }finally{home.dom.window.close();page.dom.window.close();}
  }
 });
-test('catalog arriving after API enriches current results and saved metadata in both hosts',async()=>{
+const realProducts=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/image-products.json'),'utf8'));
+function itemRequest(url){const m=String(url).match(/\/(meta|data)\/\d+\/(\d+)\.json/);return m&&{kind:m[1],id:m[2]};}
+const flush=async()=>{for(let i=0;i<12;i++)await tick();};
+test('real result IDs resolve correct names, shops, zero and paid prices without 73MB catalog in both hosts',async()=>{
  for(const home of [true,false]){
-  const pending=[];const s=setup({home,captureCaught:true,fetch:url=>{
-   if(String(url).includes('search_index_'))return new Promise(resolve=>pending.push({url:String(url),resolve}));
-   if(String(url).includes('/similar/'))return Promise.resolve({ok:true,json:async()=>({results:[{item_id:'123',image:'https://example.test/x.jpg'}]})});
-   return new Promise(()=>{});
-  }});try{
-   await s.w.imgSimilar({id:'1'});assert.match(s.el('lvResults').textContent,/BOOTH #123/);
-   s.el('lvResults').querySelector('[data-bookmark]').click();s.el('lvSheetBody').scrollTop=73;
-   assert.equal(pending.length,24);pending.forEach(({url,resolve})=>resolve({ok:true,json:async()=>url.includes('search_index_0.json')?[catalogRow('123')]:[]}));await tick();await tick();
-   assert.match(s.el('lvResults').textContent,/Catalog title/);assert.match(s.el('lvResults').textContent,/Catalog shop/);assert.match(s.el('lvResults').textContent,/1,200/);
-   assert.equal(s.el('lvSheetBody').scrollTop,73);assert.equal(JSON.parse(s.w.localStorage.getItem('boopadb_bm'))[0].name,'Catalog title');
-   const b=s.el('lvResults').querySelector('[data-bookmark]');assert.equal(b.getAttribute('aria-pressed'),'true');b.click();assert.deepEqual(JSON.parse(s.w.localStorage.getItem('boopadb_bm')),[]);
+  const s=setup({home,captureCaught:true,fetch:url=>{const req=itemRequest(url);if(req&&realProducts[req.id])return Promise.resolve({ok:true,json:async()=>realProducts[req.id][req.kind]});if(String(url).includes('/similar/'))return Promise.resolve({ok:true,json:async()=>({results:[{item_id:'8167254'},{item_id:'6725944'}]})});return new Promise(()=>{});}});
+  try{await s.w.imgSimilar({id:'1'});await flush();const cards=s.el('lvResults');
+   assert.match(cards.querySelector('[data-id="8167254"]').textContent,/Natural Makeup Set V2.0/);assert.match(cards.querySelector('[data-id="8167254"]').textContent,/Atelier Astella/);assert.match(cards.querySelector('[data-id="8167254"] .image-result-price').textContent,/0/);
+   assert.match(cards.querySelector('[data-id="6725944"]').textContent,/Flower Pierce/);assert.match(cards.querySelector('[data-id="6725944"] .image-result-price').textContent,/100/);
+   assert.doesNotMatch(cards.textContent,/BOOTH #/);assert.equal(s.requests.filter(u=>String(u).includes('search_index_')).length,0);assert.equal(s.requests.filter(u=>{const r=itemRequest(u);return r&&realProducts[r.id];}).length,4);
+   cards.querySelector('[data-bookmark="8167254"]').click();assert.match(JSON.parse(s.w.localStorage.getItem('boopadb_bm'))[0].name,/Natural Makeup/);cards.querySelector('[data-bookmark="8167254"]').click();assert.deepEqual(JSON.parse(s.w.localStorage.getItem('boopadb_bm')),[]);
    assert.deepEqual(s.errors,[]);assert.deepEqual(s.caught,[]);
   }finally{s.dom.window.close();}
  }
 });
-test('catalog arriving first is used immediately; enrichment after close or next search cannot revive older results',async()=>{
- for(const home of [true,false]){
-  const apis=[];const s=setup({home,captureCaught:true,fetch:url=>{
-   if(String(url).includes('search_index_'))return Promise.resolve({ok:true,json:async()=>String(url).includes('search_index_0.json')?[catalogRow('123')]:[]});
-   if(String(url).includes('/similar/'))return new Promise(resolve=>apis.push(resolve));return new Promise(()=>{});
-  }});try{
-   const one=s.w.imgSimilar({id:'1'});await tick();apis[0]({ok:true,json:async()=>({results:[{item_id:'123'}]})});await one;assert.match(s.el('lvResults').textContent,/Catalog title/);
-   const two=s.w.imgSimilar({id:'2'});s.w.dispatchEvent(new s.w.Event('boopa:catalog-ready'));assert.equal(s.el('lvResults').querySelector('.image-result'),null);
-   apis[1]({ok:true,json:async()=>({results:[{item_id:'456'}]})});await two;s.w.lvClose();const before=s.el('lvResults').innerHTML;s.w.dispatchEvent(new s.w.Event('boopa:catalog-ready'));assert.equal(s.el('lvResults').innerHTML,before);
-   assert.deepEqual(s.errors,[]);assert.deepEqual(s.caught,[]);
+test('individual metadata arrives progressively; a failed product never blocks successful results and manual retry works',async()=>{
+ let fail=true;const deferred=[];const s=setup({fetch:url=>{const req=itemRequest(url);if(req){if(req.id==='8167254')return Promise.resolve({ok:true,json:async()=>realProducts[req.id][req.kind]});if(fail)return Promise.resolve({ok:false});return Promise.resolve({ok:true,json:async()=>realProducts[req.id][req.kind]});}if(String(url).includes('/similar/'))return Promise.resolve({ok:true,json:async()=>({results:[{item_id:'8167254'},{item_id:'6725944'}]})});return new Promise(()=>{});}});
+ try{const original=s.w.setTimeout.bind(s.w);s.w.setTimeout=(fn,ms,...args)=>original(fn,ms===400?1:ms,...args);await s.w.imgSimilar({id:'1'});await flush();await new Promise(r=>setTimeout(r,15));
+  assert.match(s.el('lvResults').querySelector('[data-id="8167254"]').textContent,/Natural Makeup/);assert.ok(s.el('lvResults').querySelector('[data-metadata-retry="6725944"]'));assert.doesNotMatch(s.el('lvResults').textContent,/BOOTH #/);
+  fail=false;s.el('lvResults').querySelector('[data-metadata-retry="6725944"]').click();await flush();assert.match(s.el('lvResults').querySelector('[data-id="6725944"]').textContent,/Flower Pierce/);assert.equal(s.el('lvResults').querySelector('[data-metadata-retry]'),null);assert.deepEqual(s.errors,[]);
+ }finally{s.dom.window.close();}
+});
+test('deduplicated per-item requests stay at four concurrent network fetches even across searches',async()=>{
+ const pending=[];let active=0,peak=0;const s=setup({fetch:url=>{if(itemRequest(url)){active++;peak=Math.max(peak,active);return new Promise(resolve=>pending.push(()=>{active--;resolve({ok:true,json:async()=>({id:itemRequest(url).id,name:'Product',shop:{name:'Shop'},variations:{a:[{date:'2026-10-28',price:100}]}})});}));}return new Promise(()=>{});}});
+ try{s.w.lvOpen();s.w.eval('lvAcceptResults('+JSON.stringify(Array.from({length:12},(_,i)=>({item_id:String(i+100)})))+',lvRequestId)');await tick();assert.equal(peak,4);
+  s.w.eval('++lvRequestId;lvAcceptResults([{item_id:"100"},{item_id:"100"},{item_id:"200"}],lvRequestId)');await tick();
+  for(let i=0;i<30;i++){pending.splice(0).forEach(done=>done());await tick();}assert.ok(peak<=4);assert.equal(s.requests.filter(u=>String(u).endsWith('/meta/100/100.json')).length,1);assert.deepEqual(s.errors,[]);
+ }finally{s.dom.window.close();}
+});
+test('closed and superseded results never repaint on late per-item metadata; saved placeholder is upgraded safely',async()=>{
+ for(const home of [true,false]){const pending=[];const s=setup({home,fetch:url=>{const req=itemRequest(url);if(req)return new Promise(resolve=>pending.push(()=>resolve({ok:true,json:async()=>realProducts[req.id][req.kind]})));if(String(url).includes('/similar/'))return Promise.resolve({ok:true,json:async()=>({results:[{item_id:'8167254'}]})});return new Promise(()=>{});}});
+  try{await s.w.imgSimilar({id:'1'});s.el('lvResults').querySelector('[data-bookmark]').click();s.w.lvClose();const before=s.el('lvResults').innerHTML;for(let i=0;i<8;i++){pending.splice(0).forEach(done=>done());await tick();}
+   assert.equal(s.el('lvResults').innerHTML,before);assert.match(JSON.parse(s.w.localStorage.getItem('boopadb_bm'))[0].name,/Natural Makeup/);
+   if(home){s.w.toggleBm({id:'789',name:'Other'});assert.match(JSON.parse(s.w.localStorage.getItem('boopadb_bm')).find(b=>b.id==='8167254').name,/Natural Makeup/);}assert.deepEqual(s.errors,[]);
   }finally{s.dom.window.close();}
  }
 });
-test('catalog failure retries and a hung shard has a bounded timeout',async()=>{
- for(const home of [true,false]){
-  let failures=1;const s=setup({home,fetch:url=>{
-   if(String(url).includes('search_index_')){if(String(url).includes('search_index_0.json')&&failures-->0)return Promise.reject(new Error('temporary'));return Promise.resolve({ok:true,json:async()=>String(url).includes('search_index_0.json')?[catalogRow('123')]:[]});}
-   if(String(url).includes('/similar/'))return Promise.resolve({ok:true,json:async()=>({results:[{item_id:'123'}]})});return new Promise(()=>{});
-  }});try{
-   const original=s.w.setTimeout.bind(s.w);s.w.setTimeout=(fn,ms,...args)=>original(fn,ms>=1000?5:ms,...args);
-   await s.w.imgSimilar({id:'1'});await new Promise(r=>setTimeout(r,40));assert.match(s.el('lvResults').textContent,/Catalog title/);
-   let aborted=false;s.w.fetch=(_url,init)=>{init.signal.addEventListener('abort',()=>aborted=true);return new Promise(()=>{});};
-   await assert.rejects(s.w.imageCatalogShard('hung.json'),/timeout/);assert.equal(aborted,true);assert.deepEqual(s.errors,[]);
-  }finally{s.dom.window.close();}
- }
-});
-test('late catalog upgrades saved metadata after lens closes without repainting or reviving removed saves',async()=>{
- for(const home of [true,false]){
-  const pending=[];const s=setup({home,fetch:url=>{
-   if(String(url).includes('search_index_'))return new Promise(resolve=>pending.push({url:String(url),resolve}));
-   if(String(url).includes('/similar/'))return Promise.resolve({ok:true,json:async()=>({results:[{item_id:'123'},{item_id:'456'}]})});return new Promise(()=>{});
-  }});try{
-   await s.w.imgSimilar({id:'1'});s.el('lvResults').querySelector('[data-bookmark="123"]').click();s.el('lvResults').querySelector('[data-bookmark="456"]').click();s.el('lvResults').querySelector('[data-bookmark="456"]').click();s.w.lvClose();const before=s.el('lvResults').innerHTML;
-   pending.forEach(({url,resolve})=>resolve({ok:true,json:async()=>url.includes('search_index_0.json')?[catalogRow('123'),catalogRow('456')]:[]}));await tick();await tick();
-   const saved=JSON.parse(s.w.localStorage.getItem('boopadb_bm'));assert.equal(saved.length,1);assert.equal(saved[0].id,'123');assert.equal(saved[0].name,'Catalog title');if(home){s.w.toggleBm({id:'789',name:'Other'});assert.equal(JSON.parse(s.w.localStorage.getItem('boopadb_bm')).find(b=>b.id==='123').name,'Catalog title');}assert.equal(s.el('lvResults').innerHTML,before);assert.deepEqual(s.errors,[]);
-  }finally{s.dom.window.close();}
- }
+test('both documents pin the same image runtime/style revision and include resume updater',()=>{
+ for(const name of ['index.html','image-search.html']){const html=fs.readFileSync(path.join(root,name),'utf8');assert.match(html,/image-search-engine\.js\?v=20261028-results-v3/);assert.match(html,/image-search\.css\?v=20261028-results-v3/);assert.match(html,/site-update\.js\?v=20261028-results-v3/);}
 });

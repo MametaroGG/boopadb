@@ -1,7 +1,6 @@
 // Shared image-search lens. Host initializes catalog, localization and card adapters first.
 async function imgSimilar(x){
   const requestId = ++lvRequestId;
-  if (typeof lvLoadCatalog === "function") lvLoadCatalog();
   lvRemote = true; lvRect = null; lvShown = null; lvSearched = null; lvZoomReset();
   const img = document.getElementById("lvImg");
   img.onerror = null; // Do not retain a previous local-upload error handler.
@@ -26,26 +25,83 @@ async function imgSimilar(x){
 function imageResultSafeUrl(url){if(typeof url!=='string'||!/^https?:\/\//i.test(url))return '';try{const u=new URL(url);return /^https?:$/.test(u.protocol)?u.href:'';}catch{return '';}}
 function imageResultCard(x, saved, detailUrl){
  const image=imageResultSafeUrl(x.image),price=x.cur==null?'':new Intl.NumberFormat(LANG,{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(x.cur);
- return '<article class="image-result" data-id="'+esc(x.id)+'"><a href="'+esc(detailUrl)+'">'+(image?'<img src="'+esc(image)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'')+'</a><div class="image-result-body"><h3><a href="'+esc(detailUrl)+'">'+esc(x.name)+'</a></h3><p>'+esc(x.shop)+'</p><div class="image-result-price">'+(x.base>x.cur&&x.cur!=null?'<del>'+esc(new Intl.NumberFormat(LANG,{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(x.base))+'</del> ':'')+esc(price)+(x.base>x.cur&&x.cur!=null?' <small>−'+Math.round((1-x.cur/x.base)*100)+'%</small>':'')+'</div><p><a data-ext href="https://booth.pm/'+LANG+'/items/'+encodeURIComponent(x.id)+'" target="_blank" rel="noopener">'+esc(tr('pp_booth'))+' ↗</a></p><button type="button" data-bookmark="'+esc(x.id)+'" aria-pressed="'+saved+'">'+esc(tr(saved?'pp_bmed':'pp_bm'))+'</button></div></article>';
+ return '<article class="image-result" data-id="'+esc(x.id)+'"><a href="'+esc(detailUrl)+'">'+(image?'<img src="'+esc(image)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'')+'</a><div class="image-result-body"><h3><a href="'+esc(detailUrl)+'">'+esc(x._infoError&&!x.name?imageInfoText(1):x.name)+'</a></h3><p>'+esc(x.shop)+'</p><div class="image-result-price">'+(x.base>x.cur&&x.cur!=null?'<del>'+esc(new Intl.NumberFormat(LANG,{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(x.base))+'</del> ':'')+esc(price)+(x.base>x.cur&&x.cur!=null?' <small>−'+Math.round((1-x.cur/x.base)*100)+'%</small>':'')+'</div><p><a data-ext href="https://booth.pm/'+LANG+'/items/'+encodeURIComponent(x.id)+'" target="_blank" rel="noopener">'+esc(tr('pp_booth'))+' ↗</a></p>'+ (x._infoError?'<p class="image-info-error">'+esc(imageInfoText(1))+' <button type="button" data-metadata-retry="'+esc(x.id)+'">'+esc(imageInfoText(2))+'</button></p>':'')+'<button type="button" data-bookmark="'+esc(x.id)+'" aria-pressed="'+saved+'">'+esc(tr(saved?'pp_bmed':'pp_bm'))+'</button></div></article>';
 }
 
+const imageResultMetadata=new Map(), imageResultPending=new Map();
+const IMAGE_ITEM_BASE='https://mametarogg.github.io/booth-vrc-price-tracker/';
+const IMAGE_INFO_TEXT={
+ ja:['商品情報を読み込み中…','商品情報を取得できませんでした','再試行'],
+ en:['Loading product details…','Product details unavailable','Retry'],
+ ko:['상품 정보 불러오는 중…','상품 정보를 불러오지 못했습니다','다시 시도'],
+ 'zh-Hans':['正在加载商品信息…','无法获取商品信息','重试'],
+ 'zh-Hant':['正在載入商品資訊…','無法取得商品資訊','重試']
+};
+function imageInfoText(i){return (IMAGE_INFO_TEXT[LANG]||IMAGE_INFO_TEXT.ja)[i];}
+function lvMappedResults(){
+ return imgHitsFromApi(lvRawResults).map(hit=>{
+  const record=imageResultMetadata.get(String(hit.id));
+  if(record)return {...hit,...record,name:record.name||imageInfoText(record._infoError?1:0),image:hit.image||record.image,_catalog:!!record.name};
+  return hit._catalog?hit:{...hit,name:imageInfoText(0),_infoLoading:true};
+ });
+}
+function imagePriceRecord(d){
+ let series=null;
+ for(const rows of Object.values(d.variations||{}))if(Array.isArray(rows)&&(!series||rows.length>series.length))series=rows;
+ if(!series||!series.length)return {};
+ const sorted=[...series].filter(r=>Number.isFinite(r.price)).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ if(!sorted.length)return {};
+ return {cur:sorted[sorted.length-1].price,base:Math.max(...sorted.map(r=>r.price))};
+}
+function imageNotifyMetadata(){
+ imageEnrichBookmarks([...imageResultMetadata.values()].filter(r=>r.name).map(r=>({...r,_catalog:true})));
+ if(typeof lvCatalogUpdated==='function')lvCatalogUpdated();
+ lvRefreshCatalog();
+}
+async function imageFetchRecord(id){
+ if(imageResultPending.has(id))return imageResultPending.get(id);
+ const task=(async()=>{
+  const previous=imageResultMetadata.get(id)||{id};let record={...previous,_infoError:false};
+  for(const kind of ['meta','data']){
+   if(record['_'+kind+'Ready'])continue;
+   for(let attempt=0;attempt<2;attempt++){
+    try{
+     const data=await imageCatalogShard(IMAGE_ITEM_BASE+kind+'/'+id.slice(0,3)+'/'+id+'.json');
+     if(String(data.id)!==id)throw new Error('Unexpected product id');
+     record=kind==='meta'?{...record,name:data.name||record.name,shop:data.shop&&data.shop.name||'',image:data.image_resized||data.image||''}:{...record,...imagePriceRecord(data),name:record.name||data.name};
+     record['_'+kind+'Ready']=true;imageResultMetadata.set(id,{...record});imageNotifyMetadata();break;
+    }catch{if(attempt===1)record._infoError=true;else await new Promise(resolve=>setTimeout(resolve,400));}
+   }
+  }
+  imageResultMetadata.set(id,record);imageNotifyMetadata();return record;
+ })().finally(()=>imageResultPending.delete(id));
+ imageResultPending.set(id,task);return task;
+}
+async function lvEnrichResults(requestId){
+ const ids=[...new Set(lvRawResults.map(r=>String(r.item_id)).filter(id=>/^\d+$/.test(id)))];let next=0;
+ async function worker(){while(next<ids.length && requestId===lvRequestId){const id=ids[next++],known=imageResultMetadata.get(id);if(known&&known._metaReady&&known._dataReady)continue;await imageFetchRecord(id);}}
+ await Promise.all(Array.from({length:Math.min(4,ids.length)},worker));
+}
 // Fetch includes JSON decoding in the timeout; a stalled shard cannot pin retry forever.
+let imageFetchActive=0;const imageFetchWaiters=[];
 async function imageCatalogShard(url){
+ await new Promise(resolve=>{if(imageFetchActive<4){imageFetchActive++;resolve();}else imageFetchWaiters.push(resolve);});
  const controller=new AbortController();let timer;
  try{return await Promise.race([fetch(url,{signal:controller.signal}).then(r=>{if(!r.ok)throw new Error('catalog');return r.json();}),new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new Error('catalog timeout'));},10000);})]);}
- finally{clearTimeout(timer);}
+ finally{clearTimeout(timer);const next=imageFetchWaiters.shift();if(next)next();else imageFetchActive--;}
 }
 let lvRawResults=[], lvResultsRequest=-1;
 function lvAcceptResults(results, requestId){
  if(requestId!==lvRequestId)return;
  lvRawResults=Array.isArray(results)?results:[];lvResultsRequest=requestId;
- lvShowResults(imgHitsFromApi(lvRawResults));
+ lvShowResults(lvMappedResults());
+ lvEnrichResults(requestId);
 }
 function lvRefreshCatalog(){
  if(lvResultsRequest!==lvRequestId || lvEl('lensView').hidden)return;
  const scroll=lvEl('lvSheetBody').scrollTop;
  const focus=document.activeElement && document.activeElement.dataset.bookmark;
- lvRenderResults(imgHitsFromApi(lvRawResults));
+ lvRenderResults(lvMappedResults());
  lvEl('lvSheetBody').scrollTop=scroll;
  if(focus){const button=[...lvEl('lvResults').querySelectorAll('[data-bookmark]')].find(b=>b.dataset.bookmark===focus);if(button)button.focus({preventScroll:true});}
 }
@@ -236,7 +292,6 @@ async function lvCropBlob(img, r){
 }
 async function lvRunSearch(){
   const requestId = ++lvRequestId;
-  if (typeof lvLoadCatalog === "function") lvLoadCatalog();
   const img = lvEl("lvImg");
   const r = lvRect ? {...lvRect} : { x0: 0, y0: 0, x1: 1, y1: 1 };
   lvSearched = {...r};
@@ -299,7 +354,7 @@ function imageEnrichBookmarks(hits){
  try{
   const saved=JSON.parse(localStorage.getItem('boopadb_bm')||'[]');if(!Array.isArray(saved))return;
   const enriched=new Map(hits.filter(h=>h._catalog).map(h=>[String(h.id),h]));
-  const next=saved.map(b=>{const h=enriched.get(String(b.id));return h?{...b,name:h.name,shop:h.shop,image:h.image,cur:h.cur}:b;});
+  const next=saved.map(b=>{const h=enriched.get(String(b.id));return h?{...b,...Object.fromEntries(['name','shop','image','cur'].filter(k=>h[k]!==undefined&&h[k]!==null).map(k=>[k,h[k]]))}:b;});
   if(JSON.stringify(next)!==JSON.stringify(saved))localStorage.setItem('boopadb_bm',JSON.stringify(next));
  }catch{ /* Restricted storage must not hide search results. */ }
 }
@@ -482,6 +537,10 @@ function lvUploadError(key){
 
 // Called only after the host has initialized all of its own declarations.
 function initImageLens(){
+lvEl('lvResults').addEventListener('click',event=>{
+ const button=event.target.closest('[data-metadata-retry]');if(!button)return;
+ event.preventDefault();button.disabled=true;imageFetchRecord(button.dataset.metadataRetry);
+});
 window.addEventListener("boopa:catalog-ready",()=>{
   imageEnrichCatalogBookmarks();
   if(typeof lvCatalogUpdated === "function")lvCatalogUpdated();

@@ -22,6 +22,8 @@
       .catch(() => {});
   }
   function isEditing() {
+    const lens=document.getElementById('lensView');
+    if(lens && !lens.hidden)return true;
     const el = document.activeElement;
     return el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
   }
@@ -67,6 +69,7 @@
     finally { clearTimeout(timeout); busy = false; }
   }
   window.addEventListener('pageshow', check);
+  window.addEventListener('boopa:lens-close', check);
   window.addEventListener('online', check);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
   setInterval(check, 120000);

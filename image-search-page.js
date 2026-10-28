@@ -42,16 +42,7 @@ el('themeBtn').addEventListener('click',()=>{THEME=THEME==='dark'?'light':'dark'
 function veilSync(){document.body.style.overflow=el('lensView').hidden?'':'hidden';}
 function isoFD(n){if(!n)return '';const s=String(n);return s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8);}
 function pxImg(v){return !v?'':String(v).includes('://')?String(v):'https://booth.pximg.net/c/620x620/'+v+'_base_resized.jpg';}
-let catalogFailures=0;
-let fullIndex=null, indexPromise=null, currentApiResults=[], resultRecords=new Map();
-function loadImageCatalog(){
- if(typeof imageCatalogShard!=='function')return Promise.resolve(null);
- if(indexPromise)return indexPromise;
- indexPromise=Promise.all(Array.from({length:24},(_,i)=>imageCatalogShard('search_index_'+i+'.json'))).then(parts=>{
-  fullIndex=parts.flat().map(([id,name,cur,base,lowest,sale,atlow,cat,likes,img,fd,pd,shop])=>[String(id),name,'',cur,base,lowest,sale,atlow,cat,likes,pxImg(img),fd,pd,shop]);
-  window.dispatchEvent(new Event('boopa:catalog-ready'));return fullIndex;
- }).catch(()=>{indexPromise=null;if(catalogFailures++<2)setTimeout(loadImageCatalog,1500*catalogFailures);return null;});return indexPromise;
-}
+let fullIndex=null, currentApiResults=[], resultRecords=new Map();
 function imgHitsFromApi(results){
  currentApiResults=Array.isArray(results)?results:[];
  const byId=new Map((fullIndex||[]).map(e=>[e[0],e]));
@@ -63,8 +54,8 @@ function imgHitsFromApi(results){
 function savedBookmarks(){const b=readStore('boopadb_bm',[]);return Array.isArray(b)?b:[];}
 function lvResultCard(x){return imageResultCard(x,savedBookmarks().some(b=>String(b.id)===String(x.id)),'index.html#item-'+encodeURIComponent(x.id));}
 function fillCardPrice(){} // Standalone result renderer already includes catalog prices.
-function lvLoadCatalog(){if(!fullIndex){catalogFailures=0;loadImageCatalog();}}
 function fillImgs(){}
+function lvDecorateResults(hits){resultRecords=new Map(hits.map(h=>[String(h.id),h]));}
 function renderCurrentResults(){if(typeof lvRefreshCatalog==='function')lvRefreshCatalog();}
 el('lvResults').addEventListener('click',e=>{
  const button=e.target.closest('[data-bookmark]');if(!button)return;
@@ -73,6 +64,4 @@ el('lvResults').addEventListener('click',e=>{
  saved=exists?saved.filter(b=>String(b.id)!==id):[{id:record.id,name:record.name,shop:record.shop,image:record.image,cur:record.cur},...saved];
  try{localStorage.setItem('boopadb_bm',JSON.stringify(saved));button.setAttribute('aria-pressed',String(!exists));button.textContent=tr(exists?'pp_bm':'pp_bmed');}catch{ /* Keep UI unchanged if storage is unavailable. */ }
 });
-el('spImgFile').addEventListener('change',()=>{if(el('spImgFile').files.length){currentApiResults=[];loadImageCatalog();}});
-el('spImgDrop').addEventListener('drop',e=>{if(window.BoopaImageDrop && !BoopaImageDrop.validate(e.dataTransfer && e.dataTransfer.files)){currentApiResults=[];loadImageCatalog();}});
 window.addEventListener('storage',e=>{if(e.key==='boopadb_bm')renderCurrentResults();});
