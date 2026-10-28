@@ -1,5 +1,6 @@
 // Shared image-search lens. Host initializes catalog, localization and card adapters first.
 async function imgSimilar(x){
+  const requestId = ++lvRequestId;
   lvRemote = true; lvRect = null; lvShown = null; lvSearched = null; lvZoomReset();
   const img = document.getElementById("lvImg");
   img.onerror = null; // Do not retain a previous local-upload error handler.
@@ -11,18 +12,21 @@ async function imgSimilar(x){
   lvOpen(); lvStageMode("results"); lvSetState("loading");
   try {
     const res = await fetch(IMG_API + "/similar/" + encodeURIComponent(x.id));
+    if (requestId !== lvRequestId) return;
     if (res.status === 429) return lvSetState("limit");
     if (res.status === 404) return lvSetState("notindexed");
     if (!res.ok) return lvSetState("error");
     const j = await res.json();
+    if (requestId !== lvRequestId) return;
     lvShowResults(imgHitsFromApi(j.results));
-  } catch { lvSetState("error"); }
+  } catch { if (requestId === lvRequestId) lvSetState("error"); }
 }
+let lvRequestId = 0;
 let lvUrl = null, lvRect = null, lvShown = null, lvDrag = null, lvSearched = null, lvAnim = null, lvRemote = false, lvSettleGen = 0;
 const lvEl = id => document.getElementById(id);
 let lvReturnFocus = null;
-function lvOpen(){ if (lvEl("lensView").hidden) lvReturnFocus = document.activeElement; lvEl("lensView").hidden = false; if (lvEl("imageSearchPage")) lvEl("imageSearchPage").setAttribute("aria-hidden", "true"); document.body.style.overflow = "hidden"; window.dispatchEvent(new Event("boopa:lens-open")); lvEl("lvBack").focus(); }
-function lvClose(){ lvEl("lensView").hidden = true; window.dispatchEvent(new Event("boopa:lens-close")); if (lvEl("imageSearchPage")) lvEl("imageSearchPage").removeAttribute("aria-hidden"); document.body.style.overflow = ""; if (lvAnim) { cancelAnimationFrame(lvAnim); lvAnim = null; } lvZoomReset(); veilSync(); if (document.getElementById("imageSearchPage")) document.getElementById("spImgDrop").focus(); else if (lvReturnFocus && lvReturnFocus.isConnected) lvReturnFocus.focus(); }
+function lvOpen(){ if (lvEl("lensView").hidden) lvReturnFocus = document.activeElement; lvEl("lensView").hidden = false; if (lvEl("imageSearchPage")) lvEl("imageSearchPage").setAttribute("aria-hidden", "true"); veilSync(); window.dispatchEvent(new Event("boopa:lens-open")); lvEl("lvBack").focus({preventScroll:true}); }
+function lvClose(){ ++lvRequestId; lvEl("lensView").hidden = true; window.dispatchEvent(new Event("boopa:lens-close")); if (lvEl("imageSearchPage")) lvEl("imageSearchPage").removeAttribute("aria-hidden"); if (lvAnim) { cancelAnimationFrame(lvAnim); lvAnim = null; } lvZoomReset(); veilSync(); if (document.getElementById("imageSearchPage")) document.getElementById("spImgDrop").focus({preventScroll:true}); else if (lvReturnFocus && lvReturnFocus.isConnected) lvReturnFocus.focus({preventScroll:true}); }
 function lvStageMode(mode){ lvFitLoop(); }
 function lvFitBox(){
   const stage = lvEl("lvStage"), img = lvEl("lvImg"), wrap = lvEl("lvWrap");
@@ -202,20 +206,24 @@ async function lvCropBlob(img, r){
   try { return await new Promise(res => cv.toBlob(res, "image/jpeg", 0.9)); } catch { return null; }
 }
 async function lvRunSearch(){
+  const requestId = ++lvRequestId;
   const img = lvEl("lvImg");
   const r = lvRect ? {...lvRect} : { x0: 0, y0: 0, x1: 1, y1: 1 };
   lvSearched = {...r};
   lvSetState("loading");
   const blob = await lvCropBlob(img, r);
+  if (requestId !== lvRequestId) return;
   if (!blob) { lvSetState("error"); return; }
   try {
     const fd = new FormData(); fd.append("file", blob, "query.jpg");
     const res = await fetch(IMG_API + "/search", { method: "POST", body: fd });
+    if (requestId !== lvRequestId) return;
     if (res.status === 429) return lvSetState("limit");
     if (!res.ok) return lvSetState("error");
     const j = await res.json();
+    if (requestId !== lvRequestId) return;
     lvShowResults(imgHitsFromApi(j.results));
-  } catch { lvSetState("error"); }
+  } catch { if (requestId === lvRequestId) lvSetState("error"); }
 }
 function lvPeekH(){ return lvSearched || lvEl("lvResults").children.length ? 118 : 34; }
 function lvSheetSet(mode){
@@ -249,11 +257,13 @@ function lvShowResults(hits){
   lvEl("lvCount").textContent = tr("sp_count", {n: hits.length});
   lvEl("lvResults").innerHTML = hits.length ? hits.map((x2, i) => x2.cur == null && typeof plainCard === "function" ? plainCard(x2, i) : saleCard(x2, i)).join("") : "";
   if (!hits.length) { lvEl("lvNote").hidden = false; lvEl("lvNote").textContent = tr("empty_none"); }
+  if (typeof lvDecorateResults === "function") lvDecorateResults(hits);
   fillImgs();
   hits.forEach(h => { if (h.cur !== null && h.cur !== undefined) fillCardPrice(h); });
 }
 function lvOpenUpload(file){
   if (!file) return;
+  ++lvRequestId;
   if (lvUrl) URL.revokeObjectURL(lvUrl);
   const uploadUrl = URL.createObjectURL(file);
   lvUrl = uploadUrl;
@@ -478,8 +488,8 @@ document.addEventListener("keydown", e => {
   });
   const first=items[0], last=items[items.length-1];
   if (!first) return;
-  if (e.shiftKey && (document.activeElement===first || !items.includes(document.activeElement))) { e.preventDefault(); last.focus(); }
-  else if (!e.shiftKey && (document.activeElement===last || !view.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
+  if (e.shiftKey && (document.activeElement===first || !items.includes(document.activeElement))) { e.preventDefault(); last.focus({preventScroll:true}); }
+  else if (!e.shiftKey && (document.activeElement===last || !view.contains(document.activeElement))) { e.preventDefault(); first.focus({preventScroll:true}); }
 });
 
 }

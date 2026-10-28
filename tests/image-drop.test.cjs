@@ -50,12 +50,12 @@ function uploadHarness(){
  const fs=require('node:fs'), vm=require('node:vm');
  const html=fs.readFileSync(require('node:path').join(__dirname,'../image-search-engine.js'),'utf8');
  const upload=html.slice(html.indexOf('function lvOpenUpload(file)'),html.indexOf('let lvZoom ='));
- const similar=html.slice(html.indexOf('async function imgSimilar(x)'),html.indexOf('let lvUrl ='));
+ const similar=html.slice(html.indexOf('async function imgSimilar(x)'),html.indexOf('let lvRequestId ='));
  const nodes={},errors=[],revoked=[];let n=0;
  const el=id=>nodes[id]||(nodes[id]={style:{},classList:{},hidden:true});
  const context={document:{getElementById:el},URL:{createObjectURL:()=>`blob:test-${++n}`,revokeObjectURL:u=>revoked.push(u)},lvUploadError:e=>errors.push(e),fetch:async()=>({ok:false,status:500}),encodeURIComponent,IMG_API:'https://example.test',lvEl:el,lvZoomReset(){},lvSheetSet(){},lvOpen(){},lvStageMode(){},lvSetState(){},lvFitLoop(){},lvRenderSvg(){},lvShowResults(){},imgHitsFromApi(){}};
  vm.createContext(context);
- vm.runInContext('let lvUrl=null,lvRemote=false,lvRect=null,lvShown=null,lvSearched=null,lvDrag=null;\n'+upload+'\n'+similar+'\nfunction currentUrl(){return lvUrl}',context);
+ vm.runInContext('let lvRequestId=0,lvUrl=null,lvRemote=false,lvRect=null,lvShown=null,lvSearched=null,lvDrag=null;\n'+upload+'\n'+similar+'\nfunction currentUrl(){return lvUrl}',context);
  return {context,el,errors,revoked};
 }
 test('stale upload error cannot revoke a newer upload; current decode error is reported',()=>{

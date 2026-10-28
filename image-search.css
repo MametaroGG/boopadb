@@ -61,3 +61,11 @@
   .lv-sheetbody{flex:1;overflow-y:auto;overscroll-behavior:contain}
   .lv-skel{border-radius:12px;background:linear-gradient(100deg,#1d1d22 40%,#26262c 50%,#1d1d22 60%);background-size:200% 100%;animation:lvsh 1.2s infinite;min-height:190px}
   @keyframes lvsh{to{background-position:-200% 0}}
+
+/* Explicit viewport-sized modal surfaces avoid retaining an old portrait-sized layer.
+   Dynamic viewport units remain CSS-owned: no visualViewport pixel sizes or zoom lock. */
+.spage.open,#lensView{width:100%;height:100%}
+@supports (width:100dvw) and (height:100dvh){.spage.open,#lensView{width:100dvw;height:100dvh}}
+#lvResults .cbody{display:flex;flex-direction:column;flex:1;min-width:0}
+#lvResults .lv-bookmark{width:100%;min-height:44px;margin-top:10px;white-space:normal}
+#lvResults .lv-bookmark[aria-pressed="true"]{color:var(--accent)}

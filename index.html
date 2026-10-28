@@ -1729,7 +1729,7 @@ const spage = document.getElementById("searchPage");
 // scroll. The home scroll position is saved and restored on close.
 let veilY = null;
 function veilSync(){
-  const anyOpen = spage.classList.contains("open") || prodPage.classList.contains("open");
+  const anyOpen = spage.classList.contains("open") || prodPage.classList.contains("open") || !document.getElementById("lensView").hidden;
   if (anyOpen) {
     if (veilY === null) veilY = window.scrollY;
     document.body.classList.add("veil");
@@ -1743,6 +1743,15 @@ function veilSync(){
     window.scrollTo(0, y);
   }
 }
+// Reconcile the same lock owner after viewport/lifecycle changes; never pin pixel widths.
+let overlaySyncFrame = null;
+function syncOverlayViewport(){
+  if (overlaySyncFrame !== null) return;
+  overlaySyncFrame = requestAnimationFrame(() => { overlaySyncFrame = null; veilSync(); });
+}
+window.addEventListener("resize", syncOverlayViewport);
+window.addEventListener("orientationchange", syncOverlayViewport);
+window.addEventListener("pageshow", syncOverlayViewport);
 function openSearch(){
   loadFullIndex();
   prodPage.classList.remove("open");
@@ -3983,11 +3992,12 @@ function toggleBm(x){
   store.set("boopadb_bm", BMS);
   syncBmFlags();
   const btn = document.getElementById("ppBmBtn");
-  if (btn) {
+  if (btn && curProd && String(curProd.id) === String(x.id)) {
     const on = isBm(x.id);
     btn.classList.toggle("on", on);
     btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2z"/></svg>${on ? tr("pp_bmed") : tr("pp_bm")}`;
   }
+  lvSyncBookmarkButtons();
   renderPersonal();
   shopLoadP = null; loadShopSec();
 }
@@ -4049,6 +4059,33 @@ function imgSetMode(label, thumb){
   openSearch();
   spRender(); imgNoteUpdate();
 }
+// Similar results use home cards, but share the same bookmark storage as uploads.
+let lvBookmarkHits = new Map();
+function lvSyncBookmarkButtons(){
+  document.querySelectorAll('#lvResults [data-lv-bookmark]').forEach(button => {
+    const saved = isBm(button.dataset.lvBookmark);
+    button.setAttribute("aria-pressed", String(saved));
+    button.textContent = tr(saved ? "pp_bmed" : "pp_bm");
+  });
+}
+function lvDecorateResults(hits){
+  lvBookmarkHits = new Map(hits.map(x => [String(x.id), x]));
+  [...document.getElementById("lvResults").children].forEach((card, i) => {
+    if (!hits[i]) return;
+    const body = card.querySelector(".cbody"); if (!body) return;
+    const button = document.createElement("button");
+    button.type = "button"; button.className = "igs-btn lv-bookmark";
+    button.dataset.lvBookmark = String(hits[i].id); body.appendChild(button);
+  });
+  lvSyncBookmarkButtons();
+}
+document.getElementById("lvResults").addEventListener("click", e => {
+  const button = e.target.closest('[data-lv-bookmark]'); if (!button) return;
+  e.preventDefault(); e.stopPropagation();
+  const id = button.dataset.lvBookmark, hit = lvBookmarkHits.get(id); if (!hit) return;
+  toggleBm(PROD.get(id) || hit);
+});
+window.addEventListener("storage", e => { if (e.key === "boopadb_bm") { BMS = store.get("boopadb_bm", []); syncBmFlags(); lvSyncBookmarkButtons(); } });
 if (typeof initImageLens === "function") initImageLens();
 else window.imgSimilar = () => {
   document.getElementById("spImgDropError").hidden = false;

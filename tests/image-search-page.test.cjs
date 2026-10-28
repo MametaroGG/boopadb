@@ -1,12 +1,15 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {JSDOM,VirtualConsole}=require('jsdom');const root=path.join(__dirname,'..');
 function setup(opts={}){
- const errors=[],revoked=[],requests=[];let seq=0;
+ const errors=[],revoked=[],requests=[],caught=[];let seq=0;
  let source=fs.readFileSync(path.join(root,opts.home?'index.html':'image-search.html'),'utf8');
  if(opts.omitEngine)source=source.replace(/<script src="image-search-engine.js"[^>]*><\/script>/,'');
- const html=require('./fixtures/inline-local-scripts.cjs')(source,root);
+ let html=require('./fixtures/inline-local-scripts.cjs')(source,root);
+ if(opts.captureCaught)html=html.replace(/catch\s*\((\w+)\)\s*\{/g,(all,name)=>all+`window.__recordCaught(${name});`).replace(/catch\s*\{/g,'catch(__e){window.__recordCaught(__e);');
  const vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e.message));
  const dom=new JSDOM(html,{runScripts:'dangerously',url:'https://mametarogg.github.io/boopadb/'+(opts.home?'index.html':'image-search.html'),pretendToBeVisual:true,virtualConsole:vc,beforeParse(w){
+  w.__recordCaught=e=>caught.push(String(e));
+  w.HTMLCanvasElement.prototype.getContext=()=>new Proxy({measureText:()=>({width:10})},{get:(o,k)=>k in o?o[k]:(()=>{})});
   w.fetch=(url,init)=>{requests.push(url);return opts.fetch?opts.fetch(url,init,w):new Promise(()=>{});};w.scrollTo=()=>{};
   w.matchMedia=()=>({matches:false,addEventListener(){},addListener(){}});w.ResizeObserver=class{observe(){}disconnect(){}};w.IntersectionObserver=class{observe(){}disconnect(){}unobserve(){}};
   w.HTMLElement.prototype.getBoundingClientRect=()=>({width:320,height:200,left:0,top:0,right:320,bottom:200});
@@ -15,7 +18,7 @@ function setup(opts={}){
  }});
  const w=dom.window,d=w.document,el=id=>d.getElementById(id);
  function pick(files){Object.defineProperty(el('spImgFile'),'files',{value:files,configurable:true});el('spImgFile').dispatchEvent(new w.Event('change'));}
- return {dom,w,d,el,errors,revoked,requests,pick};
+ return {dom,w,d,el,errors,revoked,requests,caught,pick};
 }
 test('standalone HTML boots all scripts in production order, without home payload or iframe',()=>{
  const s=setup();try{
@@ -153,4 +156,56 @@ test('image-search camera remains the sole search-panel upload entry',()=>{
  const src=fs.readFileSync(path.join(root,'index.html'),'utf8');
  assert.doesNotMatch(src,/id="spImageSearchEntry"|\.image-search-entry/);
  assert.match(src,/getElementById\("spImgBtn"\)\.addEventListener\("click", \(\) => \{ location.href = "image-search.html";/);
+});
+
+test('detail→similar→back preserves modal lock, scroll/focus and supports bookmark add/remove',async()=>{
+ const s=setup({home:true,captureCaught:true,fetch:(url)=>String(url).includes('/similar/')?Promise.resolve({ok:true,json:async()=>({results:[{item_id:'123',image:'https://example.test/x.png'}]})}):new Promise(()=>{})});try{
+  const id=s.w.eval('[...PROD.keys()][0]');s.w.openProduct(id);
+  const opener=s.el('ppSimilarBtn'), originalBookmark=s.el('ppBmBtn').innerHTML;opener.focus();
+  s.el('prodPage').scrollTop=210;await s.w.imgSimilar({id,image:'https://example.test/x.png'});
+  const button=s.el('lvResults').querySelector('[data-lv-bookmark="123"]');assert.ok(button);assert.equal(button.closest('a'),null);button.click();
+  assert.equal(button.getAttribute('aria-pressed'),'true');assert.ok(JSON.parse(s.w.localStorage.getItem('boopadb_bm')).some(x=>x.id==='123'));assert.equal(s.el('ppBmBtn').innerHTML,originalBookmark);
+  button.click();assert.equal(button.getAttribute('aria-pressed'),'false');
+  const writes=[],style=s.d.body.style,desc=Object.getOwnPropertyDescriptor(s.w.CSSStyleDeclaration.prototype,'overflow');
+  Object.defineProperty(style,'overflow',{configurable:true,get(){return desc.get.call(style);},set(v){writes.push(v);desc.set.call(style,v);}});
+  s.el('lvBack').click();assert.equal(s.el('prodPage').scrollTop,210);assert.equal(s.d.activeElement,opener);assert.equal(s.el('prodPage').classList.contains('open'),true);
+  assert.equal(style.overflow,'hidden');assert.equal(writes.includes(''),false);assert.equal(s.d.documentElement.style.overflow,'hidden');
+  for(const event of ['resize','orientationchange','pageshow'])s.w.dispatchEvent(new s.w.Event(event));
+  await new Promise(r=>setTimeout(r,25));assert.equal(style.overflow,'hidden');assert.equal(style.width,'');assert.equal(s.d.documentElement.style.width,'');
+  s.w.closeProduct();assert.equal(style.overflow,'');assert.equal(s.d.documentElement.style.overflow,'');
+  assert.deepEqual(s.errors,[]);assert.deepEqual(s.caught,[]);
+ }finally{s.dom.window.close();}
+});
+test('priced similar cards keep bookmark controls and synchronize existing storage across locales',()=>{
+ for(const lang of ['ja','en','ko','zh-Hans','zh-Hant']){const s=setup({home:true,lang});try{
+  const hit={id:'123',name:'商品 / long product',shop:'Shop',image:'https://example.test/x.png',cur:1500,base:2000,pct:25,sale:true,at_lowest:false};
+  s.w.lvShowResults([hit]);const button=s.el('lvResults').querySelector('[data-lv-bookmark]');assert.ok(button);assert.equal(button.closest('a'),null);button.click();assert.equal(button.getAttribute('aria-pressed'),'true');
+  s.w.lvShowResults([{...hit,name:'Updated title'}]);assert.equal(s.el('lvResults').querySelector('[data-lv-bookmark]').getAttribute('aria-pressed'),'true');
+  s.w.localStorage.setItem('boopadb_bm','[]');s.w.dispatchEvent(new s.w.StorageEvent('storage',{key:'boopadb_bm'}));assert.equal(s.el('lvResults').querySelector('[data-lv-bookmark]').getAttribute('aria-pressed'),'false');assert.deepEqual(s.errors,[]);
+ }finally{s.dom.window.close();}}
+});
+test('closed or superseded similar requests cannot repaint newer results',async()=>{
+ const pending=[];const s=setup({home:true,fetch:url=>String(url).includes('/similar/')?new Promise(resolve=>pending.push(resolve)):new Promise(()=>{})});try{
+  const first=s.w.imgSimilar({id:'1'}),second=s.w.imgSimilar({id:'2'});
+  pending[1]({ok:true,json:async()=>({results:[{item_id:'222'}]})});await second;
+  pending[0]({ok:true,json:async()=>({results:[{item_id:'111'}]})});await first;
+  assert.ok(s.el('lvResults').querySelector('[data-lv-bookmark="222"]'));assert.equal(s.el('lvResults').querySelector('[data-lv-bookmark="111"]'),null);
+  const third=s.w.imgSimilar({id:'3'});s.w.lvClose();pending[2]({ok:true,json:async()=>({results:[{item_id:'333'}]})});await third;
+  assert.equal(s.el('lensView').hidden,true);assert.equal(s.el('lvResults').querySelector('[data-lv-bookmark="333"]'),null);assert.deepEqual(s.errors,[]);
+ }finally{s.dom.window.close();}
+});
+test('overlay sizing is CSS viewport-owned and focus restoration does not scroll',()=>{
+ const css=fs.readFileSync(path.join(root,'image-search.css'),'utf8'),engine=fs.readFileSync(path.join(root,'image-search-engine.js'),'utf8');
+ assert.match(css,/\.spage.open,#lensView\{width:100%;height:100%\}/);assert.match(css,/width:100dvw;height:100dvh/);assert.match(engine,/focus\(\{preventScroll:true\}\)/);
+ assert.doesNotMatch(engine,/document.body.style.overflow = ""/);
+});
+
+test('choosing a similar result opens detail without unlocking the underlying overlay',async()=>{
+ const s=setup({home:true,captureCaught:true});try{
+  const ids=s.w.eval('[...PROD.keys()].slice(0,2)');s.w.openProduct(ids[0]);s.w.lvOpen();
+  const hit=s.w.eval('PROD.get('+JSON.stringify(ids[1])+')');s.w.lvShowResults([hit]);
+  const link=s.el('lvResults').querySelector('.thumbwrap');assert.ok(link);link.click();
+  await new Promise(r=>setTimeout(r,0));assert.equal(s.el('lensView').hidden,true);assert.equal(s.el('prodPage').classList.contains('open'),true);assert.equal(s.d.body.style.overflow,'hidden');
+  assert.equal(s.w.eval('String(curProd.id)'),String(ids[1]));assert.deepEqual(s.errors,[]);assert.deepEqual(s.caught,[]);
+ }finally{s.dom.window.close();}
 });
