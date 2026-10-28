@@ -57,7 +57,7 @@ test('ranking change preserves selected product; removed product resets safely',
   h.context.full.newest.find(x => String(x.id) === id).likes = 999999;
   h.run('renderHeroFromLists(full)');
   assert.equal(h.run('String(heroItems[hi].id)'), id);
-  assert.equal(h.run('hi'), 0);
+  assert.equal(h.run('hi'), 2); // popularity changes do not reorder the seeded selection
   for (const key of ['newest', 'on_sale']) h.context.full[key] = h.context.full[key].filter(x => String(x.id) !== id);
   h.run('renderHeroFromLists(full)');
   assert.equal(h.run('hi'), 0); assert.equal(h.context.position, 1);
@@ -65,7 +65,7 @@ test('ranking change preserves selected product; removed product resets safely',
 });
 test('selector caps at six unique valid items even with overlaps, never mutates catalog', () => {
   const h = harness();
-  const items = Array.from({length:10}, (_, i) => ({id:i, likes:10-i, image:'x', base:100}));
+  const items = Array.from({length:10}, (_, i) => ({id:i, likes:10-i, image:'x', base:100, cur:100}));
   h.context.input = {newest:items, on_sale:items};
   const before = JSON.stringify(h.context.input);
   assert.equal(h.run('selectHeroEntries(input).length'), 6);
