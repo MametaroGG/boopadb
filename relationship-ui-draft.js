@@ -80,15 +80,27 @@
   function safeImage(value){
     try { const u = new URL(value); return u.protocol === 'https:' && !u.username && !u.password ? u.href : ''; } catch { return ''; }
   }
+  function cardFrame(attrs,href,media,name,shop,footer,index,linkAttrs=''){
+    return `<div class="card" ${attrs} style="animation-delay:${index % 30 * 45}ms"><a class="thumbwrap" href="${esc(href)}" ${linkAttrs}>${media}</a><div class="cbody"><div class="cname"><a href="${esc(href)}" ${linkAttrs}>${esc(name)}</a></div><div class="cshop">${esc(shop)}</div><div class="crow">${footer}</div></div></div>`;
+  }
   function card(id, meta, index, options){
-    const l = labels[options.lang] || labels.ja;
-    const img = safeImage(meta && (meta.image_resized || meta.image));
-    // Existing bookmark helper receives validated digits only. It is trusted app code.
-    const bookmark = options.bookmarkHTML ? options.bookmarkHTML(id) : '';
-    const href = 'item.html?id=' + id;
-    const price = meta && typeof meta.price === 'number' && Number.isFinite(meta.price) && meta.price >= 0 ? meta.price : null;
-    const priceText = price === null ? '—' : price === 0 ? l[6] : '¥' + price.toLocaleString('ja-JP');
-    return `<div class="card" data-pid="${id}" style="animation-delay:${index % 30 * 45}ms"><a class="thumbwrap" href="${href}">${img ? `<img decoding="async" src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : '<span class="phcard" aria-hidden="true"></span>'}${bookmark}</a><div class="cbody"><div class="cname"><a href="${href}">${esc(meta && meta.name || l[5] + ' (#' + id + ')')}</a></div><div class="cshop">${esc(meta && meta.shop && meta.shop.name)}</div><div class="crow"><span class="price solo">${esc(priceText)}</span></div></div></div>`;
+    if(!idOf(id))return '';
+    const l=labels[options.lang]||labels.ja,img=safeImage(meta&&(meta.image_resized||meta.image));
+    const bookmark=options.bookmarkHTML?options.bookmarkHTML(id):'';
+    const price=meta&&typeof meta.price==='number'&&Number.isFinite(meta.price)&&meta.price>=0?meta.price:null;
+    const priceText=price===null?'—':price===0?l[6]:'¥'+price.toLocaleString('ja-JP');
+    const media=(img?`<img decoding="async" src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:'<span class="phcard" aria-hidden="true"></span>')+bookmark;
+    return cardFrame(`data-pid="${id}"`,'item.html?id='+id,media,meta&&meta.name||l[5]+' (#'+id+')',meta&&meta.shop&&meta.shop.name,`<span class="price solo">${esc(priceText)}</span>`,index);
+  }
+  function externalToolCard(tool,index,options={}){
+    if(!tool||tool.toolKey!=='modular_avatar'||tool.url!=='https://modular-avatar.nadena.dev/ja'||tool.status!=='reviewed_required')return '';
+    const l={ja:['外部ツール','公式サイト（日本語）'],en:['External tool','Official site (Japanese)'],ko:['외부 도구','공식 사이트 (일본어)'],'zh-Hans':['外部工具','官方网站（日语）'],'zh-Hant':['外部工具','官方網站（日語）']}[options.lang]||['外部ツール','公式サイト（日本語）'];
+    const media='<span class="phcard" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="8" y="8" width="32" height="32" rx="8"/><path d="M17 15v18m14-18v18M13 20h8m6 8h8"/></svg></span>';
+    return cardFrame('data-external-tool="modular_avatar"',tool.url,media,'Modular Avatar',l[0],`<span class="cshop">${esc(l[1])}</span>`,index,'target="_blank" rel="noopener noreferrer"');
+  }
+  function rail(cards,options={}){
+    const l=labels[options.lang]||labels.ja;
+    return `<div class="relwrap"><div class="relrow">${cards}</div><button type="button" class="relbtn prev" data-draft-rel-scroll="-1" aria-label="${esc(l[7])}">‹</button><button type="button" class="relbtn next" data-draft-rel-scroll="1" aria-label="${esc(l[8])}">›</button></div>`;
   }
   function render(model, metadata, options = {}){
     model = {...model,groups:model.groups || {}};
@@ -107,7 +119,7 @@
       const title = kind === 'children' ? cl[0] : l[index];
       if (!ids.length) return;
       // data attribute, rather than a global ID, supports independently mounted hosts.
-      html += `<section data-relation-kind="${kind}" aria-label="${esc(title)}"><div class="pp-sec">${esc(title)}（${total}）</div>${kind === 'children' ? `<p data-relation-direction="inverse">${esc(childrenNotes[options.lang] || childrenNotes.ja)}</p>` : ''}<div class="relwrap"><div class="relrow">${ids.map((id,i) => card(id, metadata[id], i, options)).join('')}</div><button type="button" class="relbtn prev" data-draft-rel-scroll="-1" aria-label="${esc(l[7])}">‹</button><button type="button" class="relbtn next" data-draft-rel-scroll="1" aria-label="${esc(l[8])}">›</button></div>${kind === 'children' && total > ids.length && idOf(options.selfId) ? `<a class="relmore" data-relation-search="children" href="index.html?children=${options.selfId}">${esc(cl[1])}</a>` : kind !== 'children' && (model.groups[kind] || []).length > ids.length ? `<button type="button" class="relmore" data-relation-more="${kind}">${esc(cl[1])}</button>` : ''}${kind === 'children' && total > ids.length ? `<span class="cshop">${esc(cl[2])}: ${ids.length} / ${total}</span>` : ''}</section>`;
+      html += `<section data-relation-kind="${kind}" data-relation-total="${total}" aria-label="${esc(title)}"><div class="pp-sec">${esc(title)}（${total}）</div>${kind === 'children' ? `<p data-relation-direction="inverse">${esc(childrenNotes[options.lang] || childrenNotes.ja)}</p>` : ''}${rail(ids.map((id,i) => card(id, metadata[id], i, options)).join(''),options)}${kind === 'children' && total > ids.length && idOf(options.selfId) ? `<a class="relmore" data-relation-search="children" href="index.html?children=${options.selfId}">${esc(cl[1])}</a>` : kind !== 'children' && (model.groups[kind] || []).length > ids.length ? `<button type="button" class="relmore" data-relation-more="${kind}">${esc(cl[1])}</button>` : ''}${kind === 'children' && total > ids.length ? `<span class="cshop">${esc(cl[2])}: ${ids.length} / ${total}</span>` : ''}</section>`;
     });
     return html;
   }
@@ -123,6 +135,7 @@
     const imageFallback=()=>host.querySelectorAll('img').forEach(img=>{img.onerror=()=>{const placeholder=host.ownerDocument.createElement('span');placeholder.className='phcard';img.replaceWith(placeholder);};});
     // Render relationships immediately: slow metadata must not hide known edges.
     host.innerHTML = render(model, metadata, options);
+    if(options.onRender)options.onRender();
     host.onclick = e => {
       const more=e.target.closest('[data-relation-more]');
       if(more && host.contains(more)){const k=more.dataset.relationMore;const limits={...options.limits,[k]:((options.limits&&options.limits[k])||30)+30};mountModel(host,model,{...options,limits,_metadata:metadata});return;}
@@ -163,5 +176,5 @@
     return mountModel(host,model,{...options,selfId});
   }
   function cancel(host){ const token=mounts.get(host);if(token&&token.observer)token.observer.disconnect();mounts.delete(host); host.onclick = null; host.innerHTML = ''; }
-  return {adaptSynthetic, adaptGenerated, render, mount, mountGenerated, mountSnapshot, cancel, labels};
+  return {adaptSynthetic, adaptGenerated, render, mount, mountGenerated, mountSnapshot, cancel, labels, card, externalToolCard, rail};
 });

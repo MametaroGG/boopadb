@@ -1185,8 +1185,8 @@
 </div>
 <script src="relationship-data.js?v=1e771e8fcebf4deb"></script>
 <script src="relationship-search.js?v=e6fa3c5693bb1eca"></script>
-<script src="relationship-ui-draft.js?v=58c7dc2bb6c44c92"></script>
-<script src="relationship-supplement.js?v=b92426be45f564c4"></script>
+<script src="relationship-ui-draft.js?v=780a356355a29c1e"></script>
+<script src="relationship-supplement.js?v=352aa3eed121bee9"></script>
 <script src="image-drop.js"></script>
 <script src="image-search-engine.js?v=20261028-results-v3"></script>
 <script>
@@ -2213,16 +2213,18 @@ async function loadRelations(x){
   const snapshot = await reviewedRelationData.get(id);
   if (!isCurrent()) return;
   const supplemental = reviewedRelationSupplement ? reviewedRelationSupplement.get(id,snapshot.version) : null;
-  const primary = BoopaRelationshipDraft.mountSnapshot(host,id,snapshot,{
+  const relationOptions = {
     lang:LANG, bookmarkHTML:bmFlag, isCurrent,
+    onRender:()=>{if(reviewedRelationSupplement) BoopaRelationshipSupplement.sync(host);},
     fetchMeta:async target => {
       const [meta,record] = await Promise.all([fetchMeta(target).catch(()=>null), Promise.resolve(PROD.get(target) || fetchItemRecord(target)).catch(()=>null)]);
       return {...(meta || {}),name:meta && meta.name || record && record.name,price:record && typeof record.cur === "number" ? record.cur : null};
     }
-  });
-  const supplementalMount = supplemental && supplemental.then(result => { BoopaRelationshipSupplement.mount(host,result,{lang:LANG,selfId:id,isCurrent}); return result; });
+  };
+  const primary = BoopaRelationshipDraft.mountSnapshot(host,id,snapshot,relationOptions);
+  const supplementalMount = supplemental && supplemental.then(result => { BoopaRelationshipSupplement.mount(host,result,{...relationOptions,selfId:id}); return result; });
   await primary;
-  if (supplementalMount) BoopaRelationshipSupplement.mount(host,await supplementalMount,{lang:LANG,selfId:id,isCurrent});
+  if (supplementalMount) await BoopaRelationshipSupplement.mount(host,await supplementalMount,{...relationOptions,selfId:id});
 }
 async function openItemSmart(id){
   if (PROD.has(String(id))) { openProduct(id); return; }
