@@ -9,13 +9,20 @@
   'use strict';
   const kinds = ['parents', 'prerequisites', 'thumbnail'];
   const labels = {
-    ja: ['親作品', '動作に必要な作品・ツール', 'サムネイルに使用された作品', '関係情報は未確認です', '確認済みの関係はありません', '商品情報を取得できません', '無料', '前へ', '次へ'],
-    en: ['Parent works', 'Required works and tools', 'Works used in the thumbnail', 'Relationships not verified', 'No verified relationships', 'Product information unavailable', 'Free', 'Previous', 'Next'],
-    ko: ['부모 작품', '작동에 필요한 작품·도구', '썸네일에 사용된 작품', '관계 정보 미확인', '확인된 관계 없음', '상품 정보를 가져올 수 없습니다', '무료', '이전', '다음'],
-    'zh-Hans': ['父作品', '运行所需的作品和工具', '缩略图中使用的作品', '关系信息尚未确认', '没有已确认的关系', '无法获取商品信息', '免费', '上一页', '下一页'],
-    'zh-Hant': ['父作品', '執行所需的作品與工具', '縮圖中使用的作品', '關係資訊尚未確認', '沒有已確認的關係', '無法取得商品資訊', '免費', '上一頁', '下一頁']
+    ja: ['親作品', '動作に必要な作品・ツール', 'サムネイルに使用された作品', 'この作品の親作品・前提商品・サムネイル使用作品のデータは、未収録または取得できていません。', '現在の登録データには、この作品の親作品・前提商品・サムネイル使用作品がありません。実際に関係がないとは限りません。', '商品情報を取得できません', '無料', '前へ', '次へ'],
+    en: ['Parent works', 'Required works and tools', 'Works used in the thumbnail', 'Parent, prerequisite, and thumbnail-use data for this item is missing or could not be loaded.', 'No parent, prerequisite, or thumbnail-use entries are currently stored for this item. Relationships may still exist.', 'Product information unavailable', 'Free', 'Previous', 'Next'],
+    ko: ['부모 작품', '작동에 필요한 작품·도구', '썸네일에 사용된 작품', '이 작품의 부모 작품·필수 작품·썸네일 사용 작품 데이터가 아직 등록되지 않았거나 불러올 수 없습니다.', '현재 등록된 데이터에는 이 작품의 부모 작품·필수 작품·썸네일 사용 작품이 없습니다. 실제 관계가 없다는 뜻은 아닙니다.', '상품 정보를 가져올 수 없습니다', '무료', '이전', '다음'],
+    'zh-Hans': ['父作品', '运行所需的作品和工具', '缩略图中使用的作品', '本作品的父作品、前置作品及缩略图使用作品数据尚未收录或无法加载。', '当前数据未记录本作品的父作品、前置作品或缩略图使用作品。这不代表实际没有相关作品。', '无法获取商品信息', '免费', '上一页', '下一页'],
+    'zh-Hant': ['父作品', '執行所需的作品與工具', '縮圖中使用的作品', '本作品的父作品、前置作品及縮圖使用作品資料尚未收錄或無法載入。', '目前資料未記錄本作品的父作品、前置作品或縮圖使用作品。這不代表實際沒有相關作品。', '無法取得商品資訊', '免費', '上一頁', '下一頁']
   };
   const childrenLabels = {ja:['子作品','もっと見る','表示'],en:['Derivative works','Show more','Shown'],ko:['파생 작품','더 보기','표시'], 'zh-Hans':['子作品','查看更多','显示'],'zh-Hant':['子作品','查看更多','顯示']};
+  const childrenNotes = {
+    ja:'子作品は、他の作品に登録された親作品の情報から表示しています。',
+    en:"Derivative works are listed from other items' recorded parent links.",
+    ko:'파생 작품은 다른 작품에 등록된 부모 작품 정보를 바탕으로 표시합니다.',
+    'zh-Hans':'子作品根据其他作品中记录的父作品信息列出。',
+    'zh-Hant':'子作品依據其他作品中記錄的父作品資訊列出。'
+  };
   const capLabels={ja:'子作品は人気順で最大2,000件まで表示します。',en:'Up to 2,000 derivative works are available, sorted by popularity.',ko:'인기순으로 최대 2,000개의 파생 작품을 표시합니다.','zh-Hans':'按人气顺序最多显示2,000个子作品。','zh-Hant':'按人氣順序最多顯示2,000個子作品。'};
   const allKinds = [...kinds, 'children'];
   const visibleIds = (model,kind,options) => (model.groups[kind] || []).slice(0,(options.limits && options.limits[kind]) || 30);
@@ -80,16 +87,17 @@
     model = {...model,groups:model.groups || {}};
     const l = labels[options.lang] || labels.ja;
     const cl = childrenLabels[options.lang] || childrenLabels.ja;
-    let html = model.status !== 'verified' ? `<p role="status">${esc(l[3])}</p>` : '';
+    const hasOutgoing = kinds.some(kind => (model.groups[kind] || []).length > 0);
+    let html = model.status !== 'verified' ? `<p role="status" data-relation-status="outgoing-unavailable">${esc(l[3])}</p>` : !hasOutgoing ? `<p role="status" data-relation-status="outgoing-empty">${esc(l[4])}</p>` : '';
     allKinds.forEach((kind, index) => {
       const ids = visibleIds(model,kind,options);
       const total = kind === 'children' ? model.childrenTotal : (model.groups[kind] || []).length;
       const title = kind === 'children' ? cl[0] : l[index];
       if (!ids.length) return;
       // data attribute, rather than a global ID, supports independently mounted hosts.
-      html += `<section data-relation-kind="${kind}" aria-label="${esc(title)}"><div class="pp-sec">${esc(title)}（${total}）</div><div class="relwrap"><div class="relrow">${ids.map((id,i) => card(id, metadata[id], i, options)).join('')}</div><button type="button" class="relbtn prev" data-draft-rel-scroll="-1" aria-label="${esc(l[7])}">‹</button><button type="button" class="relbtn next" data-draft-rel-scroll="1" aria-label="${esc(l[8])}">›</button></div>${(model.groups[kind] || []).length > ids.length ? `<button type="button" class="relmore" data-relation-more="${kind}">${esc(cl[1])}</button>` : ''}${kind === 'children' && total > ids.length ? `<span class="cshop">${esc(cl[2])}: ${ids.length} / ${total}</span>` : ''}${kind === 'children' && total > (model.groups.children || []).length ? `<p class="cshop">${esc(capLabels[options.lang] || capLabels.ja)}</p>` : ''}</section>`;
+      html += `<section data-relation-kind="${kind}" aria-label="${esc(title)}"><div class="pp-sec">${esc(title)}（${total}）</div>${kind === 'children' ? `<p data-relation-direction="inverse">${esc(childrenNotes[options.lang] || childrenNotes.ja)}</p>` : ''}<div class="relwrap"><div class="relrow">${ids.map((id,i) => card(id, metadata[id], i, options)).join('')}</div><button type="button" class="relbtn prev" data-draft-rel-scroll="-1" aria-label="${esc(l[7])}">‹</button><button type="button" class="relbtn next" data-draft-rel-scroll="1" aria-label="${esc(l[8])}">›</button></div>${(model.groups[kind] || []).length > ids.length ? `<button type="button" class="relmore" data-relation-more="${kind}">${esc(cl[1])}</button>` : ''}${kind === 'children' && total > ids.length ? `<span class="cshop">${esc(cl[2])}: ${ids.length} / ${total}</span>` : ''}${kind === 'children' && total > (model.groups.children || []).length ? `<p class="cshop">${esc(capLabels[options.lang] || capLabels.ja)}</p>` : ''}</section>`;
     });
-    return html || `<p role="status">${esc(l[4])}</p>`;
+    return html;
   }
   // Every mount invalidates older responses, including A -> B -> A and same-ID retries.
   const mounts = new WeakMap();
