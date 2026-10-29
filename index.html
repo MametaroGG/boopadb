@@ -321,6 +321,7 @@
   .relsec{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
   .relmore{font-size:12.5px;font-weight:700;color:var(--sub);text-decoration:none;white-space:nowrap}
   .relmore:hover{color:var(--text)}
+  button.relmore{background:transparent;border:1px solid var(--sub);border-radius:8px;padding:7px 12px;cursor:pointer;margin:8px 12px 0 0;font-family:inherit}
   .relbtn{display:none;position:absolute;top:36%;transform:translateY(-50%);z-index:4;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(24,24,28,.88);color:#e8e8ec;cursor:pointer;align-items:center;justify-content:center;padding:0}
   .relbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
   .relbtn.prev{left:-6px}
@@ -1180,6 +1181,8 @@
     </div></div>
   </div>
 </div>
+<script src="relationship-data.js"></script>
+<script src="relationship-ui-draft.js"></script>
 <script src="image-drop.js"></script>
 <script src="image-search-engine.js?v=20261028-results-v3"></script>
 <script>
@@ -2189,38 +2192,26 @@ document.addEventListener("click", e => {
   const row = document.getElementById(rowId);
   if (row) row.scrollBy({ left: Number(dir) * row.clientWidth * 0.9, behavior: "smooth" });
 });
+// Reviewed snapshot UI gate: independent of withdrawn legacy refs/hero relations.
+const RELATION_UI_LIVE = true;
+const reviewedRelationData = typeof BoopaRelationshipData !== "undefined" ? BoopaRelationshipData.create({enabled:RELATION_UI_LIVE}) : null;
+let reviewedRelationEpoch = 0;
 async function loadRelations(x){
-  const myId = String(x.id);
-  const host0 = document.getElementById("ppRel");
-  if (!host0) return;
-  const alive = () => { const h = document.getElementById("ppRel"); return h && ppX && String(ppX.id) === myId ? h : null; };
-  const [meta, shard] = await Promise.all([fetchMeta(myId), fetchRelShard(Number(myId) % 8)]);
-  const host = alive(); if (!host) return;
-  const rel = relationParentIds(meta);
-  const parents = rel.ids.filter(r => r !== myId);
-  const kidEntry = shard ? shard[myId] : null;
-  const kidIds = kidEntry ? kidEntry[1] : [];
-  const kidTotal = kidEntry ? kidEntry[0] : 0;
-  _relState = { parents, parentFallback: !rel.strict, selfCat: meta && meta.category ? meta.category.name : null, kidIds };
-  const parts = [];
-  if (parents.length) parts.push(`<div class="pp-sec">${tr("pp_parents")}</div><div class="relwrap"><div class="relrow" id="relParents"></div>${relBtns("relParents")}</div>`);
-  if (kidIds.length) parts.push(`<div class="pp-sec relsec"><span>${tr("pp_children")}（${kidTotal}）</span><a class="relmore" href="index.html?children=${myId}">${tr("rel_more")}</a></div><div class="relwrap"><div class="relrow" id="relKids"></div>${relBtns("relKids")}</div>`);
-  host.innerHTML = parts.join("");
-  if (parents.length) await relRenderInto("p");
-  if (kidIds.length) await relRenderInto("k");
-}
-async function relRenderInto(kind){
-  if (!_relState || !ppX) return;
-  const myId = String(ppX.id);
-  const isP = kind === "p";
-  const ids = isP ? _relState.parents : _relState.kidIds.slice(0, 30);
-  const html = await relRenderCards(ids, { parentFallback: isP && _relState.parentFallback, selfCat: _relState.selfCat });
-  if (!ppX || String(ppX.id) !== myId) return;
-  const row = document.getElementById(isP ? "relParents" : "relKids");
-  if (!row) return;
-  row.innerHTML = html;
-  relObservePrices(row);
-  relBtnSync(row);
+  const epoch = ++reviewedRelationEpoch;
+  const host = document.getElementById("ppRel");
+  if (!host || !RELATION_UI_LIVE || !reviewedRelationData || typeof BoopaRelationshipDraft === "undefined") return;
+  const id = String(x.id);
+  const isCurrent = () => epoch === reviewedRelationEpoch && document.getElementById("ppRel") === host && ppX && String(ppX.id) === id;
+  host.innerHTML = BoopaRelationshipDraft.render({status:"unknown"},{},{lang:LANG});
+  const snapshot = await reviewedRelationData.get(id);
+  if (!isCurrent()) return;
+  await BoopaRelationshipDraft.mountSnapshot(host,id,snapshot,{
+    lang:LANG, bookmarkHTML:bmFlag, isCurrent,
+    fetchMeta:async target => {
+      const [meta,record] = await Promise.all([fetchMeta(target).catch(()=>null), Promise.resolve(PROD.get(target) || fetchItemRecord(target)).catch(()=>null)]);
+      return {...(meta || {}),name:meta && meta.name || record && record.name,price:record && typeof record.cur === "number" ? record.cur : null};
+    }
+  });
 }
 async function openItemSmart(id){
   if (PROD.has(String(id))) { openProduct(id); return; }
@@ -3822,6 +3813,8 @@ function closeChartPop(){ const p = document.getElementById("chartPop"); if (p) 
 document.addEventListener("keydown", e => { if (e.key === "Escape" && cpState) closeChartPop(); });
 let ppX = null, ppKeys = [];
 function renderProdPage(x){
+  const oldRelationHost=document.getElementById("ppRel");
+  if(oldRelationHost && typeof BoopaRelationshipDraft!=="undefined") BoopaRelationshipDraft.cancel(oldRelationHost);
   ppX = x;
   const bm = isBm(x.id);
   const keys = x.variations ? Object.keys(x.variations) : [];
@@ -4079,6 +4072,9 @@ function openProduct(id){
   renderPersonal();
 }
 function closeProduct(){
+  reviewedRelationEpoch++;
+  const relationHost=document.getElementById("ppRel");
+  if(relationHost && typeof BoopaRelationshipDraft!=="undefined") BoopaRelationshipDraft.cancel(relationHost);
   prodPage.classList.remove("open");
   veilSync();
 }
