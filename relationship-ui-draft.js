@@ -80,8 +80,8 @@
   function safeImage(value){
     try { const u = new URL(value); return u.protocol === 'https:' && !u.username && !u.password ? u.href : ''; } catch { return ''; }
   }
-  function cardFrame(attrs,href,media,name,shop,footer,index,linkAttrs=''){
-    return `<div class="card" ${attrs} style="animation-delay:${index % 30 * 45}ms"><a class="thumbwrap" href="${esc(href)}" ${linkAttrs}>${media}</a><div class="cbody"><div class="cname"><a href="${esc(href)}" ${linkAttrs}>${esc(name)}</a></div><div class="cshop">${esc(shop)}</div><div class="crow">${footer}</div></div></div>`;
+  function cardFrame(attrs,href,media,name,shop,footer,index,linkAttrs='',extraStyle=''){
+    return `<div class="card" ${attrs} style="animation-delay:${index % 30 * 45}ms;${extraStyle}"><a class="thumbwrap" href="${esc(href)}" ${linkAttrs}>${media}</a><div class="cbody"><div class="cname"><a href="${esc(href)}" ${linkAttrs}>${esc(name)}</a></div><div class="cshop">${esc(shop)}</div><div class="crow">${footer}</div></div></div>`;
   }
   function card(id, meta, index, options){
     if(!idOf(id))return '';
@@ -95,8 +95,8 @@
   function externalToolCard(tool,index,options={}){
     if(!tool||tool.toolKey!=='modular_avatar'||tool.url!=='https://modular-avatar.nadena.dev/ja'||tool.status!=='reviewed_required')return '';
     const l={ja:['外部ツール','公式サイト（日本語）'],en:['External tool','Official site (Japanese)'],ko:['외부 도구','공식 사이트 (일본어)'],'zh-Hans':['外部工具','官方网站（日语）'],'zh-Hant':['外部工具','官方網站（日語）']}[options.lang]||['外部ツール','公式サイト（日本語）'];
-    const media='<span class="phcard" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="8" y="8" width="32" height="32" rx="8"/><path d="M17 15v18m14-18v18M13 20h8m6 8h8"/></svg></span>';
-    return cardFrame('data-external-tool="modular_avatar"',tool.url,media,'Modular Avatar',l[0],`<span class="cshop">${esc(l[1])}</span>`,index,'target="_blank" rel="noopener noreferrer"');
+    const media='<img src="relation-supplement/assets/modular-avatar-logo.png?v=19e09e96c1fdbe4f" alt="Modular Avatar" width="2057" height="572" decoding="async" loading="lazy" style="object-fit:contain;box-sizing:border-box;padding:12px;background:#131316;transform:none;transition:none">';
+    return cardFrame('data-external-tool="modular_avatar"',tool.url,media,'Modular Avatar',l[0],`<span class="cshop">${esc(l[1])}</span>`,index,'target="_blank" rel="noopener noreferrer"','animation:none;transform:none;transition:none;');
   }
   function rail(cards,options={}){
     const l=labels[options.lang]||labels.ja;
