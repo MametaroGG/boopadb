@@ -32,18 +32,29 @@
         if(manifest.schema!==schema||manifest.shards!==64||!/^[a-f0-9]{64}$/.test(manifest.version))throw Error('relations manifest');
         const bucket=Number(BigInt(id)%64n), childBucket=Number(BigInt(id)%8n);
         const paths=[`relation-data/items_${bucket}.json?v=${manifest.version}`,`relation-data/children_${childBucket}.json?v=${manifest.version}`];
-        const data=await Promise.all(paths.map(json));
-        for(let i=0;i<data.length;i++){
-          const d=data[i];
+        const settled=await Promise.allSettled(paths.map(json));
+        const records=settled.map((result,i)=>{
+          if(result.status!=='fulfilled')return null;
+          const d=result.value;
           if(!d||d.schema!==schema||d.version!==manifest.version||!d.items||typeof d.items!=='object'||Array.isArray(d.items)){
-            cache.delete(paths[i]);cache.delete('relation-data/manifest.json');throw Error('relations generation mismatch');
+            cache.delete(paths[i]);cache.delete('relation-data/manifest.json');return null;
           }
+          return d.items;
+        });
+        const hasEntry=records[0]&&Object.prototype.hasOwnProperty.call(records[0],id);
+        let entry=hasEntry?records[0][id]:null;
+        let outgoingStatus=records[0] ? hasEntry?'loaded':'missing' : 'error';
+        if(hasEntry && (!entry||typeof entry!=='object'||!['parents','prerequisites','thumbnail'].every(k=>Array.isArray(entry[k])&&entry[k].every(validId)))){
+          entry=null;outgoingStatus='error';cache.delete(paths[0]);
         }
-        const entry=Object.prototype.hasOwnProperty.call(data[0].items,id)?data[0].items[id]:null;
-        const child=Object.prototype.hasOwnProperty.call(data[1].items,id)?data[1].items[id]:null;
-        if(child&&(!Array.isArray(child)||child.length!==2||!Number.isSafeInteger(child[0])||child[0]<0||!Array.isArray(child[1])||child[1].length!==Math.min(child[0],2000)||!child[1].every(x=>validId(x)&&x!==id)||new Set(child[1]).size!==child[1].length))throw Error('relations children');
-        return {status:'loaded',entry,children:child?child[1]:[],childrenTotal:child?child[0]:0,version:manifest.version};
-      }catch(error){cache.clear();return {status:'unknown',error:String(error.message||error)};}
+        const hasChild=records[1]&&Object.prototype.hasOwnProperty.call(records[1],id);
+        let child=hasChild?records[1][id]:null;
+        let childrenStatus=records[1]?'loaded':'error';
+        if(hasChild&&(!Array.isArray(child)||child.length!==2||!Number.isSafeInteger(child[0])||child[0]<0||!Array.isArray(child[1])||child[1].length!==Math.min(child[0],2000)||!child[1].every(x=>validId(x)&&x!==id)||new Set(child[1]).size!==child[1].length)){
+          child=null;childrenStatus='error';cache.delete(paths[1]);
+        }
+        return {status:outgoingStatus==='error'&&childrenStatus==='error'?'unknown':'loaded',entry,outgoingStatus,childrenStatus,children:child?child[1]:[],childrenTotal:child?child[0]:0,version:manifest.version};
+      }catch(error){cache.clear();return {status:'unknown',outgoingStatus:'error',childrenStatus:'error',error:String(error.message||error)};}
     }
     return {get,clear:()=>cache.clear()};
   }

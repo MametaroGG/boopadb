@@ -321,7 +321,7 @@
   .relsec{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
   .relmore{font-size:12.5px;font-weight:700;color:var(--sub);text-decoration:none;white-space:nowrap}
   .relmore:hover{color:var(--text)}
-  button.relmore{background:transparent;border:1px solid var(--sub);border-radius:8px;padding:7px 12px;cursor:pointer;margin:8px 12px 0 0;font-family:inherit}
+  button.relmore,a.relmore[data-relation-search]{display:inline-block;background:transparent;border:1px solid var(--sub);border-radius:8px;padding:7px 12px;cursor:pointer;margin:8px 12px 0 0;font-family:inherit}
   .relbtn{display:none;position:absolute;top:36%;transform:translateY(-50%);z-index:4;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(24,24,28,.88);color:#e8e8ec;cursor:pointer;align-items:center;justify-content:center;padding:0}
   .relbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
   .relbtn.prev{left:-6px}
@@ -632,6 +632,8 @@
   .pcard .pimgw{position:relative;display:block}
   .pcard .bmflag{top:0;left:0;border-radius:10px 0 0 0}
   .pp-sec{font-size:15px;font-weight:800;margin:24px 0 10px}
+  #ppRel:not(:empty){padding-top:24px}
+  #ppRel>section:first-child>.pp-sec{margin-top:0}
   .chgtable{display:grid;grid-template-columns:86px 46px minmax(0,1fr) minmax(0,1fr) auto;column-gap:10px;font-size:13px;padding:0 2px}
   .chgtable>*{padding:8px 0;border-bottom:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;min-width:0}
   .chgtable .cd{color:var(--faint)}
@@ -1181,8 +1183,9 @@
     </div></div>
   </div>
 </div>
-<script src="relationship-data.js"></script>
-<script src="relationship-ui-draft.js?v=af5ed6e94c977950"></script>
+<script src="relationship-data.js?v=1e771e8fcebf4deb"></script>
+<script src="relationship-search.js?v=e6fa3c5693bb1eca"></script>
+<script src="relationship-ui-draft.js?v=58c7dc2bb6c44c92"></script>
 <script src="image-drop.js"></script>
 <script src="image-search-engine.js?v=20261028-results-v3"></script>
 <script>
@@ -1802,6 +1805,7 @@ function openSearch(){
   setTimeout(() => { if (spage.classList.contains("open")) document.getElementById("spQ").focus(); }, 380);
 }
 function closeSearch(){
+  spRelClear();
   // Leaving search clears the relation/category filter modes, so the
   // next visit starts unfiltered instead of staying trapped in them.
   if (spRelId || spRelIds || spCatMode || spShopMode || spImgMode) {
@@ -2202,7 +2206,7 @@ async function loadRelations(x){
   if (!host || !RELATION_UI_LIVE || !reviewedRelationData || typeof BoopaRelationshipDraft === "undefined") return;
   const id = String(x.id);
   const isCurrent = () => epoch === reviewedRelationEpoch && document.getElementById("ppRel") === host && ppX && String(ppX.id) === id;
-  host.innerHTML = BoopaRelationshipDraft.render({status:"unknown"},{},{lang:LANG});
+  host.innerHTML = BoopaRelationshipDraft.render({status:"loading"},{},{lang:LANG});
   const snapshot = await reviewedRelationData.get(id);
   if (!isCurrent()) return;
   await BoopaRelationshipDraft.mountSnapshot(host,id,snapshot,{
@@ -2424,7 +2428,7 @@ function spRender(reset = true){
     if(spCatMode || spShopMode || spRelIds){
       const rel=spRelIds?new Set(spRelIds.map(String)):null;
       const category=spCatMode?spCatMode.toLowerCase().normalize("NFKC"):null;
-      hits=spCatalogHits().filter(x=>(!category||spCatMap.get(String(x.id))===category)&&(!spShopMode||x.shop===spShopMode)&&(!rel||rel.has(String(x.id))));
+      hits=spCatalogHits().filter(x=>(!category||spCatMap.get(String(x.id))===category)&&(typeof spShopMode==="undefined"||!spShopMode||x.shop===spShopMode)&&(!rel||rel.has(String(x.id))));
     }
     if(broad && !spCatMode && !spShopMode && !spRelIds && (!q || spFilter!=='all')){
       hits=spCatalogHits();
@@ -2447,6 +2451,9 @@ function spRender(reset = true){
       const allowed=new Set((chipSet(spFilter)||[]).map(x=>String(x.id)));hits=hits.filter(x=>allowed.has(String(x.id)));
     }
   }
+  if(spRelId && spRelLoadState==="ready" && fullIndex)hits=spRelHits(q);
+  // While the child scope/catalog is incomplete, never fall back to unrelated items.
+  if(spRelId && (spRelLoadState!=="ready" || !fullIndex))hits=[];
   if (spMaxPrice != null) hits = hits.filter(x => x.cur != null && x.cur <= spMaxPrice);
   if (spSort !== "rel") {
     const by = {
@@ -2464,12 +2471,13 @@ function spRender(reset = true){
   document.getElementById("spCount").textContent = (!fullIndex && !spImgMode ? spCatalogCopy()[3]+" · " : "") + (countOverride || tr("sp_count", {n: hits.length}));
   spCatalogStatusSync();
   spModeSync(hits.length);
+  spRelStatusSync();
   spPriceLabel();
   spFilterBtnLabel();
   spSortSync();
   document.getElementById("spClear").hidden = !q;
   document.getElementById("spQ").parentElement.classList.toggle("has-query", !!q);
-  document.getElementById("spEmpty").style.display = hits.length ? "none" : "block";
+  document.getElementById("spEmpty").style.display = (spRelId && (spRelLoadState!=="ready" || !fullIndex)) || hits.length ? "none" : "block";
   spTotal = hits.length;
   // Append-only: rebuilding the whole grid per batch repainted every card
   // and restarted every entrance animation, which is what turned fast
@@ -2492,6 +2500,58 @@ function spRender(reset = true){
   if (fillFrom >= 0) hits.slice(fillFrom, spRendered).forEach(x => { if (x.plain) fillPriceLazy(x.id); });
 }
 let spRelId = null, spRelIds = null, spRelName = "";
+let spRelEpoch = 0, spRelLoadState = "idle", spRelTotal = 0;
+const completeRelationSearch = typeof BoopaRelationshipSearch !== "undefined" ? BoopaRelationshipSearch.create() : null;
+function spRelCopy(){ return ({
+  ja:["子作品データを読み込み中","子作品データを取得できませんでした。全件検索には切り替えていません。","再試行","子作品","商品データあり","未収録","商品データを読み込み中"],
+  en:["Loading derivative works","Could not load derivative works. Search has not switched to the full catalog.","Retry","Derivative works","In catalog","Unavailable","Loading catalog"],
+  ko:["파생 작품 불러오는 중","파생 작품을 불러오지 못했습니다. 전체 검색으로 전환하지 않았습니다.","다시 시도","파생 작품","상품 데이터 있음","미수록","상품 데이터 불러오는 중"],
+  "zh-Hans":["正在加载子作品","无法加载子作品，未切换为全部商品搜索。","重试","子作品","有商品数据","未收录","正在加载商品数据"],
+  "zh-Hant":["正在載入子作品","無法載入子作品，未切換為全部商品搜尋。","重試","子作品","有商品資料","未收錄","正在載入商品資料"]
+})[LANG] || ["Loading derivative works","Could not load derivative works. Search remains scoped.","Retry","Derivative works","In catalog","Unavailable","Loading catalog"]; }
+function spRelHits(q){
+  const allowed=new Set(spRelIds),category=spCatMode?spCatMode.toLowerCase().normalize("NFKC"):null;
+  const matching=q?new Set(fullIndex.filter(e=>e[2].includes(q)||(e[8]&&e[8].includes(q))).map(e=>e[0])):null;
+  let hits=spCatalogHits().filter(x=>allowed.has(String(x.id))&&(!category||spCatMap.get(String(x.id))===category)&&(typeof spShopMode==="undefined"||!spShopMode||x.shop===spShopMode)&&(!matching||matching.has(String(x.id))));
+  if(spFilter==="free")hits=hits.filter(x=>x.cur===0);
+  if(spFilter==="sale")hits=hits.filter(x=>!!x.sale);
+  if(spFilter==="lowest")hits=hits.filter(x=>!!x.at_lowest);
+  if(["drop","new","rising"].includes(spFilter)){const chipIds=new Set((chipSet(spFilter)||[]).map(x=>String(x.id)));hits=hits.filter(x=>chipIds.has(String(x.id)));}
+  if(spSort==="rel"){const order=new Map(spRelIds.map((id,i)=>[id,i]));hits.sort((a,b)=>order.get(String(a.id))-order.get(String(b.id)));}
+  return hits;
+}
+function spRelStatusSync(){
+  let el=document.getElementById("spRelStatus");
+  if(!el){el=document.createElement("div");el.id="spRelStatus";el.setAttribute("role","status");el.style.cssText="margin:10px 0;overflow-wrap:anywhere;min-width:0";document.getElementById("spGrid").before(el);}
+  el.hidden=!spRelId;if(!spRelId){el.textContent="";return;}
+  const c=spRelCopy();el.textContent="";
+  if(spRelLoadState==="error"){
+    const msg=document.createElement("span");msg.textContent=c[1];el.appendChild(msg);
+    const retry=document.createElement("button");retry.type="button";retry.textContent=c[2];retry.style.marginInlineStart="10px";retry.onclick=()=>spRelLoad(spRelId);el.appendChild(retry);
+  }else if(spRelLoadState!=="ready")el.textContent=c[0];
+  else if(!fullIndex)el.textContent=c[6]+" · "+c[3]+": "+spRelTotal.toLocaleString(LOCALE);
+  else {
+    const catalogIds=new Set(fullIndex.map(e=>String(e[0]))),available=spRelIds.filter(id=>catalogIds.has(id)).length;
+    el.textContent=c[3]+": "+spRelTotal.toLocaleString(LOCALE)+" / "+c[4]+": "+available.toLocaleString(LOCALE)+(available<spRelTotal?" / "+c[5]+": "+(spRelTotal-available).toLocaleString(LOCALE):"");
+  }
+}
+function spRelClear(updateURL=true){
+  spRelEpoch++;spRelId=null;spRelIds=null;spRelName="";spRelLoadState="idle";spRelTotal=0;
+  if(updateURL){try{const u=new URL(location.href);u.searchParams.delete("children");history.replaceState(null,"",u.pathname+u.search+u.hash);}catch{}}
+}
+async function spRelLoad(id){
+  if(!/^[1-9]\d{0,15}$/.test(id || ""))return;
+  const epoch=++spRelEpoch;spRelId=id;spRelIds=[];spRelName="#"+id;spRelTotal=0;spRelLoadState="loading";
+  openSearch();
+  const result=completeRelationSearch?await completeRelationSearch.get(id):{status:"error"};
+  if(epoch!==spRelEpoch || spRelId!==id || !spage.classList.contains("open"))return;
+  if(result.status!=="ready"){spRelLoadState="error";spRender();return;}
+  spRelIds=result.ids;spRelTotal=result.total;spRelLoadState="ready";spRender();
+  const m=await fetchMeta(id);
+  if(epoch!==spRelEpoch || spRelId!==id || !spage.classList.contains("open"))return;
+  if(m&&m.name)spRelName=m.name;spModeSync(spTotal);
+}
+
 let spCatMode = null, spCatNames = new Map(); let spShopMode = null; let spImgMode = false, spImgHits = [], spImgState = null, spImgThumb = null, spImgLabel = "";
 function spModeSync(n){
   const bar = document.getElementById("spMode");
@@ -2510,26 +2570,22 @@ function spModeSync(n){
   if (label) document.getElementById("spModeT").textContent = label;
 }
 document.getElementById("spModeX").addEventListener("click", () => {
+  spRelClear();
   spRelId = null; spRelIds = null; spRelName = ""; spCatMode = null; spShopMode = null; imgClearMode(); spCatSync();
   try { history.replaceState(null, "", location.pathname); } catch {}
   spRender();
 });
 async function spRelBoot(){
-  const shp = new URLSearchParams(location.search).get("shop");
-  if (shp) { spShopMode = shp; openSearch(); loadFullIndex(); }
-  const cid = new URLSearchParams(location.search).get("children");
-  if (!cid || !/^\d+$/.test(cid)) return;
-  spRelId = cid;
-  openSearch();
-  loadFullIndex();
-  const shard = await fetchRelShard(Number(cid) % 8);
-  const ent = shard ? shard[cid] : null;
-  spRelIds = ent ? ent[1].map(String) : [];
-  const m = await fetchMeta(cid);
-  if (m && m.name) spRelName = m.name;
-  if (spage.classList.contains("open")) spRender(false);
+  const params=new URLSearchParams(location.search),cid=params.get("children"),shp=params.get("shop");
+  if(cid && /^[1-9]\d{0,15}$/.test(cid)){if(shp && typeof spShopMode!=="undefined")spShopMode=shp;return spRelLoad(cid);}
+  if(shp && typeof spShopMode!=="undefined"){spShopMode=shp;openSearch();}
 }
-document.getElementById("spQ").addEventListener("input", () => { if (spRelId || spImgMode) { spRelId = null; spRelIds = null; spRelName = ""; imgClearMode(); spCatSync(); spRender(); } });
+window.addEventListener("popstate",()=>{
+  const cid=new URLSearchParams(location.search).get("children");
+  if(cid && /^[1-9]\d{0,15}$/.test(cid))spRelLoad(cid);
+  else {spRelClear(false);if(spage.classList.contains("open"))spRender();}
+});
+document.getElementById("spQ").addEventListener("input",()=>{if(typeof spImgMode!=="undefined" && spImgMode){imgClearMode();spCatSync();spRender();}});
 setTimeout(spRelBoot, 0);
 const spSide = document.querySelector(".sp-side");
 function spSideSet(open){ spSide.classList.toggle("open", open); document.body.classList.toggle("spfilter-open", open); }
@@ -2538,7 +2594,7 @@ document.getElementById("spFilterBtn").addEventListener("click", () => spSideSet
 document.getElementById("spSideX").addEventListener("click", () => spSideSet(false));
 document.getElementById("spFilterShow").addEventListener("click", () => spSideSet(false));
 document.getElementById("spFilterReset").addEventListener("click", () => {
-  spCatMode=null;spShopMode=null;spRelId=null;spRelIds=null;spRelName="";imgClearMode();spCatSync();
+  spCatMode=null;spShopMode=null;imgClearMode();spCatSync();
   spFilter = "all";
   document.querySelectorAll("#spChips .chip").forEach(y => y.classList.toggle("on", y.dataset.f === "all"));
   spMaxPrice = null;
@@ -2624,7 +2680,7 @@ function openSearchShop(name){
   if (!fullIndex) loadFullIndex();
   spFilter = "all";
   document.getElementById("spChips").querySelectorAll(".chip").forEach(y => y.classList.toggle("on", y.dataset.f === "all"));
-  spCatMode = null; spRelId = null; spRelIds = null; spRelName = "";
+  spCatMode = null; spRelClear();
   spCatSync();
   document.getElementById("spQ").value = "";
   spShopMode = name;
@@ -2635,7 +2691,7 @@ function openSearchTag(t){
   if (!fullIndex) loadFullIndex();
   spFilter = "all";
   document.getElementById("spChips").querySelectorAll(".chip").forEach(y => y.classList.toggle("on", y.dataset.f === "all"));
-  spCatMode = null; spRelId = null; spRelIds = null; spRelName = ""; spShopMode = null; imgClearMode();
+  spCatMode = null; spRelClear(); spShopMode = null; imgClearMode();
   spCatSync();
   document.getElementById("spQ").value = t;
   spRender();
@@ -2646,7 +2702,7 @@ function openSearchCat(raw){
   spFilter = "all";
   document.getElementById("spChips").querySelectorAll(".chip").forEach(y => y.classList.toggle("on", y.dataset.f === "all"));
   document.getElementById("spQ").value = "";
-  spCatMode = raw; spRelId = null; spRelIds = null; spRelName = ""; spShopMode = null;
+  spCatMode = raw; spRelClear(); spShopMode = null;
   spCatSync();
   spRender();
   openSearch();
@@ -2930,7 +2986,6 @@ function spCatRender(){
     k.onclick = () => {
       if (!fullIndex) loadFullIndex();
       spCatMode = spCatMode === k.dataset.cat ? null : k.dataset.cat;
-      spRelId = null; spRelIds = null; spRelName = "";
       spCatSync();
       spRender();
       spSideSet(false);
@@ -4110,7 +4165,7 @@ function imgHitsFromApi(results){
   });
 }
 function imgSetMode(label, thumb){
-  spCatMode = null; spRelId = null; spRelIds = null; spRelName = ""; spShopMode = null;
+  spCatMode = null; spRelClear(); spShopMode = null;
   spCatSync();
   spFilter = "all";
   document.getElementById("spChips").querySelectorAll(".chip").forEach(y => y.classList.toggle("on", y.dataset.f === "all"));
