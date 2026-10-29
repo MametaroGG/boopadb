@@ -1909,11 +1909,45 @@ function spCatalogHits(){
   if (!spCatalogCache.byId) spCatalogCache.byId = new Map(spCatalogCache.hits.map(x=>[String(x.id),x]));
   return spCatalogCache.hits;
 }
+// Keep only the usable landing candidates; equal likes retain catalog order.
+// Each catalog stream has unique IDs, so its first 3000 suffice for 3000
+// deduplicated results even when history and the other streams overlap.
+function spTopLiked(rows, limit = 3000, categories = null){
+  const heap = [];
+  const worse = (a, b) => a.likes < b.likes || (a.likes === b.likes && a.order > b.order);
+  for (let order = 0; order < rows.length; order++) {
+    const row = rows[order];
+    if (categories && !categories.has(row[8])) continue;
+    const likes = row[9] || 0;
+    if (heap.length === limit && (likes < heap[0].likes || (likes === heap[0].likes && order > heap[0].order))) continue;
+    const entry = {row, likes, order};
+    if (heap.length < limit) {
+      let i = heap.length; heap.push(entry);
+      while (i > 0) {
+        const parent = (i - 1) >> 1;
+        if (!worse(entry, heap[parent])) break;
+        heap[i] = heap[parent]; i = parent;
+      }
+      heap[i] = entry;
+    } else {
+      let i = 0;
+      while (i * 2 + 1 < heap.length) {
+        let child = i * 2 + 1;
+        if (child + 1 < heap.length && worse(heap[child + 1], heap[child])) child++;
+        if (!worse(heap[child], entry)) break;
+        heap[i] = heap[child]; i = child;
+      }
+      heap[i] = entry;
+    }
+  }
+  return heap.sort((a, b) => b.likes - a.likes || a.order - b.order).map(x => x.row);
+}
 let spLandingCache = { key: null, hits: null };
 function spLandingHits(){
   const key = fullIndex.length + "|" + HIST.map(h => h.id).join(",") + "|" + BMS.map(b => b.id).join(",");
   if (spLandingCache.key === key) return spLandingCache.hits;
-  const byIdF = new Map(fullIndex.map(e => [e[0], e]));
+  const byIdF = new Map();
+  for (const e of fullIndex) byIdF.set(e[0], e);
   const rich = new Map(spIndex.map(x => [String(x.id), x]));
   const plainOf = e => ({id: e[0], name: e[1], shop: e[13] || "", image: e[10] || null, cur: e[3], base: e[4], lowest: e[5], sale: !!e[6], pct: e[4] > e[3] ? Math.round((1 - e[3] / e[4]) * 100) : 0, at_lowest: !!e[7], plain: e[3] === null || e[3] === undefined, likes: e[9] || 0, first_date: isoFD(e[11]), per_day: (e[12] || 0) / 10});
   const objOf = id => rich.get(String(id)) || (byIdF.has(String(id)) ? plainOf(byIdF.get(String(id))) : null);
@@ -1921,8 +1955,8 @@ function spLandingHits(){
   const push = x => { if (x && !seen.has(String(x.id))) { seen.add(String(x.id)); out.push(x); } };
   HIST.slice(0, 12).forEach(h => push(objOf(h.id) || {id: h.id, name: h.name, shop: h.shop || "", image: h.image || null, cur: h.cur, base: h.cur, pct: 0, plain: true}));
   const bmCats = new Set(BMS.map(b => spCatMap.get(String(b.id))).filter(Boolean));
-  const bmStream = bmCats.size ? fullIndex.filter(e => bmCats.has(e[8])).sort((a, b) => (b[9] || 0) - (a[9] || 0)) : [];
-  const popStream = [...fullIndex].sort((a, b) => (b[9] || 0) - (a[9] || 0));
+  const bmStream = bmCats.size ? spTopLiked(fullIndex, 3000, bmCats) : [];
+  const popStream = spTopLiked(fullIndex);
   const newSeen = new Set(spIndex.map(x => String(x.id)));
   const newStream = [...spIndex, ...(chipSet("new") || []).filter(x => !newSeen.has(String(x.id)))];
   const streams = [
