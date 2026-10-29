@@ -36,8 +36,8 @@
     "image-search-page.js": "15bf85d6cdd2fefafca5d782156776205baa86593953b7895fdcc05f41a6bc92",
     "image-search.css": "a00dbbeba06d4202da957ccc8319728e6f11f4d76a952d703316f5ec6cccf256",
     "image-search.html": "85b5ac2d18ddf47c2f651880ae309b2488057e24c65ca9f8a9db26a4f6b6b756",
-    "index.html": "f3811d4224f3402d910f283a9746695af2c302cd317e574f42dfb1215c11176c",
-    "item.html": "466a434b8bebf2996a8924e8a3735786ee8d71984bab092d5702b872bebfcc60",
+    "index.html": "4a14164ea2e43865c41720f0a5d9f20d336b2a58ab44ac51a837b9039411eb1a",
+    "item.html": "b4de65133a65c62586b38615ca042ec498869983eaf715b67b9f6ffe6f9c6ff6",
     "lists_full.json": "15697560ac7e0c86c8e1326c517efaa65c9d52b7a4225f6eccb7d2fd44b2a906",
     "manifest.webmanifest": "3987b4de918c0a2ea0644065e641ff698edb5f77fa55673cfeb9b214c62d1747",
     "new.html": "2b1f9e2da876324992799ccc651577b887f9e124c2932ad5f9dd5e84a880afa5",
@@ -196,7 +196,8 @@
     "site-update.js": "35b7a6a4e239871e9b8bce16a924796e0144a802449d43c03da749f570a67b6e",
     "sw.js": "d4639d034c6d9d54400f872b5aebbdde34873ddbabbd9feee72b418ecba404d6",
     "terms.html": "a0c81e7109eab616e138abb4970e18a3c2abe1a9642865b749d0cfde78083fbd",
-    "updates.html": "0fb75230fca366f41817022216af8d9cd42bdcc99f059056d98716272a82672f"
+    "updates.html": "0fb75230fca366f41817022216af8d9cd42bdcc99f059056d98716272a82672f",
+    "catalog-cache.js": "e0d279c631f6833d2171c3993d27bbf239ed1082c673f8810288bf8207cc78f7"
   },
   "validation": {
     "ok": true,
@@ -328,11 +329,11 @@
     "approval_sha256": "3ebfcf2965b2f980f5af29b9284b6e151650a575d9fbea48dca3667da928a6dc",
     "scope": "publication-approved"
   },
-  "build_mode": "reviewed-single-item-relation-correction-and-search-CPU-optimization",
+  "build_mode": "reviewed-static-catalog-cache-candidate",
   "raw_rebuild_performed": false,
-  "source_candidate_manifest_sha256": "0a93474f5e5581c425e6b7892d22193ff1173d5ec618e8cfa907c63add53374d",
-  "raw_provenance_note": "Exact inherited86fcbef catalog/raw inputs; only independently reviewed4847896 outgoing graph delta; no new crawl/raw rebuild. Search landing top-K CPU optimization only; no catalog, network or policy-content changes.",
-  "publication_base_commit": "86fcbef0f0e6c3fef5aef972780eb69e57f5b9e8",
+  "source_candidate_manifest_sha256": "51bb0b743e2fca4d6130f4b90bfef6aa329f05d3fdcc9a72d718b8bac4615cf8",
+  "raw_provenance_note": "Exact inherited fff389f catalog, relationship data and runtime; only index/item static cache integration and new catalog-cache.js. No new crawl/raw rebuild or backend query transmission.",
+  "publication_base_commit": "fff389f8468cb0d2a6e086fdbbf8170da8d8b960",
   "semantic_patch_sha256": "b9845c53ecce0f37d78c3c5016f1035e0a93a1b70a2d27a097512f67c32f88e6",
   "semantic_review_sha256": "aef9d8da43c6e47fcd025eb62daa076913d4a395487317439d4e1efd4192aa7d",
   "search_patch_sha256": "4eabdcc22869667e82678250fab61ea191c03a0ec60c16217609864ed30b7979",
@@ -341,5 +342,15 @@
     "No new raw rebuild or independent producer-completion attestation",
     "Nine parents are reviewed variant-union links, not a claim every variant supports every avatar",
     "Missing Shinra4707634 catalog metadata retains existing generic ID/link placeholder"
-  ]
+  ],
+  "catalog_cache": {
+    "version": 1,
+    "scope": "public-static-shards-only",
+    "new_query_transmission": false,
+    "manifest": "fresh-no-store",
+    "reuse": "sha256-verified-per-shard",
+    "decode_concurrency": 2,
+    "maximum_unresolved_writes": 2,
+    "device_performance_verified": false
+  }
 }
