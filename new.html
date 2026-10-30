@@ -1004,6 +1004,29 @@ function displayChangePercent(from, to){
 }
 // DISCOUNT_DISPLAY_GUARD_END
 </script>
+<script id="current-variant-presentation">const CURRENT_VARIANT_SNAPSHOT="6ef779228e1bc5c7884b7886ef228d36ccd49fc468cbdccd104bbf6205ebdba0";const CURRENT_VARIANT_PROOFS={"schema":1,"entries":{"5846349":{"observed_at":"2026-10-30","current_variants":{"verified_current":true,"complete":false,"observed_at":"2026-10-30","source":{"kind":"official_item_json","item_id":"5846349","sha256":"29e16aaa03ed9cc14dc900f7608c6982959fa8830806e27ec5d406b4abda91aa"},"items":[{"id":"9871542","name":"オリジナル3Dモデル【まつり】","price":2480,"available":true,"status":"addable_to_cart","sale_evidence":null},{"id":"12736779","name":"【単体アイテム】キセルのみ【全アバター対応】","price":0,"available":true,"status":"free_download","sale_evidence":null}]},"expected_cur":2480,"expected_base":5480,"snapshot_id":"6ef779228e1bc5c7884b7886ef228d36ccd49fc468cbdccd104bbf6205ebdba0"}}};
+const VerifiedVariants=(()=>{function verified(proof){const v=proof&&proof.current_variants;if(!v||v.verified_current!==true||v.observed_at!==proof.observed_at||!/^\d{4}-\d{2}-\d{2}$/.test(v.observed_at)||!Array.isArray(v.items)||!v.items.length)return null;const ids=v.items.map(x=>x&&x.id);if(ids.some(x=>typeof x!=='string'||!x)||new Set(ids).size!==ids.length)return null;return v;}
+function known(v){return v.items.filter(x=>x.available===true&&typeof x.price==='number'&&Number.isFinite(x.price)&&x.price>=0);}
+function freeLabel(proof){const v=verified(proof);if(!v)return null;const xs=known(v),free=xs.filter(x=>x.price===0).length,paid=xs.filter(x=>x.price>0).length;if(free&&paid)return '一部無料';if(v.complete!==true||v.items.some(x=>!([true,false].includes(x.available)))||v.items.some(x=>x.available===true&&!xs.includes(x)))return null;return free&&!paid?(xs.length===1?'無料':'全て無料'):null;}
+function saleKnown(x,v){const s=x.sale_evidence;return !!(s&&s.confirmed===true&&s.basis==='same_variant_history'&&s.variant_id===x.id&&s.current===x.price&&s.observed_at===v.observed_at);}
+function project(record,proof,context='all',snapshotDate=null){
+ let v=verified(proof);if(v&&(!v.source||v.source.item_id!==String(record.id)))v=null;const base={displayPrice:record.cur,filterPrice:record.cur,sortPrice:record.cur,variantName:null,freeLabel:v?freeLabel(proof):null,saleSelected:false};if(!v||context!=='sale'||snapshotDate!==v.observed_at)return base;
+ const options=known(v).filter(x=>saleKnown(x,v)).sort((a,b)=>a.price-b.price||a.id.localeCompare(b.id));if(!options.length)return base;const x=options[0];return {...base,displayPrice:x.price,filterPrice:x.price,sortPrice:x.price,variantName:x.name||null,saleSelected:true};
+}
+function heroGroups(proof){const v=verified(proof);if(!v)return [];const groups=new Map();for(const x of known(v)){const sale=saleKnown(x,v),key=x.price+':'+sale;if(!groups.has(key))groups.set(key,{price:x.price,sale,names:[],ids:[]});const g=groups.get(key);g.names.push(x.name||x.id);g.ids.push(x.id);}return [...groups.values()].sort((a,b)=>Number(b.sale)-Number(a.sale)||a.price-b.price);}
+const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function heroMarkup(proof,labels={heading:'確認できたバリエーション価格',sale:'セール',free:'無料',more:'ほか'}){const groups=heroGroups(proof);if(groups.length<2)return '';return '<div class="verified-hero-prices"><div class="variant-price-caption">'+esc(labels.heading)+'</div>'+groups.slice(0,3).map(g=>'<div class="variant-price-row"><span>'+esc(g.names.join(' / '))+'</span><strong>'+(g.sale?'<span class="variant-sale">'+esc(labels.sale)+'</span>':'')+(g.price===0?esc(labels.free):'¥'+g.price.toLocaleString('ja-JP'))+'</strong></div>').join('')+(groups.length>3?'<span>'+esc(labels.more)+' '+(groups.length-3)+'</span>':'')+'</div>';}
+const heroCSS='.verified-hero-prices{display:none}@media(min-width:900px){.hero .verified-hero-prices{display:block;min-width:0}.variant-price-row{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-top:8px}.variant-price-row>span{min-width:0;overflow-wrap:anywhere}.variant-price-row strong{flex-shrink:0}.variant-sale{font-size:12px;margin-right:6px}.variant-price-caption{font-size:12px;opacity:.75}}';
+
+return {freeLabel,heroMarkup,project};})();
+function verifiedVariantProof(x){const p=CURRENT_VARIANT_PROOFS.entries[String(x.id)];return p&&p.current_variants&&p.current_variants.source&&p.current_variants.source.item_id===String(x.id)&&p.snapshot_id===CURRENT_VARIANT_SNAPSHOT&&p.expected_cur===x.cur&&p.expected_base===x.base?p:null;}
+function variantLabels(){return ({ja:['無料','全て無料','一部無料','確認できたバリエーション価格','セール','ほか','バリエーション確認日'],en:['Free','All free','Partly free','Observed variation prices','Sale','more','Variations checked'],ko:['무료','모두 무료','일부 무료','확인된 옵션 가격','세일','추가','옵션 확인일'],'zh-Hans':['免费','全部免费','部分免费','已确认的款式价格','促销','更多','款式确认日期'],'zh-Hant':['免費','全部免費','部分免費','已確認的款式價格','促銷','更多','款式確認日期']})[typeof LANG==='string'?LANG:'ja']||['Free','All free','Partly free','Observed variation prices','Sale','more','Variations checked'];}
+function verifiedVariantBadge(x){const p=verifiedVariantProof(x),code=p&&VerifiedVariants.freeLabel(p);if(!code)return '';const i=['無料','全て無料','一部無料'].indexOf(code);return `<span class="vavailability" title="${variantLabels()[6]}: ${p.observed_at}">${variantLabels()[i]}</span>`;}
+function verifiedVariantDetail(x){const p=verifiedVariantProof(x);if(!p)return '';return `<div class="vobserved">${verifiedVariantBadge(x)} ${variantLabels()[6]}: ${p.observed_at}</div>`;}
+function verifiedHeroPrices(x){const p=verifiedVariantProof(x);if(!p)return '';const l=variantLabels();return VerifiedVariants.heroMarkup(p,{heading:l[3]+' · '+p.observed_at,sale:l[4],free:l[0],more:l[5]});}
+function withVariantBadge(html,x){const badge=verifiedVariantBadge(x);if(!badge)return html;for(const marker of ['<div class="crow">','<div class="caprow">','<div class="bprow">'])if(html.includes(marker))return html.replace(marker,marker+badge);return badge+html;}
+</script>
+<style id="current-variant-style">.vavailability{display:inline-block;font-size:11px;line-height:1.4;padding:3px 5px;background:var(--green-bg,#edf0e6);color:inherit;border-radius:3px;white-space:nowrap}.vobserved{font-size:12px;color:var(--sub);margin:8px 0}.verified-hero-prices{display:none}@media(min-width:900px){.hslide .verified-hero-prices{display:block;min-width:0}.variant-price-row{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-top:8px}.variant-price-row>span{min-width:0;overflow-wrap:anywhere}.variant-price-row strong{flex-shrink:0}.variant-sale{font-size:12px;margin-right:6px}.variant-price-caption{font-size:12px;opacity:.75}}</style>
 </head>
 <body>
 <header>
@@ -1215,7 +1238,8 @@ Object.assign(I18N["zh-Hant"], {hist_title: "最近瀏覽", hist_sub: "此瀏覽
 const BM_SET = new Set((() => { try { return JSON.parse(localStorage.getItem("boopadb_bm") || "[]").map(b => String(b.id)); } catch { return []; } })());
 const BM_FLAG_SVG = '<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2z"/></svg>';
 const bmFlag = id => BM_SET.has(String(id)) ? `<span class="bmflag">${BM_FLAG_SVG}</span>` : "";
-function clusterCB(cur, base, sale, atLowest, id){
+function clusterCB(cur,base,sale,atLowest,id){return withVariantBadge(clusterCBVariantOriginal(cur,base,sale,atLowest,id),{id,cur,base});}
+function clusterCBVariantOriginal(cur, base, sale, atLowest, id){
   const pct = base > cur ? Math.round((1 - cur / base) * 100) : 0;
   const badge = sale && pct > 0 ? `${discountBadge(base, cur, "discst", "-", id)}` : "";
   const stack = base > cur ? `<span class="bstack">${comparisonMarkup(base, cur, id, `<span class="was${wCls(base)}">${yen(base)}</span>`)}<span class="price">${yen(cur)}</span></span>` : `<span class="price">${yen(cur)}</span>`;
