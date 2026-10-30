@@ -16,16 +16,16 @@
     "app.html": "1b8e61bdfd32949fa98e529627ba2a17d7e3d1dd17b84dcb278d3b48993bfadd",
     "apple-touch-icon.png": "0fd085d04035210812b90dcede93160b9e21f87dc95c383ce6367373f004fda5",
     "banner.jpg": "5ba0f29ea882c5239ef66a59bf35bf318344cfdef0d0b307e1fe79dfc7b698fc",
-    "bookmarks.html": "497efc309f16b98675e0ce9ae5f57972926ff8f4517698cb151d4ca644ef3ec8",
+    "bookmarks.html": "8fe520dd7cc30c03caa2fdfd7c2e094ce85ec72a13241122820a5c895f256679",
     "cat_cards.json": "7d5e6a0805cc8f9949b522ab8b2a5f6899f077cae50b4326e77bf42464f1933f",
     "catalog-cache.js": "56adbe78663321a8b4610bda5bbc1c10c58576b75459ad6556de1c9c390eb337",
     "catalog-images.js": "d02f5dc19a5b3d970d10ff9bed409035bd00db21e3f02d9266ff0af27a5f4f80",
-    "drops.html": "9809efe8dc497d7421a5189301b3fb9f17327f7a5e3882652abe526dca4ca903",
+    "drops.html": "1fcbc962328a669c6b127bf1ee4006a718c570842fac6cf27203b912cad92b58",
     "favicon-192.png": "d3f31a79640cfbe14e48f4e220c3c03de4e1dcc7fd45ff1daca6493f357859a5",
     "favicon.ico": "58a90b2447f4b8f6087be77c9628cefde5297105d309b9f14148c3eaf4fd8fa8",
-    "free.html": "fdc57152b686c8d07dbddf325090ecd1e778e30ffebc53316943ae3d66a40c91",
+    "free.html": "e116c689425257884c1cb429daf45fba7cb522e71586302f8ac9b0fe2255ed78",
     "google7556652f03bdf586.html": "fd8b6795d43fd96d074d98ba39787bebcd57330c9204f8bd03b527e3c49cd819",
-    "history.html": "cce6ec5443bcbaeb21d1b72ad2b56ce6ba65c627758364e15133ac22dc73f0aa",
+    "history.html": "e9260b769769f38f3b25f6db7da7246d024b6ed37c94df2712ef3159dfc7a821",
     "icon-512.png": "a64aaad4981cc746aafb75bfa7e6c94b331df9ee23f89163756690bae4722fdc",
     "icon-maskable-512.png": "e29a7c3ad4af299e211cc6cbb3cc5309cbb48b55cc55180d3247df88c937a8b4",
     "image-drop.js": "098a1f8b2cd6c1545478f1ba14060b1fafe8b253456f9b3bb827b5f00cc8730b",
@@ -37,14 +37,14 @@
     "image-search-page.js": "15bf85d6cdd2fefafca5d782156776205baa86593953b7895fdcc05f41a6bc92",
     "image-search.css": "a00dbbeba06d4202da957ccc8319728e6f11f4d76a952d703316f5ec6cccf256",
     "image-search.html": "85b5ac2d18ddf47c2f651880ae309b2488057e24c65ca9f8a9db26a4f6b6b756",
-    "index.html": "578d34ddc2d83ff4ccba33312cdc21f803a36c06ff4ae71ea1f88b67a2a5d4fa",
-    "item.html": "448e2bdcfccccd7da4eebd43ca9b0fdd1e00adbbd411b452f4c6c3bb930add4d",
+    "index.html": "2eec16fc60de0c5857b82df26e20b71d533637e85818266374aa970e518ecc57",
+    "item.html": "4656de973b42e8b3611e2a42a7d61ae9cb3fa4425baaadab9370b55ca1dc8aef",
     "lists_full.json": "1c9676d24c9316ee6bf9e3a502e4f7255536e6205dc8125e22cc24451a7e1782",
     "manifest.webmanifest": "3987b4de918c0a2ea0644065e641ff698edb5f77fa55673cfeb9b214c62d1747",
-    "new.html": "930883e51a29fb9966ff0518470811c41e596257320785d88038b4212d5f2fd3",
+    "new.html": "b3a81d3ad132b2504386e94cdf804b50963db3bc3cff1086e4a53af75a2862f0",
     "ogp-16x9.png": "ea557bc1f1534a17439adc3f3af3838f15ce2ea1feb122eee4d723c1af37ec6c",
     "privacy.html": "654390017ad8e9065834df7f0ff0d924f6aa6fb2d35303eda55380b95dc8c0c3",
-    "ranking.html": "5bb79823e47ab29663df07cb885ae9b9c4a5cb7ef810e021d749c9af11882e68",
+    "ranking.html": "f3578cf9778622ab479b66965e0ba93cd66fbe73a43dc301f13ef04c0774bf4b",
     "relation-data/children_0.json": "238901ac55dc2ab5d14438a6cba870cb576b8a107cc365beabcb7abc58ce7155",
     "relation-data/children_1.json": "ecb15e6835586ba2ba3cc7987d990ff17d5fc18c91862b535f5a679b93c3d36e",
     "relation-data/children_2.json": "fbaf5bc25a02b36f66f7892a2ef7ab0f154f815b0e0604a63a13eab2d7bb1a7a",
@@ -142,8 +142,8 @@
     "relationship-search.js": "e6fa3c5693bb1ecad58f103eff1289bb54a15c651980338aee4116ef6a09a937",
     "relationship-supplement.js": "352aa3eed121bee9abe93629576cffe6444316d623995ab3a1c045dda32cec05",
     "relationship-ui-draft.js": "f16647f479b2906348b7edada55d3d24b05f0b2ecc9f5864f875e1179d4903fc",
-    "rising.html": "7534ada0383aefe1e68db05379b5009a22309f78f873e8f83ea7797eb615109d",
-    "sale.html": "20782a65e5b265d2637306788969d297272e3f6258707f2826d6c7694cc39eba",
+    "rising.html": "5af128983e5a9b78093efcc17aff651b06234cc887de459abe2430837d3339a0",
+    "sale.html": "e116939844101805d10ee3a921e808909d3f8ae22a92756dbab6f727c61fea2e",
     "scripts/embed-hero.cjs": "946f4226d75e00017404735bf295100ffd35dfafac78dd6cdea0652a07f85d68",
     "search-core/core_0.json": "b491216be8315aae1c0ef9aab8036fa2dd6756cf3c3d45cec8915e0a25c46682",
     "search-core/core_1.json": "897f650b7d058ae3d9e59f3339a7b855b775ae84780af659fe24f59566373524",
@@ -733,7 +733,7 @@
     "site-update.js": "35b7a6a4e239871e9b8bce16a924796e0144a802449d43c03da749f570a67b6e",
     "sw.js": "d4639d034c6d9d54400f872b5aebbdde34873ddbabbd9feee72b418ecba404d6",
     "terms.html": "2f45868a017625a55882c2ac8ff1f3f0684ad6bb629f82f8c27332b3125546ce",
-    "updates.html": "68b35c2b02aa915f30ce2df52b8a3affd036f39456f4259c5a6e2d34d705e950"
+    "updates.html": "b924feb90f21281059067f9749bdfb12be140a0a30cf61cd7c1b093da76ce5fb"
   },
   "validation": {
     "ok": true,
@@ -930,5 +930,31 @@
       "updates.html"
     ],
     "source_data_unchanged": true
+  },
+  "postbuild_price_presentation": {
+    "baseline_commit": "bb6c55dcc5a15847634c820fcbaca9121fe33400",
+    "scope": "display-only existing same-variant outlier comparison evidence",
+    "proof_sha256": "c29adb01c97a5cb8a43626441fa7ccdbd14a06cab1fdceb8b91863268efe9bc6",
+    "known_evidence_ids": [
+      "8328795",
+      "8350004",
+      "8372235",
+      "8422085"
+    ],
+    "raw_data_unchanged": true,
+    "current_variant_availability": "unknown; no all-free or partly-free inference",
+    "changed_html": [
+      "bookmarks.html",
+      "drops.html",
+      "free.html",
+      "history.html",
+      "index.html",
+      "item.html",
+      "new.html",
+      "ranking.html",
+      "rising.html",
+      "sale.html",
+      "updates.html"
+    ]
   }
 }

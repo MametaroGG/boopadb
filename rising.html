@@ -957,16 +957,40 @@
   .nempty{color:var(--faint);font-size:13px;padding:26px 0;text-align:center}
 
 </style>
+<script id="price-presentation-proof">const PRICE_PRESENTATION = {"schema":1,"entries":{"8328795":{"representative_name":"【無料4種類】","observed_at":"2026-10-29","current":0,"comparison_base":9999999,"comparison_outlier":true,"proof_basis":"existing-tagged-representative-history","variant_coverage":"unknown"},"8350004":{"representative_name":"【無料】4種類（差分無し）","observed_at":"2026-10-29","current":0,"comparison_base":9999999,"comparison_outlier":true,"proof_basis":"existing-tagged-representative-history","variant_coverage":"unknown"},"8422085":{"representative_name":"フルセット","observed_at":"2026-10-29","current":500,"comparison_base":9999999,"comparison_outlier":true,"proof_basis":"existing-tagged-representative-history","variant_coverage":"unknown"},"8372235":{"representative_name":"default","observed_at":"2026-10-29","current":100,"comparison_base":1000000,"comparison_outlier":true,"variant_coverage":"unknown","proof":{"basis":"existing-varutil-tag_outliers","policy_source_sha256":"de883ab6f400671e7c76062d43669cf3bc4496fcf65b949f91bb4ca7ddf37b94","comparison_occurrences":2,"tagged_comparison_occurrences":2,"ordinary_comparison_occurrences":0},"source_sha256":"31ff8c1341b55f674f3529c707b06a6d06684e7b531dfb14a44e372515f75c99"}}};</script>
 <script>
+// PRICE_PRESENTATION_HELPERS_START
+function comparisonSuppressed(base, cur, id){
+  const e = PRICE_PRESENTATION.entries[String(id)];
+  return !!(e && e.comparison_outlier === true && Number.isFinite(base) && Number.isFinite(cur) && e.comparison_base === base && e.current === cur);
+}
+function comparisonMarkup(base, cur, id, html){ return comparisonSuppressed(base, cur, id) ? "" : html; }
+function freeAvailabilityLabel(id){
+  const e = PRICE_PRESENTATION.entries[String(id)], v = e && e.current_variants;
+  if (!v || v.verified_current !== true || !Array.isArray(v.items) || !v.items.length || !/^\d{4}-\d{2}-\d{2}$/.test(v.observed_at || "") || v.observed_at !== e.observed_at) return null;
+  if (v.items.some(x => !x || typeof x.id !== "string" || !x.id) || new Set(v.items.map(x => x.id)).size !== v.items.length) return null;
+  const known = v.items.filter(x => x.available === true && Number.isFinite(x.price) && x.price >= 0);
+  const free = known.filter(x => x.price === 0).length, paid = known.filter(x => x.price > 0).length;
+  const labels = {ja:["無料","全て無料","一部無料"],en:["Free","All free","Partly free"],ko:["무료","모두 무료","일부 무료"],"zh-Hans":["免费","全部免费","部分免费"],"zh-Hant":["免費","全部免費","部分免費"]};
+  const l = labels[typeof LANG === "string" ? LANG : "ja"] || labels.ja;
+  if (free && paid) return l[2];
+  if (v.complete !== true || v.items.some(x => x.available !== true && x.available !== false) || v.items.some(x => x.available === true && (!Number.isFinite(x.price) || x.price < 0))) return null;
+  if (free && !paid) return known.length === 1 ? l[0] : l[1];
+  return null;
+}
+function freePriceLabel(id){ return freeAvailabilityLabel(id) || tr("free"); }
+// PRICE_PRESENTATION_HELPERS_END
 // DISCOUNT_DISPLAY_GUARD_START
 // Presentation only: never alter sale classification, source prices or ranking pct.
-function displayDiscountPercent(base, cur){
+function displayDiscountPercent(base, cur, id){
+  if (comparisonSuppressed(base, cur, id)) return null;
   if (!Number.isFinite(base) || !Number.isFinite(cur) || base <= 0 || cur < 0 || cur >= base) return null;
   if (cur === 0) return 100;
   return Math.min(99, Math.max(0, Math.round((1 - cur / base) * 100)));
 }
-function discountBadge(base, cur, cls, minus = "-"){
-  const pct = displayDiscountPercent(base, cur);
+function discountBadge(base, cur, cls, minus = "-", id){
+  if (comparisonSuppressed(base, cur, id)) return `<span class="${cls}">${tr("chip_onsale")}</span>`;
+  const pct = displayDiscountPercent(base, cur, id);
   return pct === null || pct <= 0 ? "" : `<span class="${cls}">${minus}${pct}%</span>`;
 }
 function displayChangePercent(from, to){
@@ -1187,10 +1211,10 @@ Object.assign(I18N["zh-Hant"], {hist_title: "最近瀏覽", hist_sub: "此瀏覽
 const BM_SET = new Set((() => { try { return JSON.parse(localStorage.getItem("boopadb_bm") || "[]").map(b => String(b.id)); } catch { return []; } })());
 const BM_FLAG_SVG = '<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2z"/></svg>';
 const bmFlag = id => BM_SET.has(String(id)) ? `<span class="bmflag">${BM_FLAG_SVG}</span>` : "";
-function clusterCB(cur, base, sale, atLowest){
+function clusterCB(cur, base, sale, atLowest, id){
   const pct = base > cur ? Math.round((1 - cur / base) * 100) : 0;
-  const badge = sale && pct > 0 ? `${discountBadge(base, cur, "discst")}` : "";
-  const stack = base > cur ? `<span class="bstack"><span class="was${wCls(base)}">${yen(base)}</span><span class="price">${yen(cur)}</span></span>` : `<span class="price">${yen(cur)}</span>`;
+  const badge = sale && pct > 0 ? `${discountBadge(base, cur, "discst", "-", id)}` : "";
+  const stack = base > cur ? `<span class="bstack">${comparisonMarkup(base, cur, id, `<span class="was${wCls(base)}">${yen(base)}</span>`)}<span class="price">${yen(cur)}</span></span>` : `<span class="price">${yen(cur)}</span>`;
   return `<span class="bprice">${badge}${stack}</span>`;
 }
 const HEART12 = '<svg class="hico" viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.1a5 5 0 1 1 7.5 6.5z"/></svg> ';
@@ -1321,7 +1345,7 @@ document.getElementById("pgMore").onclick = () => { pgShown += 60; pgRender(); }
   wdScanAll(document.body);
 })();
 
-pgRowFn = x => listRow(x, HEART12 + tr("rising_note", {likes: (x.likes || 0).toLocaleString(), g: fmtGain(x.per_day)}), clusterCB(x.cur, x.base, !!x.on_sale, x.at_lowest));
+pgRowFn = x => listRow(x, HEART12 + tr("rising_note", {likes: (x.likes || 0).toLocaleString(), g: fmtGain(x.per_day)}), clusterCB(x.cur, x.base, !!x.on_sale, x.at_lowest, x.id));
 pgItems = [];
 pgRender();
 loadFull().then(f => { if (f && f.rising) { pgItems = f.rising; pgShown = 60; document.getElementById("subStats").textContent = tr("pg_rising_sub", {n: pgItems.length}); pgRender(); } });
