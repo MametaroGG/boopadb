@@ -620,13 +620,16 @@
   .bmcard .bmimg .pph{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1/1;background:#1b1b1f}
   .bmcard .bmimg .pph svg{width:34px;height:34px;stroke:#2c2c33;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
   .bmcard .bmflag{top:0;left:0;border-radius:8px 0 0 0}
-  .bmstrip{display:flex;align-items:stretch;height:32px;margin-top:0;min-width:0}
-  .bmstrip .discst{height:32px;font-size:14px;padding:0 9px}
-  .bmstrip .saletag{display:inline-flex;align-items:center;height:32px;background:var(--green-bg);color:#c8ec6e;font-weight:800;font-size:12.5px;padding:0 9px}
-  .bmvals{flex:1;background:#26262c;display:flex;align-items:center;justify-content:flex-end;gap:7px;padding:0 10px;min-width:0}
+  /* bookmark-price-layout-v1: let badges wrap, never overlap price values. */
+  .bmstrip{display:flex;flex-wrap:wrap;align-items:stretch;min-height:42px;height:auto;margin-top:0;min-width:0;background:#26262c}
+  .bmstrip .discst{flex:0 1 auto;max-width:100%;box-sizing:border-box;min-height:42px;height:auto;font-size:13px;padding:6px;overflow-wrap:anywhere}
+  .bmstrip .saletag{display:inline-flex;align-items:center;flex:0 1 auto;max-width:100%;box-sizing:border-box;min-height:42px;height:auto;background:var(--green-bg);color:#c8ec6e;font-weight:800;font-size:12.5px;padding:6px;overflow-wrap:anywhere}
+  .bmvals{flex:1 1 5.5rem;box-sizing:border-box;background:#26262c;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:2px;padding:4px 6px;min-width:0;max-width:100%}
   html[data-theme="light"] .bmvals{background:#e8e8ed}
-  .bmvals .was{background:none;padding:0;height:auto;font-size:12.5px}
-  .bmvals .price{font-weight:800;font-size:14.5px;white-space:nowrap}
+  .bmvals .was{background:none;padding:0;height:auto;font-size:12.5px;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.15;text-align:right}
+  .bmvals .price{font-weight:800;font-size:14.5px;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.2;text-align:right}
+  .bmvals .price .free{white-space:normal;overflow-wrap:anywhere}
+  html[data-theme="light"] .bmstrip{background:#e8e8ed}
   span.was.wl{font-size:11px}
   span.was.wxl{font-size:9.5px}
   .bmvals .was.wl{font-size:11px}
@@ -2112,10 +2115,29 @@ async function fetchItemRecord(id){
   return rec;
 }
 const META_BASE = "https://mametarogg.github.io/booth-vrc-price-tracker/meta/";
+// Image-only correction; not a refresh of prices, names, variants or availability.
+// Source: https://booth.pm/ja/items/5846349; verified 2026-10-30T14:12:49Z.
+// JPEG SHA256: 642d34b389c4cbef6105d5f2a750fb69f723cf35e5cad2b33cc32692b401da10
+function verifiedThumbnail(id){
+  return String(id) === "5846349" ? "https://booth.pximg.net/d6304d84-2a45-40c9-a097-1b6c352b8b18/i/5846349/15154d5d-200f-4282-a7f8-0fc0e84421c1_base_resized.jpg" : "";
+}
 const _metaCache = new Map();
 function fetchMeta(id){
   id = String(id);
-  if (!_metaCache.has(id)) _metaCache.set(id, fetch(META_BASE + id.slice(0, 3) + "/" + id + ".json").then(r => r.ok ? r.json() : null).catch(() => null));
+  const cached = _metaCache.get(id);
+  if (cached && cached.retryAt && Date.now() >= cached.retryAt) _metaCache.delete(id);
+  if (!_metaCache.has(id)) {
+    const request = fetch(META_BASE + id.slice(0, 3) + "/" + id + ".json", {cache: "no-cache"})
+      .then(r => r.ok ? r.json() : null).catch(() => null)
+      .then(meta => {
+        // Failed metadata must not stay unavailable for the entire page session.
+        if (!meta || meta.unavailable) request.retryAt = Date.now() + 60000;
+        const image = verifiedThumbnail(id);
+        return image && !(meta && (meta.image_resized || meta.image))
+          ? {...(meta || {}), image, image_resized: image, image_verified_at: "2026-10-30T14:12:49Z"} : meta;
+      });
+    _metaCache.set(id, request);
+  }
   return _metaCache.get(id);
 }
 async function fillImgs(){
@@ -2296,10 +2318,64 @@ async function loadRelations(x){
   await primary;
   if (supplementalMount) await BoopaRelationshipSupplement.mount(host,await supplementalMount,{...relationOptions,selfId:id});
 }
-async function openItemSmart(id){
-  if (PROD.has(String(id))) { openProduct(id); return; }
-  try { const rec = await fetchItemRecord(id); if (rec) { regP(rec); openProduct(id); } } catch {}
+// DETAIL_HISTORY_HYDRATION_START
+let detailHistoryEpoch = 0;
+const detailHistoryInflight = new Map();
+function hasDetailHistory(x){
+  if (!x) return false;
+  if (x._detailHistoryLoaded === true) return true;
+  const entries = Object.values(x.variations || {});
+  return entries.length > 0 && entries.every(v => { const rows = Array.isArray(v) ? v : v && v.p; return Array.isArray(rows) && rows.length >= 2; });
 }
+function detailHistoryRequest(id){
+  if (!detailHistoryInflight.has(id)) {
+    let timer;
+    const deadline = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('History request timeout')), 15000); });
+    const request = Promise.race([Promise.resolve().then(() => fetchItemRecord(id)), deadline]).then(rec => {
+      if (!rec || String(rec.id) !== id) throw new Error('Missing or mismatched item history');
+      const old = PROD.get(id);
+      const merged = {...rec, ...(old || {}), variations:rec.variations, spark:rec.spark, _detailHistoryLoaded:true};
+      PROD.set(id, merged);
+      return merged;
+    }).finally(() => { clearTimeout(timer); detailHistoryInflight.delete(id); });
+    detailHistoryInflight.set(id, request);
+  }
+  return detailHistoryInflight.get(id);
+}
+function detailHistoryStatus(id, failed){
+  const chart = document.getElementById('ppChart');
+  if (!chart) return;
+  const labels = {ja:['価格履歴を読み込み中…','価格履歴を読み込めませんでした。','再試行'],en:['Loading price history…','Could not load price history.','Retry'],ko:['가격 기록 불러오는 중…','가격 기록을 불러오지 못했습니다.','다시 시도'],'zh-Hans':['正在加载价格历史…','无法加载价格历史。','重试'],'zh-Hant':['正在載入價格歷史…','無法載入價格歷史。','重試']};
+  const text = labels[typeof LANG === 'string' ? LANG : 'ja'] || labels.ja;
+  chart.innerHTML = `<p class="note" role="status">${failed ? text[1] : text[0]}</p>${failed ? `<button type="button" data-history-retry>${text[2]}</button>` : ''}`;
+  const button = chart.querySelector('[data-history-retry]');
+  if (button) button.onclick = () => openItemSmart(id);
+}
+async function openItemSmart(id){
+  id = String(id);
+  if (!/^\d+$/.test(id)) return;
+  const epoch = ++detailHistoryEpoch;
+  const existing = PROD.get(id);
+  if (existing) openProduct(id);
+  else {
+    curProd = null;
+    ppX = null;
+    document.getElementById('ppBody').innerHTML = '<div id="ppChart"></div>';
+    prodPage.classList.add('open');
+    veilSync();
+  }
+  if (hasDetailHistory(existing)) return;
+  detailHistoryStatus(id, false);
+  try {
+    const rec = await detailHistoryRequest(id);
+    if (epoch !== detailHistoryEpoch || !prodPage.classList.contains('open')) return;
+    if (existing) { curProd = rec; renderProdPage(rec); }
+    else openProduct(id);
+  } catch {
+    if (epoch === detailHistoryEpoch && prodPage.classList.contains('open')) detailHistoryStatus(id, true);
+  }
+}
+// DETAIL_HISTORY_HYDRATION_END
 function plainCard(x, i){
   return `<div class="card" data-pid="${x.id}">
     <a class="thumbwrap" href="${itemUrl(x.id)}" target="_blank" rel="noopener"><span class="noimg">${PH_ICON}</span>${bmFlag(x.id)}</a>
@@ -2581,6 +2657,7 @@ function spRender(reset = true){
   const key = (spRelId || "") + "|" + (spCatMode || "") + "|" + q + "|" + spFilter + "|" + (fullIndex ? "F" : "-") + "|" + (FULL_LISTS ? "L" : "-") + "|" + (spMaxPrice == null ? "A" : spMaxPrice) + "|" + spSort;
   const grid = document.getElementById("spGrid");
   const cardOf = (x, i) => {
+    if (!x.image && verifiedThumbnail(x.id)) x = {...x, image: verifiedThumbnail(x.id)};
     let html=x.plain?plainCard(x,i):saleCard({...x,pct:x.pct},i);
     if(fullIndex&&!spImgMode&&spCatalogImages&&spCatalogReader.isCore()&&!x.image){
       html=html.replace('data-fill=', 'data-core-image=');
@@ -3679,7 +3756,7 @@ function renderPPBody(x){
     chartEl.innerHTML = `<div class="cmpranges pp-ranges">${rangeBtnsHTML()}</div>` + keys.map((k, i) => varBlockHTML(x, k, i)).join("");
   } else {
     const ser = seriesOf(x, null);
-    statsEl.innerHTML = ser.p && ser.p.length >= 2 ? statsHTML(ser) : "";
+    statsEl.innerHTML = ser.p && ser.p.length >= 2 ? statsHTML(ser) : (Number.isFinite(x.cur) && x.cur >= 0 ? `<div><div class="k">${tr("pp_cur")}</div><div class="v">${yen(x.cur)}</div></div>` : "");
     chartEl.innerHTML = `<div class="cmpranges pp-ranges">${rangeBtnsHTML()}</div>` + varBlockHTML(x, null, 0);
   }
   chartEl.querySelectorAll("[data-cr]").forEach(b => b.onclick = () => { ppRange = b.dataset.cr; renderPPBody(x); wireBlockHovers(x); });
@@ -4025,7 +4102,25 @@ async function fillGallery(x){
   try {
     const m = await fetchMeta(x.id);
     if (ppX !== x) return;
-    urls = (m && m.images) || [];
+    urls = (m && Array.isArray(m.images) && m.images) || [];
+    // A summary may have no image even after fresh metadata becomes available.
+    const primary = x.image || (m && (m.image_resized || m.image)) || urls.find(Boolean);
+    const wrap = document.querySelector("#ppBody .pp-imgwrap");
+    if (primary && wrap && !wrap.querySelector(".hfg")) {
+      x.image = primary;
+      for (const cls of ["hbg", "hfg"]) {
+        const img = document.createElement("img");
+        img.className = cls; img.src = primary; img.alt = "";
+        img.decoding = "async"; img.referrerPolicy = "no-referrer";
+        if (cls === "hbg") img.setAttribute("aria-hidden", "true");
+        wrap.appendChild(img);
+      }
+      if (!document.getElementById("ppImgCount")) {
+        const count = document.createElement("span");
+        count.className = "pp-imgcount"; count.id = "ppImgCount"; count.hidden = true;
+        wrap.appendChild(count);
+      }
+    }
   } catch { return; }
   if (ppX !== x) return;
   const main = x.image || "";
@@ -4231,6 +4326,7 @@ function openProduct(id){
   renderPersonal();
 }
 function closeProduct(){
+  detailHistoryEpoch++;
   reviewedRelationEpoch++;
   const relationHost=document.getElementById("ppRel");
   if(relationHost && typeof BoopaRelationshipDraft!=="undefined") BoopaRelationshipDraft.cancel(relationHost);
