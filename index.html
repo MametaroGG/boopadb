@@ -2404,6 +2404,22 @@ function spRelSort(a, b){
 function spRender(reset = true){
   if (reset) spShown = 30;
   const q = document.getElementById("spQ").value.trim().normalize("NFKC").toLowerCase();
+  // Never paint the embedded sample as search results: its population, order
+  // and prices differ from the verified full snapshot. Keep controls and the
+  // explicit loading/error + retry region visible until one atomic commit.
+  const pendingCatalog = !fullIndex && !spImgMode;
+  const resultGrid = document.getElementById("spGrid");
+  resultGrid.setAttribute("aria-busy", String(pendingCatalog));
+  if (pendingCatalog) {
+    resultGrid.replaceChildren(); spKey = ""; spRendered = 0; spTotal = 0;
+    document.getElementById("spCount").textContent = "—";
+    document.getElementById("spEmpty").style.display = "none";
+    spCatalogStatusSync(); spModeSync(null); spRelStatusSync();
+    spPriceLabel(); spFilterBtnLabel(); spSortSync();
+    document.getElementById("spClear").hidden = !q;
+    document.getElementById("spQ").parentElement.classList.toggle("has-query", !!q);
+    return;
+  }
   let hits, countOverride = null;
   if (spFilter !== "all") {
     const set = chipSet(spFilter);
@@ -2650,6 +2666,7 @@ async function spRelLoad(id){
 
 let spCatMode = null, spCatNames = new Map(); let spShopMode = null; let spImgMode = false, spImgHits = [], spImgState = null, spImgThumb = null, spImgLabel = "";
 function spModeSync(n){
+  if (!fullIndex && !spImgMode) n = null;
   const bar = document.getElementById("spMode");
   if (!bar) return;
   let label = "";
