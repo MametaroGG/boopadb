@@ -2863,9 +2863,9 @@ function shopPriceHTML(t){
   if (t.on_sale && t.base && t.base > t.cur){
     const pct = Math.round((1 - t.cur / t.base) * 100);
     if (pct > 0) return `<div class="spr"><span class="sg">−${pct}%</span><span class="swas"><span class="ww">${yen(t.base)}</span></span><span class="scur">${yen(t.cur)}</span></div>`;
-    return `<div class="spr"><span class="sgt">${tr("rib_sale")}</span><span class="scur">${yen(t.cur)}</span></div>`;
+    return `<div class="spr"><span class="sg">${tr("rib_sale")}</span><span class="scur">${yen(t.cur)}</span></div>`;
   }
-  if (t.on_sale) return `<div class="spr"><span class="sgt">${tr("rib_sale")}</span><span class="scur">${yen(t.cur)}</span></div>`;
+  if (t.on_sale) return `<div class="spr"><span class="sg">${tr("rib_sale")}</span><span class="scur">${yen(t.cur)}</span></div>`;
   if (t.cur === 0) return `<div class="spr solo"><span class="scur">${tr("free")}</span></div>`;
   return `<div class="spr solo"><span class="scur">${yen(t.cur)}</span></div>`;
 }
