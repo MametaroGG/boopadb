@@ -957,6 +957,26 @@
   .nempty{color:var(--faint);font-size:13px;padding:26px 0;text-align:center}
 
 </style>
+<script>
+// DISCOUNT_DISPLAY_GUARD_START
+// Presentation only: never alter sale classification, source prices or ranking pct.
+function displayDiscountPercent(base, cur){
+  if (!Number.isFinite(base) || !Number.isFinite(cur) || base <= 0 || cur < 0 || cur >= base) return null;
+  if (cur === 0) return 100;
+  return Math.min(99, Math.max(0, Math.round((1 - cur / base) * 100)));
+}
+function discountBadge(base, cur, cls, minus = "-"){
+  const pct = displayDiscountPercent(base, cur);
+  return pct === null || pct <= 0 ? "" : `<span class="${cls}">${minus}${pct}%</span>`;
+}
+function displayChangePercent(from, to){
+  if (!Number.isFinite(from) || !Number.isFinite(to) || from <= 0 || to < 0) return "";
+  let pct = Math.round((to - from) / from * 100);
+  if (to > 0 && pct <= -100) pct = -99;
+  return (to >= from ? "+" : "") + pct + "%";
+}
+// DISCOUNT_DISPLAY_GUARD_END
+</script>
 </head>
 <body>
 <header>
@@ -1170,7 +1190,7 @@ const BM_FLAG_SVG = '<svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l
 const bmFlag = id => BM_SET.has(String(id)) ? `<span class="bmflag">${BM_FLAG_SVG}</span>` : "";
 function clusterCB(cur, base, sale, atLowest){
   const pct = base > cur ? Math.round((1 - cur / base) * 100) : 0;
-  const badge = sale && pct > 0 ? `<span class="discst">-${pct}%</span>` : "";
+  const badge = sale && pct > 0 ? `${discountBadge(base, cur, "discst")}` : "";
   const stack = base > cur ? `<span class="bstack"><span class="was${wCls(base)}">${yen(base)}</span><span class="price">${yen(cur)}</span></span>` : `<span class="price">${yen(cur)}</span>`;
   return `<span class="bprice">${badge}${stack}</span>`;
 }

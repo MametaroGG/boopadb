@@ -959,6 +959,26 @@
   @media (max-width:560px){.rankno{width:22px;font-size:14px}}
 
 </style>
+<script>
+// DISCOUNT_DISPLAY_GUARD_START
+// Presentation only: never alter sale classification, source prices or ranking pct.
+function displayDiscountPercent(base, cur){
+  if (!Number.isFinite(base) || !Number.isFinite(cur) || base <= 0 || cur < 0 || cur >= base) return null;
+  if (cur === 0) return 100;
+  return Math.min(99, Math.max(0, Math.round((1 - cur / base) * 100)));
+}
+function discountBadge(base, cur, cls, minus = "-"){
+  const pct = displayDiscountPercent(base, cur);
+  return pct === null || pct <= 0 ? "" : `<span class="${cls}">${minus}${pct}%</span>`;
+}
+function displayChangePercent(from, to){
+  if (!Number.isFinite(from) || !Number.isFinite(to) || from <= 0 || to < 0) return "";
+  let pct = Math.round((to - from) / from * 100);
+  if (to > 0 && pct <= -100) pct = -99;
+  return (to >= from ? "+" : "") + pct + "%";
+}
+// DISCOUNT_DISPLAY_GUARD_END
+</script>
 </head>
 <body>
 <header>
@@ -1185,7 +1205,7 @@ const HEART12 = '<svg class="hico" viewBox="0 0 24 24"><path d="M19.5 12.6 12 20
 const fmtGain = v => { const n = Number(v) || 0; return n >= 10 ? Math.round(n).toLocaleString() : String(Math.round(n * 10) / 10); };
 function rkCluster(s){
   const pct = s.base > s.cur ? Math.round((1 - s.cur / s.base) * 100) : 0;
-  const badge = s.on_sale && pct > 0 ? `<span class="discst">-${pct}%</span>` : "";
+  const badge = s.on_sale && pct > 0 ? `${discountBadge(s.base, s.cur, "discst")}` : "";
   const stack = s.base > s.cur ? `<span class="bstack"><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span>` : `<span class="price">${yen(s.cur)}</span>`;
   return `<span class="bprice">${badge}${stack}</span>`;
 }
@@ -1210,7 +1230,7 @@ function rkBuild(){
 }
 rkBuild();
 function rkRow(s, i){
-  return `<a class="brow" href="${itemLink(s.id)}"><span class="rankno${i < 3 ? " top" : ""}">${i + 1}</span><span class="bthw">${s.image ? `<img decoding="async" class="bth" src="${esc(s.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}</span><span class="bmain"><span class="bname">${esc(s.name)}</span><span class="bsub">${esc(s.shop || "")}${s.at_lowest ? " · " + tr("chip_lowest") : ""}</span></span><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span></span></a>`;
+  return `<a class="brow" href="${itemLink(s.id)}"><span class="rankno${i < 3 ? " top" : ""}">${i + 1}</span><span class="bthw">${s.image ? `<img decoding="async" class="bth" src="${esc(s.image)}" alt="" loading="lazy" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${s.id}">${PH_ICON}</span>`}${bmFlag(s.id)}</span><span class="bmain"><span class="bname">${esc(s.name)}</span><span class="bsub">${esc(s.shop || "")}${s.at_lowest ? " · " + tr("chip_lowest") : ""}</span></span><span class="bprice">${discountBadge(s.base, s.cur, "discst")}<span class="bstack"><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span></span></a>`;
 }
 let rk = "amount", rkShown = 60;
 function renderRk(){

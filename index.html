@@ -989,6 +989,26 @@
   html[data-theme="light"] .hero-dots button.on{background:#1d1d20}
 </style>
 <link rel="stylesheet" href="image-search.css?v=20261028-results-v3">
+<script>
+// DISCOUNT_DISPLAY_GUARD_START
+// Presentation only: never alter sale classification, source prices or ranking pct.
+function displayDiscountPercent(base, cur){
+  if (!Number.isFinite(base) || !Number.isFinite(cur) || base <= 0 || cur < 0 || cur >= base) return null;
+  if (cur === 0) return 100;
+  return Math.min(99, Math.max(0, Math.round((1 - cur / base) * 100)));
+}
+function discountBadge(base, cur, cls, minus = "-"){
+  const pct = displayDiscountPercent(base, cur);
+  return pct === null || pct <= 0 ? "" : `<span class="${cls}">${minus}${pct}%</span>`;
+}
+function displayChangePercent(from, to){
+  if (!Number.isFinite(from) || !Number.isFinite(to) || from <= 0 || to < 0) return "";
+  let pct = Math.round((to - from) / from * 100);
+  if (to > 0 && pct <= -100) pct = -99;
+  return (to >= from ? "+" : "") + pct + "%";
+}
+// DISCOUNT_DISPLAY_GUARD_END
+</script>
 </head>
 <body>
 <div id="splash" hidden>
@@ -1481,7 +1501,8 @@ function ribOf(x){
   return null;
 }
 function htagsArr(x){
-  const t = [tr("chip_onsale"), `${x.pct}%OFF`];
+  const pct = displayDiscountPercent(x.base, x.cur);
+  const t = [tr("chip_onsale"), ...(pct !== null && pct > 0 ? [`${pct}%OFF`] : [])];
   if (x.at_lowest) t.push(tr("chip_lowest"));
   if (x.shop) t.push(x.shop);
   return t;
@@ -1630,7 +1651,7 @@ function heroSlideHTML(x, i){
       <div class="hname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="hsub"><span class="hstatus">${x._status}</span>${x.shop ? `<span class="hshop">${esc(x.shop)}</span>` : ""}</div>
       <div class="hmeta" data-hmeta="${x.id}">${heroMetaHTML(x)}</div>
-      <div class="hprice2">${x._disc > 0 ? `<span class="disc">-${x._disc}%</span>` : ""}${x.base > x.cur ? `<span class="was${wCls(x.base)}">${yen(x.base)}</span>` : ""}<span class="price${x.cur === 0 ? " free" : ""}">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
+      <div class="hprice2">${x._disc > 0 ? `${discountBadge(x.base, x.cur, "disc")}` : ""}${x.base > x.cur ? `<span class="was${wCls(x.base)}">${yen(x.base)}</span>` : ""}<span class="price${x.cur === 0 ? " free" : ""}">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
     </div>
   </div>`;
 }
@@ -2239,7 +2260,7 @@ function relCard(id, m, i){
 function relFillPrice(rec){
   document.querySelectorAll(`[data-relcrow="${rec.id}"]`).forEach(crow => {
     crow.innerHTML = rec.sale && rec.pct > 0
-      ? `<span class="bprice"><span class="discst">-${rec.pct}%</span><span class="bstack"><span class="was${wCls(rec.base)}">${yen(rec.base)}</span><span class="price">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span></span></span>`
+      ? `<span class="bprice">${discountBadge(rec.base, rec.cur, "discst")}<span class="bstack"><span class="was${wCls(rec.base)}">${yen(rec.base)}</span><span class="price">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span></span></span>`
       : `<span class="price solo">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span>`;
   });
 }
@@ -2323,7 +2344,7 @@ function fillCardPrice(rec){
   const crow = document.querySelector(`[data-crow="${rec.id}"]`);
   if (!crow) return;
   crow.innerHTML = rec.sale && rec.pct > 0
-    ? `<span class="bprice"><span class="discst">-${rec.pct}%</span><span class="bstack"><span class="was${wCls(rec.base)}">${yen(rec.base)}</span><span class="price">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span></span></span>`
+    ? `<span class="bprice">${discountBadge(rec.base, rec.cur, "discst")}<span class="bstack"><span class="was${wCls(rec.base)}">${yen(rec.base)}</span><span class="price">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span></span></span>`
     : `<span class="price solo">${rec.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(rec.cur)}</span>`;
   if (rec.at_lowest) {
     const card = crow.closest(".card");
@@ -2891,7 +2912,7 @@ function catDotsSync(){
 function updCard(s){
   const pct = s.base > s.cur ? Math.round((1 - s.cur / s.base) * 100) : 0;
   let price;
-  if (s.on_sale && pct > 0) price = `<span class="udisc">-${pct}%</span><span class="uwas"><span class="was">${yen(s.base)}</span></span><span class="upr">${yen(s.cur)}</span>`;
+  if (s.on_sale && pct > 0) price = `${discountBadge(s.base, s.cur, "udisc")}<span class="uwas"><span class="was">${yen(s.base)}</span></span><span class="upr">${yen(s.cur)}</span>`;
   else if (s.cur === 0) price = `<span class="upr solo free">${tr("free")}</span>`;
   else price = `<span class="upr solo">${yen(s.cur)}</span>`;
   const a0 = (s.added || [])[0] || {};
@@ -2970,7 +2991,7 @@ function shopPriceHTML(t){
   if (t.on_sale && t.cur === 0) return `<div class="spr"><span class="sgt">${tr("free")}</span><span class="scur">¥0</span></div>`;
   if (t.on_sale && t.base && t.base > t.cur){
     const pct = Math.round((1 - t.cur / t.base) * 100);
-    if (pct > 0) return `<div class="spr"><span class="sg">−${pct}%</span><span class="swas"><span class="ww">${yen(t.base)}</span></span><span class="scur">${yen(t.cur)}</span></div>`;
+    if (pct > 0) return `<div class="spr">${discountBadge(t.base, t.cur, "sg", "−")}<span class="swas"><span class="ww">${yen(t.base)}</span></span><span class="scur">${yen(t.cur)}</span></div>`;
     return `<div class="spr"><span class="sg">${tr("rib_sale")}</span><span class="scur">${yen(t.cur)}</span></div>`;
   }
   if (t.on_sale) return `<div class="spr"><span class="sg">${tr("rib_sale")}</span><span class="scur">${yen(t.cur)}</span></div>`;
@@ -3202,7 +3223,7 @@ function saleCard(s, i){
       <div class="cname"><a href="${itemUrl(s.id)}" target="_blank" rel="noopener">${esc(s.name)}</a></div>
       <div class="cshop"${s.shop ? ` data-shop="${esc(s.shop)}"` : ""}>${esc(s.shop || "")}</div>
       <div class="htags">${esc(s.sale === false ? htagsPlain(s) : htags(s))}</div>
-      <div class="crow">${s.sale !== false && s.pct > 0 ? `<span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack"><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span></span></span>` : `<span class="price solo">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span>`}</div>
+      <div class="crow">${s.sale !== false && s.pct > 0 ? `<span class="bprice">${discountBadge(s.base, s.cur, "discst")}<span class="bstack"><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span></span></span>` : `<span class="price solo">${s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur)}</span>`}</div>
     </div>
   </div>`;
 }
@@ -3218,7 +3239,7 @@ function mosaicCell(s, i){
     ${s.image ? `<img decoding="async" src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}
     ${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : (s.cur === 0 ? '<span class="mlab">' + tr("free") + '</span>' : "")}
     ${bmFlag(s.id, (s.at_lowest || s.cur === 0) ? "u2" : "")}
-    <span class="scrim"><span class="discst">-${s.pct}%</span><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span>
+    <span class="scrim">${discountBadge(s.base, s.cur, "discst")}<span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price">${yen(s.cur)}</span></span>
   </a>`;
 }
 function steamCap(s){
@@ -3227,7 +3248,7 @@ function steamCap(s){
     <div class="capbody">
       <div class="capname"><a href="${itemUrl(s.id)}" target="_blank" rel="noopener">${esc(s.name)}</a></div>
       <div class="capshop">${esc(s.shop || "")}</div>
-      <div class="capbtm">${s.at_lowest ? '<div class="lowtx">' + tr("chip_lowest") + '</div>' : ""}<div class="caprow"><span class="discst">-${s.pct}%</span><span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price${wCls(s.cur)}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></div></div>
+      <div class="capbtm">${s.at_lowest ? '<div class="lowtx">' + tr("chip_lowest") + '</div>' : ""}<div class="caprow">${discountBadge(s.base, s.cur, "discst")}<span class="was${wCls(s.base)}">${yen(s.base)}</span><span class="price${wCls(s.cur)}">${s.cur === 0 ? tr("free") : yen(s.cur)}</span></div></div>
     </div>
   </div>`;
 }
@@ -3339,8 +3360,8 @@ document.getElementById("saleMore").onclick = () => { location.href = "sale.html
 function railTile(s, sm){
   const priceIn = s.cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(s.cur);
   const strip = sm
-    ? `<span class="pstrip"><span class="bprice"><span class="discst">-${s.pct}%</span><span class="bstack">${s.base > s.cur ? `<span class="was${wCls(s.base)}">${yen(s.base)}</span>` : ""}<span class="price">${priceIn}</span></span></span></span>`
-    : `<span class="pstrip"><span class="discst">-${s.pct}%</span>${s.base > s.cur ? `<span class="pwas"><span class="wasx">${yen(s.base)}</span></span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${priceIn}</span></span>`;
+    ? `<span class="pstrip"><span class="bprice">${discountBadge(s.base, s.cur, "discst")}<span class="bstack">${s.base > s.cur ? `<span class="was${wCls(s.base)}">${yen(s.base)}</span>` : ""}<span class="price">${priceIn}</span></span></span></span>`
+    : `<span class="pstrip">${discountBadge(s.base, s.cur, "discst")}${s.base > s.cur ? `<span class="pwas"><span class="wasx">${yen(s.base)}</span></span>` : ""}<span class="pprice${s.cur === 0 ? " free" : ""}">${priceIn}</span></span>`;
   return `<a class="rtile${sm ? " sm" : ""}" href="${itemUrl(s.id)}" target="_blank" rel="noopener"><span class="rimg">${s.image ? `<img decoding="async" src="${s.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'phcard')">` : `<span class="phcard" data-fill="${s.id}">${PH_ICON}</span>`}${s.at_lowest ? '<span class="mlab">' + tr("chip_lowest") + '</span>' : ""}${bmFlag(s.id, s.at_lowest ? "u2" : "")}</span>${strip}</a>`;
 }
 const tabsEl = document.getElementById("sortTabs");
@@ -3397,7 +3418,7 @@ function browHTML(x, i){
   return `<a class="brow${i === 0 ? " sel" : ""}" data-i="${i}" href="${itemUrl(x.id)}" target="_blank" rel="noopener">
     <span class="bthw">${x.image ? `<img decoding="async" src="${x.image}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'bthph')">` : `<span class="bthph" data-fill="${x.id}">${PH_ICON}</span>`}${bmFlag(x.id)}</span>
     <span class="bmain"><span class="bname">${esc(x.name)}</span><span class="bshop">${esc(x.shop || "")}</span><span class="bnote">${x.note || ""}</span></span>
-    <span class="bprice">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="bstack"><span class="was${wCls(x.base)}">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</span>
+    <span class="bprice">${x.pct > 0 && x.sale ? `${discountBadge(x.base, x.cur, "discst")}` : ""}${x.base > x.cur ? `<span class="bstack"><span class="was${wCls(x.base)}">${yen(x.base)}</span><span class="price">${yen(x.cur)}</span></span>` : `<span class="price">${yen(x.cur)}</span>`}</span>
   </a>`;
 }
 function repSeriesOf(x){
@@ -3465,7 +3486,7 @@ function bPrevHTML(x){
     <div class="bpchips">${(x.chips || []).map(c => `<span class="bpchip">${esc(c)}</span>`).join("")}</div>
     ${x.image ? `<img decoding="async" class="bpimg" src="${x.image}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}
     ${repSeriesOf(x) ? `<div class="bpspark bpchart"><div class="cap">${tr("pp_chart")}</div>${bpChartSVG(repSeriesOf(x), 340, 118)}</div>` : `<div class="bpspark bpchart" data-bpchart="${x.id}"><div class="cap">${tr("pp_chart")}</div><div class="bpchart-load"></div></div>`}
-    <div class="bprow">${x.pct > 0 && x.sale ? `<span class="discst">-${x.pct}%</span>` : ""}${x.base > x.cur ? `<span class="was${wCls(x.base)}">${yen(x.base)}</span>` : ""}<span class="price">${yen(x.cur)}</span>${x.at_lowest ? '<span class="lowest">' + tr("chip_lowest") + '</span>' : ""}</div>`;
+    <div class="bprow">${x.pct > 0 && x.sale ? `${discountBadge(x.base, x.cur, "discst")}` : ""}${x.base > x.cur ? `<span class="was${wCls(x.base)}">${yen(x.base)}</span>` : ""}<span class="price">${yen(x.cur)}</span>${x.at_lowest ? '<span class="lowest">' + tr("chip_lowest") + '</span>' : ""}</div>`;
 }
 function renderBList(){
   const list = document.getElementById("bList");
@@ -3552,7 +3573,7 @@ function featCap(x, tag, meta, cls){
       <div class="capname"><a href="${itemUrl(x.id)}" target="_blank" rel="noopener">${esc(x.name)}</a></div>
       <div class="capshop">${esc(x.shop || "")}</div>
       <div class="spark${fser ? " kp" : ""}"${fser ? "" : ` data-fchart="${x.id}"`}>${fser ? bpChartSVG(fser, 200, 64) : sparkSVG(x.spark)}</div>
-      <div class="caprow">${(cls || "").includes("new") ? `<span class="newtag">${tag}</span>` : ""}${pct > 0 && x.on_sale ? `<span class="discst">-${pct}%</span><span class="was${wCls(x.base)}"><span class="wasx">${yen(x.base)}</span></span>` : (x.on_sale ? `<span class="saletag">${tr("rib_sale")}</span>` : "")}<span class="price${wCls(x.cur)}">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
+      <div class="caprow">${(cls || "").includes("new") ? `<span class="newtag">${tag}</span>` : ""}${pct > 0 && x.on_sale ? `${discountBadge(x.base, x.cur, "discst")}<span class="was${wCls(x.base)}"><span class="wasx">${yen(x.base)}</span></span>` : (x.on_sale ? `<span class="saletag">${tr("rib_sale")}</span>` : "")}<span class="price${wCls(x.cur)}">${x.cur === 0 ? tr("free") : yen(x.cur)}</span></div>
     </div>
   </div>`;
 }
@@ -3660,7 +3681,7 @@ function changesHTML(ser){
   if (!chgs.length) return {n: 0, html: '<p class="note">' + tr("pp_nochg") + '</p>'};
   const rows = chgs.slice(-8).reverse().map(c => {
     const d = c.to - c.from, pc = c.from ? Math.round(d / c.from * 100) : 0;
-    return `<span class="cd">${c.date}</span><span class="${d < 0 ? "down" : "up"}">${d < 0 ? tr("pp_down") : tr("pp_up")}</span><span class="cb">${yen(c.from)}</span><span class="ca">${yen(c.to)}</span><span class="cr ${d < 0 ? "down" : "up"}">${d < 0 ? "" : "+"}${pc}%${c.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</span>`;
+    return `<span class="cd">${c.date}</span><span class="${d < 0 ? "down" : "up"}">${d < 0 ? tr("pp_down") : tr("pp_up")}</span><span class="cb">${yen(c.from)}</span><span class="ca">${yen(c.to)}</span><span class="cr ${d < 0 ? "down" : "up"}">${displayChangePercent(c.from, c.to)}${c.outl ? ' <span class="outlb">' + tr("outlier") + '</span>' : ""}</span>`;
   }).join("");
   const html = `<div class="chgtable"><span class="chh">${tr("chg_date")}</span><span class="chh"></span><span class="chh cb">${tr("chg_before")}</span><span class="chh ca">${tr("chg_after")}</span><span class="chh cr">${tr("chg_rate")}</span>` + rows + `</div>`;
   return {n: Math.min(chgs.length, 8), html};
@@ -3994,7 +4015,7 @@ function renderProdPage(x){
       <div class="pp-name">${esc(x.name)}</div>
       <div class="pp-shop"${x.shop ? ` data-shop="${esc(x.shop)}"` : ""}>${esc(x.shop || "")}</div>
       <div class="pp-meta" id="ppMeta">${ppMetaHTML(x)}</div>
-      <div class="bpchips">${x.cur === 0 ? `<span class="bpchip">${tr("free")}</span>` : ""}${x.sale ? `<span class="bpchip sale">${tr("chip_onsale")}${x.pct > 0 ? ` -${x.pct}%` : ""}</span>` : ""}${x.at_lowest ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}</div>
+      <div class="bpchips">${x.cur === 0 ? `<span class="bpchip">${tr("free")}</span>` : ""}${x.sale ? `<span class="bpchip sale">${tr("chip_onsale")}${displayDiscountPercent(x.base, x.cur) > 0 ? ` -${displayDiscountPercent(x.base, x.cur)}%` : ""}</span>` : ""}${x.at_lowest ? `<span class="bpchip">${tr("chip_lowest")}</span>` : ""}</div>
       <div class="pstats" id="ppStats"></div>
       <div class="pp-actions">
         <a class="pp-booth" data-ext href="${itemUrl(x.id)}" target="_blank" rel="noopener">${tr("pp_booth")}</a>
@@ -4355,7 +4376,7 @@ function pcardHTML(h){
   const onSale = !!(now && now.base > cur && (now.on_sale || now.sale || saleIds().has(String(h.id))));
   const pct = onSale ? (now.pct != null ? now.pct : Math.round((1 - cur / now.base) * 100)) : 0;
   const priceHTML = onSale
-    ? `<span class="bprice"><span class="discst">-${pct}%</span><span class="bstack"><span class="was${wCls(now.base)}">${yen(now.base)}</span><span class="price">${cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(cur)}</span></span></span>`
+    ? `<span class="bprice">${discountBadge(now.base, cur, "discst")}<span class="bstack"><span class="was${wCls(now.base)}">${yen(now.base)}</span><span class="price">${cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(cur)}</span></span></span>`
     : `<span class="price solo">${cur === 0 ? '<span class="free">' + tr("free") + '</span>' : yen(cur)}</span>`;
   return `<a class="pcard" href="${itemUrl(h.id)}">
     <span class="pimgw">${img ? `<img decoding="async" src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'pph')">` : `<span class="pph" data-fill="${h.id}">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
@@ -4370,7 +4391,7 @@ function bmCardHTML(h){
   const pct = onSale ? (now.pct != null ? now.pct : Math.round((1 - cur / now.base) * 100)) : 0;
   const priceTxt = cur === 0 ? `<span class="free">${tr("free")}</span>` : (cur == null ? "—" : yen(cur));
   const strip = onSale
-    ? `<span class="bmstrip">${pct > 0 ? `<span class="discst">-${pct}%</span>` : `<span class="saletag">${tr("rib_sale")}</span>`}<span class="bmvals"><span class="was${wCls(now.base)}">${yen(now.base)}</span><span class="price${wCls(cur)}">${priceTxt}</span></span></span>`
+    ? `<span class="bmstrip">${pct > 0 ? `${discountBadge(now.base, cur, "discst")}` : `<span class="saletag">${tr("rib_sale")}</span>`}<span class="bmvals"><span class="was${wCls(now.base)}">${yen(now.base)}</span><span class="price${wCls(cur)}">${priceTxt}</span></span></span>`
     : `<span class="bmstrip"><span class="bmvals"><span class="price${wCls(cur)}">${priceTxt}</span></span></span>`;
   return `<a class="bmcard" href="${itemUrl(h.id)}" title="${esc(h.name)}">
     <span class="bmimg">${img ? `<img decoding="async" src="${img}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="imgPh(this,'pph')">` : `<span class="pph" data-fill="${h.id}">${PH_ICON}</span>`}${bmFlag(h.id)}</span>
