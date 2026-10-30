@@ -16,16 +16,16 @@
     "app.html": "7489d67b561ab85a424dea8c2e4580345a2abada69f6b53d7ed4f15d9c957694",
     "apple-touch-icon.png": "0fd085d04035210812b90dcede93160b9e21f87dc95c383ce6367373f004fda5",
     "banner.jpg": "5ba0f29ea882c5239ef66a59bf35bf318344cfdef0d0b307e1fe79dfc7b698fc",
-    "bookmarks.html": "5821f3e7905fa48f2290aa8ce7b62294d4dbc5b338accaf3f0ed33f61c7fe563",
+    "bookmarks.html": "68e407e4a5984cf36bba6435f7a57e9ee673a51336267235c236d3281825de49",
     "cat_cards.json": "7d5e6a0805cc8f9949b522ab8b2a5f6899f077cae50b4326e77bf42464f1933f",
     "catalog-cache.js": "56adbe78663321a8b4610bda5bbc1c10c58576b75459ad6556de1c9c390eb337",
     "catalog-images.js": "d02f5dc19a5b3d970d10ff9bed409035bd00db21e3f02d9266ff0af27a5f4f80",
-    "drops.html": "3334fb7f9f95068c5822dacba930fa962dc38f0f6ac1987d1be020b7b04c4f22",
+    "drops.html": "dbf6c58409dcfca8470aa0d3e8a467c8df69fc9683530b191f0edaccc6c8ea2e",
     "favicon-192.png": "d3f31a79640cfbe14e48f4e220c3c03de4e1dcc7fd45ff1daca6493f357859a5",
     "favicon.ico": "58a90b2447f4b8f6087be77c9628cefde5297105d309b9f14148c3eaf4fd8fa8",
-    "free.html": "f9c9f63a2f0d288834712494d86ffea1f37c50fb320d995748bde9a0f380d3c4",
+    "free.html": "45faed7a54cec868cf78980f23e1e79fe7c34f722126d3b2d4efd03f1e01556e",
     "google7556652f03bdf586.html": "fd8b6795d43fd96d074d98ba39787bebcd57330c9204f8bd03b527e3c49cd819",
-    "history.html": "88bc1045949c52f93ed07ca061dc3acd53fc54e920c991fb3096620fd5976797",
+    "history.html": "6bcaf797ee25b67d2ef5be50fd0a75e02227faea7713532308733403d75367f1",
     "icon-512.png": "a64aaad4981cc746aafb75bfa7e6c94b331df9ee23f89163756690bae4722fdc",
     "icon-maskable-512.png": "e29a7c3ad4af299e211cc6cbb3cc5309cbb48b55cc55180d3247df88c937a8b4",
     "image-drop.js": "098a1f8b2cd6c1545478f1ba14060b1fafe8b253456f9b3bb827b5f00cc8730b",
@@ -37,14 +37,14 @@
     "image-search-page.js": "15bf85d6cdd2fefafca5d782156776205baa86593953b7895fdcc05f41a6bc92",
     "image-search.css": "a00dbbeba06d4202da957ccc8319728e6f11f4d76a952d703316f5ec6cccf256",
     "image-search.html": "85b5ac2d18ddf47c2f651880ae309b2488057e24c65ca9f8a9db26a4f6b6b756",
-    "index.html": "79236ace757799b2ae281d287fa690788c6ad5ccb4d42c86c2f7eab67a7fb15b",
-    "item.html": "e67a323458a6bc6ce8feece150dce8835c9bd1b198bb57d2bff0a71183cd5fd9",
+    "index.html": "96f47b9665b13e8bec1d735c6686b479c2bf2700b6f46a26b3bc256f96cff007",
+    "item.html": "76244b9adae5392c568ad20c63fb8b1a296b9aef6f2eace41bd1cd7c1bea23e0",
     "lists_full.json": "1c9676d24c9316ee6bf9e3a502e4f7255536e6205dc8125e22cc24451a7e1782",
     "manifest.webmanifest": "3987b4de918c0a2ea0644065e641ff698edb5f77fa55673cfeb9b214c62d1747",
-    "new.html": "93fa1d54c8cb018462d39835c8163187731defe3cc3827cf171728b6247c1cba",
+    "new.html": "c214d7c9ab8a96d929e423e0ab2b3db6d0cb9b35b6988d8860c1372552daf80b",
     "ogp-16x9.png": "ea557bc1f1534a17439adc3f3af3838f15ce2ea1feb122eee4d723c1af37ec6c",
     "privacy.html": "924abc7e4c8d00e35c7eb626ba9da97d129d8450de5abad6836d873bce4e1bb3",
-    "ranking.html": "3e796ff8d69d89c293b52f4eeac1f22447cc25ab12b82de1d0d4ff6c8b7b9326",
+    "ranking.html": "574c15702fde2779a1521faefafac12fb66fb76d47eec2ee49dc0d13148c30b4",
     "relation-data/children_0.json": "238901ac55dc2ab5d14438a6cba870cb576b8a107cc365beabcb7abc58ce7155",
     "relation-data/children_1.json": "ecb15e6835586ba2ba3cc7987d990ff17d5fc18c91862b535f5a679b93c3d36e",
     "relation-data/children_2.json": "fbaf5bc25a02b36f66f7892a2ef7ab0f154f815b0e0604a63a13eab2d7bb1a7a",
@@ -142,8 +142,8 @@
     "relationship-search.js": "e6fa3c5693bb1ecad58f103eff1289bb54a15c651980338aee4116ef6a09a937",
     "relationship-supplement.js": "352aa3eed121bee9abe93629576cffe6444316d623995ab3a1c045dda32cec05",
     "relationship-ui-draft.js": "f16647f479b2906348b7edada55d3d24b05f0b2ecc9f5864f875e1179d4903fc",
-    "rising.html": "2d8a55861b41e15fa12ef60228136302531212d649e547c0215223bbb1e46c6d",
-    "sale.html": "3e9669e56930f3a13f6adb0a1a4091e58d4d6544153b116e9d9f527f41be799d",
+    "rising.html": "9add49c24c2f2f821416a846930e48c2f1bb1da8734508a51e73a5378c6bd96f",
+    "sale.html": "c455592d90a7e8aa179feacbd986411fa2e0ea5fccc663ad56b12d6261d82373",
     "scripts/embed-hero.cjs": "946f4226d75e00017404735bf295100ffd35dfafac78dd6cdea0652a07f85d68",
     "search-core/core_0.json": "b491216be8315aae1c0ef9aab8036fa2dd6756cf3c3d45cec8915e0a25c46682",
     "search-core/core_1.json": "897f650b7d058ae3d9e59f3339a7b855b775ae84780af659fe24f59566373524",
@@ -733,7 +733,7 @@
     "site-update.js": "35b7a6a4e239871e9b8bce16a924796e0144a802449d43c03da749f570a67b6e",
     "sw.js": "d4639d034c6d9d54400f872b5aebbdde34873ddbabbd9feee72b418ecba404d6",
     "terms.html": "d096022e6c8e652f6c774bb8601c7f5bb6e1607cecb6474235eee2fa999ea3fb",
-    "updates.html": "4c09c479f7b903a327d975c2a4baeafd3002fb332747c9c78bbf568d6d6566f5"
+    "updates.html": "f031b0cfd004650eeed0297449175ed2fd1edbee4e09223ae674a91b54f04f14"
   },
   "validation": {
     "ok": true,
@@ -963,16 +963,26 @@
     "item_ids": [
       "5846349"
     ],
-    "observed_at": "2026-10-30",
-    "proof_file_sha256": "a8c5a0f8aafba2ce2ce8e986afb9e1c811c12f1ab5f22e03df195f5381074d5c",
+    "observed_at": "2026-10-31",
+    "proof_file_sha256": "48e69765fc3385c9a98763e1695b45921e2f43502b1cddc59adc2c090762224b",
     "complete_inventory_claim": false,
     "sale_evidence_available": false,
     "legacy_price_filters_unchanged": true,
-    "snapshot_binding": "6ef779228e1bc5c7884b7886ef228d36ccd49fc468cbdccd104bbf6205ebdba0"
+    "snapshot_binding": "6ef779228e1bc5c7884b7886ef228d36ccd49fc468cbdccd104bbf6205ebdba0",
+    "observed_at_utc": "2026-10-30T16:56:30.917444Z",
+    "expires_at_utc": "2026-10-31T16:56:30.917444Z",
+    "freshness_policy": "24h display evidence; not seller campaign duration",
+    "historical_statistics_unchanged": true
   },
   "variant_label_contrast_fix": {
     "foreground": "#ffffff",
     "background": "#4c6b22",
     "scope": "explicit colors avoid inherited gray on darkgreen"
+  },
+  "variant_history_consistency": {
+    "scope": "official observation separated from dated history; no raw price changes",
+    "client_clock_expiry": true,
+    "open_page_expiry_cleanup": true,
+    "history_label": "last observed price"
   }
 }
