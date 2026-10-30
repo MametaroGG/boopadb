@@ -28,8 +28,8 @@
     "image-search-page.js": "15bf85d6cdd2fefafca5d782156776205baa86593953b7895fdcc05f41a6bc92",
     "image-search.css": "a00dbbeba06d4202da957ccc8319728e6f11f4d76a952d703316f5ec6cccf256",
     "image-search.html": "85b5ac2d18ddf47c2f651880ae309b2488057e24c65ca9f8a9db26a4f6b6b756",
-    "index.html": "802ae5d40a7eb85395bfa0e07b70905dc21d802a4b85a23bf1245af0e5013e38",
-    "item.html": "6fc22115060ac654c6c67de3696603f3be933db379908c86b79019feaff6dd1d",
+    "index.html": "466fe49365b3b6337875dbc8c9a775f1f2c2acc07e0333215e300fee8a9ef6e9",
+    "item.html": "0ca07d1fd92920f8438021911fed89a8508bc11590c8f276566a61466a6d19a4",
     "lists_full.json": "0df60db7c70002829baf770568bfa78a261cc21a56a59d7077c015537587e575",
     "manifest.webmanifest": "3987b4de918c0a2ea0644065e641ff698edb5f77fa55673cfeb9b214c62d1747",
     "new.html": "2b1f9e2da876324992799ccc651577b887f9e124c2932ad5f9dd5e84a880afa5",
@@ -858,11 +858,11 @@
     "approval_sha256": "3ebfcf2965b2f980f5af29b9284b6e151650a575d9fbea48dca3667da928a6dc",
     "scope": "publication-approved"
   },
-  "build_mode": "compact-static-search-reconciliation",
+  "build_mode": "price-change-stats-ui-split",
   "raw_rebuild_performed": false,
   "source_candidate_manifest_sha256": "35044a803e4b8f11fc9a93eae1d1f132c000fee3c318c05e5971b63db7a4828d",
-  "raw_provenance_note": "Derived only from 51 GitOID/SHA256-verified published outputs at0e59b473271c4f1d22bf52e6eaf9fdf156623fe3 plus unchanged prior public assets. All51 refreshed outputs retained byte-for-byte. Compact core and image buckets regenerated from their24 complete legacy shards. No raw collection or producer-completion attestation. Existing HTML embedded/home payload retained and may predate lists snapshot2026-10-30; no full raw same-snapshot HTML rebuild claimed. Only HERO_BOOTSTRAP_DATA was regenerated using the unchanged trusted selector from fresh lists_full; other embedded/chart payloads were not rebuilt.",
-  "publication_base_commit": "0e59b473271c4f1d22bf52e6eaf9fdf156623fe3",
+  "raw_provenance_note": "Derived only from 51 GitOID/SHA256-verified published outputs at0e59b473271c4f1d22bf52e6eaf9fdf156623fe3 plus unchanged prior public assets. All51 refreshed outputs retained byte-for-byte. Compact core and image buckets regenerated from their24 complete legacy shards. No raw collection or producer-completion attestation. Existing HTML embedded/home payload retained and may predate lists snapshot2026-10-30; no full raw same-snapshot HTML rebuild claimed. Only HERO_BOOTSTRAP_DATA was regenerated using the unchanged trusted selector from fresh lists_full; other embedded/chart payloads were not rebuilt. Stats UI now distinguishes cumulative and daily observations. Published lists remain unchanged; exact daily count is unavailable and displayed as unknown, not inferred from lists or cumulative totals.",
+  "publication_base_commit": "787db5a857054c7f3a58742b93b92d2889e73037",
   "semantic_patch_sha256": "b9845c53ecce0f37d78c3c5016f1035e0a93a1b70a2d27a097512f67c32f88e6",
   "semantic_review_sha256": "aef9d8da43c6e47fcd025eb62daa076913d4a395487317439d4e1efd4192aa7d",
   "search_patch_sha256": "4eabdcc22869667e82678250fab61ea191c03a0ec60c16217609864ed30b7979",
@@ -927,5 +927,15 @@
   "collection_id": "published-output-reconciliation-2026-10-30",
   "collection_completion": "not-independently-verified",
   "source_published_output_inventory_sha256": "5e8ff2567f50ca869284b5c6980d1ceb1443648d9a19cbf891506fc7051eff76",
-  "source_published_output_files": 51
+  "source_published_output_files": 51,
+  "stats_ui": {
+    "schema": 1,
+    "cumulative_basis": "representative-variation-history",
+    "daily_basis": "JST-price-transition-observations",
+    "daily_current_public_data": "unavailable-no-complete-history-provenance",
+    "raw_rebuild_performed": false,
+    "missing_or_stale_is_zero": false,
+    "generator_template_sha256": "0d37650cb1d14a8a607655abd877c702bcf5facfb7703d22809e13a25356fb3c",
+    "generator_metric_sha256": "d3f4335a569bfd317707117b035100a02e110d3a2efefd0bdd266a1e6e20d652"
+  }
 }
