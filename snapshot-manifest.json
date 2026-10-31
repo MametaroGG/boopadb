@@ -37,8 +37,8 @@
     "image-search-page.js": "15bf85d6cdd2fefafca5d782156776205baa86593953b7895fdcc05f41a6bc92",
     "image-search.css": "a00dbbeba06d4202da957ccc8319728e6f11f4d76a952d703316f5ec6cccf256",
     "image-search.html": "85b5ac2d18ddf47c2f651880ae309b2488057e24c65ca9f8a9db26a4f6b6b756",
-    "index.html": "96f47b9665b13e8bec1d735c6686b479c2bf2700b6f46a26b3bc256f96cff007",
-    "item.html": "76244b9adae5392c568ad20c63fb8b1a296b9aef6f2eace41bd1cd7c1bea23e0",
+    "index.html": "17e69a8922a31829462655a7b7cd227f077b737aa6be3915ddf472d3b573d82a",
+    "item.html": "d5664bcf07c03b7da38466709c38787359e4d076c231a60e326c6068cb002b78",
     "lists_full.json": "1c9676d24c9316ee6bf9e3a502e4f7255536e6205dc8125e22cc24451a7e1782",
     "manifest.webmanifest": "3987b4de918c0a2ea0644065e641ff698edb5f77fa55673cfeb9b214c62d1747",
     "new.html": "c214d7c9ab8a96d929e423e0ab2b3db6d0cb9b35b6988d8860c1372552daf80b",
@@ -984,5 +984,16 @@
     "client_clock_expiry": true,
     "open_page_expiry_cleanup": true,
     "history_label": "last observed price"
+  },
+  "thumbnail_correction_2625416": {
+    "scope": "exact-ID image-only fallback; existing successful metadata image has priority",
+    "proof_image_sha256": "6e7f8f5dd29c15d64c7d4a59f3901fce7e280b54e04d5702689b3a3cfe3d525b",
+    "verified_at": "2026-10-31T00:54:24.326165+00:00",
+    "price_availability_and_statistics_unchanged": true
+  },
+  "duplicate_variant_explanation_removal": {
+    "scope": "remove top detail disclosure render and duplicate variant-heading price/date only",
+    "retained": "existing statistics last-observed price/date, badges, expansion, history and proof guards",
+    "product_values_and_statistics_unchanged": true
   }
 }
