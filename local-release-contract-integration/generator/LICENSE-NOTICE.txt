@@ -1,0 +1,6 @@
+Private project handoff for the user's BoopaDB maintenance work.
+This bundle does not introduce or grant a new open-source license. Existing
+project/asset rights and any upstream license terms remain unchanged. No external
+Python or Node dependencies, credentials, raw tracker data, or third-party package
+installations are bundled. The pinned static assets are exact project assets from
+the documented baseline; relation assets are the reviewed project handoff outputs.

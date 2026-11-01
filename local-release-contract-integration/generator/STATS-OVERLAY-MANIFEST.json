@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "required_compact_overlay_archive_sha256": "d4f63dc6b191a80e519cd9b1850acbbac84ca85584c635d188beff2c3396fda0",
+  "public_release_commit": "0dcd37873ccc8a2a9cb59ac74d3d0fd7d2013066",
+  "public_snapshot_sha256": "f17f4baaff2b13ae465707c41121269c171fff6a39f904d5bb22c6a646e17ee6",
+  "installed_paths": [
+    "build_full.py",
+    "build_site.py",
+    "build_prototype.py",
+    "test_price_change_stats.py"
+  ],
+  "expected_previous_layer_hashes": {
+    "build_full.py": "135d569f96183d1673dac376ad37be4e9494f1865ab1c954b2ef62d5f0246abb",
+    "build_site.py": "948d9491432ab5e877ac98cb1ba50d8e7cf466697038534d281940c71dfa12df",
+    "build_prototype.py": "ea6f112528120f102c29e4c802c2c2f8f79c30a55024f6a6ff46a41939198a00",
+    "test_price_change_stats.py": null
+  },
+  "files": {
+    "FRESH-LAYER-TESTS.log": {
+      "sha256": "a7ab2a93304fa2e3e89d491a0820e52ee273e114ee69bf80be9868ae5704cf5e",
+      "bytes": 5726
+    },
+    "PUBLIC-BROWSER-QA.json": {
+      "sha256": "24720fac95b0a80dcd59fc2376de64174c6d8c12bec4062eebb0645f9c46fda7",
+      "bytes": 898
+    },
+    "PUBLICATION-STATUS.json": {
+      "sha256": "a18a7097cce96b6bc505a29abcdd29f5c96f904660e826d257da8bda2ba4d9f0",
+      "bytes": 667
+    },
+    "README.md": {
+      "sha256": "9b810442849eb984f69d299b153bf184ccb77309d28ce38393be3f31bf35956c",
+      "bytes": 2942
+    },
+    "STATS-CONTRACT.md": {
+      "sha256": "a7be4a8961a9d61a1605ef9e1916b074595c117b523ed1e26230cac5e60c5552",
+      "bytes": 5584
+    },
+    "build_full.py": {
+      "sha256": "d3f4335a569bfd317707117b035100a02e110d3a2efefd0bdd266a1e6e20d652",
+      "bytes": 30094
+    },
+    "build_prototype.py": {
+      "sha256": "1dd75aafce583c92b10aad003da079270cd6d03dbc34afdcb67db30490c04185",
+      "bytes": 329891
+    },
+    "build_site.py": {
+      "sha256": "281987ffc863ac10edc3f5844494a5af44ab4b3921024fd20a7f76ceaf9dfa36",
+      "bytes": 13210
+    },
+    "test_price_change_stats.py": {
+      "sha256": "69288583d394bef6b6dd76dd1069bd3e233f713b030804a0a911cfd23e6813f0",
+      "bytes": 13575
+    }
+  }
+}

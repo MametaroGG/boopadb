@@ -1,0 +1,680 @@
+{
+  "schema": 1,
+  "purpose": "private source/runtime preservation sync; not scheduler installation or publication authority",
+  "public_release_commit": "fff389f8468cb0d2a6e086fdbbf8170da8d8b960",
+  "publication_snapshot_sha256": "51bb0b743e2fca4d6130f4b90bfef6aa329f05d3fdcc9a72d718b8bac4615cf8",
+  "required_layers": {
+    "v4": "d4cb538007657f1b065cde744122ef0f39100b3071b7b6dcf61faadd3b21ca23",
+    "relations_addon": "b9bef3a74c6fcc2dedec392ae8bc916f9186f9c6d7585cec9afd6d72c36d2714",
+    "supplement_addon_r4": "a3db5f51025547564020960f3b8b5f457d0465f953843d213fbb7a830f051706"
+  },
+  "installed_paths": [
+    "build_prototype.py",
+    "plan_connector_handoff.py",
+    "relation-bundle-inventory.json",
+    "relation-bundle/relation-data/children_0.json",
+    "relation-bundle/relation-data/children_1.json",
+    "relation-bundle/relation-data/children_2.json",
+    "relation-bundle/relation-data/children_3.json",
+    "relation-bundle/relation-data/children_4.json",
+    "relation-bundle/relation-data/children_5.json",
+    "relation-bundle/relation-data/children_6.json",
+    "relation-bundle/relation-data/children_7.json",
+    "relation-bundle/relation-data/items_0.json",
+    "relation-bundle/relation-data/items_1.json",
+    "relation-bundle/relation-data/items_10.json",
+    "relation-bundle/relation-data/items_11.json",
+    "relation-bundle/relation-data/items_12.json",
+    "relation-bundle/relation-data/items_13.json",
+    "relation-bundle/relation-data/items_14.json",
+    "relation-bundle/relation-data/items_15.json",
+    "relation-bundle/relation-data/items_16.json",
+    "relation-bundle/relation-data/items_17.json",
+    "relation-bundle/relation-data/items_18.json",
+    "relation-bundle/relation-data/items_19.json",
+    "relation-bundle/relation-data/items_2.json",
+    "relation-bundle/relation-data/items_20.json",
+    "relation-bundle/relation-data/items_21.json",
+    "relation-bundle/relation-data/items_22.json",
+    "relation-bundle/relation-data/items_23.json",
+    "relation-bundle/relation-data/items_24.json",
+    "relation-bundle/relation-data/items_25.json",
+    "relation-bundle/relation-data/items_26.json",
+    "relation-bundle/relation-data/items_27.json",
+    "relation-bundle/relation-data/items_28.json",
+    "relation-bundle/relation-data/items_29.json",
+    "relation-bundle/relation-data/items_3.json",
+    "relation-bundle/relation-data/items_30.json",
+    "relation-bundle/relation-data/items_31.json",
+    "relation-bundle/relation-data/items_32.json",
+    "relation-bundle/relation-data/items_33.json",
+    "relation-bundle/relation-data/items_34.json",
+    "relation-bundle/relation-data/items_35.json",
+    "relation-bundle/relation-data/items_36.json",
+    "relation-bundle/relation-data/items_37.json",
+    "relation-bundle/relation-data/items_38.json",
+    "relation-bundle/relation-data/items_39.json",
+    "relation-bundle/relation-data/items_4.json",
+    "relation-bundle/relation-data/items_40.json",
+    "relation-bundle/relation-data/items_41.json",
+    "relation-bundle/relation-data/items_42.json",
+    "relation-bundle/relation-data/items_43.json",
+    "relation-bundle/relation-data/items_44.json",
+    "relation-bundle/relation-data/items_45.json",
+    "relation-bundle/relation-data/items_46.json",
+    "relation-bundle/relation-data/items_47.json",
+    "relation-bundle/relation-data/items_48.json",
+    "relation-bundle/relation-data/items_49.json",
+    "relation-bundle/relation-data/items_5.json",
+    "relation-bundle/relation-data/items_50.json",
+    "relation-bundle/relation-data/items_51.json",
+    "relation-bundle/relation-data/items_52.json",
+    "relation-bundle/relation-data/items_53.json",
+    "relation-bundle/relation-data/items_54.json",
+    "relation-bundle/relation-data/items_55.json",
+    "relation-bundle/relation-data/items_56.json",
+    "relation-bundle/relation-data/items_57.json",
+    "relation-bundle/relation-data/items_58.json",
+    "relation-bundle/relation-data/items_59.json",
+    "relation-bundle/relation-data/items_6.json",
+    "relation-bundle/relation-data/items_60.json",
+    "relation-bundle/relation-data/items_61.json",
+    "relation-bundle/relation-data/items_62.json",
+    "relation-bundle/relation-data/items_63.json",
+    "relation-bundle/relation-data/items_7.json",
+    "relation-bundle/relation-data/items_8.json",
+    "relation-bundle/relation-data/items_9.json",
+    "relation-bundle/relation-data/manifest.json",
+    "relation-bundle/relationship-data.js",
+    "relation-bundle/relationship-ui-draft.js",
+    "relation-search-bundle-inventory.json",
+    "relation-search-bundle/relation-search/children_0.json",
+    "relation-search-bundle/relation-search/children_1.json",
+    "relation-search-bundle/relation-search/children_2.json",
+    "relation-search-bundle/relation-search/children_3.json",
+    "relation-search-bundle/relation-search/children_4.json",
+    "relation-search-bundle/relation-search/children_5.json",
+    "relation-search-bundle/relation-search/children_6.json",
+    "relation-search-bundle/relation-search/children_7.json",
+    "relation-search-bundle/relation-search/manifest.json",
+    "relation-search-bundle/relationship-search.js",
+    "relation-supplement-bundle-inventory.json",
+    "relation-supplement-bundle/relation-supplement/assets/modular-avatar-logo.png",
+    "relation-supplement-bundle/relation-supplement/items.json",
+    "relation-supplement-bundle/relation-supplement/manifest.json",
+    "relation-supplement-bundle/relationship-supplement.js",
+    "test_connector_handoff.py"
+  ],
+  "expected_previous_layer_hashes": {
+    "build_prototype.py": "38c0868871d22155d55b13334c1c0f25e078f10c33c4d60b3028ac6a1a4f70b4",
+    "plan_connector_handoff.py": null,
+    "test_connector_handoff.py": null,
+    "relation-bundle/relationship-data.js": "1e771e8fcebf4deb1bcbf699abc85bddc3c25344f586c0ae6cd2a2b927f52228",
+    "relation-bundle/relationship-ui-draft.js": "f16647f479b2906348b7edada55d3d24b05f0b2ecc9f5864f875e1179d4903fc",
+    "relation-bundle/relation-data/items_30.json": "b617f49e67eb2ee2d977fba2a51519e4d3b6df295afacef1e4c99818c9fa2d51",
+    "relation-bundle/relation-data/children_6.json": "0a984ed092bf1037b2a69eab52c40a3838bbff86ec27d30b6bb59e6bf3914eb9",
+    "relation-bundle/relation-data/items_10.json": "d27f66f70be6f49808f0b40b05fbc9ca3e5ffad38e45c8ad004dd74d0e91145c",
+    "relation-bundle/relation-data/items_50.json": "06935a0aac750d9eaeaafc16dd97773808ff9548b39e8a22f8012125b2bc5bdb",
+    "relation-bundle/relation-data/items_3.json": "db05f3fc7b7e22b1152c3be8d178bd70f6b8a1ba73ac74fc34bb2706c49c775f",
+    "relation-bundle/relation-data/items_45.json": "b770d1e4487299d14e71e28d5b0099015dc2092c5d867f476fd813d75347ee6e",
+    "relation-bundle/relation-data/items_6.json": "64ba8e04a621f763adedd063465b974ded9793ab8d21198e4f6ce66d4852b2c4",
+    "relation-bundle/relation-data/items_44.json": "c925031e1562ef5b89dac19625b9baa4cc1041f039a3e6b54f2e463db272de55",
+    "relation-bundle/relation-data/items_4.json": "82b775dd6c3194d2b3891a2a6d35144c25b491d5e000052b9abf61615938a321",
+    "relation-bundle/relation-data/items_20.json": "d9aae63be29e57671fca40aa095a698a8007885ab7f73183fcdeaa3b6a267961",
+    "relation-bundle/relation-data/items_24.json": "3dd80e7aa9c6859044c67525984251a207a4797a3c88b22efe317895c1584760",
+    "relation-bundle/relation-data/items_27.json": "1d2ec3917b7099f97d1b178e020040e45005fe1ec8435209917347ddeff6735b",
+    "relation-bundle/relation-data/items_19.json": "77a31cf829b7b01337285e1b45cfc887b5fa0d2ade9b1560f20cbf16dba1ebcb",
+    "relation-bundle/relation-data/items_46.json": "c9a16cef828d97737dbb26536d178f07ccc4a98e630fc7adbce591b3dc4b07b6",
+    "relation-bundle/relation-data/items_37.json": "268839c4fa04dc8b4b2bd7294d461981bff131bdf9eb1cc3d56e92c5d9276ac8",
+    "relation-bundle/relation-data/items_49.json": "aa88691cee24a522bca30b74aeeba7588074f28fe1a66ce83be3df2affff5f2e",
+    "relation-bundle/relation-data/items_0.json": "74384e3b4904e464b63b1596631d958114685473926f74fe3aed12491080557e",
+    "relation-bundle/relation-data/items_21.json": "b8495f21716dfe43ccdb24a4aa369ea73ec2ff7d132b3ddd45b239fc8c81a641",
+    "relation-bundle/relation-data/items_17.json": "43e501b44c2b832053a5188fd25e3b5cef2f4026691c9dd8c89cede335bb3e50",
+    "relation-bundle/relation-data/items_59.json": "b0a58d37efbf50fa045b321bd5d4971d86372ca897f53a433e7e3d2809446e3d",
+    "relation-bundle/relation-data/items_58.json": "de5deb9ba23f9ac8c967744913d697dedf5d8f4484f2cd5379493f941cea7658",
+    "relation-bundle/relation-data/items_29.json": "ad8c3a80879dbfc6f132ae752a5c4cd48eae5753ebf16ba3ea9d47f6ef72ec72",
+    "relation-bundle/relation-data/items_14.json": "4fb52259065e1c7701bfa77ad01fabdbd1db789d0f5ac78373925cc397943c32",
+    "relation-bundle/relation-data/items_8.json": "fd7b0aa95d7d046ca5a688c290a9c632e334b58d6b677156a2e99d6927e38be6",
+    "relation-bundle/relation-data/items_63.json": "9e9aa0e09ddc3cb7208cfdcbd64d3b0214923c929195ef467c9590d62ef8b05c",
+    "relation-bundle/relation-data/items_40.json": "b8a654e7562a98ad09bba5ebc9ca9da430fe113c3ed0e989b7ac85679be441f0",
+    "relation-bundle/relation-data/items_25.json": "6403b356524a08919c588c1b69966579c1eb39f2b3566470023109f55c3bb1aa",
+    "relation-bundle/relation-data/items_53.json": "bf37534dbf74cfb330ec69d6bec5555725682bfd6f8220f9656c6a212b5c991c",
+    "relation-bundle/relation-data/items_2.json": "de8d25674cc1f779d78af6c6ba7d706b744de09059bd0c468c0fadb08d2b1410",
+    "relation-bundle/relation-data/items_48.json": "12631fc69578c37763b09824c912fdcaa177edb999850f42c8650a1e239a46fe",
+    "relation-bundle/relation-data/items_51.json": "3b0b47986feaa50b4061ccffbe5423a5545bb0941a1e6b53eb6e1245748f1b62",
+    "relation-bundle/relation-data/children_1.json": "e4e076b0597dc23fed0f50ad5ce8b3f75a048e3f3ee314c8201a36fb1f92ffe7",
+    "relation-bundle/relation-data/items_23.json": "da381edb5556be784fb101cff60a43c74df4b2fd18e8c0708823fb9df2e1dd3d",
+    "relation-bundle/relation-data/items_60.json": "d68fd2708eedbc018905fab6c81f7a9c7bd89ea0245c12d9d68e6dc5587e3cb8",
+    "relation-bundle/relation-data/items_18.json": "262e1d1dd574d296322e8137e928b88d9ad0a094e91509405624749e7f510893",
+    "relation-bundle/relation-data/items_34.json": "ae1a9323f47e25ae532f16fd479aa03c48c44e5ecd351d25ddefff72d38a11ca",
+    "relation-bundle/relation-data/items_28.json": "631ae1fd6b786b32390fd225d6b6c5cb18752de757edd543663c8049fa2eb875",
+    "relation-bundle/relation-data/items_36.json": "f02b7e91a9fb9299db85d6d96e791df754e4f525d8f1c58b12c3bc6fd7a42549",
+    "relation-bundle/relation-data/children_4.json": "e3253730722c07c693be9758df6f1cc85ab6266a16970307533d385f193da4e3",
+    "relation-bundle/relation-data/children_3.json": "0df653fbcc0c7b1f01894cccb1230c9524e40c3e1bfbc762022b29937de9f315",
+    "relation-bundle/relation-data/items_42.json": "4f3b3382840ed101f3462badc2660d562eb434b25eee0951588bf3f670a09fcf",
+    "relation-bundle/relation-data/items_11.json": "ac839129bc623f93f016ad6facdeb6193ea0ede996c6c3e5ec920013c943d093",
+    "relation-bundle/relation-data/children_0.json": "90f58f99837a9d07c5238c3d50a1d6e6925fc7d5ee2a82ff7575b11af4d11674",
+    "relation-bundle/relation-data/items_38.json": "3075bb10f07b9a55ece5f8858d2a7d410d3c1b919619243b2b3a5991f3c37c6a",
+    "relation-bundle/relation-data/children_2.json": "22aeedce0a79d553f9e717116a38d7d6cb49356db2334429f9617629c56b657c",
+    "relation-bundle/relation-data/items_56.json": "d0ecc1a974387e3986f3ca8ed710883d8457bf0afdf916be078d718dd6f21609",
+    "relation-bundle/relation-data/items_43.json": "0340e6f8e3e9793e7929d2e5ee579a81ab3828bbafd475a280fbd3333ce83086",
+    "relation-bundle/relation-data/items_26.json": "6094fe4d06d783ffbeaac8ff2eae84e52f2b620422c1d218e76602697d6f2099",
+    "relation-bundle/relation-data/items_35.json": "991ef2c6436a9b3ffe3c5a79a29e8eb29cccc652f3833c817a128953249d3753",
+    "relation-bundle/relation-data/items_52.json": "c6e28031c104bfb0bdff09a39f6a20be21807e946e365c8ffe0d18a60be43a93",
+    "relation-bundle/relation-data/items_5.json": "0ffe7c92cf7bec4329a7ef2a2b0f42ef9986a92a4b3bf7ba2a106a1830e25d28",
+    "relation-bundle/relation-data/items_57.json": "37fd127079d54dc536dc0178090d9b1a0b0c723b468b799bb371ce81c8ff97f2",
+    "relation-bundle/relation-data/children_5.json": "c02bb05031855a0ed1fadd4635720e11f64e8a0be4b9885a9249d9fcec64c7ed",
+    "relation-bundle/relation-data/items_54.json": "8c2c6856b90d89dd7f149c991ef817fe2e5724500c0c8366231b21dd80d2a964",
+    "relation-bundle/relation-data/items_9.json": "b92faea180f3dc580ead4876e28966e32df3863eb416dccc8fdaf1532e01e319",
+    "relation-bundle/relation-data/items_39.json": "d842f83ff5b2c547915ac40e182cb2c82f55500ea3f84909ca3dd0a97d180f0b",
+    "relation-bundle/relation-data/items_15.json": "a122322a8b30d0dfb39a2e7b0e6afd26d6c1a69990b7b850e9d59bed190ca890",
+    "relation-bundle/relation-data/items_41.json": "8f604a45c8d7134b73cde2839e0fc6ca1111da05326cf3359577abc8c6e04b62",
+    "relation-bundle/relation-data/items_32.json": "b6bf42c32582f58be9ed70aae9d104a1288f76e9d6d6e6a8e5d6bd2a5b3a79e5",
+    "relation-bundle/relation-data/children_7.json": "b5c30292ef4673cc018a01db740dcfa625ef806ea5d17d9adc82fff586961001",
+    "relation-bundle/relation-data/items_13.json": "ac1ef1e1a219fab8f25c80fded71c75d23a5c9c9c659fb216857a9b77c7a8ed2",
+    "relation-bundle/relation-data/items_47.json": "1d5ad618ce06b6579025c5868b95fb3968b1938c2ce396adefd97d79c3a7594b",
+    "relation-bundle/relation-data/items_16.json": "2b741436f68c83dc3d2ba17e733cee8d65d22e3831dee00db4d4882c215142e5",
+    "relation-bundle/relation-data/items_22.json": "66a6029179edc7daaa892e7f3b3bb335adc1cb8352d6553988c4d18834333745",
+    "relation-bundle/relation-data/items_31.json": "a793cf6252904cc16bdf44c6131096ab49fb730a5592ef118a8a7d64745faf59",
+    "relation-bundle/relation-data/items_62.json": "49757a26f0e237f6217a53002f2ff500f00d302937d4e45302bd4923168a3563",
+    "relation-bundle/relation-data/items_55.json": "3e47d7d90cc34867f6493b59bdfd5a1746eb9a7c229da7db56a44703d0c69908",
+    "relation-bundle/relation-data/manifest.json": "4a424c686bc5da67f072da77f1d7a135f07660369ad6a8737122e73b43f6794f",
+    "relation-bundle/relation-data/items_1.json": "bf82f106dab1091189be12d0cf8248abca14eb8e575ed3278596e0eb3758e427",
+    "relation-bundle/relation-data/items_33.json": "40a9828a7d31c2016336a69b6e39522ba5ebf32b24c5cb8de0e0e60937bc7870",
+    "relation-bundle/relation-data/items_7.json": "75d496c8077b8b3a9dce91b18b30b316945be2c5c0f95f64c9b16912e91ca423",
+    "relation-bundle/relation-data/items_61.json": "b89e4b837433e4bda9ea41a3bbbbc78ca61724ab189ebc0f32d20ba39f104b02",
+    "relation-bundle/relation-data/items_12.json": "935b84a00db078522f83758c221313f548fb575953e897e0fa5a9a61f589716a",
+    "relation-bundle-inventory.json": "8c36115dc11d1a3563b4a00f766acf5acede37a4085d21db8bfc154593aadedb",
+    "relation-search-bundle/relationship-search.js": "e6fa3c5693bb1ecad58f103eff1289bb54a15c651980338aee4116ef6a09a937",
+    "relation-search-bundle/relation-search/children_6.json": "ce3429d87e8e57b5595c1376c5b5253d4ef9eabd89af147d2d20a853294cb471",
+    "relation-search-bundle/relation-search/children_1.json": "008326acbdb5a5eaa0babb5eec0a25fd9e62039cd821d17b9eb4e6db06742e6d",
+    "relation-search-bundle/relation-search/children_4.json": "c242fb667398d8d915c06b4b2d10f8aad189947cac89abb0c1821a51875eca5f",
+    "relation-search-bundle/relation-search/children_3.json": "87ee86a655d0dc54b3399fdd49c004c01f61ddeb8cd6195bbc54d358a6d319fd",
+    "relation-search-bundle/relation-search/children_0.json": "558e930799c0cdd327aeca283489ddc13bf70cd2aecf6d8006922e7fb565354c",
+    "relation-search-bundle/relation-search/children_2.json": "b4a04f5bc81135fc8bae67466b8c41a481fdc5cdb4dbe26263ea3e7fe517e430",
+    "relation-search-bundle/relation-search/children_5.json": "3339bc60a9ba60abef0484b586a48b925f99799980f269de4ce710dfe692b5e6",
+    "relation-search-bundle/relation-search/children_7.json": "44fae2c26a4bd058fec0c35e3ac8b72acfd39043e4b9af027079329a2ceed332",
+    "relation-search-bundle/relation-search/manifest.json": "d947d6709d9ecc3c72fe2e96292d55181fd6b1d3fbf5ce1b649b680611f185a3",
+    "relation-search-bundle-inventory.json": "a5f57c21f35735d58e8ed75b2ab1becfffd1c046a4aebbc5a23ae35824225b98",
+    "relation-supplement-bundle/relationship-supplement.js": "352aa3eed121bee9abe93629576cffe6444316d623995ab3a1c045dda32cec05",
+    "relation-supplement-bundle/relation-supplement/items.json": "684b4f191b1808c454bf8a1aedbe5e019713c09795db1f07952e239d80d46c89",
+    "relation-supplement-bundle/relation-supplement/manifest.json": "42cff3885a2b42c48c7717d487e26ad40da23123bd5fbaf4469e4f38186139a8",
+    "relation-supplement-bundle/relation-supplement/assets/modular-avatar-logo.png": "19e09e96c1fdbe4fd608fa9bf99d82b122754c0c883ee4ef504eb9f85f33a321",
+    "relation-supplement-bundle-inventory.json": "e841a5c8dbefe46821f48ce3fee07c1443724aaf455e9c92212efbc8d0897825"
+  },
+  "master_canonical_sha256": "ff66c2e7a21b0ccda409c5634fb13d684a626a550d28d220fa5c04faf36e07ed",
+  "files": {
+    "DOT-AUTOUPDATE-PRODUCER-PLAN-20261029.md": {
+      "bytes": 4976,
+      "sha256": "c0597aa235f4977c3e770ade2e9f168d376ddb8a32236d2d2a086da5da87385e"
+    },
+    "DOT-PUBLISHER-AUTOMATION-DRAFT.md": {
+      "bytes": 4941,
+      "sha256": "826470aeeb4803100a36eade12347c3c152051e28b7c0af9aae1a2eee8b823d2"
+    },
+    "PUBLICATION-STATUS.json": {
+      "bytes": 901,
+      "sha256": "c130e9500265e8f3b793ca3e53e3521ff5508652d9594b7683dccaaaf843b45a"
+    },
+    "QA-RESULTS.json": {
+      "bytes": 721,
+      "sha256": "8117c47d794e7cf7f3296a641f8ea7b7dfa59e083da6922e5575cccecee51065"
+    },
+    "README-SYNC.md": {
+      "bytes": 5042,
+      "sha256": "6ac1144e64262caa3a0fa1f33625b7502ab7519e6a35a94f34ea2a8fb38cef03"
+    },
+    "ROOT-PUBLICATION-REVIEW.json": {
+      "bytes": 10824,
+      "sha256": "3ebfcf2965b2f980f5af29b9284b6e151650a575d9fbea48dca3667da928a6dc"
+    },
+    "build_prototype.py": {
+      "bytes": 322041,
+      "sha256": "3dbdfc74184b0e40563d766d0852d321679c558c2d2c772333c0f3d9d54f306d"
+    },
+    "generated-item-search-delta.diff": {
+      "bytes": 3373,
+      "sha256": "8fd6fe35a25bc41530ca68e09de324843aa8a1a2f4778725f64378f87e3b4d37"
+    },
+    "generator-rerender-dom.log": {
+      "bytes": 3190,
+      "sha256": "3fb5968572034c418205778009f4c95331c0a9b17ead52395c2d747b457c2555"
+    },
+    "generator-tests.log": {
+      "bytes": 36433,
+      "sha256": "4d1d8a09396d9707d74df715959cd7819ae0e8cdfec465219f9625098b4dd2b8"
+    },
+    "plan_connector_handoff.py": {
+      "bytes": 5890,
+      "sha256": "cb035b07ecb2d4f304b536ddf12948150e145675706de0428d792c722308ea1b"
+    },
+    "private-provenance/INDEPENDENT-BUNDLE-REVIEW.json": {
+      "bytes": 1033,
+      "sha256": "493346ddf261cf7c1f84a20caff9fb8791f1b18855ae516bb57fcb431c9e4ed8"
+    },
+    "private-provenance/INDEPENDENT-REVIEW.json": {
+      "bytes": 1420,
+      "sha256": "aef9d8da43c6e47fcd025eb62daa076913d4a395487317439d4e1efd4192aa7d"
+    },
+    "private-provenance/LOGO-PROVENANCE.json": {
+      "bytes": 1649,
+      "sha256": "870000031b31a54b97c71e2192aba3a35c964b7ea189f6799ef7a11b62f7a99d"
+    },
+    "private-provenance/README.md": {
+      "bytes": 4311,
+      "sha256": "5e3f7275f8dbd7141ae099c29d3260fb80e1c5dc5008eb63f54a20d3ded0a78d"
+    },
+    "private-provenance/SEARCH-LOADING-1029.md": {
+      "bytes": 3816,
+      "sha256": "31aa99238cc553cf387dd920c4704cfe48270e658b129d07c81625a4740d4c96"
+    },
+    "private-provenance/SEARCH-LOADING-MANIFEST.json": {
+      "bytes": 794,
+      "sha256": "c45cbeeaf90c6a92d3daba80eb96d419df3f3eb5c2ced2486cb80d5a51dba992"
+    },
+    "private-provenance/apply_patch.py": {
+      "bytes": 1651,
+      "sha256": "d7c956c1f218a122d5d8de36ed93da7d493b02c67697cb5d5eba9234da3ff22b"
+    },
+    "private-provenance/impact.json": {
+      "bytes": 1937,
+      "sha256": "c49e42d1cc330cd1dc0d5070722aed57c9ca93c1ca3f649d7e89c8a316802e3c"
+    },
+    "private-provenance/proposal.json": {
+      "bytes": 18183,
+      "sha256": "b9845c53ecce0f37d78c3c5016f1035e0a93a1b70a2d27a097512f67c32f88e6"
+    },
+    "private-provenance/search-loading-generator.patch": {
+      "bytes": 3413,
+      "sha256": "8d89a44cd5d6424bb8cf1412093a4c2d7864749e74b025c0ff514f2d3a629f02"
+    },
+    "published-fff389-snapshot-receipt.json": {
+      "bytes": 30720,
+      "sha256": "51bb0b743e2fca4d6130f4b90bfef6aa329f05d3fdcc9a72d718b8bac4615cf8"
+    },
+    "relation-bundle/relation-data/children_0.json": {
+      "bytes": 62663,
+      "sha256": "238901ac55dc2ab5d14438a6cba870cb576b8a107cc365beabcb7abc58ce7155"
+    },
+    "relation-bundle/relation-data/children_1.json": {
+      "bytes": 53047,
+      "sha256": "ecb15e6835586ba2ba3cc7987d990ff17d5fc18c91862b535f5a679b93c3d36e"
+    },
+    "relation-bundle/relation-data/children_2.json": {
+      "bytes": 97838,
+      "sha256": "fbaf5bc25a02b36f66f7892a2ef7ab0f154f815b0e0604a63a13eab2d7bb1a7a"
+    },
+    "relation-bundle/relation-data/children_3.json": {
+      "bytes": 153120,
+      "sha256": "a7a9e313d17a52e93093d2cd860a497a963baee7278790745e0d55e847906a93"
+    },
+    "relation-bundle/relation-data/children_4.json": {
+      "bytes": 94559,
+      "sha256": "2bea0c84543b812c779ca8b957db16a292c2afaafed5a7b1c423b1a1bcb19de9"
+    },
+    "relation-bundle/relation-data/children_5.json": {
+      "bytes": 101400,
+      "sha256": "60147ac7f5b650822fd7d81312d42dc79647327cdf25c87088e738caa0100b93"
+    },
+    "relation-bundle/relation-data/children_6.json": {
+      "bytes": 106954,
+      "sha256": "dbb309aac83962559bb6d734d4dcad3652e9390f9a681cb166bfd0902e5f9206"
+    },
+    "relation-bundle/relation-data/children_7.json": {
+      "bytes": 94400,
+      "sha256": "b89d15af63fc90450e2b82753f61b5419fd7344924bde3d517ce84d340b0fc13"
+    },
+    "relation-bundle/relation-data/items_0.json": {
+      "bytes": 74731,
+      "sha256": "db5f6f9801e216c7591e630b42119a86872a75863772c5ffb67ae9886839eccb"
+    },
+    "relation-bundle/relation-data/items_1.json": {
+      "bytes": 78713,
+      "sha256": "a34a727b97d4944880b7512cd244e223ab898f50ea359c8e2a001c9fe843afbd"
+    },
+    "relation-bundle/relation-data/items_10.json": {
+      "bytes": 78721,
+      "sha256": "fc349a688dcc400e4271a6aff85b3d8ce30d3403f6bb90105879a239220815ef"
+    },
+    "relation-bundle/relation-data/items_11.json": {
+      "bytes": 76798,
+      "sha256": "175b44dd78073fb28338d1695b91e951c43464698d709ace1f7a1e8da87b63c6"
+    },
+    "relation-bundle/relation-data/items_12.json": {
+      "bytes": 78683,
+      "sha256": "eec6928a9319d8988ccc4b235b4671ab3ef21276cf57f4df235514b93a93d78c"
+    },
+    "relation-bundle/relation-data/items_13.json": {
+      "bytes": 77290,
+      "sha256": "40b58d50f414aa0884a1889c405d46af39e163a6486b5ad0606c02c9ac3e1781"
+    },
+    "relation-bundle/relation-data/items_14.json": {
+      "bytes": 79012,
+      "sha256": "c1c833c89994ad7da2352bc5ec25645841ab016e6ca431d267f2619dd4082d90"
+    },
+    "relation-bundle/relation-data/items_15.json": {
+      "bytes": 76224,
+      "sha256": "032f15fce6d3bbed9ffca62391901eca786ce0ed22e8c802a26d9c2a4655b34a"
+    },
+    "relation-bundle/relation-data/items_16.json": {
+      "bytes": 72007,
+      "sha256": "4e50c238438b304a7c51301cde4e15b86084b14e8c052729fb8df3fd787d3611"
+    },
+    "relation-bundle/relation-data/items_17.json": {
+      "bytes": 79210,
+      "sha256": "bb4a20c2bc13a9b88a9f467d70b9aed9c3f78f502cfb5a5cca2f342ae660522a"
+    },
+    "relation-bundle/relation-data/items_18.json": {
+      "bytes": 72919,
+      "sha256": "cd5ea52499bbd4345f41ff608d625f551cb1f2445679d8aef121630122651717"
+    },
+    "relation-bundle/relation-data/items_19.json": {
+      "bytes": 76487,
+      "sha256": "2dc8789a53754726c1b23816aff79da1b12538eb6dc93d55ea63946a6cd657c2"
+    },
+    "relation-bundle/relation-data/items_2.json": {
+      "bytes": 79931,
+      "sha256": "0f08c350d8b8f4fed6ddcb396b1c51fb32f4c160b156888a90da54b6bdb797ad"
+    },
+    "relation-bundle/relation-data/items_20.json": {
+      "bytes": 73867,
+      "sha256": "65603ec6bc1d6a9942fbea3a554d2c2df9c330fd5793defdbce65e3fceb4352c"
+    },
+    "relation-bundle/relation-data/items_21.json": {
+      "bytes": 76233,
+      "sha256": "d41d1afa58c15ca3cc2a78c5411aa61fc68e2abbab74ef3dd16b1e343729a9c9"
+    },
+    "relation-bundle/relation-data/items_22.json": {
+      "bytes": 72621,
+      "sha256": "561ff0989a591fab1ea81952a05dc31e81ef7a40a63cb2e575cb45fde69e03a4"
+    },
+    "relation-bundle/relation-data/items_23.json": {
+      "bytes": 80688,
+      "sha256": "f3a5d8ab695120edf2f3c512533e56f5e0367d44ea1d42c0a9825c467d4ce865"
+    },
+    "relation-bundle/relation-data/items_24.json": {
+      "bytes": 74638,
+      "sha256": "a8afa1dbf857099fe5a9706cad8a00a3988a716f67523ef856721fa30f38c956"
+    },
+    "relation-bundle/relation-data/items_25.json": {
+      "bytes": 73640,
+      "sha256": "2535f7cc9b64d9c2bde043d5a4d638e8d2d2bdec542175c05f4c779b099c507b"
+    },
+    "relation-bundle/relation-data/items_26.json": {
+      "bytes": 75026,
+      "sha256": "e0c8c859bfc55852404321f7e1b13847747babe477beff667bcb6f70da67b1a0"
+    },
+    "relation-bundle/relation-data/items_27.json": {
+      "bytes": 74676,
+      "sha256": "77f10af9e5929b7585fff110c73882495e2cbfff74eab25cc9d8fb3ff7ad41b4"
+    },
+    "relation-bundle/relation-data/items_28.json": {
+      "bytes": 77326,
+      "sha256": "de224a19924f445397e1f12091fa17b99ba63ba442702819818b081f93d6372e"
+    },
+    "relation-bundle/relation-data/items_29.json": {
+      "bytes": 72662,
+      "sha256": "e77a5c15fc597dd9e9c65e27fb49b84b3fa4d5fd70bcfc517f55d7909f774b05"
+    },
+    "relation-bundle/relation-data/items_3.json": {
+      "bytes": 74658,
+      "sha256": "e78b2ca8e5ee7a5edf45e99b37a9e565b14b22575a428acf4c31254bc15af902"
+    },
+    "relation-bundle/relation-data/items_30.json": {
+      "bytes": 75879,
+      "sha256": "bd01f88d9de5487031f41092d5798c9895a54ef9a3ac7a9ed05879b78e7183db"
+    },
+    "relation-bundle/relation-data/items_31.json": {
+      "bytes": 77768,
+      "sha256": "d415c0ab8a7c0be9b472de58ed36cf8727eea51add091ff551e60074ec883eac"
+    },
+    "relation-bundle/relation-data/items_32.json": {
+      "bytes": 77140,
+      "sha256": "9617a0892edaf48f22ae03f24369b1072321080c1707a67dd52acace4f420b4a"
+    },
+    "relation-bundle/relation-data/items_33.json": {
+      "bytes": 78363,
+      "sha256": "73c85540dd9911f07dff0041feec8b55a119751ebcf9f046ad18e9df77d56459"
+    },
+    "relation-bundle/relation-data/items_34.json": {
+      "bytes": 73811,
+      "sha256": "1753338dfaa62c60c58d542ee182f11595b10b5f84bc247307656b44a6c0a03f"
+    },
+    "relation-bundle/relation-data/items_35.json": {
+      "bytes": 76325,
+      "sha256": "fac406461c97266dec8162fa84d119fef539fccd0bba9c5d72a665ac9f2022d7"
+    },
+    "relation-bundle/relation-data/items_36.json": {
+      "bytes": 76758,
+      "sha256": "e564a707e2881f8f8e29fdbb3c46cdc3693ed7ca4dd55294a767c11037eff2c5"
+    },
+    "relation-bundle/relation-data/items_37.json": {
+      "bytes": 78373,
+      "sha256": "0ad006c7742755b4852ec9c6324a837391df8767f89fca968c44e450f12eb66e"
+    },
+    "relation-bundle/relation-data/items_38.json": {
+      "bytes": 79265,
+      "sha256": "4e4bf637de59a1d7ab3c10c7a6800de2d4aa71e83c269c97a7219a4bd7c7466d"
+    },
+    "relation-bundle/relation-data/items_39.json": {
+      "bytes": 72223,
+      "sha256": "39dd0153360d700d091c3b3766b2b2f8c0564f310d353aee1e7d2c1579faa374"
+    },
+    "relation-bundle/relation-data/items_4.json": {
+      "bytes": 77889,
+      "sha256": "babde39206a7153a0d7b2bb012696e0f13e0438b0cedb36ee638bfe1ea4465a0"
+    },
+    "relation-bundle/relation-data/items_40.json": {
+      "bytes": 76201,
+      "sha256": "6b9b76c8e6a168cfecf9ff22e0937275309e3af28dc8dc106454d449feac12b4"
+    },
+    "relation-bundle/relation-data/items_41.json": {
+      "bytes": 75857,
+      "sha256": "7aca9b7d4e43a2c98661250c5f78679ab98a0930bccaae2cc12ffaafedd009fa"
+    },
+    "relation-bundle/relation-data/items_42.json": {
+      "bytes": 80631,
+      "sha256": "cec70c3d562368adb7e95798f9aa07fd66ebc830214d515e8ad89d40f5c8acdf"
+    },
+    "relation-bundle/relation-data/items_43.json": {
+      "bytes": 73096,
+      "sha256": "f84985c2fcd79a5e3c5f07e06734b39f662386cc45d6fae5c9ad19f62375f684"
+    },
+    "relation-bundle/relation-data/items_44.json": {
+      "bytes": 78963,
+      "sha256": "2d017d9be9afe1fdab70f429e72db2eadb581a5371d494ac90eca19a8b21ce8f"
+    },
+    "relation-bundle/relation-data/items_45.json": {
+      "bytes": 76696,
+      "sha256": "0318de6206cc774f1147fe45e5deb90b9b9b9a2685118c044877cd1c880df4d6"
+    },
+    "relation-bundle/relation-data/items_46.json": {
+      "bytes": 73976,
+      "sha256": "41e9111982518a7d0690db7db204d05b3c92ec2e06380f8dd20297a0cf156958"
+    },
+    "relation-bundle/relation-data/items_47.json": {
+      "bytes": 75476,
+      "sha256": "44cce8b016e5646a7b1cbc49f6cb9a52520fd8efdcaf062a3f1cd210fcb3b196"
+    },
+    "relation-bundle/relation-data/items_48.json": {
+      "bytes": 74775,
+      "sha256": "28befeed86febcc5a52deb4e390b3120bab7d11854c2297ef73165dcf55023f3"
+    },
+    "relation-bundle/relation-data/items_49.json": {
+      "bytes": 75193,
+      "sha256": "e57a12ae3f5eb9d80149890664d8c0b50933acf4f1aa984d5045ef47b3746853"
+    },
+    "relation-bundle/relation-data/items_5.json": {
+      "bytes": 80681,
+      "sha256": "f01de192babd0d31176214429584b52b9eb5fb7e3659d9183598f2aa2820b183"
+    },
+    "relation-bundle/relation-data/items_50.json": {
+      "bytes": 77961,
+      "sha256": "e2738bedfe88500b9f35fd185fad192767be81e046fc2746900f6cf4610289b8"
+    },
+    "relation-bundle/relation-data/items_51.json": {
+      "bytes": 74911,
+      "sha256": "3bccbc98d239ed1343b893b91037686564a7765add66737f804819355904e55c"
+    },
+    "relation-bundle/relation-data/items_52.json": {
+      "bytes": 79241,
+      "sha256": "474f01e57afbb7f2274c439f4d36c429dd6b419806eba9cb6f9a2a14cecd2a48"
+    },
+    "relation-bundle/relation-data/items_53.json": {
+      "bytes": 76878,
+      "sha256": "09c9bece585ccb1a80a62dbaf6a3a9f74b25196b8db1c063f9806cec109bba4a"
+    },
+    "relation-bundle/relation-data/items_54.json": {
+      "bytes": 77922,
+      "sha256": "85c0a7a33c76da47768fdaa62253a55a6d8c1a314ffe33f2101a11d33298772e"
+    },
+    "relation-bundle/relation-data/items_55.json": {
+      "bytes": 77992,
+      "sha256": "750ac2cd68af80a3615612b6d9d1f2b4f8beb74649da968c02ad7b5e07105820"
+    },
+    "relation-bundle/relation-data/items_56.json": {
+      "bytes": 75685,
+      "sha256": "049de76e20e148f6a2deca6d44e0b10f295ab1d6bfc64a8f7f638ff30bd29d4a"
+    },
+    "relation-bundle/relation-data/items_57.json": {
+      "bytes": 78771,
+      "sha256": "69b5d70ba82bf9412c766b2d180d5305dbfcd87d759931becd9cd7db593c958f"
+    },
+    "relation-bundle/relation-data/items_58.json": {
+      "bytes": 79309,
+      "sha256": "865fd29855b2d10f22871060892480e9a4e0d962a2c5aab581fd4d90c7bf19ce"
+    },
+    "relation-bundle/relation-data/items_59.json": {
+      "bytes": 77548,
+      "sha256": "e59ccd435871f725648c25814e426ecf6adae8182ecfcb9b18b88e447698dd92"
+    },
+    "relation-bundle/relation-data/items_6.json": {
+      "bytes": 71935,
+      "sha256": "818af1f34f2d55f6cd64f6b323a4e58f266a17c43d13329190f9882ac5a97309"
+    },
+    "relation-bundle/relation-data/items_60.json": {
+      "bytes": 75875,
+      "sha256": "ad9231548cbe696518f4936c711fe821b465b902398e2e50e99d49e6b2bd0671"
+    },
+    "relation-bundle/relation-data/items_61.json": {
+      "bytes": 78384,
+      "sha256": "0dd79c30a08cc651c5997d56a44fb9c48f35b570377c1c4ebc429b44993d7d41"
+    },
+    "relation-bundle/relation-data/items_62.json": {
+      "bytes": 74960,
+      "sha256": "cf46044e0ca480fa88aca129f0857a8752fdf38f6e7345b30516e34d3c700154"
+    },
+    "relation-bundle/relation-data/items_63.json": {
+      "bytes": 79741,
+      "sha256": "5b4d30baf2893e4fe27f3462ce63f14c75609e1a55dbe9f4d46d2af2da4478e0"
+    },
+    "relation-bundle/relation-data/items_7.json": {
+      "bytes": 80845,
+      "sha256": "4807fdfab5c9882ed8e2456b19fffee94444707414bb817bec63eb9cf3a68999"
+    },
+    "relation-bundle/relation-data/items_8.json": {
+      "bytes": 78020,
+      "sha256": "002c4cab29439129a370ca753470d9c40bd0817920f4d9de20b0a05a08a6c612"
+    },
+    "relation-bundle/relation-data/items_9.json": {
+      "bytes": 72055,
+      "sha256": "5684e678b5ed267e23e2adeb87d64f7c1aec9462848613a6892fea71388092c2"
+    },
+    "relation-bundle/relation-data/manifest.json": {
+      "bytes": 8964,
+      "sha256": "e6dc11e49d14ed61ff00626d65ef0686a9318a61dc95ca1e7e9b574683eb37c4"
+    },
+    "relation-bundle/relationship-data.js": {
+      "bytes": 3740,
+      "sha256": "1e771e8fcebf4deb1bcbf699abc85bddc3c25344f586c0ae6cd2a2b927f52228"
+    },
+    "relation-bundle/relationship-ui-draft.js": {
+      "bytes": 16138,
+      "sha256": "f16647f479b2906348b7edada55d3d24b05f0b2ecc9f5864f875e1179d4903fc"
+    },
+    "relation-bundle-inventory.json": {
+      "bytes": 7990,
+      "sha256": "19667b530a7fee4166b472e7f7c33b7d86d9875896eb2230810e23199d5dc7ef"
+    },
+    "relation-bundle-local-test-approval.json": {
+      "bytes": 7982,
+      "sha256": "4a1a9f8e42d27e7115f70964a68e95ccd2bc60c0b544c34a470009acc8652569"
+    },
+    "relation-search-bundle/relation-search/children_0.json": {
+      "bytes": 62752,
+      "sha256": "92d8ad3c2633b7daca14a7b2c62d0f4fa728bc7023b22882e682919dd46932c3"
+    },
+    "relation-search-bundle/relation-search/children_1.json": {
+      "bytes": 53136,
+      "sha256": "0a2a4ceaa3f1484aae0ab3d56c2905a3fa4db96276156b8530a2b3ee8d91781d"
+    },
+    "relation-search-bundle/relation-search/children_2.json": {
+      "bytes": 101647,
+      "sha256": "12b3fe3453a6cd422a1fae5cba419dabf93f026d69096d05e7c6ed0d32345c6f"
+    },
+    "relation-search-bundle/relation-search/children_3.json": {
+      "bytes": 157919,
+      "sha256": "a315c0226200d587edb12e6f3127c2a512a96ce45c5d172089c85fd81f69781f"
+    },
+    "relation-search-bundle/relation-search/children_4.json": {
+      "bytes": 94648,
+      "sha256": "7121e6627fb7afe7cd781e9fe3fd734e719ce39702b9fcc8be16823a27a527f4"
+    },
+    "relation-search-bundle/relation-search/children_5.json": {
+      "bytes": 117289,
+      "sha256": "d934ee384471da9b8fdfb51405b823d61211344acc15c8e1725ffa59e9febaad"
+    },
+    "relation-search-bundle/relation-search/children_6.json": {
+      "bytes": 107043,
+      "sha256": "b71c220f5913dfee02a27dcaf131dae83a8831403e0dc652bb2f048cdfaee8c1"
+    },
+    "relation-search-bundle/relation-search/children_7.json": {
+      "bytes": 103649,
+      "sha256": "7b8b10e33ca226bc4503371d3137072ba4826b266e832774e570e07eb2b879ca"
+    },
+    "relation-search-bundle/relation-search/manifest.json": {
+      "bytes": 1232,
+      "sha256": "2a52ec24991eba21dfde6cfa08ab0e605daa5b0b490811bf7c867bbdc1381d9e"
+    },
+    "relation-search-bundle/relationship-search.js": {
+      "bytes": 2419,
+      "sha256": "e6fa3c5693bb1ecad58f103eff1289bb54a15c651980338aee4116ef6a09a937"
+    },
+    "relation-search-bundle-inventory.json": {
+      "bytes": 1415,
+      "sha256": "f35f05d9a51dc94f4afde94ed54c9a7e20162f3586ccf865a9ac4bfa5d90b541"
+    },
+    "relation-search-bundle-local-test-approval.json": {
+      "bytes": 1407,
+      "sha256": "9614e9e58b90cdc8e9ee0f97e952d12d4186304b37e60f64d1804aa22c3edf8c"
+    },
+    "relation-supplement-bundle/relation-supplement/assets/modular-avatar-logo.png": {
+      "bytes": 59391,
+      "sha256": "19e09e96c1fdbe4fd608fa9bf99d82b122754c0c883ee4ef504eb9f85f33a321"
+    },
+    "relation-supplement-bundle/relation-supplement/items.json": {
+      "bytes": 2042,
+      "sha256": "97325daf2eadab5f490d742f7b5ef090056706c47f354a37ea645297cdc92a73"
+    },
+    "relation-supplement-bundle/relation-supplement/manifest.json": {
+      "bytes": 379,
+      "sha256": "51fc590e3227cfcd305be95809ed3acfcc764bee2bff8a7604d31075c4e38897"
+    },
+    "relation-supplement-bundle/relationship-supplement.js": {
+      "bytes": 10736,
+      "sha256": "352aa3eed121bee9abe93629576cffe6444316d623995ab3a1c045dda32cec05"
+    },
+    "relation-supplement-bundle-inventory.json": {
+      "bytes": 799,
+      "sha256": "63fa9e726ea87825b84a4c570f60fcd12bef3d6780d9db4a0f73d39edf4e0fd2"
+    },
+    "relation-supplement-bundle-local-test-approval.json": {
+      "bytes": 791,
+      "sha256": "7ac9c98ce7ad7c6041533ecff9f8a6f545af271986ab8f44d1d7eafbeae61ecb"
+    },
+    "test_connector_handoff.py": {
+      "bytes": 2892,
+      "sha256": "6e8d818e8acd3a4fb92451740d0d81391f571f16a10ed81d88fe1e560318e83b"
+    }
+  }
+}

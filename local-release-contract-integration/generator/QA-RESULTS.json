@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "base_archive_sha256": "d4cb538007657f1b065cde744122ef0f39100b3071b7b6dcf61faadd3b21ca23",
+  "override_sha256": "fba1fdf22984d82ff3efed2f5b64a229b31828f9f5ff3fc2de29d264b4a2b1e2",
+  "pipeline_tests_passed": 22,
+  "installed_base_plus_addon_smoke_tests_passed": 2,
+  "runtime_guard_negative_cases": 10,
+  "new_corrected_fixture_rerender_validated": true,
+  "same_corrected_target_plan_files": 182,
+  "old_v4_rejected_against_corrected_target": true,
+  "raw_rebuild_performed": false,
+  "actual_muse_rerender_executed_here": false,
+  "private_full_master_included": false,
+  "public_release_commit": "96378c22831ac7005dbf916c9bb4974bb86e5572",
+  "independent_guard_review": "GO final offline addon review",
+  "independent_data_pack_review": "GO via UI owner; exact82 hash/inverse/version verified"
+}

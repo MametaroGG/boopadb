@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "purpose": "private reviewed cache generator preservation; no new batch or publication authorization",
+  "required_source_sync_archive_sha256": "8d897ddea6ef926e0e411c5784b7165126f670d5f7add9d150399a29e017ab29",
+  "public_release_commit": "20d21da774be0483eabb354ba6d59825e2087e05",
+  "public_snapshot_sha256": "8fd4d86bd51e781c888a5c057b4aa3de9b35d99fde169e09619520ae1fd80bda",
+  "installed_paths": [
+    "build_prototype.py",
+    "build_site.py",
+    "static_assets.py",
+    "pinned-static/static-manifest.json",
+    "pinned-static/catalog-cache.js",
+    "test_catalog_cache_static.py"
+  ],
+  "expected_previous_layer_hashes": {
+    "build_prototype.py": "3dbdfc74184b0e40563d766d0852d321679c558c2d2c772333c0f3d9d54f306d",
+    "build_site.py": "0ece3f2df780abf16cb559d6b84f05d06c54af0716ac6b0cba983d917469970e",
+    "static_assets.py": "0af725b55163d6e3774b9428adf700e3f1d2ff056a0b46d466a148f8432ab899",
+    "pinned-static/static-manifest.json": "975da85235bb5b91e86f10970ecb594f8dffc56c710685646d3a2e7350af55e0",
+    "pinned-static/catalog-cache.js": null,
+    "test_catalog_cache_static.py": null
+  },
+  "files": {
+    "build_prototype.py": {
+      "sha256": "33cbc450496f58ade9efe2221c3103f1eb923366c35adf27984e4f32f1e8fe58",
+      "bytes": 322399
+    },
+    "build_site.py": {
+      "sha256": "695bfbc85f994505da3c81ffff07d3237f967306f88c18510836ac9be0cbd624",
+      "bytes": 12500
+    },
+    "static_assets.py": {
+      "sha256": "8dd9bac8aeccbade86ec4f2460327468acb397c9809bbf8c537921061f2fb397",
+      "bytes": 2129
+    },
+    "pinned-static/static-manifest.json": {
+      "sha256": "3f9ee13a762433312f4b27be190330442d78b8e68ccfdc896fdf027718f072ad",
+      "bytes": 2218
+    },
+    "pinned-static/catalog-cache.js": {
+      "sha256": "e0d279c631f6833d2171c3993d27bbf239ed1082c673f8810288bf8207cc78f7",
+      "bytes": 6468
+    },
+    "test_catalog_cache_static.py": {
+      "sha256": "c4e164cec9e62654ee3ad15007da69c26f33c8863f8c742c2196aa49fd7194bb",
+      "bytes": 1240
+    },
+    "README.md": {
+      "sha256": "e5e1c66c07f075944cb97dcc66ab5878a4d31ffbcdcc6d783e1277af187486b7",
+      "bytes": 1927
+    },
+    "PUBLICATION-STATUS.json": {
+      "sha256": "fb06a5504c242a5b6392be3cc976649e3690d71235ed3d91f35e6b009df416b3",
+      "bytes": 871
+    }
+  }
+}

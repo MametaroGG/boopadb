@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "purpose": "private deterministic core preservation, no new run/scheduler/publication permission",
+  "required_source_sync_archive_sha256": "8d897ddea6ef926e0e411c5784b7165126f670d5f7add9d150399a29e017ab29",
+  "required_cache_overlay_archive_sha256": "b951a34c18a50af2e6d14acb11e753125c0bcb5f9b98c9d74418dd21688d4a9a",
+  "public_release_commit": "bbe48e031eb84a0f73f64e4ea6143a9984db9e77",
+  "public_snapshot_sha256": "35044a803e4b8f11fc9a93eae1d1f132c000fee3c318c05e5971b63db7a4828d",
+  "installed_paths": [
+    "build_prototype.py",
+    "build_site.py",
+    "pinned-static/catalog-cache.js",
+    "pinned-static/catalog-images.js",
+    "pinned-static/static-manifest.json",
+    "prepare_deployment.py",
+    "rerender_candidate.py",
+    "scripts/build-search-core.py",
+    "scripts/validate_search_core.py",
+    "scripts/validate_snapshot.py",
+    "static_assets.py",
+    "test_catalog_cache_static.py",
+    "test_delivery_smoke.py",
+    "test_search_core.py"
+  ],
+  "expected_previous_layer_hashes": {
+    "build_prototype.py": "33cbc450496f58ade9efe2221c3103f1eb923366c35adf27984e4f32f1e8fe58",
+    "build_site.py": "695bfbc85f994505da3c81ffff07d3237f967306f88c18510836ac9be0cbd624",
+    "pinned-static/catalog-cache.js": "e0d279c631f6833d2171c3993d27bbf239ed1082c673f8810288bf8207cc78f7",
+    "pinned-static/catalog-images.js": null,
+    "pinned-static/static-manifest.json": "3f9ee13a762433312f4b27be190330442d78b8e68ccfdc896fdf027718f072ad",
+    "prepare_deployment.py": "863566355aaa8128289d615c6619cccbe8ec9b264c59a0b9827c3cb1e71cdd2e",
+    "rerender_candidate.py": "dff7cae14f508eeeb9608803ee34dbba8f61ed1bc06592bb2dda40a744f23ed8",
+    "scripts/build-search-core.py": null,
+    "scripts/validate_search_core.py": null,
+    "scripts/validate_snapshot.py": "fad9e007976b2460f9474b664965867ffbfcd61d431520dfdaf48ac2365cda81",
+    "static_assets.py": "8dd9bac8aeccbade86ec4f2460327468acb397c9809bbf8c537921061f2fb397",
+    "test_catalog_cache_static.py": "c4e164cec9e62654ee3ad15007da69c26f33c8863f8c742c2196aa49fd7194bb",
+    "test_delivery_smoke.py": "535b8bf530c9a05d21104af8570931cbd2653990bb947f22c6d44f890386ee1f",
+    "test_search_core.py": null
+  },
+  "generated_assets_included": false,
+  "generated_asset_count": 536,
+  "files": {
+    "build_prototype.py": {
+      "sha256": "f84cf606a8f991afdac0b4de26abd1e98a6c5fb550a7be89f395aa0cde5246ab",
+      "bytes": 323175
+    },
+    "build_site.py": {
+      "sha256": "948d9491432ab5e877ac98cb1ba50d8e7cf466697038534d281940c71dfa12df",
+      "bytes": 12667
+    },
+    "pinned-static/catalog-cache.js": {
+      "sha256": "3504ec6c647636e1598c93a9b647c10b20dc0b796fc6259a9f4002c2580aba26",
+      "bytes": 8590
+    },
+    "pinned-static/catalog-images.js": {
+      "sha256": "d02f5dc19a5b3d970d10ff9bed409035bd00db21e3f02d9266ff0af27a5f4f80",
+      "bytes": 1928
+    },
+    "pinned-static/static-manifest.json": {
+      "sha256": "b7ff54c7f18d0b0865fac96ab7f034703f67083ad999f1cbd02689ac107a91cb",
+      "bytes": 2311
+    },
+    "prepare_deployment.py": {
+      "sha256": "37891e900578db85fd513337702861e6e7182a1594e1151131655b19c8d24865",
+      "bytes": 13041
+    },
+    "rerender_candidate.py": {
+      "sha256": "51dc4c099d9c4284701849beca77c42cfb3095517b0dba4d88a5ca9d314d2ef0",
+      "bytes": 14831
+    },
+    "scripts/build-search-core.py": {
+      "sha256": "397e94a78d5c59c84305c18a0725f181be067cd23b9b5ef04ddc2ce3a7784e3f",
+      "bytes": 10065
+    },
+    "scripts/validate_search_core.py": {
+      "sha256": "f730282b1539e6c3f9c51586c28c07624b3519ea2f2a8c3bf84e3d3f18bcc091",
+      "bytes": 3889
+    },
+    "scripts/validate_snapshot.py": {
+      "sha256": "ad684c797e00cd9e0eddeb60f0304b0d095989c368d5f588636f5e1a5ed5cc27",
+      "bytes": 5969
+    },
+    "static_assets.py": {
+      "sha256": "65b0dc2ca667fe1e2a7c8c6c4d6073433adc038dd24141eeb95d05cda0d9e265",
+      "bytes": 2209
+    },
+    "test_catalog_cache_static.py": {
+      "sha256": "3970702a600dc51905e68f5f9f361ae8e2fbfa52523744dafe8dc26793c9a731",
+      "bytes": 1595
+    },
+    "test_delivery_smoke.py": {
+      "sha256": "9114cbc4b0bcac0819cfb1afe2825940f0bbf682c72e0bd0d7d0cd5315441f2b",
+      "bytes": 5080
+    },
+    "test_search_core.py": {
+      "sha256": "594b00527a2adda7a6acf88fb08081eb4f6daa1de149d891a7e86314086e5d78",
+      "bytes": 3858
+    },
+    "README.md": {
+      "sha256": "e52316cae24805d81786216e8fd998e39881390a0e2515436c109244b9edbadc",
+      "bytes": 2975
+    },
+    "PUBLICATION-STATUS.json": {
+      "sha256": "91574e729c44af4277f1f3bdabc54aa2badc886cc0dbdd9051c1b1743feab4ee",
+      "bytes": 1309
+    }
+  }
+}

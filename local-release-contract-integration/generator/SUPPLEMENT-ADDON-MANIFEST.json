@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "purpose": "Replacement r4 original-logo UI supplement overlay directly on verified v4 plus relations addon; local tests/rerender only, no publication or installation authority",
+  "required_base_archive_sha256": "d4cb538007657f1b065cde744122ef0f39100b3071b7b6dcf61faadd3b21ca23",
+  "required_relations_addon_archive_sha256": "b9bef3a74c6fcc2dedec392ae8bc916f9186f9c6d7585cec9afd6d72c36d2714",
+  "public_release_commit": "a97d51347c9279cf17ef6cc49cf2351b23106b20",
+  "independent_review": "GO",
+  "generator_files": [
+    "build_prototype.py",
+    "build_site.py",
+    "rerender_candidate.py",
+    "prepare_deployment.py",
+    "publish_snapshot.py",
+    "preserve_relation_supplement.py"
+  ],
+  "runtime_files": 5,
+  "previous_relationship_runtime_85_files_changed": [
+    "relationship-ui-draft.js"
+  ],
+  "unchanged_runtime_json_files": 84,
+  "replaces": "supplement-addon-r2/r3 as alternative third layer, never stacked on r2/r3",
+  "accepted_source_evidence_sha256": "ab13035165a2b0ea6d395fe9ffb104538a78f4bf2c773d8c4638600d94bdefdb",
+  "installed_overlay_paths": [
+    "SUPPLEMENT-CONTRACT.md",
+    "build_prototype.py",
+    "build_site.py",
+    "prepare_deployment.py",
+    "preserve_relation_supplement.py",
+    "publish_snapshot.py",
+    "relation-bundle-inventory.json",
+    "relation-bundle/relationship-ui-draft.js",
+    "relation-supplement-bundle-inventory.json",
+    "relation-supplement-bundle/relation-supplement/assets/modular-avatar-logo.png",
+    "relation-supplement-bundle/relation-supplement/items.json",
+    "relation-supplement-bundle/relation-supplement/manifest.json",
+    "relation-supplement-bundle/relationship-supplement.js",
+    "rerender_candidate.py",
+    "test_delivery_smoke.py",
+    "test_relation_supplement.py",
+    "test_runtime_preservation.py"
+  ],
+  "expected_previous_layer_hashes": {
+    "SUPPLEMENT-CONTRACT.md": null,
+    "build_prototype.py": "23356ba7bf96a690e870d628d8694468126beeee04b38a7eb7b2a42a328ca939",
+    "build_site.py": "4c4787bc6ec5da73198c662133dd62f401231186a0a2a0e2e1f2e150ff7b6340",
+    "prepare_deployment.py": "75c3c6343174cb7d49c8038236eb890b3ea8f1b8488756e1ddd4e3ded15ba1d2",
+    "preserve_relation_supplement.py": null,
+    "publish_snapshot.py": "6787f9ecacce387bc4438b82401e902950ca0d195a11d98628024a8f5100e7df",
+    "relation-bundle/relationship-ui-draft.js": "58c7dc2bb6c44c921e97e6280f9c04f33af82539bca36235b8aa0d2809849ca1",
+    "relation-bundle-inventory.json": "4437c08d5eaad94af54a48dc8aacc0415c1f9cecec7716f8895bb854e3c75ab7",
+    "relation-supplement-bundle/relation-supplement/assets/modular-avatar-logo.png": null,
+    "relation-supplement-bundle/relation-supplement/items.json": null,
+    "relation-supplement-bundle/relation-supplement/manifest.json": null,
+    "relation-supplement-bundle/relationship-supplement.js": null,
+    "relation-supplement-bundle-inventory.json": null,
+    "rerender_candidate.py": "54cec233a4550f1043d934bc6c1bddf165c6325210f3b3e1b5c9dd9b30df7a52",
+    "test_delivery_smoke.py": "8cfcca9646b7fc63690915881dbb8c8cbe8f814d2718c4923f4d39c4c8b6dad7",
+    "test_relation_supplement.py": null,
+    "test_runtime_preservation.py": "ab0fb7825d6e559d9b2d68a8688cb11d8197da46dbd6560c7a70f63df923ca60"
+  },
+  "excluded": [
+    "full source corpus/master",
+    "raw catalog",
+    "credentials",
+    "local candidate fixtures"
+  ],
+  "files": {
+    "LOGO-PROVENANCE.json": {
+      "bytes": 1649,
+      "sha256": "870000031b31a54b97c71e2192aba3a35c964b7ea189f6799ef7a11b62f7a99d"
+    },
+    "QA-RESULTS.json": {
+      "bytes": 1841,
+      "sha256": "ddaad2f5781f9106539bbde5de5e8fcf234c5a592a5b0a1084a615b5b2a2186b"
+    },
+    "README-SUPPLEMENT-ADDON.md": {
+      "bytes": 7586,
+      "sha256": "79bf36f2e18bff925fc14b74256d96feed1c8a251fc7c69a65558c4956662f4d"
+    },
+    "SUPPLEMENT-CONTRACT.md": {
+      "bytes": 4115,
+      "sha256": "d2bc1faa60812365cb97254b94c398699f6a2b1b2086d613f23f58a5f1a55eb5"
+    },
+    "build_prototype.py": {
+      "bytes": 320713,
+      "sha256": "38c0868871d22155d55b13334c1c0f25e078f10c33c4d60b3028ac6a1a4f70b4"
+    },
+    "build_site.py": {
+      "bytes": 12137,
+      "sha256": "0ece3f2df780abf16cb559d6b84f05d06c54af0716ac6b0cba983d917469970e"
+    },
+    "prepare_deployment.py": {
+      "bytes": 12964,
+      "sha256": "863566355aaa8128289d615c6619cccbe8ec9b264c59a0b9827c3cb1e71cdd2e"
+    },
+    "preserve_relation_supplement.py": {
+      "bytes": 8138,
+      "sha256": "3647b5c08f3ae7e9bfdfc67cc8881ba41eb24710be7e5e754fe09685a3eae7b3"
+    },
+    "publish_snapshot.py": {
+      "bytes": 7538,
+      "sha256": "0dd4b30f3a83ef62c929d4457530bf3e88c3747d5cbcfcc7062aaa44c00ddceb"
+    },
+    "relation-bundle/relationship-ui-draft.js": {
+      "bytes": 16138,
+      "sha256": "f16647f479b2906348b7edada55d3d24b05f0b2ecc9f5864f875e1179d4903fc"
+    },
+    "relation-bundle-inventory.json": {
+      "bytes": 7868,
+      "sha256": "8c36115dc11d1a3563b4a00f766acf5acede37a4085d21db8bfc154593aadedb"
+    },
+    "relation-supplement-bundle/relation-supplement/assets/modular-avatar-logo.png": {
+      "bytes": 59391,
+      "sha256": "19e09e96c1fdbe4fd608fa9bf99d82b122754c0c883ee4ef504eb9f85f33a321"
+    },
+    "relation-supplement-bundle/relation-supplement/items.json": {
+      "bytes": 2042,
+      "sha256": "684b4f191b1808c454bf8a1aedbe5e019713c09795db1f07952e239d80d46c89"
+    },
+    "relation-supplement-bundle/relation-supplement/manifest.json": {
+      "bytes": 379,
+      "sha256": "42cff3885a2b42c48c7717d487e26ad40da23123bd5fbaf4469e4f38186139a8"
+    },
+    "relation-supplement-bundle/relationship-supplement.js": {
+      "bytes": 10736,
+      "sha256": "352aa3eed121bee9abe93629576cffe6444316d623995ab3a1c045dda32cec05"
+    },
+    "relation-supplement-bundle-inventory.json": {
+      "bytes": 702,
+      "sha256": "e841a5c8dbefe46821f48ce3fee07c1443724aaf455e9c92212efbc8d0897825"
+    },
+    "rerender_candidate.py": {
+      "bytes": 14625,
+      "sha256": "dff7cae14f508eeeb9608803ee34dbba8f61ed1bc06592bb2dda40a744f23ed8"
+    },
+    "test_delivery_smoke.py": {
+      "bytes": 4406,
+      "sha256": "535b8bf530c9a05d21104af8570931cbd2653990bb947f22c6d44f890386ee1f"
+    },
+    "test_relation_supplement.py": {
+      "bytes": 6499,
+      "sha256": "12ad4da41912a6b5b600f85aef8771005788530c98607791f167ffae59d00976"
+    },
+    "test_runtime_preservation.py": {
+      "bytes": 2068,
+      "sha256": "a49bb161f120dbb1b3049b0280673335814eb754d27e750aebe753e8b513d731"
+    }
+  }
+}
