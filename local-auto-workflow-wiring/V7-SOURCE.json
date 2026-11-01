@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "sources": [
+    {
+      "original_path": "muse-handover/recovery-inbox/workflow-draft-v7-20261101/gha_workflow_draft/boopadb-daily.yml",
+      "bundled_path": "evidence/v7-originals/boopadb-daily.yml",
+      "sha256": "8c7215e609ef73df683c7e816b5219c6109435a9c5e986a8223a5c65b895b2c1"
+    },
+    {
+      "original_path": "muse-handover/recovery-inbox/workflow-draft-v7-20261101/gha_workflow_draft/boopadb-promote.yml",
+      "bundled_path": "evidence/v7-originals/boopadb-promote.yml",
+      "sha256": "061ddf8201328c200026987e3bc80d988c9bfbc21845aeec7bde345005c0e08a"
+    },
+    {
+      "original_path": "muse-handover/recovery-inbox/workflow-draft-v7-20261101/gha_workflow_draft/boopadb-qa-review.yml",
+      "bundled_path": "evidence/v7-originals/boopadb-qa-review.yml",
+      "sha256": "3d8e2025d26c7ddb561503c4b08b58fc39d258999397d664718092d4b54abb67"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+test_api_access_failure_is_closed_and_sanitized (test_resolver.ResolverTests.test_api_access_failure_is_closed_and_sanitized) ... ok
+test_claimed_source_does_not_bypass_source_gate (test_resolver.ResolverTests.test_claimed_source_does_not_bypass_source_gate) ... ok
+test_digest_tamper_rejected (test_resolver.ResolverTests.test_digest_tamper_rejected) ... ok
+test_duplicate_artifact_rejected (test_resolver.ResolverTests.test_duplicate_artifact_rejected) ... ok
+test_duplicate_json_rejected (test_resolver.ResolverTests.test_duplicate_json_rejected) ... ok
+test_expired_artifact_rejected (test_resolver.ResolverTests.test_expired_artifact_rejected) ... ok
+test_extra_zip_entry_rejected (test_resolver.ResolverTests.test_extra_zip_entry_rejected) ... ok
+test_failed_live_fetch_not_absence (test_resolver.ResolverTests.test_failed_live_fetch_not_absence) ... ok
+test_fork_head_rejected (test_resolver.ResolverTests.test_fork_head_rejected) ... ok
+test_future_receipt_timestamp_rejected (test_resolver.ResolverTests.test_future_receipt_timestamp_rejected) ... ok
+test_future_run_rejected (test_resolver.ResolverTests.test_future_run_rejected) ... ok
+test_live_changed_rejected (test_resolver.ResolverTests.test_live_changed_rejected) ... ok
+test_missing_digest_rejected (test_resolver.ResolverTests.test_missing_digest_rejected) ... ok
+test_new_terminal_failure_during_downloads_rejected (test_resolver.ResolverTests.test_new_terminal_failure_during_downloads_rejected) ... ok
+test_newer_active_run_is_not_a_terminal_candidate (test_resolver.ResolverTests.test_newer_active_run_is_not_a_terminal_candidate) ... ok
+test_newest_failure_never_falls_back (test_resolver.ResolverTests.test_newest_failure_never_falls_back) ... ok
+test_original_failure_rejected (test_resolver.ResolverTests.test_original_failure_rejected) ... ok
+test_other_repo_rejected (test_resolver.ResolverTests.test_other_repo_rejected) ... ok
+test_other_workflow_rejected (test_resolver.ResolverTests.test_other_workflow_rejected) ... ok
+test_partial_cannot_use_successful_job (test_resolver.ResolverTests.test_partial_cannot_use_successful_job) ... ok
+test_redirect_never_forwards_token (test_resolver.ResolverTests.test_redirect_never_forwards_token) ... ok
+test_rerun_during_resolution_rejected (test_resolver.ResolverTests.test_rerun_during_resolution_rejected) ... ok
+test_source_changed_by_final_rebase_rejected (test_resolver.ResolverTests.test_source_changed_by_final_rebase_rejected) ... ok
+test_stale_run_rejected (test_resolver.ResolverTests.test_stale_run_rejected) ... ok
+test_success_and_exact_context (test_resolver.ResolverTests.test_success_and_exact_context) ... ok
+test_unapproved_redirect_host_rejected (test_resolver.ResolverTests.test_unapproved_redirect_host_rejected) ... ok
+test_unreviewed_actual_checkout_rejected (test_resolver.ResolverTests.test_unreviewed_actual_checkout_rejected) ... ok
+test_unreviewed_workflow_rejected (test_resolver.ResolverTests.test_unreviewed_workflow_rejected) ... ok
+test_wrong_attempt_rejected (test_resolver.ResolverTests.test_wrong_attempt_rejected) ... ok
+test_wrong_branch_rejected (test_resolver.ResolverTests.test_wrong_branch_rejected) ... ok
+test_changed_source_before_scrape_or_after_rebase_rejected (test_source_gate.SourceGateTests.test_changed_source_before_scrape_or_after_rebase_rejected) ... ok
+test_changing_data_metadata_and_installed_modules_allowed (test_source_gate.SourceGateTests.test_changing_data_metadata_and_installed_modules_allowed) ... ok
+test_dirty_worktree_rejected (test_source_gate.SourceGateTests.test_dirty_worktree_rejected) ... ok
+test_exact_reviewed_source_passes (test_source_gate.SourceGateTests.test_exact_reviewed_source_passes) ... ok
+test_existing_npmrc_rejected_even_if_git_ignored (test_source_gate.SourceGateTests.test_existing_npmrc_rejected_even_if_git_ignored) ... ok
+test_extra_tracked_executable_rejected (test_source_gate.SourceGateTests.test_extra_tracked_executable_rejected) ... ok
+test_gate_order_in_full_workflow (test_source_gate.SourceGateTests.test_gate_order_in_full_workflow) ... ok
+test_package_lock_tamper_rejected (test_source_gate.SourceGateTests.test_package_lock_tamper_rejected) ... ok
+test_untracked_injected_require_rejected (test_source_gate.SourceGateTests.test_untracked_injected_require_rejected) ... ok
+test_untracked_npmrc_rejected (test_source_gate.SourceGateTests.test_untracked_npmrc_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 40 tests in 0.609s
+
+OK

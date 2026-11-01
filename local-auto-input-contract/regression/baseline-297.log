@@ -1,0 +1,458 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> booth-vrc-price-tracker@1.2.2 test
+> node --test test/*.test.js
+
+✔ every point tooltip retains its exact date and price, with literal variation names (55.107204ms)
+✔ repeated full-range toggles clear overflow disclosure and use the latest hover targets (5.57654ms)
+✔ ordinary tooltip preserves product and red SALE header, then separate date and price lines (4.288783ms)
+✔ overflow tooltip puts yellow outlier and red SALE badges beside the name with only three lines (3.067106ms)
+✔ hiding all variations removes stale tooltip targets and overflow disclosure (4.062874ms)
+✔ coincident overflow markers expose both exact recorded prices and clear hidden variations (3.512606ms)
+✔ all-zero history has finite hover coordinates and exact zero-price tooltips (2.396565ms)
+✔ unchanged overflow records preserve disclosure nodes across hover redraws (2.366988ms)
+✔ redrawing a visible switch never transiently hides it and risks keyboard focus (4.751674ms)
+✔ outlier badges and disclosure counts follow ja without a fourth line (3.281258ms)
+✔ outlier badges and disclosure counts follow en without a fourth line (15.195524ms)
+✔ outlier badges and disclosure counts follow ko without a fourth line (5.255086ms)
+✔ outlier badges and disclosure counts follow zh-cn without a fourth line (6.053163ms)
+✔ outlier badges and disclosure counts follow zh-tw without a fourth line (5.820817ms)
+✔ history table exposes semantic localized columns and literal exact records in ja (3.202469ms)
+✔ history table exposes semantic localized columns and literal exact records in en (3.342217ms)
+✔ history table exposes semantic localized columns and literal exact records in ko (2.357164ms)
+✔ history table exposes semantic localized columns and literal exact records in zh-cn (2.8635ms)
+✔ history table exposes semantic localized columns and literal exact records in zh-tw (5.191484ms)
+[Boopa] Script initialized for ID: /items/7635325
+[Boopa] Extracted Product ID: 7635325
+✔ split rule needs five distinct ordinary dates; long gag stretches and lone gag prices are caught (1.92366ms)
+✔ ordinary sales, legitimate tiers, and zero values remain intact (0.303196ms)
+✔ minimum badge suppresses unsupported extreme comparisons and never claims a regular price (0.549588ms)
+✔ ordinary repeated 4000 reference restores the original minus 20 percent chip for 3200 (0.390476ms)
+✔ comparison evidence requires distinct dates and suppresses sparse or unresolved extreme baselines (0.499941ms)
+✔ classified high records do not become comparison baselines or alter factual minimum (0.339113ms)
+✔ chart zooms with overflow data, restores full range, and never bridges excluded point (26.236024ms)
+✔ each variation is classified independently and hidden/date-filtered points do not affect axis (1.662372ms)
+✔ sale-suffix merging is unchanged and does not mutate source histories (1.025734ms)
+✔ multiple separated high tiers cannot leave a second extreme flattening the chart (0.384934ms)
+✔ the 20x threshold is inclusive and read-only with frozen observations (0.398086ms)
+✔ productive actual deadlines continue, including normal page delay and in-flight draining (1.887224ms)
+✔ early oversized-backoff deadlines and tiny deadline loops cannot continue (0.44622ms)
+✔ healthy midnight transitions may continue after real work (0.387944ms)
+✔ a completed short final segment continues, but a fresh short sweep cannot recur (0.369127ms)
+✔ HTTP attempts and search-only empty pages are insufficient progress (0.352484ms)
+✔ failures, deferred retries, unknown statuses, and cooldowns stop continuation (0.368344ms)
+✔ durably queued item errors and benign search-stop counts do not stop healthy handovers (0.315382ms)
+✔ missing, malformed, negative, and out-of-order policy inputs fail closed (0.723642ms)
+✔ dispatcher makes one exact public GitHub POST and accepts only HTTP 204 (3.094293ms)
+✔ dispatcher rejects invalid environment before any request, without exposing values (2.155848ms)
+✔ dispatcher does not follow redirects or retry refusals, rate limits, or server errors (6.141454ms)
+✔ dispatcher does not retry ambiguous network failures or expose transport errors (0.760806ms)
+✔ dispatcher terminates a socket timeout without retrying (0.410785ms)
+✔ dispatcher enforces an absolute 30-second timeout even before a socket exists (1.363986ms)
+✔ rendered HTML language takes precedence over BOOTH metadata, path and browser preferences (5.885445ms)
+✔ BOOTH locale metadata, localized URL, then Japanese are the fallback order (7.207677ms)
+✔ all verified BOOTH locale codes and Chinese script/region aliases normalize (1.71602ms)
+✔ every site language has complete nonempty strings, eight ranges, and substitutes counts (6.828929ms)
+✔ dates follow site locale and keep observation calendar dates; values remain yen (57.093978ms)
+✔ product names stay literal including labels that match a Japanese translation key (1.597358ms)
+✔ switch has large geometric SVG icons without emoji/font or blend artifacts (1.050418ms)
+✔ Chrome manifest declares Japanese default and localized name/description (3.682886ms)
+✔ five supported Chrome locales resolve every manifest message within limits (2.748468ms)
+✔ bundler includes the locale directory recursively and fails on missing inputs (0.338459ms)
+✔ shouldContinueMeta chains a cap-bound completed run only (1.01402ms)
+✔ shouldContinueMeta hands over at the real deadline with work left (0.235796ms)
+✔ shouldContinueMeta continues across a day boundary but never into a hold or budget stop (0.159195ms)
+✔ shouldContinueMeta refuses failed, empty, or malformed runs (0.170914ms)
+✔ dispatchMetaContinuation posts one continue-meta dispatch (2.715375ms)
+✔ dispatchMetaContinuation validates the environment and never retries a refusal (1.465753ms)
+✔ parseItemJson extracts tags, category, and the wish-list count (10.166768ms)
+✔ parseItemJson stores the full image list, omitted when it adds nothing (7.377708ms)
+✔ parseItemJson extracts declared parent-work refs from description item URLs (0.790589ms)
+✔ parseItemJson separates contextual parent refs from related works and dependencies (0.763642ms)
+✔ parseItemJson reads parent context in English, Korean and Chinese prose (0.698495ms)
+✔ parseItemJson rejects foreign or shapeless payloads (0.90447ms)
+✔ resizedImage only rewrites the canonical pximg shape (0.301769ms)
+✔ buildRecord appends and replaces likes snapshots by date (18.850556ms)
+✔ fetchItemMeta maps statuses and parses string payloads (1.737304ms)
+✔ buildWorkList prioritizes missing (newest first), then stalest refreshes (5.287078ms)
+✔ buildWorkList refreshes records without refs ahead of other stale records (1.13634ms)
+✔ buildWorkList refreshes unjudged relation records ahead of judged ones (1.530581ms)
+✔ readActivity detects sale, price change, and newness inside the window (1.363914ms)
+✔ buildWorkList gives hot items a daily snapshot ahead of the quiet refresh (1.182979ms)
+✔ main re-collects a hot item the next day so likes deltas accrue (6.754112ms)
+✔ main continuation is granted for a cap-bound run of successes (4.438769ms)
+✔ main stops gracefully at its own run cap instead of being hard-killed (2.313283ms)
+✔ main collects into meta/ through an injected transport (1.875516ms)
+✔ metadata workflow mirrors the price workflow discipline (2.636748ms)
+✔ metadata workflow chains continuations like the price workflow (0.524874ms)
+✔ unchanged metadata exits successfully without making a commit (256.874459ms)
+✔ saves only metadata, excluding unrelated staged files (320.144604ms)
+✔ the push script refuses non-default branches even outside the workflow (151.983154ms)
+✔ a reservation is durable before subsequent collection results are saved (280.740202ms)
+✔ replays the single meta commit after upstream advances beyond shallow history (273.845101ms)
+✔ upstream budget-ledger changes cannot be merged with stale accounting (232.265177ms)
+✔ persistent push rejection fails after six attempts and keeps the reservation durable (541.232191ms)
+✔ both real BOOTH contexts preserve their distinct parent alignment and table collision fixtures (2.739243ms)
+✔ tracker owns inherited typography and alignment but still follows theme color (1.853476ms)
+✔ range controls no longer depend on host button font/reset defaults (0.509051ms)
+✔ table cell spacing and right-aligned prices override the observed ID-scoped shop rules (0.368465ms)
+✔ history table follows its own available width without minimum-width floors (0.318635ms)
+✔ dates and prices reserve intrinsic width while product names use the remainder (0.125191ms)
+✔ narrow columns compact cell padding without hostname or viewport coupling (0.354367ms)
+✔ extreme content stays in a keyboard-accessible local scrolling region (0.401627ms)
+✔ closed disclosure keeps intrinsic width outside containment (0.254891ms)
+✔ delayed 23:32 JST start receives five hours regardless of the next cron (7.106142ms)
+✔ long setup is included in the six-hour job limit with a 30-minute save reserve (0.773995ms)
+✔ transient failures use bounded exponential backoff and every retry consumes budget (5.718499ms)
+✔ retry exhaustion is a failure after three total attempts (1.644085ms)
+✔ daily cap is shared by concurrent requests and persists across client restarts (2.162316ms)
+✔ retry requests cannot exceed the shared daily budget (1.346817ms)
+✔ 429 stops the run, honors Retry-After, and blocks queued and restarted requests (2.39891ms)
+✔ Retry-After supports dates and never retries immediately on missing/invalid/zero values (0.304776ms)
+✔ 403 stops without retry and persists a six-hour cooldown (1.217953ms)
+✔ transient failure circuit stops later requests (1.608943ms)
+✔ 404/410 are explicit unavailable results and other permanent errors are not retried (2.710621ms)
+✔ deadline prevents requests and retries, and timeout is bounded by remaining collection time (1.916286ms)
+✔ normal requests have a 30-second timeout and automatic redirects disabled (0.51432ms)
+✔ every allowed redirect is paced and budgeted; non-BOOTH redirects fail (2.076584ms)
+✔ JST midnight requires a new reservation and preserves the server cooldown (1.783863ms)
+✔ corrupt/malformed/future budget cannot silently grant fresh allowance (1.184494ms)
+✔ optional finite reservations refund unused allowance only at finish (1.84459ms)
+✔ lost final checkpoint fails closed instead of replenishing quota, including the next day (0.757301ms)
+✔ unresolved legacy nonzero reservations keep their hold when unlimited mode is enabled (1.284845ms)
+✔ unlimited sessions reject malformed counters or mode markers without resetting the ledger (2.48366ms)
+✔ optional finite daily reservation is clamped to remaining quota and resumes count correctly (1.526958ms)
+✔ an unlimited session checkpoints at JST midnight and records the new day in its next session (1.473196ms)
+✔ cooldown blocks quota reservations as well as requests (0.556814ms)
+✔ default unlimited bootstrap records a durable session and can collect on the first day (1.407691ms)
+✔ 403 respects a Retry-After longer than the default six-hour pause (0.747019ms)
+✔ terminal responses break consecutive transient failure streaks (2.144368ms)
+✔ finishing a client is terminal and cannot spend refunded quota (0.89392ms)
+✔ calendar-invalid budget dates fail closed (0.632627ms)
+✔ default unlimited session continues beyond 48,000 observed attempts in the same JST day (1.606565ms)
+✔ a legacy lost zero-allowance run recovers automatically because it could not send requests (0.602742ms)
+✔ completed legacy reservations migrate at the old daily ceiling without lowering a verified cooldown (1.046636ms)
+✔ default pacing preserves a simultaneous five-request batch while persisting every start (22.414078ms)
+✔ concurrent search and detail requests share the full remaining allowance (3.303392ms)
+✔ remaining quota excludes the durable precharge and spans completed runs (0.90127ms)
+✔ explicit stop blocks queued starts without inventing a cooldown and allows active responses to drain (0.940908ms)
+✔ 429 cooldown stops queued starts at the default zero interval (1.068025ms)
+✔ budget persistence failure stops queued calls before sending unrecorded HTTP (3.409153ms)
+✔ queued requests retain the actual circuit-triggering URL rather than their own URL (1.795637ms)
+✔ circuit attribution uses the original URL even when a redirected hop fails (1.129755ms)
+✔ a later active transient failure does not replace the first circuit origin (1.436812ms)
+✔ same-url redirects preserve filtered search identity while allowing query order and encoding changes (4.163247ms)
+✔ same-url policy rejects filter loss or source changes before following a redirect (4.591332ms)
+✔ same-url redirects preserve duplicate query entries instead of comparing only the first value (1.150838ms)
+✔ product identity permits BOOTH shop/localized item redirects for the same numeric ID (2.160401ms)
+✔ product identity rejects another item, a search page, or a foreign host before following (2.495262ms)
+✔ unknown redirect policies and malformed product identities fail before any HTTP attempt (0.854034ms)
+✔ attempt hook observes each persisted retry and redirect immediately before HTTP starts (1.154799ms)
+✔ shared budget denials never invoke a queued attempt hook (1.208883ms)
+✔ attempt hook failure halts all queued starts instead of being retried as a network error (1.167853ms)
+✔ invalid and asynchronous attempt hooks cannot cause an HTTP start (0.741293ms)
+✔ 403 stops queued hooks at the default zero interval and retains the failing URL (1.054916ms)
+✔ a slow synchronous attempt hook cannot bunch subsequent HTTP starts (1.025085ms)
+✔ an observer crossing midnight cannot send an old-day charged request on the new day (0.639309ms)
+✔ an observer crossing the deadline cannot start HTTP after it (0.784201ms)
+✔ the fifth transient failure blocks queued starts at the default zero interval (1.606436ms)
+✔ a synchronous transport rejection also stops queued requests before the next start (0.946408ms)
+✔ an active later rate-limit response preserves the first stop and extends its durable cooldown (7.735123ms)
+✔ overflowing Retry-After durations saturate at a valid far-future timestamp (0.485602ms)
+✔ huge Retry-After on 429 and 403 remains a valid durable hold after finish and restart (8.839746ms)
+✔ out-of-range persisted cooldowns fail validation without changing the ledger (0.871523ms)
+✔ retry backoff beyond the deadline remains durable after finishing and blocks the next session (3.275203ms)
+✔ retry backoff crossing JST midnight is held across the next day and can resume only after it expires (1.309875ms)
+✔ request pacing beyond the deadline remains a normal stop without inventing a cooldown (0.707293ms)
+✔ the final transient retry preserves its Retry-After cooldown for the next session (1.820732ms)
+✔ circuit opening honors server Retry-After longer than its default minute (1.771852ms)
+✔ a draining transient failure can extend the server hold without replacing the first stop (6.27844ms)
+✔ a transient Retry-After survives a concurrent stop before its outer catch handles the failure (1.663486ms)
+✔ one or five requests cancelled by the shortened deadline stop normally without retry or circuit cooldown (13.919586ms)
+✔ ordinary 30-second timeouts before the deadline still retry at most three times (2.052977ms)
+✔ an early cancellation or an unshortened timeout does not become a normal deadline stop (7.934353ms)
+✔ deadline cancellation never hides a real late HTTP response or its Retry-After (4.41066ms)
+✔ a deadline cancellation retains an existing failed global stop and its server cooldown (1.387595ms)
+✔ the request own deadline timeout signal proves a normal stop even when the wall clock is one millisecond early (20.009086ms)
+✔ an external timeout signal before the deadline does not prove the request own deadline timer fired (1.118867ms)
+✔ an own ordinary timeout signal still fails when its timeout was not shortened by the collection deadline (11.702807ms)
+✔ real deadline timers drain five simultaneous mock requests without creating a cooldown (3007.572087ms)
+✔ embedded and descriptive OFF are not sale evidence (30.467993ms)
+✔ explicit number and percent or currency OFF remains evidence (11.792705ms)
+✔ existing Japanese and SALE evidence remains intact (1.890472ms)
+✔ variant sale badge and explicit DOM class stay independent (4.111885ms)
+✔ same price Coffee no longer writes sale; real price drop still does (14.48421ms)
+✔ appending corrected observation does not rewrite historical flags (2.838477ms)
+✔ normalization expands OFF only, not other legacy keyword rules (1.309749ms)
+Scraping Search: https://booth.pm/ja/browse/test?sort=new&page=1
+Scraping Search: https://booth.pm/ja/browse/test?sort=new&page=1
+Error scraping item 2: JST day changed; a new durable reservation is required
+Scraping Search: https://booth.pm/ja/browse/test?sort=new&page=1
+Scraping Search: https://booth.pm/ja/browse/test?sort=new&page=2
+Error scraping item 2: Collection time budget reached
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=1
+Scraping Search: https://booth.pm/ja/browse/%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2?sort=new&tags%5B%5D=VRChat&type=digital&page=1
+Scraping Search: fixture
+Scraping Search: fixture
+Scraping Search: fixture
+Error scraping search fixture: HTTP 503
+Scraping Search: fixture
+Error scraping search fixture: Unrecognized search page markup
+Scraping Search: fixture
+Error scraping search fixture: Unrecognized search page markup
+Scraping Search: fixture
+Error scraping search fixture: Unrecognized search page markup
+Scraping Search: fixture
+Error scraping search fixture: Search card is missing a valid product ID
+Scraping Search: fixture
+Error scraping search fixture: Search card is missing a valid product ID
+Scraping Search: fixture
+Error scraping search fixture: Search returned HTTP 503
+Error scraping item 123: Unrecognized product page or missing price
+Error scraping item 123: Unrecognized product page or missing price
+Error scraping item 123: Product returned HTTP 503
+✔ unlimited five-hour runs exceed the old daily cap and resume only their pending items (40.454885ms)
+✔ unlimited midnight pause saves progress, chains once and resets only daily observations (7.507689ms)
+✔ a deadline-limited cancellation retains pending work and permits the saved handover (7.985361ms)
+✔ inherited workflow metadata cannot replace a fixture clock or reservation (5.533685ms)
+✔ search distinguishes products, explicit empty, HTTP errors and malformed HTML (8.192158ms)
+✔ product parsing preserves variant identity, sale normalization and explicit free prices (3.524886ms)
+✔ only explicit 404/410 is unavailable; missing title/price and non-200 HTML fail (1.511106ms)
+✔ a delayed start shortly before the next cron still performs actual work (1.54027ms)
+✔ search errors preserve the failed page and cannot end a category (2.009962ms)
+✔ both original filtered categories and all 3333 pages remain in sequential order (2.349462ms)
+✔ legacy page 3334 checkpoints advance categories without requesting page 3334 (0.826687ms)
+✔ pending IDs are durable before requests; successful history precedes pending removal (1.110502ms)
+✔ one bad item is queued durably while the remaining page and following pages proceed (2.615985ms)
+✔ a completed sweep restarts next run even with backed-off failures (2.353674ms)
+✔ 404/410 preserve historical bytes and schedule a later retry without pinning pages (3.051307ms)
+✔ deadline and budget stops preserve pending work without inventing item failures (2.367223ms)
+✔ resuming pending IDs skips the page search and never repeats already-saved successes (1.777326ms)
+✔ an empty durable pending array advances without repeating its finished search page (1.107109ms)
+✔ original five-item Promise.all barrier, one-second batch and two-second page waits remain (15.036962ms)
+✔ duplicate search IDs are claimed once per run without concurrent writes (2.29885ms)
+✔ due retry batches alternate with normal pages and retry each failure at most once per run (4.032657ms)
+✔ retry backoff is capped and rediscovery does not bypass it (1.528159ms)
+Error scraping item 101: HTTP 429: stopping and preserving Retry-After cooldown; requests paused until 2026-10-04T14:33:00.000Z
+Error scraping item 102: HTTP 429: stopping and preserving Retry-After cooldown; requests paused until 2026-10-04T14:33:00.000Z
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=1
+Error scraping item 105: Reserved request allowance reached
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=2
+Scraping Search: https://booth.pm/ja/browse/%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2?sort=new&tags%5B%5D=VRChat&type=digital&page=1
+✔ 429 stops launches but drains active successes and late 403 evidence before finishing quota (12.159314ms)
+✔ reserved daily budget checkpoints partial batches and resumes only unfinished IDs next day (10.640297ms)
+✔ malformed checkpoints fail closed and leave their original bytes unchanged (3.047011ms)
+✔ isolated corrupt history preserves bytes and queues a retry without pinning the page (1.260358ms)
+✔ malformed nested history entries are isolated failures, retain bytes, and do not pin the crawl (4.021995ms)
+✔ item redirect and HTTP identity failures are retryable without globally pinning the page (2.421007ms)
+✔ systemic history writes stop new batches, drain started saves, and retain failures pending (2.943327ms)
+✔ failed final checkpoint keeps a durable reservation unresolved instead of refunding quota (4.685604ms)
+✔ same-day history updates are idempotent and retain stable variation keys and earlier prices (17.845843ms)
+✔ incompatible existing history shapes are never overwritten (2.361468ms)
+✔ history-read failures retain storage error codes and causes (0.816713ms)
+✔ CLI refuses unreserved collection before network activity (293.13906ms)
+✔ dangling inherited-name variation mapping is isolated and cannot pin later products (1.534682ms)
+✔ prototype-like variation names and IDs are ordinary keys and replay idempotently (0.71031ms)
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?page=3055&type=digital&tags%5B%5D=VRChat&sort=new
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=1
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=1: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3053
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3053: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3054
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3054: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3056
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3056: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Search card is missing a valid product ID
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055&tags%5B%5D=VRChat
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055&tags%5B%5D=VRChat: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055&bad=%ZZ
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055&bad=%ZZ: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Search returned HTTP 403
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Search returned HTTP 429
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Search returned HTTP 500
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Scraping Search: https://booth.pm/ja/browse/%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2?sort=new&tags%5B%5D=VRChat&type=digital&page=1
+Scraping Search: https://booth.pm/ja/browse/%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2?sort=new&tags%5B%5D=VRChat&type=digital&page=2
+Scraping Search: https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055
+Error scraping search https://booth.pm/ja/browse/3D%E3%83%A2%E3%83%87%E3%83%AB?sort=new&tags%5B%5D=VRChat&type=digital&page=3055: Unrecognized search page markup
+✔ real BOOTH DOM beyond the final page is empty despite no empty message and a next link (57.294216ms)
+✔ an empty list on or before the advertised last page remains an error (15.635072ms)
+✔ cards are still collected and malformed cards or changed result lists cannot become an empty result (15.270635ms)
+▶ foreign, changed-filter and malformed pagination cannot end the current search
+  ✔ foreign origin (5.641612ms)
+  ✔ different category (2.980135ms)
+  ✔ different sort (2.600807ms)
+  ✔ missing digital filter (3.277696ms)
+  ✔ different tag (2.415289ms)
+  ✔ duplicate tag (2.904177ms)
+  ✔ duplicate page (3.053387ms)
+  ✔ zero page (3.14471ms)
+  ✔ negative page (3.857188ms)
+  ✔ fractional page (3.865633ms)
+  ✔ unsafe page (2.733783ms)
+  ✔ fragment (2.451598ms)
+  ✔ credentials (2.884553ms)
+  ✔ malformed escape (4.890399ms)
+  ✔ malformed UTF-8 (3.792631ms)
+✔ foreign, changed-filter and malformed pagination cannot end the current search (57.508163ms)
+▶ missing or ambiguous search evidence, error pages and challenges remain failures
+  ✔ missing result grid (3.666719ms)
+  ✔ duplicate result grid (1.878561ms)
+  ✔ missing result list (1.735841ms)
+  ✔ duplicate result list (1.565458ms)
+  ✔ missing heading (1.077208ms)
+  ✔ wrong heading (1.603638ms)
+  ✔ wrong title (1.184674ms)
+  ✔ duplicate titles (0.994759ms)
+  ✔ title does not identify BOOTH (1.06967ms)
+  ✔ missing count (1.076978ms)
+  ✔ invalid count (0.953737ms)
+  ✔ zero count with pages (1.102564ms)
+  ✔ no last-page control (1.040675ms)
+  ✔ no last-page href (1.561915ms)
+  ✔ ambiguous last-page controls (1.241815ms)
+  ✔ no corroborating final numbered link (1.336659ms)
+  ✔ last-page control cannot corroborate itself (1.350833ms)
+  ✔ numbered link contradicts final page (1.498753ms)
+  ✔ numbered label differs from target page (1.590188ms)
+  ✔ ordinary numbered link changes filters (3.921319ms)
+  ✔ pagination detached from results (1.202951ms)
+  ✔ unknown error response (1.187736ms)
+  ✔ challenge response (0.805994ms)
+✔ missing or ambiguous search evidence, error pages and challenges remain failures (37.204452ms)
+✔ the real terminal page advances to the original software filter and preserves prior history (16.487995ms)
+✔ unproven end-of-results preserves the current category, page and history without continuing (3.768778ms)
+✔ English heading is exactly Price Tracker; other site headings are unchanged (2.011633ms)
+✔ track owns exact nonshrinking border-box geometry and the external clip (0.649951ms)
+✔ both knob endpoint boxes exactly match track height and symbol centers (0.679965ms)
+✔ dark paint bleeds beyond coincident outer arcs without changing layout dimensions (0.963562ms)
+✔ stretch and contract keep bounded dimensions in either direction, including reversals (0.652176ms)
+✔ coarse pointer enlarges hit target without shrinking the visible pill (0.546508ms)
+✔ light, dark, tinted and low-contrast shop palettes retain readable symbols (25.316727ms)
+✔ nested translucent surfaces composite over host ancestors (2.241611ms)
+✔ malformed or unsupported computed colors safely fall back (2.224965ms)
+✔ theme changes coalesce, own styles are not observed, no-op refreshes do not write (8.220095ms)
+✔ detached tracker requests full cleanup rather than retaining theme observers (2.763723ms)
+✔ fallback symbol contrast holds across every neutral surface luminance (26.613854ms)
+✔ host color transition endpoints refresh, unrelated and switch transitions do not (2.278388ms)
+✔ Neil: real history and four variant groups: no title leakage, discounted history retained (22.444201ms)
+✔ initial multi variant title is insufficient, but scoped badge remains sufficient (1.3644ms)
+✔ same variant actual price drop works without title; historical high alone does not (2.023916ms)
+✔ known limitation: old higher price plus stale promotional title remains positive (1.071936ms)
+✔ single variant title behavior intentionally unchanged (0.789655ms)
+✔ all seven official current Neil IDs retain same-variant scope and history (6.818333ms)
+✔ future dated high does not corroborate a multi variant title (0.924978ms)
+✔ workflow budgets setup and saving, tests first, and exposes scraper failures (1.886552ms)
+✔ continuation requires a successful scraper, final save and explicit safe output without added permissions (0.444635ms)
+✔ recording job start permits only the default branch (33.566761ms)
+✔ unchanged data exits successfully without making a commit (192.699749ms)
+✔ saves only data and checkpoints, excluding unrelated staged files (217.843707ms)
+✔ the push script refuses non-default branches even outside the workflow (120.922445ms)
+✔ a reservation is durable before subsequent collection results are saved (284.984294ms)
+✔ a failed final push leaves the earlier request reservation durable (376.149859ms)
+✔ replays the single data commit after upstream advances beyond shallow history (282.603145ms)
+✔ a detached checkout can save to the explicit branch (188.562149ms)
+✔ data already saved upstream does not create a duplicate or fail (235.760875ms)
+✔ an identical reservation already saved upstream is safe to retry (215.285113ms)
+✔ upstream quota changes cannot be auto-merged with stale accounting (205.818651ms)
+✔ an upstream change between fetch and push is retried without force (302.139137ms)
+✔ conflicting remote data fails and preserves the remote and local checkpoint (219.760435ms)
+✔ a real commit failure is not mistaken for unchanged data (134.857364ms)
+✔ persistent push rejection fails after three attempts (306.265618ms)
+ℹ tests 297
+ℹ suites 0
+ℹ pass 297
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3999.697992

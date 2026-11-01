@@ -1,0 +1,23 @@
+# LOCAL DESIGN SNIPPET ONLY. Append AFTER existing Continue collection step.
+# Do not enable without source review, reviewed source pins and authorization.
+# This preserves original collector continuation ordering; failed continuation
+# conservatively yields no selectable publication input.
+      - name: Record immutable saved collection
+        if: ${{ success() && steps.scraper.outcome == 'success' && steps.save.outcome == 'success' && steps.scraper.outputs.boopadb_eligible == 'true' }}
+        timeout-minutes: 1
+        env:
+          SCRAPER_OUTCOME: ${{ steps.scraper.outcome }}
+          SAVE_OUTCOME: ${{ steps.save.outcome }}
+          SAVED_COMMIT: ${{ steps.save.outputs.saved_commit }}
+        run: node write-save-receipt.cjs
+
+      - name: Retain immutable saved collection
+        timeout-minutes: 1
+        if: ${{ success() && steps.scraper.outcome == 'success' && steps.save.outcome == 'success' && steps.scraper.outputs.boopadb_eligible == 'true' }}
+        # Upstream upload-artifact v4.6.2 commit verified read-only; local proposal.
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: boopadb-collector-${{ github.run_id }}-${{ github.run_attempt }}
+          path: saved-collection.json
+          if-no-files-found: error
+          overwrite: false

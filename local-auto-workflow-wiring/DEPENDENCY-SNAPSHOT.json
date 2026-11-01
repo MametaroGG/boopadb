@@ -1,0 +1,20 @@
+{
+  "local-auto-input-contract/resolve_automatic_inputs.py": "6a33dba2472c4d6686f243e187f5c88af8a15f378b77306a9d56f4a3b531622d",
+  "local-auto-input-contract/select-input.cjs": "0de6ed2b5f1ed0979db291be8096fca03958b35c8524f02f44c47c95b007ba2a",
+  "local-auto-input-contract/proposed/src/collection-receipt.js": "bd882cb9a31a9df1bf85797095ea32a2d4017db66f9fb8ba5b6136d8b7451648",
+  "local-auto-input-contract/producer-pin.PROPOSAL.json": "fc2396677767fcf4c42b037e1149e3c8aafdcdebf2f826db11f074dce9048f18",
+  "local-release-contract-integration/run_candidate.py": "ee973baf8cc0a6f0dca95c0604bc4dcdaf17d1491b4adc2b58889f2f8418614a",
+  "local-release-contract-integration/validation_job.py": "acf7735120a760bdf30806b2bab2c374c3f943b27a31f830ee55a7e2de54fdd2",
+  "local-release-contract-integration/release_contract.py": "e1469e9b3ffb21e48cd6081514ab777edc8f2cee23f26f11b66fcb859e9e583b",
+  "local-release-contract-integration/artifact_handoff_base.py": "9f722dfd99ca05dc390e5c45962bf214eb8ce57dee89e3220a45511e19e4bfd1",
+  "local-release-contract-integration/GENERATOR-INVENTORY.json": "469d3ae04209f7ef17390615773fa5bfcb8b1a7b0250c9802093e62270cd4a8c",
+  "local-release-contract-integration/validators/check_projection.py": "2228b55dc67f3c7542ffd3487e29d93c71004ffff7ca97f4dda42a1cb234e602",
+  "local-release-contract-integration/validators/compact_codec.py": "d5ebf4c4fa1003c5f544f3da71fece6db527e7f8669ca03dc77b8bc6f3438aa2",
+  "local-release-contract-integration/validators/gate_ui.py": "280dfa381fbed53056cb81a82cbc7ff81cfcc0cfc27677f41785b6f579a28543",
+  "local-release-contract-integration/validators/safe_extract.py": "01253d869a69862e9d2dfa2993ee7c11f62b9af715a7141fa3a9d4af699db1b7",
+  "local-release-contract-integration/validators/selected_price_selector.py": "512e14fd57fb8ed6547c6af5574324f4e54d2e8e8e670da2b019aac15ec1249a",
+  "local-release-contract-integration/validators/validate_bindings.py": "03cfeb9ed4ce258b33b21547a375d30776f3ab4e1eba1aa3de150898cdad988e",
+  "local-release-contract-integration/validators/validate_search_core.py": "6b49182886ca302a6ea89e0c73746add7cd251361fb95553295ec9904cade3f8",
+  "local-release-contract-integration/validators/validate_snapshot.py": "ad684c797e00cd9e0eddeb60f0304b0d095989c368d5f588636f5e1a5ed5cc27",
+  "local-release-contract-integration/validators/verify_inventory.py": "f369d4c8ed2c014d5f758abf0709d6fdeb86ae8d85b6d602fedbfc606e853f09"
+}

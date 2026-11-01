@@ -1,0 +1,269 @@
+# ============================================================================
+# DRAFT v4 — REVIEW ONLY — DO NOT ENABLE AS-IS
+# BoopaDB 独立QAレビュー記録 GitHub Actions 移行案（レビュー用ドラフト）
+#
+# - v4 (dot v3 review point 1 — independent QA authority and
+#   substance): this job runs under the GitHub environment
+#   `qa-approval`. With required reviewers configured on that
+#   environment, the job cannot start until an authorized person
+#   explicitly approves the deployment in the GitHub UI — that
+#   approval IS the attestation by an authorized person, and the
+#   approver is recorded by GitHub. THIS DRAFT ONLY DECLARES
+#   `environment: qa-approval`; configuring the environment's
+#   protection rules (required reviewers) is an OWNER settings step
+#   at migration time and is NOT done here. Until it is configured,
+#   the environment name alone attests nothing — promote therefore
+#   ALSO verifies the workflow BLOBS: the source (daily) run's
+#   workflow file at its head SHA and this workflow's file at this
+#   run's head SHA must equal the trusted versions pinned in
+#   generator/workflow_pins.json (a path-suffix match is not a
+#   version guarantee). Both blob SHAs are bound into the record.
+#
+# - New in v3 (dot v2 review point 2): the independent QA approval must
+#   be a CHECKABLE OBJECT bound to {source_run_id, artifact_digest,
+#   verdict}, not a free-text reference that promote merely records.
+#   This workflow is that object-producer, using only GitHub
+#   primitives: it re-downloads the QA artifact from the source daily
+#   run, RECOMPUTES the archive digest itself, and writes
+#   qa-review-record.json as an artifact of ITS OWN run
+#   (boopadb-qa-review-<qa_run_id>). boopadb-promote.yml then verifies
+#   this run's identity/conclusion via the GitHub API and asserts the
+#   record's fields against its inputs.
+# - WHO DISPATCHES THIS, AND WHEN: the owner (or Muse) dispatches it
+#   ONLY after dot's independent QA verdict for the artifact exists.
+#   The dispatch input qa_report_ref carries the identifier of dot's
+#   QA report (Drive file name / ID in the BoopaDB_handover folder),
+#   so dot's judgment stays traceable; the record binds that reference
+#   together with the recomputed digest, the verdict, the dispatching
+#   actor (github.actor) and the timestamp. A transcribed verdict
+#   therefore cannot be attached to different bytes: the digest in the
+#   record is computed here, from the artifact, never typed in.
+# - A "fail" verdict is recorded and uploaded exactly like "pass";
+#   recording is not approval — promote rejects any verdict != pass.
+# - No PAT, no deploy key, no secrets beyond the default GITHUB_TOKEN.
+#   This workflow has read permissions only and publishes nothing.
+# - The Drive alternative (dot's QA result living only in Drive) stays
+#   NOTED AS UNRESOLVED for unattended verification: promote cannot
+#   read Drive. Until that is designed, the checkable record is this
+#   GitHub-native one, with qa_report_ref pointing at the Drive-side
+#   report for human cross-checking.
+# ============================================================================
+
+name: BoopaDB QA Review (DRAFT v4 - review only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Run ID of the BoopaDB Daily workflow run whose QA artifact was independently reviewed."
+        required: true
+        type: string
+      expected_digest:
+        description: "SHA256 (64-hex) of that run's QA release archive (site-release.tar). This workflow recomputes it from the downloaded artifact and fails on mismatch — the value is a cross-check, never trusted."
+        required: true
+        type: string
+      verdict:
+        description: "The independent QA verdict for THIS artifact (dot's QA result). Recorded verbatim; promote accepts only 'pass'."
+        required: true
+        type: choice
+        options:
+          - pass
+          - fail
+      qa_report_ref:
+        description: "Identifier of the independent QA report behind this verdict (e.g. dot's QA report file name / Drive ID in BoopaDB_handover). Bound into the record for traceability."
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read # download the QA artifact from the source daily run
+
+env:
+  PYTHON_VERSION: "3.12"
+  SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+  EXPECTED_DIGEST: ${{ inputs.expected_digest }}
+  VERDICT: ${{ inputs.verdict }}
+  QA_REPORT_REF: ${{ inputs.qa_report_ref }}
+  QA_ARTIFACT_NAME_PREFIX: "boopadb-qa-"
+
+jobs:
+  qa-review:
+    name: Record independent QA verdict (bound to the artifact digest)
+    runs-on: ubuntu-latest
+    # v4: the qa-approval environment is the authority anchor. Its
+    # required-reviewer approval (an owner settings step at
+    # migration — NOT configured by this draft) is the explicit
+    # confirmation by an authorized person; GitHub records who
+    # approved. The record below binds the environment name so a
+    # record produced outside this job shape is distinguishable.
+    environment: qa-approval
+    steps:
+      - name: Checkout BoopaDB repo (workflow pins)
+        uses: actions/checkout@v4
+      - name: Validate input formats FIRST (fail closed)
+        run: |
+          set -euo pipefail
+          if ! printf '%s' "$SOURCE_RUN_ID" | grep -Eq '^[0-9]+$'; then
+            echo "::error::source_run_id must be the numeric Actions run ID"
+            exit 1
+          fi
+          if ! printf '%s' "$EXPECTED_DIGEST" | grep -Eq '^[0-9a-f]{64}$'; then
+            echo "::error::expected_digest must be a 64-hex SHA256"
+            exit 1
+          fi
+          if [ -z "$QA_REPORT_REF" ]; then
+            echo "::error::qa_report_ref (independent QA report identifier) is required"
+            exit 1
+          fi
+
+      - name: Verify the source run identity via the GitHub API
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p review-work
+          # The record must bind to a REAL daily run: workflow path,
+          # dispatch event, completed+success. (head_sha / run_attempt
+          # are asserted by promote against the run manifest; here we
+          # store them in the record's evidence for traceability.)
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN_ID}" > review-work/source-run.json
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+          run = json.loads(Path("review-work/source-run.json").read_text())
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+          if not str(run.get("path", "")).endswith("boopadb-daily.yml"):
+              fail(f"source run is not the daily workflow: path={run.get('path')!r}")
+          if run.get("event") != "workflow_dispatch":
+              fail(f"source run event is not workflow_dispatch: {run.get('event')!r}")
+          if run.get("status") != "completed" or run.get("conclusion") != "success":
+              fail(f"source run not successfully completed: "
+                   f"{run.get('status')}/{run.get('conclusion')}")
+          print(f"source run OK: head_sha={run.get('head_sha')}, "
+                f"attempt={run.get('run_attempt')}")
+          PY
+
+      - name: Verify workflow blobs against workflow_pins.json (trusted versions)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # v4 (dot v3 review point 1): a workflow PATH match is not
+          # a version guarantee. Fetch each workflow file's git blob
+          # SHA at the relevant run's head commit through the
+          # contents API and require equality with the trusted
+          # versions pinned in generator/workflow_pins.json:
+          # - the DAILY file at the SOURCE run's head_sha (the run
+          #   that produced the artifact under review really ran the
+          #   pinned daily workflow);
+          # - the QA-REVIEW file at THIS run's head_sha (this record
+          #   is produced by the pinned review workflow).
+          # The verified blob SHAs are bound into the record, and
+          # promote re-verifies them independently.
+          SRC_HEAD="$(python3 -c "import json; print(json.load(open('review-work/source-run.json'))['head_sha'])")"
+          gh api "repos/${GITHUB_REPOSITORY}/contents/.github/workflows/boopadb-daily.yml?ref=${SRC_HEAD}" > review-work/daily-file.json
+          gh api "repos/${GITHUB_REPOSITORY}/contents/.github/workflows/boopadb-qa-review.yml?ref=${GITHUB_SHA}" > review-work/qa-file.json
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, "generator/scripts")
+          from validate_bindings import BindingError, load_typed
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          try:
+              pins = load_typed("workflow-pins", "generator/workflow_pins.json")
+          except BindingError as exc:
+              fail(str(exc))
+          daily_blob = json.loads(
+              Path("review-work/daily-file.json").read_text()).get("sha")
+          qa_blob = json.loads(
+              Path("review-work/qa-file.json").read_text()).get("sha")
+          if daily_blob != pins["workflows"]["boopadb-daily.yml"]:
+              fail(f"source run's daily workflow blob {daily_blob} != "
+                   f"pinned {pins['workflows']['boopadb-daily.yml']}")
+          if qa_blob != pins["workflows"]["boopadb-qa-review.yml"]:
+              fail(f"this run's qa-review workflow blob {qa_blob} != "
+                   f"pinned {pins['workflows']['boopadb-qa-review.yml']}")
+          Path("review-work/workflow-blobs.json").write_text(json.dumps({
+              "source_workflow_blob": daily_blob,
+              "qa_workflow_blob": qa_blob,
+          }, indent=1, sort_keys=True))
+          print(f"workflow blobs OK: daily={daily_blob}, qa-review={qa_blob}")
+          PY
+
+      - name: Download the QA artifact from the source run
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.QA_ARTIFACT_NAME_PREFIX }}${{ inputs.source_run_id }}
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ github.token }}
+          path: qa
+        # Layout (v3 staging contract, same as promote sees):
+        # qa/site-release.tar + qa/evidence/*.json
+
+      - name: Recompute the archive digest (never trust the input value)
+        run: |
+          set -euo pipefail
+          actual="$(sha256sum qa/site-release.tar | awk '{print $1}')"
+          if [ "$actual" != "$EXPECTED_DIGEST" ]; then
+            echo "::error::QA archive digest mismatch: got $actual, expected $EXPECTED_DIGEST"
+            exit 1
+          fi
+          recorded="$(python3 -c "import json; print(json.load(open('qa/evidence/qa-archive.json'))['sha256'])")"
+          if [ "$recorded" != "$EXPECTED_DIGEST" ]; then
+            echo "::error::artifact's own qa-archive.json digest != expected_digest"
+            exit 1
+          fi
+          echo "digest OK: $actual"
+
+      - name: Write the QA review record
+        run: |
+          set -euo pipefail
+          mkdir -p review-out
+          python3 - <<'PY'
+          import datetime as dt, json, os
+          from pathlib import Path
+          src = json.loads(Path("review-work/source-run.json").read_text())
+          blobs = json.loads(Path("review-work/workflow-blobs.json").read_text())
+          record = {
+              "schema": 1,
+              "source_run_id": os.environ["SOURCE_RUN_ID"],
+              "artifact_digest": os.environ["EXPECTED_DIGEST"],
+              "verdict": os.environ["VERDICT"],
+              "qa_run_id": os.environ["GITHUB_RUN_ID"],
+              "qa_report_ref": os.environ["QA_REPORT_REF"],
+              "reviewer": os.environ["GITHUB_ACTOR"],
+              "reviewed_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "source_head_sha": src.get("head_sha"),
+              "source_run_attempt": src.get("run_attempt"),
+              # v4: the attestation context — the qa-approval
+              # environment this job ran under (its required-reviewer
+              # approval is the authorized person's confirmation),
+              # and the pinned workflow blobs verified above.
+              "environment": "qa-approval",
+              "source_workflow_blob": blobs["source_workflow_blob"],
+              "qa_workflow_blob": blobs["qa_workflow_blob"],
+          }
+          Path("review-out/qa-review-record.json").write_text(
+              json.dumps(record, indent=1, sort_keys=True))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+              fh.write("## BoopaDB QA review record (DRAFT workflow)\n\n")
+              for k, v in record.items():
+                  fh.write(f"- {k}: {v}\n")
+          print(record)
+          PY
+
+      - name: Upload the QA review record artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: boopadb-qa-review-${{ github.run_id }}
+          path: review-out
+          retention-days: 90
+        # Layout: the artifact root contains qa-review-record.json.
+        # Promote downloads it with path: review and reads
+        # review/qa-review-record.json.

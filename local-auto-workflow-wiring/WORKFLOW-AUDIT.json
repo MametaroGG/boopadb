@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "yaml": "parsed",
+  "shell_blocks": "bash -n passed",
+  "immutable_action_references": 13,
+  "actual_pinned_action_input_compatibility": "passed",
+  "original_v7_daily_qa_promote_bytes": "verified against pinned bundled originals",
+  "schedule": "OFF",
+  "jobs": "literal false",
+  "installed": false,
+  "published": false
+}

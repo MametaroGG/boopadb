@@ -1,0 +1,37 @@
+$ python -m unittest discover -s local-auto-workflow-wiring/tests -v
+test_actual_cli_options_exist (test_wiring.WiringTests.test_actual_cli_options_exist) ... ok
+test_actual_generator_identity_matches_and_wrong_head_refused (test_wiring.WiringTests.test_actual_generator_identity_matches_and_wrong_head_refused) ... ok
+test_actual_shell_passes_quoted_env_without_execution (test_wiring.WiringTests.test_actual_shell_passes_quoted_env_without_execution) ... ok
+test_audit_portable_without_original_handover_and_tamper_refusal (test_wiring.WiringTests.test_audit_portable_without_original_handover_and_tamper_refusal) ... ok
+test_changed_config_handoff_refused (test_wiring.WiringTests.test_changed_config_handoff_refused) ... ok
+test_configuration_placeholders_unknown_keys_and_digest_refused (test_wiring.WiringTests.test_configuration_placeholders_unknown_keys_and_digest_refused) ... ok
+test_duplicate_json_rejected (test_wiring.WiringTests.test_duplicate_json_rejected) ... ok
+test_malformed_selection_refused (test_wiring.WiringTests.test_malformed_selection_refused) ... ok
+test_no_fallback_or_qa_after_resolver_failure (test_wiring.WiringTests.test_no_fallback_or_qa_after_resolver_failure) ... ok
+test_real_inventory_finalize_and_mocked_shell_contract_in_order (test_wiring.WiringTests.test_real_inventory_finalize_and_mocked_shell_contract_in_order) ... ok
+test_reuse_refused_without_overwriting_context (test_wiring.WiringTests.test_reuse_refused_without_overwriting_context) ... ok
+test_workflow_audit_refuses_unpinned_actions_and_incompatible_inputs (test_wiring.WiringTests.test_workflow_audit_refuses_unpinned_actions_and_incompatible_inputs) ... ok
+test_wrong_checkout_rejected_before_inventory (test_wiring.WiringTests.test_wrong_checkout_rejected_before_inventory) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 1.036s
+
+OK
+
+exit=0
+
+$ python local-auto-workflow-wiring/audit_workflow.py
+{
+  "status": "passed",
+  "yaml": "parsed",
+  "shell_blocks": "bash -n passed",
+  "immutable_action_references": 13,
+  "actual_pinned_action_input_compatibility": "passed",
+  "original_v7_daily_qa_promote_bytes": "verified against pinned bundled originals",
+  "schedule": "OFF",
+  "jobs": "literal false",
+  "installed": false,
+  "published": false
+}
+
+exit=0

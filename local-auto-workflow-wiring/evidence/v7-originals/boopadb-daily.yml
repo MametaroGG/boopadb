@@ -1,0 +1,1282 @@
+# ============================================================================
+# DRAFT v6 — REVIEW ONLY — DO NOT ENABLE AS-IS
+# BoopaDB 日次生成＋検証 GitHub Actions 移行案（レビュー用ドラフト）
+#
+# - This file is a design draft prepared for dot's review (2026-11-01;
+#   v3 revision per DOT-GHA-V2-REVIEW-20261101, v4 revision per
+#   DOT-GHA-V3-REVIEW-20261101, v5 revision per
+#   DOT-GHA-V4-REVIEW-20261101, v6 revision per
+#   DOT-GHA-V5-REVIEW-20261101). It is NOT placed in any repository
+#   and must not be enabled as-is.
+# - v6 changes (dot v5 review, 2 remaining points):
+#   * (point 1) Gate 5b judges expiry at EVALUATION time: the
+#     validate step passes its own current UTC (date -u) as
+#     --evaluation-time to check_projection.py. The declaration's
+#     as_of is recorded and sanity-checked only (not later than
+#     the evaluation time; no observation later than it) and never
+#     drives a freshness judgment.
+#   * (point 2) Gate 5b binds the evidence to the ACTUAL generated
+#     payload: the site payload current-price-projection.json must
+#     exist, its canonical digest must equal the declaration's
+#     payload_sha256, every payload entry must equal the entry the
+#     verified contract recomputes, the applied item set must be
+#     identical across payload / declaration applied_items /
+#     recomputation / evidence records, and the embedded
+#     createCurrentPriceProjection config in index.html and
+#     item.html must digest-match the payload. An empty payload
+#     or an empty projection script fails. The build staging step
+#     asserts the same payload binding at staging time.
+# - v5 changes (dot v4 review point 1 — the price/variant evidence
+#   contract, implemented from the recovered
+#   current_price_projection.py):
+#   * NEW Gate 5b verifies the current-price projection contract
+#     (generator/scripts/check_projection.py) against the pinned
+#     tracker snapshot's raw histories: package digest, schema,
+#     raw-record digest, source evidence bytes, observed <= as_of
+#     < expires (max 24 h), seller window, variant binding +
+#     latest price, int comparison price greater than the selected
+#     price, and the runtime snapshot bindings. The selector is
+#     the recovered selected_price_selector.py, hash-pinned before
+#     import.
+#   * Gate 5's kind enumeration now admits current_price_projection
+#     alongside verified_thumbnail; Gate 5b REQUIRES a verified
+#     projection package whenever a projection is applied, so a
+#     thumbnail-only evidence list can no longer pass in that case.
+# - v4 changes (dot v3 review, 4 remaining conditions):
+#   * the input inventory commitment (inventory_digest +
+#     inventory_count, digest = SHA256 of the exact bytes of
+#     work/input-inventory.json) is REQUIRED in the attestation and
+#     asserted equal across the prepared-input record, the run
+#     manifest, the validation results and the release-manifest
+#     inside the archive (point 4);
+#   * the run manifest also binds prev_release_digest (SHA256 of the
+#     currently published release-manifest at dispatch time, or the
+#     baseline sentinel in baseline_pin.json for the first
+#     promotion) and the relations bundle+approval hash set, which
+#     validate asserts against the pinned set (points 2, 3);
+#   * Gate 4's UI checks are backed by acceptance fixtures in
+#     fixtures/ (published baseline passes; duplicate / comment-only
+#     definitions, TTL change, R3 span, hydration removal and
+#     2625416 guard/time tampering all fail).
+# - Route (owner decision 2026-11-01): build in Actions, validate as a
+#   separate job, and end at an IMMUTABLE QA artifact. This workflow
+#   contains NO deploy job: promotion to GitHub Pages is the separate
+#   workflow boopadb-promote.yml, and independent QA is bound through
+#   boopadb-qa-review.yml (both drafts).
+# - The GITHUB_TOKEN branch-commit route is NOT used: commits made with
+#   GITHUB_TOKEN do not trigger GitHub Pages builds (GitHub docs; dot
+#   DOT-GHA-ARCHITECTURE-REVIEW-20261101).
+# - No PAT, no deploy key, no secrets beyond the default GITHUB_TOKEN.
+#   Top-level permissions are read-only; this workflow never writes.
+# - Fail-closed: every manifest binding is MANDATORY and TYPED
+#   (generator/scripts/validate_bindings.py — missing or mistyped
+#   fields fail; there are no presence-only checks and no fallbacks).
+#   Any gate failure stops the run, no QA artifact is promoted, and
+#   failure evidence (stage, run ID, diagnostics) is kept for BOTH
+#   jobs.
+# - ARTIFACT LAYOUT (v3, dot v2 review point 1 — ONE explicit staging
+#   structure, identical on the upload and download sides; see
+#   DESIGN.md for the full tree):
+#     build artifact  boopadb-build-<run_id>   staged in build-artifact/
+#       -> validate downloads it with path: incoming
+#          (incoming/site-release.tar, incoming/work/*.json)
+#     QA artifact     boopadb-qa-<run_id>      staged in qa-artifact/
+#       -> promote downloads it with path: qa
+#          (qa/site-release.tar, qa/evidence/*.json)
+#   Each upload uses a SINGLE directory path, so upload-artifact's
+#   least-common-ancestor rule can never shift the layout (the v2 bug:
+#   uploading qa/site-release.tar + work/ together made the download
+#   land at qa/qa/site-release.tar).
+# - Steps marked [DRAFT-ADAPTATION] are new entry points/assertions
+#   that do not exist in the current producer tooling in this exact
+#   form; they must be confirmed when the generator is migrated
+#   in-repo. The draft validator/gate scripts live with this
+#   draft package under generator_scripts/ and are proposed to be
+#   checked in at generator/scripts/ (validate_bindings.py,
+#   check_projection.py, selected_price_selector.py (recovered,
+#   hash-pinned), gate_ui.py, safe_extract.py, verify_inventory.py,
+#   test_check_projection.py; validate_snapshot.py already lives
+#   there in the producer tools).
+# ============================================================================
+
+name: BoopaDB Daily (DRAFT v5 - review only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tracker_commit:
+        description: "Pinned booth-vrc-price-tracker commit (full 40-hex SHA). Input pinning starts manual: an automatic pin must wait for dot's input-completion contract, because the tracker saves partial results on failure, so 'latest main' is not proof of completion."
+        required: true
+        type: string
+      generation:
+        description: "Generation (producer pointer sequence) of the captured snapshot being built, e.g. 2 for the successor of the published baseline (generation 1). Manual pin, same rationale as tracker_commit: the lineage lives in the producer handoff state, which unattended Actions cannot read (Drive auth unresolved). Promote requires candidate generation STRICTLY greater than the live generation."
+        required: true
+        type: string
+      prev_release_digest:
+        description: "SHA256 (64-hex) of the currently published release-manifest.json file bytes — the lineage anchor this candidate succeeds (v4, dot v3 review point 3). For the FIRST promotion, where the live site was published by the old route and has no release-manifest, use the baseline sentinel pinned in generator/baseline_pin.json (baseline_prev_release_sentinel). Promote recomputes the live digest and fails on any mismatch; a wrong or stale anchor cannot be promoted."
+        required: true
+        type: string
+  # schedule:
+  #   # DISABLED in this draft. Enable only after dot defines the
+  #   # input-completion contract (how a completed tracker collection
+  #   # is proven and pinned automatically, and how the generation is
+  #   # assigned). Until then both pins are manual via workflow_dispatch.
+  #   - cron: "53 20 * * *"  # placeholder time (05:53 JST), NOT final
+
+# Top-level permissions are read-only for the whole daily workflow.
+# (Pages write scopes exist only in boopadb-promote.yml.)
+permissions:
+  contents: read
+
+# Daily runs are serialized so two generations cannot interleave their
+# artifacts. (The Pages-side serialization lives in the promote
+# workflow's own concurrency group; rollback protection does NOT rely
+# on concurrency — see the generation gate in boopadb-promote.yml.)
+concurrency:
+  group: boopadb-daily
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: "3.12"  # producer runs on Python 3.12.3, stdlib only (no lockfile, no third-party packages)
+  # Dispatch inputs are passed to steps ONLY through these env
+  # bindings. They are never expanded as ${{ inputs.* }} inside a run:
+  # block (dot review point 1 in v2): every shell use is a quoted
+  # variable, and a dedicated step validates the formats before any
+  # other use of the values.
+  TRACKER_COMMIT: ${{ inputs.tracker_commit }}
+  GENERATION: ${{ inputs.generation }}
+  PREV_RELEASE_DIGEST: ${{ inputs.prev_release_digest }}
+  # Freshness window: mirrors producer-install/config/producer-config.json
+  # (minimum_source_date / max_source_age_days). Re-pin at migration time.
+  MINIMUM_SOURCE_DATE: "2026-10-30"
+  MAX_SOURCE_AGE_DAYS: "1"
+  # Population regression gate: candidate rows must be >= pinned
+  # baseline rows * (1 - 0.02). Mirrors producer config
+  # max_population_drop_fraction=0.02 and the producer_runner
+  # 'provenance' stage check. The baseline VALUES are pinned in
+  # generator/baseline_pin.json (checked in with this draft package;
+  # no live baseline reads anywhere).
+  MAX_POPULATION_DROP_FRACTION: "0.02"
+  TRACKER_REPO: "MametaroGG/booth-vrc-price-tracker"
+
+jobs:
+  # ------------------------------------------------------------------------
+  # Job 1: build — validate the pins, snapshot+inventory the input,
+  # attest it, generate the site (incl. the release manifest that the
+  # promote generation gate reads back from the live site), ledger it,
+  # verify the ledger against the tree, and pack the site into ONE
+  # deterministic tar archive that is the only site-bytes handoff.
+  # Corresponds to producer stages: capture/extract -> attest ->
+  # prepare -> build -> provenance (manifest write) -> package.
+  # ------------------------------------------------------------------------
+  build:
+    name: Build (pinned input snapshot)
+    runs-on: ubuntu-latest
+    outputs:
+      expected_date: ${{ steps.run_manifest.outputs.expected_date }}
+      product_count: ${{ steps.run_manifest.outputs.product_count }}
+      generation: ${{ steps.run_manifest.outputs.generation }}
+    steps:
+      - name: Record build context + validate input formats FIRST (fail closed)
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          # Context is written before validation so the failure-evidence
+          # step has diagnostics even when the format check itself fails.
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          ctx = {
+              "stage": "build",
+              "job": "build",
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "tracker_commit_raw_length": len(os.environ.get("TRACKER_COMMIT", "")),
+              "generation_raw": os.environ.get("GENERATION", ""),
+              "prev_release_digest_raw_length": len(os.environ.get("PREV_RELEASE_DIGEST", "")),
+          }
+          Path("work/build-context.json").write_text(
+              json.dumps(ctx, indent=1, sort_keys=True))
+          print(ctx)
+          PY
+          # Format gates: the FIRST use of the input values, through
+          # the quoted shell variables only.
+          if ! printf '%s' "$TRACKER_COMMIT" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error::tracker_commit must be a full 40-hex commit SHA"
+            exit 1
+          fi
+          if ! printf '%s' "$GENERATION" | grep -Eq '^[1-9][0-9]*$'; then
+            echo "::error::generation must be a positive integer (producer pointer sequence)"
+            exit 1
+          fi
+          if ! printf '%s' "$PREV_RELEASE_DIGEST" | grep -Eq '^[0-9a-f]{64}$'; then
+            echo "::error::prev_release_digest must be a 64-hex SHA256 (or the baseline sentinel from baseline_pin.json)"
+            exit 1
+          fi
+
+      - name: Checkout BoopaDB repo (generator canonical home)
+        uses: actions/checkout@v4
+        # DRAFT ASSUMPTION: at migration, the generator canonical tools
+        # (currently producer-install/tools, SHA-pinned by tools-manifest
+        # f010404f3a5234d33fdd6b77406532e399c52ec339fbbd7447096b7305df6fb2)
+        # live in this repo under generator/ and are pinned by this repo's
+        # commit. The in-repo layout is an open design question (DESIGN.md).
+
+      - name: Checkout tracker repo at the pinned commit
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.TRACKER_REPO }}
+          ref: ${{ env.TRACKER_COMMIT }}
+          path: source
+        # NOTE: the tracker repo is public, so the default token can read
+        # it. If it ever becomes private, cross-repo read access becomes an
+        # open question — this draft deliberately introduces no PAT for it.
+
+      - name: Verify checked-out HEAD equals the pinned commit
+        run: |
+          set -euo pipefail
+          actual="$(git -C source rev-parse HEAD)"
+          if [ "$actual" != "$TRACKER_COMMIT" ]; then
+            echo "::error::input pin mismatch: HEAD=$actual"
+            exit 1
+          fi
+
+      - name: Record input inventory (EVERY regular file under data/ + meta/)
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          # The inventory covers every regular file under source/data
+          # and source/meta regardless of extension — non-JSON files
+          # are NOT silently skipped; they are inventoried (hash-bound)
+          # and explicitly accounted in the inventory summary.
+          # v3 hardening (dot v2 review, inventory addenda): the input
+          # root itself and the data/meta roots must not be symlinks;
+          # symlinked directories are pruned AND fail the build (a
+          # walk must never follow one and double-count its target);
+          # two distinct paths that collide after Unicode NFC +
+          # case folding fail the build.
+          python3 - <<'PY'
+          import hashlib, json, os, sys, unicodedata
+          from pathlib import Path
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          if os.path.islink("source"):
+              fail("input root 'source' is a symlink")
+          inv = {}
+          folded = {}
+          non_json = []
+          for directory in ("data", "meta"):
+              base = Path("source") / directory
+              if os.path.islink(base):
+                  fail(f"input root 'source/{directory}' is a symlink")
+              if not base.is_dir():
+                  fail(f"missing source/{directory}")
+              for dirpath, dirnames, filenames in os.walk(base, followlinks=False):
+                  keep = []
+                  for d in dirnames:
+                      if os.path.islink(os.path.join(dirpath, d)):
+                          fail(f"symlinked directory in input snapshot: "
+                               f"{os.path.join(dirpath, d)}")
+                      keep.append(d)
+                  dirnames[:] = keep
+                  for name in filenames:
+                      p = Path(dirpath) / name
+                      rel = p.relative_to(Path("source")).as_posix()
+                      if p.is_symlink():
+                          fail(f"symlink in input snapshot: {rel}")
+                      if not p.is_file():
+                          fail(f"non-regular file in input snapshot: {rel}")
+                      key = unicodedata.normalize("NFC", rel).casefold()
+                      if key in folded:
+                          fail(f"normalization/case collision in input: "
+                               f"{rel!r} vs {folded[key]!r}")
+                      folded[key] = rel
+                      inv[rel] = hashlib.sha256(p.read_bytes()).hexdigest()
+                      if p.suffix != ".json":
+                          non_json.append(rel)
+          if not inv:
+              fail("input inventory is empty")
+          Path("work/input-inventory.json").write_text(
+              json.dumps(inv, indent=1, sort_keys=True))
+          # v4 (dot v3 review point 4): the inventory COMMITMENT.
+          # inventory_digest is the SHA256 of the exact bytes of
+          # work/input-inventory.json as written here (sorted keys,
+          # fixed formatting — the same writer is the only producer
+          # of this file, so the digest is reproducible by every
+          # later stage from the artifact copy). The attestation must
+          # carry this digest + count, and validate/promote assert
+          # the SAME value across the prepared-input record, the run
+          # manifest, the validation results and the release-manifest
+          # inside the archive.
+          inv_bytes = Path("work/input-inventory.json").read_bytes()
+          summary = {
+              "files": len(inv),
+              "non_json_files": non_json,
+              "inventory_digest": hashlib.sha256(inv_bytes).hexdigest(),
+              "inventory_count": len(inv),
+          }
+          Path("work/input-inventory-summary.json").write_text(
+              json.dumps(summary, indent=1, sort_keys=True))
+          print(f"input files inventoried: {len(inv)} "
+                f"(non-JSON, all hash-bound: {len(non_json)}: {non_json[:10]}); "
+                f"inventory_digest={summary['inventory_digest']}")
+          PY
+
+      - name: Set up Python (stdlib only, no pip installs)
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+        # The producer toolchain imports only the Python standard library
+        # (verified in the 2026-11-01 inventory); there is no lockfile and
+        # this draft adds no dependency installation step.
+
+      - name: "[DRAFT-ADAPTATION] Attest input snapshot (producer_runner.attest equivalent)"
+        run: |
+          set -euo pipefail
+          # In the current producer, attest() is a function inside
+          # producer_runner.py, not a standalone script. It validates:
+          # product IDs (string, [1-9][0-9]*), ID uniqueness, variation
+          # series structure, observation dates/prices (finite, >= 0, not
+          # future), tracker state-file envelopes (data/crawl_state.json,
+          # data/request_budget.json are hash-bound input, never product
+          # records), and freshness (latest date >= MINIMUM_SOURCE_DATE
+          # and within MAX_SOURCE_AGE_DAYS of the run date, JST).
+          # Its output (attestation.json) binds expected_date + the
+          # input inventory + the capture commit, and its
+          # completion_scope is "immutable-captured-snapshot-integrity"
+          # — snapshot integrity, NOT crawl/daily-coverage completion.
+          # v3: the attestation output contract is the typed
+          # "attestation" spec in generator/scripts/validate_bindings.py
+          # (expected_date, tracker_commit, completion_scope — all
+          # REQUIRED). The extracted entry point must always emit them;
+          # the validate job fails if any is missing or mistyped.
+          # v4: the spec additionally REQUIRES inventory_digest +
+          # inventory_count, which the entry point computes from the
+          # --inventory file it is given (SHA256 of its exact bytes +
+          # entry count). This binds the attestation to the pinned
+          # input snapshot's price/variation data itself: the
+          # snapshot, hash-bound by the inventory, is the authority
+          # for that data (DESIGN.md, evidence enumeration).
+          python3 generator/attest_snapshot.py \
+            --tracker-root source \
+            --tracker-commit "$TRACKER_COMMIT" \
+            --inventory work/input-inventory.json \
+            --minimum-source-date "${MINIMUM_SOURCE_DATE}" \
+            --max-source-age-days "${MAX_SOURCE_AGE_DAYS}" \
+            --output work/attestation.json
+
+      - name: Prepare inputs (mirrors producer 'prepare' stage)
+        run: |
+          set -euo pipefail
+          python3 generator/prepare_inputs.py \
+            --tracker-root source \
+            --generate-charts \
+            --attestation work/attestation.json \
+            --output-dir prepared
+
+      - name: Assert the prepared-input record carries the inventory commitment
+        run: |
+          set -euo pipefail
+          # v4 (dot v3 review point 4): the prepared-input record
+          # (prepared/completion.json — the record build_site.py
+          # consumes as --completion-manifest) must carry the SAME
+          # inventory_digest as the attestation. Its contract is the
+          # typed "prepared-input" spec (inventory_digest,
+          # tracker_commit, expected_date — all REQUIRED)
+          # [DRAFT-ADAPTATION: prepare_inputs.py must emit these
+          # fields at migration]. The assertion happens HERE, in the
+          # build, because prepared/ itself is not shipped in the
+          # artifact; the value then travels onward via the run
+          # manifest, whose digest validate/promote assert against
+          # the attestation directly.
+          python3 generator/scripts/validate_bindings.py prepared-input prepared/completion.json
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+          att = json.loads(Path("work/attestation.json").read_text())
+          prep = json.loads(Path("prepared/completion.json").read_text())
+          if prep["inventory_digest"] != att["inventory_digest"]:
+              print("::error::prepared-input inventory_digest != attestation")
+              sys.exit(1)
+          if prep["tracker_commit"] != att["tracker_commit"] or \
+                  prep["expected_date"] != att["expected_date"]:
+              print("::error::prepared-input commit/date != attestation")
+              sys.exit(1)
+          print("prepared-input inventory commitment OK")
+          PY
+
+      - name: Build site (mirrors producer 'build' stage)
+        run: |
+          set -euo pipefail
+          # Same argument shape as producer_runner's build_site.py call.
+          # The --*-bundle / --*-approval arguments are the inventory-pinned
+          # relation build inputs from the producer config (in-repo layout
+          # assumed under generator/).
+          python3 generator/build_site.py \
+            --input-root prepared \
+            --completion-manifest prepared/completion.json \
+            --static-root generator/pinned-static \
+            --output-dir site \
+            --relations-bundle generator/relation-bundle \
+            --relations-approval generator/inputs/approvals/relation.json \
+            --relation-search-bundle generator/relation-search-bundle \
+            --relation-search-approval generator/inputs/approvals/relation-search.json \
+            --supplement-bundle generator/relation-supplement-bundle \
+            --supplement-approval generator/inputs/approvals/supplement.json
+
+      - name: Write release manifest into the site + run manifest + hash ledger
+        id: run_manifest
+        run: |
+          set -euo pipefail
+          # Mirrors producer 'provenance': read the candidate
+          # snapshot-manifest (validation.rows = product population)
+          # and bind run/input/tool provenance so the artifact is
+          # traceable (dot: run ID, input and tool versions, hash list,
+          # validation results must be recoverable from the artifact).
+          # v3 additions:
+          # - site/release-manifest.json [DRAFT-ADAPTATION]: a small
+          #   machine-readable record PUBLISHED WITH THE SITE carrying
+          #   the generation. boopadb-promote.yml fetches it from the
+          #   live site to enforce strictly-increasing generations
+          #   (dot v2 review point 5). It is written BEFORE the ledger
+          #   so it is ledgered and tarred like every other site file.
+          #   NOTE: this adds one file to the published file set vs
+          #   the pinned baseline — flagged in DESIGN.md for dot's
+          #   confirmation at migration.
+          # - the run manifest binds the generation (typed "int" in
+          #   the run-manifest spec) alongside commit/run/date.
+          # - v4: both manifests also bind the input inventory
+          #   commitment (digest+count), the lineage anchor
+          #   prev_release_digest (dispatch input), and — the run
+          #   manifest only — the relations bundle+approval hash set
+          #   actually consumed by this build.
+          # - any symlink or unexpected empty directory in the site
+          #   output fails here already, not only in validate.
+          python3 - <<'PY'
+          import hashlib, json, os, sys
+          from pathlib import Path
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          att = json.loads(Path("work/attestation.json").read_text())
+          snap = json.loads(Path("site/snapshot-manifest.json").read_text())
+          summary = json.loads(Path("work/input-inventory-summary.json").read_text())
+          rows = snap["validation"]["rows"]
+          expected_date = att["expected_date"]
+          generation = int(os.environ["GENERATION"])
+          # v4: the relations binding set — SHA256 of the ACTUAL
+          # bundle manifests and approval files this build consumes
+          # ([DRAFT-ADAPTATION] proposed in-repo locations; the
+          # producer keeps manifests under manifests/ and approvals
+          # under inputs/approvals/). Validate asserts this set
+          # against the values pinned in baseline_pin.json from the
+          # producer config; a missing file fails the build.
+          def sha256_file(rel):
+              p = Path(rel)
+              if not p.is_file():
+                  fail(f"relations binding input missing: {rel}")
+              return hashlib.sha256(p.read_bytes()).hexdigest()
+          relations_binding = {
+              "relations_bundle_manifest_sha256": sha256_file(
+                  "generator/manifests/relation-bundle-manifest.json"),
+              "relations_approval_sha256": sha256_file(
+                  "generator/inputs/approvals/relation.json"),
+              "relation_search_bundle_manifest_sha256": sha256_file(
+                  "generator/manifests/relation-search-bundle-manifest.json"),
+              "relation_search_approval_sha256": sha256_file(
+                  "generator/inputs/approvals/relation-search.json"),
+              "supplement_bundle_manifest_sha256": sha256_file(
+                  "generator/manifests/relation-supplement-bundle-manifest.json"),
+              "supplement_approval_sha256": sha256_file(
+                  "generator/inputs/approvals/supplement.json"),
+          }
+          release = {
+              "schema": 1,
+              "generation": generation,
+              "source_date": expected_date,
+              "product_count": rows,
+              "tracker_commit": os.environ["TRACKER_COMMIT"],
+              "generator_commit": os.environ["GITHUB_SHA"],
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "inventory_digest": summary["inventory_digest"],
+              "prev_release_digest": os.environ["PREV_RELEASE_DIGEST"],
+          }
+          Path("site/release-manifest.json").write_text(
+              json.dumps(release, indent=1, sort_keys=True))
+          ledger = {}
+          dirs_with_files = set()
+          all_dirs = set()
+          for dirpath, dirnames, filenames in os.walk("site", followlinks=False):
+              base = Path(dirpath)
+              for name in dirnames:
+                  p = base / name
+                  if p.is_symlink():
+                      fail(f"symlink in site output: {p}")
+                  all_dirs.add(p.relative_to(Path("site")).as_posix())
+              for name in filenames:
+                  p = base / name
+                  if p.is_symlink():
+                      fail(f"symlink in site output: {p}")
+                  rel = p.relative_to(Path("site")).as_posix()
+                  ledger[rel] = hashlib.sha256(p.read_bytes()).hexdigest()
+                  parent = p.parent
+                  while parent != Path("site"):
+                      dirs_with_files.add(parent.relative_to(Path("site")).as_posix())
+                      parent = parent.parent
+          empty = sorted(all_dirs - dirs_with_files)
+          if empty:
+              fail(f"unexpected empty directories in site output: {empty[:10]}")
+          if not ledger:
+              fail("site hash ledger is empty")
+          Path("work/hash-ledger.json").write_text(
+              json.dumps(ledger, indent=1, sort_keys=True))
+          run_manifest = {
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "tracker_commit": os.environ["TRACKER_COMMIT"],
+              "generator_commit": os.environ["GITHUB_SHA"],
+              "expected_date": expected_date,
+              "product_count": rows,
+              "site_files": len(ledger),
+              "generation": generation,
+              "inventory_digest": summary["inventory_digest"],
+              "inventory_count": summary["inventory_count"],
+              "prev_release_digest": os.environ["PREV_RELEASE_DIGEST"],
+              "relations_binding": relations_binding,
+          }
+          Path("work/run-manifest.json").write_text(
+              json.dumps(run_manifest, indent=1, sort_keys=True))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"expected_date={expected_date}\n")
+              fh.write(f"product_count={rows}\n")
+              fh.write(f"generation={generation}\n")
+          print(run_manifest)
+          PY
+
+      - name: Write evidence records (pinned correction evidence, bound into the artifact)
+        run: |
+          set -euo pipefail
+          # [DRAFT-ADAPTATION] The evidence record for the 2625416
+          # verifiedThumbnail correction travels INSIDE the artifact
+          # so validate and promote can re-verify the actual record —
+          # item/variant identifier, corrected URL, proof hash,
+          # confirmation time — against the pinned snapshot and the
+          # generated pages (dot v2 review point 4), instead of only
+          # checking dates. The pinned values have ONE source: the
+          # evidence block of generator/baseline_pin.json (itself
+          # pinned from DOT-GHA-PUBLIC-BASELINE-ADDENDUM-20261101).
+          # At migration, the generator's correction table becomes the
+          # producer of this file; the values must not change.
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          pin = json.loads(Path("generator/baseline_pin.json").read_text())
+          ev = pin["evidence"]["thumbnail_correction_2625416"]
+          record = {
+              "item_id": ev["item_id"],
+              "kind": "verified_thumbnail",
+              "corrected_url": ev["corrected_url"],
+              "proof_sha256": ev["proof_sha256"],
+              "confirmed_at": ev["confirmed_at"],
+              "applies_when": ev["applies_when"],
+          }
+          out = {"schema": 1, "records": [record]}
+          Path("work/evidence-records.json").write_text(
+              json.dumps(out, indent=1, sort_keys=True))
+          print(out)
+          PY
+
+      - name: Stage projection package (generator obligation, v5)
+        run: |
+          set -euo pipefail
+          # [DRAFT-ADAPTATION] When the generator applies a
+          # current-price projection, it MUST stage the projection
+          # package, its declaration, and its evidence artifacts
+          # into work/ so validate (Gate 5b) and promote can verify
+          # the actual contract inputs:
+          #   work/projection-package.json      (approved package)
+          #   work/projection-declaration.json  (applied / package_sha256 /
+          #     payload_sha256 / applied_items / as_of)
+          #   work/projection-evidence/<sha256> (content-addressed artifacts)
+          # v6 (dot v5 review point 2): the declaration ALSO binds
+          # the actual site payload — site/current-price-projection.json
+          # must exist, declaration.payload_sha256 must equal its
+          # canonical digest, and applied_items must be present —
+          # and a site payload with NO staged package is refused
+          # here (undeclared projection payload).
+          # This step enforces the staging convention only: if a
+          # package is staged, its declaration and evidence dir
+          # must exist too; the contract itself is verified by
+          # Gate 5b. A build that applies a projection without
+          # staging it fails here, and a build that stages nothing
+          # passes here but still fails Gate 5b if the generated
+          # pages carry projection markers.
+          python3 - <<'PY'
+          import hashlib, json, sys
+          from pathlib import Path
+          pkg = Path("work/projection-package.json")
+          decl = Path("work/projection-declaration.json")
+          evdir = Path("work/projection-evidence")
+          payload_path = Path("site/current-price-projection.json")
+          if not pkg.exists():
+              if payload_path.exists():
+                  print("::error::site payload current-price-projection.json "
+                        "present but no projection package staged — "
+                        "undeclared projection payload refused")
+                  sys.exit(1)
+              print("no projection package staged by the generator")
+              raise SystemExit(0)
+          missing = [p for p in (decl, evdir) if not p.exists()]
+          if missing:
+              print(f"::error::projection package staged but missing: {missing}")
+              sys.exit(1)
+          package = json.loads(pkg.read_text())
+          declaration = json.loads(decl.read_text())
+          canonical = json.dumps(package, ensure_ascii=False, sort_keys=True,
+                                 separators=(",", ":"), allow_nan=False).encode()
+          if hashlib.sha256(canonical).hexdigest() != declaration.get("package_sha256"):
+              print("::error::declaration package_sha256 != canonical "
+                    "digest of the staged package")
+              sys.exit(1)
+          # v6 (dot v5 review point 2): bind the declaration to the
+          # ACTUAL site payload at staging time; Gate 5b re-verifies
+          # the same binding against the recomputation.
+          if not payload_path.exists():
+              print("::error::projection package staged but the site "
+                    "payload current-price-projection.json is missing")
+              sys.exit(1)
+          payload = json.loads(payload_path.read_text())
+          pcanonical = json.dumps(payload, ensure_ascii=False, sort_keys=True,
+                                  separators=(",", ":"), allow_nan=False).encode()
+          if hashlib.sha256(pcanonical).hexdigest() != declaration.get("payload_sha256"):
+              print("::error::declaration payload_sha256 != canonical "
+                    "digest of the site payload")
+              sys.exit(1)
+          items = declaration.get("applied_items")
+          if not isinstance(items, list) or not items or \
+                  not all(isinstance(i, str) for i in items):
+              print("::error::declaration applied_items missing or malformed")
+              sys.exit(1)
+          # The generator's evidence list must carry one
+          # current_price_projection record per package record key,
+          # so Gate 5b can bind every applied item to its evidence.
+          ev_path = Path("work/evidence-records.json")
+          ev = json.loads(ev_path.read_text())
+          have = {(r.get("item_id"), r.get("kind"))
+                  for r in ev.get("records", [])}
+          added = 0
+          for key in sorted(package.get("records", {})):
+              rec = {"item_id": key,
+                     "kind": "current_price_projection",
+                     "package_sha256": declaration["package_sha256"],
+                     "as_of": declaration["as_of"]}
+              if (key, "current_price_projection") not in have:
+                  ev.setdefault("records", []).append(rec)
+                  added += 1
+          ev_path.write_text(json.dumps(ev, indent=1, sort_keys=True))
+          print(f"projection staging OK: package + declaration + "
+                f"site payload binding + evidence dir; "
+                f"{added} projection record(s) ensured")
+          PY
+
+      - name: Verify ledger against the built tree (pre-pack, common routine)
+        run: |
+          set -euo pipefail
+          python3 generator/scripts/verify_inventory.py work/hash-ledger.json site
+
+      - name: Pack site into ONE deterministic tar archive (the only site-bytes handoff)
+        run: |
+          set -euo pipefail
+          # upload-artifact v4 excludes hidden files by default, which
+          # would silently drop .nojekyll (and any other reviewed
+          # dotfile) from a directory upload. The site is therefore
+          # handed over as a single deterministic tar: sorted names,
+          # fixed mtime, numeric zero owner/group — the archive bytes
+          # (and thus its SHA256) are a function of the site content
+          # only, and hidden files are preserved byte-exact. No .git
+          # content: the ledger verifier rejects any ".git" path, and
+          # safe_extract rejects it again on the receiving side. The
+          # tar SHA256 is the promotion digest that boopadb-promote.yml
+          # binds to.
+          mkdir -p qa
+          tar --sort=name --format=gnu --mtime='@0' --owner=0 --group=0 \
+            --numeric-owner -cf qa/site-release.tar -C site .
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          blob = Path("qa/site-release.tar").read_bytes()
+          info = {
+              "archive": "site-release.tar",
+              "sha256": hashlib.sha256(blob).hexdigest(),
+              "bytes": len(blob),
+          }
+          Path("work/qa-archive.json").write_text(
+              json.dumps(info, indent=1, sort_keys=True))
+          print(info)
+          PY
+
+      - name: Stage + upload build artifact (handoff to validate; not yet QA-passed)
+        run: |
+          set -euo pipefail
+          # v3 staging (point 1): ONE staging directory, uploaded with
+          # a single path. Validate downloads it with path: incoming,
+          # yielding incoming/site-release.tar + incoming/work/*.json
+          # exactly as the validate steps reference them.
+          rm -rf build-artifact
+          mkdir -p build-artifact
+          cp qa/site-release.tar build-artifact/site-release.tar
+          cp -r work build-artifact/work
+      - uses: actions/upload-artifact@v4
+        with:
+          name: boopadb-build-${{ github.run_id }}
+          path: build-artifact
+          retention-days: 90
+
+      - name: Stage failure evidence — build (stage, run ID, diagnostics)
+        if: failure()
+        run: |
+          set -euo pipefail
+          rm -rf failure-evidence
+          mkdir -p failure-evidence
+          cp -r work/. failure-evidence/ 2>/dev/null || true
+      - name: Upload failure evidence — build
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boopadb-failure-build-${{ github.run_id }}
+          path: failure-evidence
+          retention-days: 90
+          if-no-files-found: warn
+        # work/ carries build-context.json, inventories, attestation
+        # (if reached) and ledgers (if reached); combined with the run
+        # log this identifies the failing stage and run.
+
+  # ------------------------------------------------------------------------
+  # Job 2: validate — every gate must pass; on success the QA artifact
+  # (the SAME deterministic tar built in Job 1, unchanged) is staged
+  # and uploaded under the QA artifact name, on failure only failure
+  # evidence is kept and nothing is promoted. Corresponds to producer
+  # stages: attest freshness checks, 'provenance' population gate, and
+  # the validate_snapshot.py run (which internally performs search-core
+  # exact-recombination validation). This workflow ends here: promotion
+  # to Pages is boopadb-promote.yml, gated by boopadb-qa-review.yml.
+  # ------------------------------------------------------------------------
+  validate:
+    name: Validate (fail-closed gates)
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      # Build outputs reach shell only through env + quoted variables,
+      # same rule as the tracker_commit handling.
+      EXPECTED_DATE: ${{ needs.build.outputs.expected_date }}
+      EXPECTED_GENERATION: ${{ needs.build.outputs.generation }}
+    steps:
+      - name: Checkout BoopaDB repo (validator scripts + baseline pin live with the generator)
+        uses: actions/checkout@v4
+
+      - name: Set up Python (stdlib only, no pip installs)
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: boopadb-build-${{ github.run_id }}
+          path: incoming
+        # Layout (v3 staging contract): incoming/site-release.tar and
+        # incoming/work/*.json — exactly what the steps below read.
+
+      - name: Typed validation of every build manifest (mandatory fields, no fallbacks)
+        run: |
+          set -euo pipefail
+          # v3 (dot v2 review point 3): before any gate logic, EVERY
+          # manifest the build produced must satisfy its typed
+          # contract. A missing or mistyped field fails the run here;
+          # no gate below re-checks "if present".
+          python3 generator/scripts/validate_bindings.py attestation incoming/work/attestation.json
+          python3 generator/scripts/validate_bindings.py run-manifest incoming/work/run-manifest.json
+          python3 generator/scripts/validate_bindings.py qa-archive incoming/work/qa-archive.json
+          python3 generator/scripts/validate_bindings.py evidence-records incoming/work/evidence-records.json
+          python3 generator/scripts/validate_bindings.py ledger incoming/work/hash-ledger.json
+          python3 generator/scripts/validate_bindings.py ledger incoming/work/input-inventory.json
+          python3 generator/scripts/validate_bindings.py input-inventory-summary incoming/work/input-inventory-summary.json
+          python3 generator/scripts/validate_bindings.py baseline-pin generator/baseline_pin.json
+
+      - name: Gate 0 — archive digest + safe extraction + ledger set-equality
+        run: |
+          set -euo pipefail
+          # The archive bytes are the bytes the build job recorded.
+          python3 - <<'PY'
+          import hashlib, json, sys
+          from pathlib import Path
+          info = json.loads(Path("incoming/work/qa-archive.json").read_text())
+          blob = Path("incoming/site-release.tar").read_bytes()
+          if hashlib.sha256(blob).hexdigest() != info["sha256"]:
+              print("::error::site-release.tar digest differs from build record")
+              sys.exit(1)
+          if len(blob) != info["bytes"]:
+              print("::error::site-release.tar size differs from build record")
+              sys.exit(1)
+          print("archive digest OK")
+          PY
+          # The ONE common safe-extraction routine (also used by
+          # promote): confined, link-free, duplicate/collision-free.
+          python3 generator/scripts/safe_extract.py incoming/site-release.tar site
+          # Ledger set EXACTLY equal to the extracted file set, hashes
+          # equal, no symlinks, no unexpected empty directories.
+          python3 generator/scripts/verify_inventory.py incoming/work/hash-ledger.json site
+
+      - name: Gate 1 — binding consistency + freshness (future dates rejected)
+        run: |
+          set -euo pipefail
+          # v3: all manifests are loaded through the typed loader —
+          # every field read here is REQUIRED by its spec (the v2
+          # presence-only checks `att.get("tracker_commit") not in
+          # (None, ...)` and `if snap_date and ...` are gone). The
+          # bindings asserted: attestation == run manifest == snapshot
+          # on commit/date/rows; run manifest run_id == THIS run;
+          # generation == the build job's output; attestation scope is
+          # the producer's snapshot-integrity scope string.
+          python3 - <<'PY'
+          import datetime as dt, json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, "generator/scripts")
+          from validate_bindings import BindingError, load_typed
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          try:
+              att = load_typed("attestation", "incoming/work/attestation.json")
+              man = load_typed("run-manifest", "incoming/work/run-manifest.json")
+              snap = load_typed("snapshot-manifest", "site/snapshot-manifest.json")
+              summ = load_typed("input-inventory-summary",
+                                "incoming/work/input-inventory-summary.json")
+              pin = load_typed("baseline-pin", "generator/baseline_pin.json")
+              inv = load_typed("ledger", "incoming/work/input-inventory.json")
+          except BindingError as exc:
+              fail(str(exc))
+          # v4 (dot v3 review point 4): the inventory commitment,
+          # end-to-end. The attestation's digest must equal the
+          # SHA256 of the inventory file bytes AS SHIPPED in the
+          # artifact, its count must equal the actual entry count,
+          # and the summary / run manifest must carry the same value.
+          import hashlib as _hl
+          inv_digest = _hl.sha256(
+              Path("incoming/work/input-inventory.json").read_bytes()).hexdigest()
+          if att["inventory_digest"] != inv_digest:
+              fail("attestation inventory_digest != SHA256 of the "
+                   "shipped input-inventory.json")
+          if att["inventory_count"] != len(inv):
+              fail("attestation inventory_count != inventory entry count")
+          if summ["inventory_digest"] != inv_digest or \
+                  summ["inventory_count"] != len(inv) or \
+                  summ["files"] != len(inv):
+              fail("inventory summary disagrees with the inventory ledger")
+          if man["inventory_digest"] != inv_digest or \
+                  man["inventory_count"] != len(inv):
+              fail("run manifest inventory commitment != attestation")
+          if man["prev_release_digest"] != os.environ["PREV_RELEASE_DIGEST"]:
+              fail("run manifest prev_release_digest != dispatch input")
+          # v4 (point 2): the relations bundle+approval hashes the
+          # build actually consumed must equal the pinned set.
+          if man["relations_binding"] != pin["relations_binding"]:
+              fail("run manifest relations_binding != pinned set in "
+                   "baseline_pin.json")
+          if att["tracker_commit"] != os.environ["TRACKER_COMMIT"]:
+              fail("attestation tracker_commit != dispatch input")
+          if man["tracker_commit"] != os.environ["TRACKER_COMMIT"]:
+              fail("run manifest tracker_commit != dispatch input")
+          if att["completion_scope"] != "immutable-captured-snapshot-integrity":
+              fail("attestation completion_scope is not the snapshot-integrity scope")
+          if str(man["run_id"]) != os.environ["GITHUB_RUN_ID"]:
+              fail("run manifest run_id != this workflow run")
+          if man["expected_date"] != att["expected_date"]:
+              fail("run manifest target date != attestation expected_date")
+          if snap["validation"]["max_date"] != att["expected_date"]:
+              fail("snapshot max_date != attestation expected_date")
+          if man["product_count"] != snap["validation"]["rows"]:
+              fail("run manifest product_count != snapshot rows")
+          if man["generation"] != int(os.environ["EXPECTED_GENERATION"]):
+              fail("run manifest generation != build job generation output")
+          expected = dt.date.fromisoformat(att["expected_date"])
+          minimum = dt.date.fromisoformat(os.environ["MINIMUM_SOURCE_DATE"])
+          max_age = int(os.environ["MAX_SOURCE_AGE_DAYS"])
+          jst = dt.timezone(dt.timedelta(hours=9))
+          today = dt.datetime.now(jst).date()
+          if expected > today:
+              fail(f"source date is in the future: {expected} > run date {today} (JST)")
+          if expected < minimum:
+              fail(f"source date regresses: {expected} < {minimum}")
+          if (today - expected).days > max_age:
+              fail(f"source stale: {expected} is {(today - expected).days}d old (max {max_age}d)")
+          print(f"bindings + freshness OK: expected_date={expected}, "
+                f"run={man['run_id']}, generation={man['generation']}")
+          PY
+
+      - name: Gate 2 — counts, population regression vs PINNED baseline
+        run: |
+          set -euo pipefail
+          # Input-side ID format/uniqueness was enforced at attest
+          # time. Output-side: snapshot population must be >= 1 and
+          # must not regress vs the PINNED baseline (the pin is
+          # checked in at generator/baseline_pin.json; its values come
+          # from the published baseline commit
+          # 06fc871a5b86287ce91dee20d2a2ea54d86328e3 — 201,872 items,
+          # max_date 2026-10-31, generation 1). The candidate's target
+          # date must also not regress below the pinned baseline date.
+          # (Strict generation monotonicity vs the LIVE site is
+          # enforced at promotion time, where the live state is read.)
+          python3 - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, "generator/scripts")
+          from validate_bindings import BindingError, load_typed
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          try:
+              pin = load_typed("baseline-pin", "generator/baseline_pin.json")
+              snap = load_typed("snapshot-manifest", "site/snapshot-manifest.json")
+          except BindingError as exc:
+              fail(str(exc))
+          rows = snap["validation"]["rows"]
+          if rows < 1:
+              fail("empty population")
+          base_rows = pin["product_count"]
+          max_drop = float(os.environ["MAX_POPULATION_DROP_FRACTION"])
+          if rows < base_rows * (1 - max_drop):
+              fail(f"population regression: {rows} vs pinned baseline {base_rows} "
+                   f"(commit {pin['baseline_commit']})")
+          cand_date = snap["validation"]["max_date"]
+          if cand_date < pin["max_date"]:
+              fail(f"date regression vs pinned baseline: {cand_date} < {pin['max_date']}")
+          print(f"population OK: {rows} (pinned baseline {base_rows}, "
+                f"date {cand_date} >= {pin['max_date']})")
+          PY
+
+      - name: Gate 3 — snapshot validation incl. search-core exact recombination
+        run: |
+          set -euo pipefail
+          # Real producer step (producer_runner 'provenance' stage):
+          # tools/scripts/validate_snapshot.py validates the whole
+          # candidate against the snapshot-manifest and internally runs
+          # validate_search_core.validate(), which requires the
+          # search-core shards to recombine EXACTLY into the declared
+          # catalog_core (tamper-evident even if the manifest is
+          # rehashed; covered by tools/test_search_core.py).
+          python3 generator/scripts/validate_snapshot.py \
+            --root site \
+            --expected-date "$EXPECTED_DATE" \
+            --manifest site/snapshot-manifest.json
+
+      - name: Gate 4 — UI regression checks, per page, brace-matched function bodies
+        run: |
+          set -euo pipefail
+          # v3 (dot v2 review point 6): function bodies are extracted
+          # by brace matching (strings/templates/comments aware), not
+          # by window search. Roles are checked as the published
+          # baseline implements them:
+          # - historySaleLabel handles セール観測 ONLY; its body must
+          #   not contain 現在セール. The current-sale rendering is
+          #   checked where the baseline implements it: varBlockHTML
+          #   deriving onSaleNow from the latest point's sale flag.
+          # - Markers alone never pass: definitions AND call sites
+          #   are required (historySaleLabel, fetchMeta, openItemSmart).
+          # - The negative-cache check is now a HARD gate with the
+          #   exact identifiers pinned from the canonical overlay
+          #   source (_metaCache / fetchMeta / retryAt /
+          #   `Date.now() + 60000`); v2's warning-only TODO is gone.
+          # - v4: extraction runs on a comment-stripped copy (a
+          #   comment-only definition fails), duplicate definitions
+          #   fail, and the 2625416 check covers the guard branch,
+          #   the missing-only application guard and the ORIGINAL
+          #   confirmation-time literal. The acceptance pattern is
+          #   proven by fixtures/run_fixtures.py in this package
+          #   against the published baseline + mutations.
+          python3 generator/scripts/gate_ui.py site
+
+      - name: Gate 5 — evidence records re-verified against the pin and the pages
+        run: |
+          set -euo pipefail
+          # v3 (dot v2 review point 4, validate side): the artifact's
+          # evidence record for the 2625416 correction must EXACTLY
+          # equal the pinned evidence (item identifier, corrected URL,
+          # proof hash, ORIGINAL confirmation time — a refreshed
+          # timestamp fails), the confirmation must not be in the
+          # future, and the corrected URL must be present in BOTH
+          # generated pages inside the artifact.
+          # v4 (dot v3 review point 2): records of any evidence kind
+          # other than verified_thumbnail are rejected outright —
+          # the evidence types in use are enumerated in DESIGN.md
+          # and anything unlisted is refused, not passed through.
+          # v5 (dot v4 review point 1): the enumerated set now also
+          # includes current_price_projection; a projection record
+          # is NOT rejected here — it is verified by Gate 5b below.
+          # A thumbnail-only list still fails Gate 5b whenever a
+          # projection is applied (see check_projection.py --gate).
+          python3 - <<'PY'
+          import datetime as dt, sys
+          from pathlib import Path
+          sys.path.insert(0, "generator/scripts")
+          from validate_bindings import BindingError, load_typed
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          try:
+              pin = load_typed("baseline-pin", "generator/baseline_pin.json")
+              ev = load_typed("evidence-records", "incoming/work/evidence-records.json")
+              # v4 (dot v3 review point 2): ANY evidence record of a
+              # kind outside the enumerated set is rejected outright
+              # — unlisted evidence is never passed through.
+              from validate_bindings import check_evidence_kinds
+              check_evidence_kinds(ev)
+          except BindingError as exc:
+              fail(str(exc))
+          want = pin["evidence"]["thumbnail_correction_2625416"]
+          matches = [r for r in ev["records"]
+                     if r["item_id"] == want["item_id"]
+                     and r["kind"] == "verified_thumbnail"]
+          if len(matches) != 1:
+              fail(f"expected exactly one 2625416 evidence record, got {len(matches)}")
+          rec = matches[0]
+          for field in ("corrected_url", "proof_sha256", "confirmed_at", "applies_when"):
+              if rec[field] != want[field]:
+                  fail(f"evidence record {field} != pinned value "
+                       f"({rec[field]!r} vs {want[field]!r})")
+          confirmed = dt.datetime.fromisoformat(
+              rec["confirmed_at"].replace("Z", "+00:00"))
+          if confirmed > dt.datetime.now(dt.timezone.utc):
+              fail("evidence confirmation time is in the future")
+          for page in ("index.html", "item.html"):
+              text = Path("site", page).read_text(errors="replace")
+              if want["corrected_url"] not in text:
+                  fail(f"{page}: corrected 2625416 URL missing")
+          print("evidence records OK: 2625416 record == pinned evidence, "
+                "URL present in both pages")
+          PY
+
+      - name: Checkout tracker repo at the pinned commit (projection raw histories)
+        run: |
+          set -euo pipefail
+          # Gate 5b verifies projection records against the RAW price
+          # histories from the pinned input snapshot — never against
+          # a candidate-side copy. The pinned commit comes from the
+          # typed run manifest inside the artifact (not from a new
+          # dispatch input), and the checkout ref is passed through
+          # env, never expanded inside a run: block.
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          man = json.loads(Path("incoming/work/run-manifest.json").read_text())
+          commit = man["tracker_commit"]
+          assert len(commit) == 40 and all(c in "0123456789abcdef" for c in commit), commit
+          with open(os.environ["GITHUB_ENV"], "a") as fh:
+              fh.write(f"TRACKER_COMMIT_PINNED={commit}\n")
+          print(f"pinned tracker commit for projection gate: {commit}")
+          PY
+      - uses: actions/checkout@v4
+        with:
+          repository: MametaroGG/booth-vrc-price-tracker
+          ref: ${{ env.TRACKER_COMMIT_PINNED }}
+          path: source
+
+      - name: Gate 5b — current-price projection contract (v6, dot v5 review points 1–2)
+        run: |
+          set -euo pipefail
+          # The recovered contract (current_price_projection.py):
+          # package digest, schema 1, raw-record digest vs the pinned
+          # snapshot, source evidence artifact bytes, observed <=
+          # evaluation < expires with a max 24 h window, seller-declared
+          # window, variant binding to a raw key whose latest price
+          # equals the selected price, int comparison price strictly
+          # greater than the selected price, and the runtime snapshot
+          # bindings (future rejection, artifact/record digest,
+          # metadata and variant-set equality, prefix preservation,
+          # append-only, per-variant price match). The selector is
+          # the recovered selected_price_selector.py, hash-pinned
+          # before import (see check_projection.py).
+          # v6 point 1: expiry is judged at EVALUATION time — this
+          # step passes the validate run's own current UTC. The
+          # declaration's as_of is sanity-checked only (never later
+          # than the evaluation time) and drives no judgment.
+          # v6 point 2: the gate also binds the ACTUAL site payload
+          # (current-price-projection.json digest == declaration
+          # payload_sha256; every entry == the recomputed entry;
+          # applied set identical across payload / declaration /
+          # recomputation / evidence records; embedded
+          # createCurrentPriceProjection config in the pages
+          # digest-matches the payload; empty payload or empty
+          # projection script fails).
+          # The gate ALSO closes the kind-enumeration gap: if any
+          # projection-applied signal is present (declaration,
+          # package file, site markers, or a projection evidence
+          # record), a verified projection package is REQUIRED — a
+          # thumbnail-only evidence list FAILS in that case.
+          # Evidence expiry is never extended or refreshed here;
+          # no evidence timestamp is rewritten anywhere.
+          EVALUATION_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "projection gate evaluation time (validate run, UTC): $EVALUATION_TIME"
+          python3 generator/scripts/check_projection.py --gate \
+            --work-dir incoming/work --site-dir site \
+            --raw-dir source/data \
+            --evaluation-time "$EVALUATION_TIME"
+
+      - name: Write validation results
+        if: success()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          run_manifest = json.loads(Path("incoming/work/run-manifest.json").read_text())
+          archive = json.loads(Path("incoming/work/qa-archive.json").read_text())
+          pin = json.loads(Path("generator/baseline_pin.json").read_text())
+          results = {
+              "status": "passed",
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "tracker_commit": run_manifest["tracker_commit"],
+              "generator_commit": run_manifest["generator_commit"],
+              "expected_date": run_manifest["expected_date"],
+              "product_count": run_manifest["product_count"],
+              "generation": run_manifest["generation"],
+              "inventory_digest": run_manifest["inventory_digest"],
+              "prev_release_digest": run_manifest["prev_release_digest"],
+              "qa_archive": archive["archive"],
+              "qa_archive_sha256": archive["sha256"],
+              "baseline_pin": {
+                  "baseline_commit": pin["baseline_commit"],
+                  "product_count": pin["product_count"],
+                  "max_date": pin["max_date"],
+                  "generation": pin["generation"],
+              },
+              "gates": [
+                  "typed-manifest-validation",
+                  "archive-digest+safe-extract+ledger-set-equality",
+                  "bindings+freshness",
+                  "population-vs-pinned-baseline",
+                  "validate_snapshot+search-core-recombination",
+                  "ui-regression-per-page-brace-matched",
+                  "evidence-records-vs-pin",
+                  "projection-contract-gate",
+              ],
+          }
+          Path("incoming/work/validation-results.json").write_text(
+              json.dumps(results, indent=1, sort_keys=True))
+          print(results)
+          PY
+
+      - name: Stage + upload QA artifact (deterministic tar + evidence set; immutable)
+        if: success()
+        run: |
+          set -euo pipefail
+          # v3 staging (point 1): ONE staging directory, uploaded with
+          # a single path. Promote downloads it with path: qa, yielding
+          # qa/site-release.tar + qa/evidence/*.json exactly as the
+          # promote steps reference them. The tar is copied byte-exact
+          # from the build artifact — never repacked.
+          rm -rf qa-artifact
+          mkdir -p qa-artifact/evidence
+          cp incoming/site-release.tar qa-artifact/site-release.tar
+          for f in hash-ledger.json run-manifest.json qa-archive.json \
+                   attestation.json input-inventory.json \
+                   input-inventory-summary.json validation-results.json \
+                   evidence-records.json; do
+            cp "incoming/work/$f" "qa-artifact/evidence/$f"
+          done
+          # v5 (dot v4 review point 1): the projection package,
+          # declaration and evidence artifacts travel with the QA
+          # set so promote can re-verify the same contract inputs.
+          # They are copied ONLY if the build staged them; Gate 5b
+          # has already failed the run if a staged package lacked
+          # its declaration/evidence, and fails it again if pages
+          # carry projection markers without a staged package.
+          for f in projection-package.json projection-declaration.json; do
+            if [ -f "incoming/work/$f" ]; then
+              cp "incoming/work/$f" "qa-artifact/evidence/$f"
+            fi
+          done
+          if [ -d incoming/work/projection-evidence ]; then
+            cp -r incoming/work/projection-evidence \
+              qa-artifact/evidence/projection-evidence
+          fi
+          ls -laR qa-artifact
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: boopadb-qa-${{ github.run_id }}
+          path: qa-artifact
+          retention-days: 90
+        # QA ARTIFACT CONTRACT (see DESIGN.md): the site bytes travel
+        # ONLY as site-release.tar (deterministic; hidden files such
+        # as .nojekyll preserved byte-exact; its SHA256 is recorded in
+        # evidence/qa-archive.json and evidence/validation-results.json
+        # and is the digest the QA review and the promotion bind to).
+        # Workflow success alone is NOT publication approval: the
+        # independent QA verdict is recorded by boopadb-qa-review.yml
+        # and promotion (boopadb-promote.yml) verifies that record,
+        # the source run identity, and this digest before deploying.
+        #
+        # [FUTURE DRIVE HANDOFF — PLACEHOLDER, NOT IMPLEMENTED]
+        # A copy of this QA set is handed to dot through the existing
+        # manual Drive route (BoopaDB_handover folder). Unattended
+        # Actions -> Drive upload authentication is UNRESOLVED (dot,
+        # 2026-11-01): it would need a new credential/permission and a
+        # separate approval. Do NOT add a Drive upload step here until
+        # that is designed and approved; the artifact contract above is
+        # intentionally independent of the Drive integration.
+
+      - name: Write failure diagnostics — validate (stage, run ID)
+        if: failure()
+        run: |
+          set -euo pipefail
+          mkdir -p incoming/work
+          python3 - <<'PY'
+          import datetime as dt, json, os
+          from pathlib import Path
+          diag = {
+              "stage": "validate",
+              "job": "validate",
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "tracker_commit": os.environ.get("TRACKER_COMMIT"),
+              "recorded_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "note": "Gate failure in the validate job; see the run log "
+                      "for the failing gate. No QA artifact was promoted.",
+          }
+          Path("incoming/work/failure-diagnostics.json").write_text(
+              json.dumps(diag, indent=1, sort_keys=True))
+          print(diag)
+          PY
+
+      - name: Stage failure evidence — validate
+        if: failure()
+        run: |
+          set -euo pipefail
+          rm -rf failure-evidence
+          mkdir -p failure-evidence
+          cp -r incoming/work/. failure-evidence/ 2>/dev/null || true
+      - name: Upload failure evidence — validate
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boopadb-failure-validate-${{ github.run_id }}
+          path: failure-evidence
+          retention-days: 90
+          if-no-files-found: ignore
+        # Fail-closed (dot): on gate failure there is no QA promotion
+        # and nothing is published; the known-good published site is
+        # left untouched, and the failure stage / run ID / logs /
+        # obtainable validation evidence are retained here at the same
+        # 90-day retention as the QA artifact.

@@ -1,0 +1,808 @@
+# ============================================================================
+# DRAFT v6 — REVIEW ONLY — DO NOT ENABLE AS-IS
+# BoopaDB 昇格（promotion）GitHub Actions 移行案（レビュー用ドラフト）
+#
+# - This file is a design draft prepared for dot's review (2026-11-01;
+#   v3 revision per DOT-GHA-V2-REVIEW-20261101, v4 revision per
+#   DOT-GHA-V3-REVIEW-20261101, v6 revision per
+#   DOT-GHA-V5-REVIEW-20261101). It is NOT placed in any repository
+#   and must not be enabled as-is.
+# - v6 changes (dot v5 review, 2 remaining points):
+#   * (point 1) promotion judges expiry with a TRUSTWORTHY clock:
+#     the re-verification step passes the promotion run's own
+#     current UTC (date -u) as --evaluation-time to
+#     check_projection.py. The candidate's declared as_of is
+#     sanity-checked only (never later than the evaluation time)
+#     and cannot keep expired evidence alive — evidence that was
+#     valid at build time but has expired by promotion time FAILS
+#     here. No evidence timestamp is extended or rewritten.
+#   * (point 2) the re-verification binds the evidence to the
+#     ACTUAL generated payload inside the artifact's site bytes:
+#     current-price-projection.json must exist, digest-match the
+#     declaration's payload_sha256, and every entry must equal the
+#     entry recomputed from the verified contract; the applied
+#     item set must be identical across payload / declaration /
+#     recomputation / evidence records, and the embedded
+#     createCurrentPriceProjection config in the pages must
+#     digest-match the payload. Empty payload / empty projection
+#     script fails.
+# - v4 changes (dot v3 review, 4 remaining conditions):
+#   * the runs' WORKFLOW BLOBS are verified against the trusted
+#     versions pinned in generator/workflow_pins.json (the daily
+#     file at the source run's head SHA, the qa-review file at the
+#     QA run's head SHA), and the review record's environment +
+#     blob fields must match — a path match is not a version
+#     guarantee (point 1);
+#   * the generation gate is a LINEAGE contract: the SHA256 of the
+#     live release-manifest bytes must equal the candidate's
+#     prev_release_digest AND candidate generation must equal live
+#     generation + 1. The first promotion (live site published by
+#     the old route, no release-manifest) is allowed ONLY against
+#     the pinned baseline: live index/item bytes hash to the pinned
+#     blobs, live snapshot rows/max_date equal the pin, candidate
+#     prev_release_digest equals the baseline sentinel, candidate
+#     generation equals pin generation + 1 (point 3);
+# - v5 changes (dot v4 review, 2 remaining conditions):
+#   * (point 2) the first-promotion path additionally requires the
+#     SHA256 of the ACTUAL live snapshot-manifest bytes to equal
+#     the expected digest derived from baseline_pin.json
+#     (baseline_prev_release_sentinel) — the manifest as a whole
+#     is pinned, not only its parsed rows/max_date fields.
+#   * (point 1) the current-price projection contract (current_price_projection.py) is verified here on
+#     the deployed bytes: the gate re-runs check_projection.py
+#     against the QA artifact's staged package + declaration +
+#     evidence artifacts and the pinned tracker snapshot, with the
+#     recovered selector hash-pinned before import. A
+#     thumbnail-only evidence list fails whenever a projection is
+#     applied.
+#   * the inventory commitment is re-asserted on the EXPANDED
+#     release-manifest as well (point 4);
+#   * evidence records of unlisted kinds are rejected (point 2).
+# - Why a separate workflow: a dispatcher must never be able to
+#   publish a fresh, unreviewed build. Promotion binds three inputs —
+#   the daily run's ID, the SHA256 digest of that run's immutable QA
+#   release archive, and the run ID of the independent QA review
+#   record (boopadb-qa-review.yml) — and RESOLVES AND VERIFIES all of
+#   them here (v3, dot v2 review point 2):
+#     * the source run is fetched through the GitHub API: workflow
+#       identity (boopadb-daily), event, completed+success, head SHA
+#       and run attempt must equal the run manifest inside the
+#       artifact;
+#     * the QA review run is likewise verified (boopadb-qa-review,
+#       success), and its record artifact is downloaded and asserted:
+#       record.source_run_id == input, record.artifact_digest ==
+#       expected_digest, record.verdict == "pass",
+#       record.qa_run_id == input. A non-empty string is NOT enough.
+# - Everything else is re-verified on the bytes actually deployed:
+#   typed manifests (no presence-only checks, no fallbacks), archive
+#   digest, the common safe_extract + verify_inventory routines,
+#   the actual correction EVIDENCE records against the pinned
+#   baseline (not just dates), evidence freshness at promotion time,
+#   and STRICT GENERATION MONOTONICITY against the live site: the
+#   candidate generation must be greater than the live generation;
+#   if the live publication cannot be identified (no release
+#   manifest and not the pinned baseline) promotion FAILS.
+# - Nothing is rebuilt or regenerated here; the deployed bytes are
+#   the exact archive bytes the daily workflow validated and the
+#   independent QA approved.
+# - Route (owner decision 2026-11-01): upload-pages-artifact +
+#   deploy-pages. The GITHUB_TOKEN branch-commit route is NOT used
+#   (such commits do not trigger GitHub Pages builds — GitHub docs).
+# - No PAT, no deploy key, no secrets beyond the default GITHUB_TOKEN.
+# - The Pages source switch itself remains a separate owner-approved
+#   migration step; this draft changes no settings.
+# ============================================================================
+
+name: BoopaDB Promote (DRAFT v5 - review only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Run ID of the BoopaDB Daily workflow run whose QA artifact is being promoted. Verified via the GitHub API against the artifact's run manifest."
+        required: true
+        type: string
+      expected_digest:
+        description: "SHA256 (64-hex) of that run's QA release archive (site-release.tar), as recorded in its evidence/qa-archive.json and evidence/validation-results.json. Promotion fails closed on any mismatch."
+        required: true
+        type: string
+      qa_run_id:
+        description: "Run ID of the BoopaDB QA Review workflow run that recorded the independent QA verdict for THIS artifact (its artifact boopadb-qa-review-<id> holds qa-review-record.json). Verified via the GitHub API; the record's digest and verdict are asserted, not just recorded."
+        required: true
+        type: string
+
+# Top level stays read-only; write scopes are granted only inside the
+# promote job below.
+permissions:
+  contents: read
+
+# One Pages deployment at a time; never cancel an in-flight deployment.
+# (Rollback protection does NOT rely on this alone — see the
+# generation monotonicity gate; concurrency only serializes.)
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: "3.12"  # stdlib only, same as the daily workflow
+  # Passed via env, never expanded inside run: blocks (same rule as
+  # the daily workflow's tracker_commit handling).
+  SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+  EXPECTED_DIGEST: ${{ inputs.expected_digest }}
+  QA_RUN_ID: ${{ inputs.qa_run_id }}
+  # Freshness window: must match the daily workflow / producer config.
+  # Re-checked HERE, immediately before promotion (dot review point
+  # 5): evidence that was fresh when the daily run validated may have
+  # expired by promotion time.
+  MINIMUM_SOURCE_DATE: "2026-10-30"
+  MAX_SOURCE_AGE_DAYS: "1"
+  PUBLIC_SITE_BASE: "https://mametarogg.github.io/boopadb"
+  QA_ARTIFACT_NAME_PREFIX: "boopadb-qa-"
+  QA_REVIEW_ARTIFACT_NAME_PREFIX: "boopadb-qa-review-"
+
+jobs:
+  # ------------------------------------------------------------------------
+  # Single job: promote — verify the bound artifact and its QA record
+  # end-to-end, then deploy its exact bytes. Any check failing means
+  # NO deployment.
+  # ------------------------------------------------------------------------
+  promote:
+    name: Promote QA artifact to GitHub Pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read   # download artifacts + read run records via the API
+      pages: write    # upload-pages-artifact + deploy-pages
+      id-token: write # deploy-pages OIDC
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Validate input formats FIRST (fail closed)
+        run: |
+          set -euo pipefail
+          mkdir -p promote-work
+          if ! printf '%s' "$SOURCE_RUN_ID" | grep -Eq '^[0-9]+$'; then
+            echo "::error::source_run_id must be the numeric Actions run ID"
+            exit 1
+          fi
+          if ! printf '%s' "$EXPECTED_DIGEST" | grep -Eq '^[0-9a-f]{64}$'; then
+            echo "::error::expected_digest must be a 64-hex SHA256"
+            exit 1
+          fi
+          if ! printf '%s' "$QA_RUN_ID" | grep -Eq '^[0-9]+$'; then
+            echo "::error::qa_run_id must be the numeric Actions run ID"
+            exit 1
+          fi
+
+      - name: Checkout BoopaDB repo (validator scripts + baseline pin)
+        uses: actions/checkout@v4
+
+      - name: Set up Python (stdlib only, no pip installs)
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Verify source run + QA review run identity via the GitHub API
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # v3 (dot v2 review point 2): both runs are resolved through
+          # the API and their identity/conclusion asserted. The raw
+          # records are kept in promote-work/ and cross-checked
+          # against the artifact manifests in the binding step below.
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN_ID}" > promote-work/source-run.json
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${QA_RUN_ID}" > promote-work/qa-run.json
+          SRC_HEAD="$(python3 -c "import json; print(json.load(open('promote-work/source-run.json'))['head_sha'])")"
+          QA_HEAD="$(python3 -c "import json; print(json.load(open('promote-work/qa-run.json'))['head_sha'])")"
+          # v4 (dot v3 review point 1): the workflow FILES those runs
+          # executed, fetched at their head commits via the contents
+          # API — their git blob SHAs must equal the trusted versions
+          # pinned in generator/workflow_pins.json.
+          gh api "repos/${GITHUB_REPOSITORY}/contents/.github/workflows/boopadb-daily.yml?ref=${SRC_HEAD}" > promote-work/daily-file.json
+          gh api "repos/${GITHUB_REPOSITORY}/contents/.github/workflows/boopadb-qa-review.yml?ref=${QA_HEAD}" > promote-work/qa-file.json
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, "generator/scripts")
+          from validate_bindings import BindingError, load_typed
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          src = json.loads(Path("promote-work/source-run.json").read_text())
+          if not str(src.get("path", "")).endswith("boopadb-daily.yml"):
+              fail(f"source run is not the daily workflow: path={src.get('path')!r}")
+          if src.get("event") != "workflow_dispatch":
+              fail("source run event is not workflow_dispatch")
+          if src.get("status") != "completed" or src.get("conclusion") != "success":
+              fail(f"source run not successfully completed: "
+                   f"{src.get('status')}/{src.get('conclusion')}")
+          qa = json.loads(Path("promote-work/qa-run.json").read_text())
+          if not str(qa.get("path", "")).endswith("boopadb-qa-review.yml"):
+              fail(f"QA run is not the QA review workflow: path={qa.get('path')!r}")
+          if qa.get("event") != "workflow_dispatch":
+              fail("QA review run event is not workflow_dispatch")
+          if qa.get("status") != "completed" or qa.get("conclusion") != "success":
+              fail(f"QA review run not successfully completed: "
+                   f"{qa.get('status')}/{qa.get('conclusion')}")
+          try:
+              pins = load_typed("workflow-pins", "generator/workflow_pins.json")
+          except BindingError as exc:
+              fail(str(exc))
+          daily_blob = json.loads(
+              Path("promote-work/daily-file.json").read_text()).get("sha")
+          qa_blob = json.loads(
+              Path("promote-work/qa-file.json").read_text()).get("sha")
+          if daily_blob != pins["workflows"]["boopadb-daily.yml"]:
+              fail(f"source run's daily workflow blob {daily_blob} != "
+                   f"pinned trusted version "
+                   f"{pins['workflows']['boopadb-daily.yml']}")
+          if qa_blob != pins["workflows"]["boopadb-qa-review.yml"]:
+              fail(f"QA run's qa-review workflow blob {qa_blob} != "
+                   f"pinned trusted version "
+                   f"{pins['workflows']['boopadb-qa-review.yml']}")
+          Path("promote-work/workflow-blobs.json").write_text(json.dumps({
+              "source_workflow_blob": daily_blob,
+              "qa_workflow_blob": qa_blob,
+          }, indent=1, sort_keys=True))
+          print(f"runs verified: source head={src.get('head_sha')} "
+                f"attempt={src.get('run_attempt')}; qa reviewer run by "
+                f"{qa.get('actor', {}).get('login')}; workflow blobs "
+                f"match workflow_pins.json")
+          PY
+
+      - name: Download the QA artifact from the source run
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.QA_ARTIFACT_NAME_PREFIX }}${{ inputs.source_run_id }}
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ github.token }}
+          path: qa
+        # Layout (v3 staging contract): qa/site-release.tar +
+        # qa/evidence/*.json
+
+      - name: Download the QA review record from the QA review run
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.QA_REVIEW_ARTIFACT_NAME_PREFIX }}${{ inputs.qa_run_id }}
+          run-id: ${{ inputs.qa_run_id }}
+          github-token: ${{ github.token }}
+          path: review
+        # Layout: review/qa-review-record.json
+
+      - name: Typed validation of every manifest + the review record (no fallbacks)
+        run: |
+          set -euo pipefail
+          # v3 (dot v2 review point 3): every object promotion relies
+          # on must satisfy its typed contract first. The v2 fallback
+          # `att.get("tracker_commit", man["tracker_commit"])` is gone:
+          # a missing field fails here, before any comparison logic.
+          python3 generator/scripts/validate_bindings.py attestation qa/evidence/attestation.json
+          python3 generator/scripts/validate_bindings.py run-manifest qa/evidence/run-manifest.json
+          python3 generator/scripts/validate_bindings.py qa-archive qa/evidence/qa-archive.json
+          python3 generator/scripts/validate_bindings.py validation-results qa/evidence/validation-results.json
+          python3 generator/scripts/validate_bindings.py evidence-records qa/evidence/evidence-records.json
+          python3 generator/scripts/validate_bindings.py ledger qa/evidence/hash-ledger.json
+          python3 generator/scripts/validate_bindings.py ledger qa/evidence/input-inventory.json
+          python3 generator/scripts/validate_bindings.py review-record review/qa-review-record.json
+          python3 generator/scripts/validate_bindings.py baseline-pin generator/baseline_pin.json
+          python3 generator/scripts/validate_bindings.py workflow-pins generator/workflow_pins.json
+
+      - name: Recompute archive digest + assert ALL bindings (run, review, manifests)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, "generator/scripts")
+          from validate_bindings import BindingError, load_typed
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          blob = Path("qa/site-release.tar").read_bytes()
+          actual = hashlib.sha256(blob).hexdigest()
+          if actual != os.environ["EXPECTED_DIGEST"]:
+              fail(f"QA archive digest mismatch: got {actual}, "
+                   f"expected {os.environ['EXPECTED_DIGEST']}")
+          try:
+              man = load_typed("run-manifest", "qa/evidence/run-manifest.json")
+              res = load_typed("validation-results", "qa/evidence/validation-results.json")
+              att = load_typed("attestation", "qa/evidence/attestation.json")
+              arc = load_typed("qa-archive", "qa/evidence/qa-archive.json")
+              rec = load_typed("review-record", "review/qa-review-record.json")
+          except BindingError as exc:
+              fail(str(exc))
+          src = json.loads(Path("promote-work/source-run.json").read_text())
+
+          # Artifact-internal bindings.
+          if arc["sha256"] != os.environ["EXPECTED_DIGEST"]:
+              fail("qa-archive.json digest != expected_digest")
+          if arc["bytes"] != len(blob):
+              fail("qa-archive.json size != actual archive size")
+          if res["qa_archive_sha256"] != os.environ["EXPECTED_DIGEST"]:
+              fail("validation results digest != expected_digest")
+          if res["status"] != "passed":
+              fail("validation results are not 'passed'")
+          if man["tracker_commit"] != att["tracker_commit"]:
+              fail("attestation/run-manifest tracker_commit mismatch")
+          if man["expected_date"] != att["expected_date"]:
+              fail("run manifest target date != attestation expected_date")
+          if res["tracker_commit"] != man["tracker_commit"] or \
+                  res["expected_date"] != man["expected_date"] or \
+                  res["product_count"] != man["product_count"] or \
+                  res["generation"] != man["generation"] or \
+                  res["generator_commit"] != man["generator_commit"]:
+              fail("validation results disagree with the run manifest")
+
+          # Source-run bindings (GitHub API record vs artifact).
+          if str(man["run_id"]) != os.environ["SOURCE_RUN_ID"]:
+              fail("run manifest run_id != source_run_id input")
+          if str(res["run_id"]) != os.environ["SOURCE_RUN_ID"]:
+              fail("validation results run_id != source_run_id input")
+          if src.get("head_sha") != man["generator_commit"]:
+              fail("source run head_sha != run manifest generator_commit")
+          if str(src.get("run_attempt")) != str(man["run_attempt"]):
+              fail("source run attempt != run manifest run_attempt")
+
+          # QA review record bindings — the approval is RESOLVED, not
+          # just referenced: the record must name this source run,
+          # this digest, a pass verdict, and this QA run.
+          if rec["source_run_id"] != os.environ["SOURCE_RUN_ID"]:
+              fail("QA review record source_run_id != source_run_id input")
+          if rec["artifact_digest"] != os.environ["EXPECTED_DIGEST"]:
+              fail("QA review record digest != expected_digest")
+          if rec["verdict"] != "pass":
+              fail(f"QA review verdict is not 'pass': {rec['verdict']!r}")
+          if rec["qa_run_id"] != os.environ["QA_RUN_ID"]:
+              fail("QA review record qa_run_id != qa_run_id input")
+          # v4 (point 1): the record must also match the attestation
+          # context and the pinned workflow versions verified via
+          # the API in the identity step — the record's environment
+          # must be the qa-approval environment, and its recorded
+          # workflow blobs must equal the blobs the two runs
+          # actually executed.
+          blobs = json.loads(Path("promote-work/workflow-blobs.json").read_text())
+          if rec["environment"] != "qa-approval":
+              fail(f"QA review record environment is not 'qa-approval': "
+                   f"{rec['environment']!r}")
+          if rec["source_workflow_blob"] != blobs["source_workflow_blob"]:
+              fail("QA review record source_workflow_blob != the daily "
+                   "blob the source run executed")
+          if rec["qa_workflow_blob"] != blobs["qa_workflow_blob"]:
+              fail("QA review record qa_workflow_blob != the qa-review "
+                   "blob the QA run executed")
+          # v4 (point 4): the inventory commitment agrees across the
+          # attestation and the candidate manifests (the expanded
+          # release-manifest is re-asserted after extraction below).
+          if man["inventory_digest"] != att["inventory_digest"] or \
+                  res["inventory_digest"] != att["inventory_digest"]:
+              fail("inventory_digest disagreement across attestation / "
+                   "run manifest / validation results")
+          if res["prev_release_digest"] != man["prev_release_digest"]:
+              fail("validation results prev_release_digest != run manifest")
+          print("digest + all bindings OK (run, review record, manifests)")
+          PY
+
+      - name: Safe extraction + inventory re-verification (common routines)
+        run: |
+          set -euo pipefail
+          # The same two routines the daily workflow uses — no second
+          # hand-rolled copy (dot v2 review, inventory addenda):
+          # confined/link-free/duplicate-free extraction, then ledger
+          # set-equality + hashes + no empty directories + no
+          # symlinks (including a symlinked root check).
+          python3 generator/scripts/safe_extract.py qa/site-release.tar site
+          python3 generator/scripts/verify_inventory.py qa/evidence/hash-ledger.json site
+
+      - name: Re-assert the inventory commitment on the EXPANDED release-manifest
+        run: |
+          set -euo pipefail
+          # v4 (dot v3 review point 4): the release-manifest that
+          # will be published inside the site must carry the SAME
+          # inventory commitment as the attestation / run manifest /
+          # validation results (asserted above), plus the same
+          # lineage anchor and generation — verified on the expanded
+          # bytes, not only on the evidence copies.
+          python3 - <<'PY'
+          import sys
+          sys.path.insert(0, "generator/scripts")
+          from validate_bindings import BindingError, load_typed
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          try:
+              att = load_typed("attestation", "qa/evidence/attestation.json")
+              man = load_typed("run-manifest", "qa/evidence/run-manifest.json")
+              rel = load_typed("release-manifest", "site/release-manifest.json")
+          except BindingError as exc:
+              fail(str(exc))
+          if rel["inventory_digest"] != att["inventory_digest"]:
+              fail("expanded release-manifest inventory_digest != attestation")
+          if rel["prev_release_digest"] != man["prev_release_digest"]:
+              fail("expanded release-manifest prev_release_digest != "
+                   "run manifest")
+          if rel["generation"] != man["generation"] or \
+                  rel["tracker_commit"] != man["tracker_commit"] or \
+                  rel["source_date"] != man["expected_date"] or \
+                  rel["product_count"] != man["product_count"] or \
+                  rel["run_id"] != man["run_id"]:
+              fail("expanded release-manifest disagrees with the run manifest")
+          print("expanded release-manifest commitment OK "
+                f"(inventory_digest={rel['inventory_digest'][:12]}…, "
+                f"generation={rel['generation']})")
+          PY
+
+      - name: Re-verify the correction EVIDENCE records against the pin and the artifact
+        run: |
+          set -euo pipefail
+          # v3 (dot v2 review point 4): not dates only — the actual
+          # evidence record inside the artifact is re-verified field
+          # by field against the pinned baseline evidence: item
+          # identifier, corrected URL, proof hash, and the ORIGINAL
+          # confirmation time (a refreshed timestamp fails). The
+          # corrected URL must be present in BOTH pages of the pinned
+          # snapshot inside the artifact, and the confirmation must
+          # not be in the future.
+          python3 - <<'PY'
+          import datetime as dt, sys
+          from pathlib import Path
+          sys.path.insert(0, "generator/scripts")
+          from validate_bindings import BindingError, load_typed
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          try:
+              pin = load_typed("baseline-pin", "generator/baseline_pin.json")
+              ev = load_typed("evidence-records", "qa/evidence/evidence-records.json")
+              # v4 (dot v3 review point 2): unlisted evidence kinds
+              # are rejected, not passed through.
+              # v5 (dot v4 review point 1): the enumerated set now
+              # also includes current_price_projection; a projection
+              # record is verified by the projection gate below,
+              # not rejected here.
+              from validate_bindings import check_evidence_kinds
+              check_evidence_kinds(ev)
+          except BindingError as exc:
+              fail(str(exc))
+          want = pin["evidence"]["thumbnail_correction_2625416"]
+          matches = [r for r in ev["records"]
+                     if r["item_id"] == want["item_id"]
+                     and r["kind"] == "verified_thumbnail"]
+          if len(matches) != 1:
+              fail(f"expected exactly one 2625416 evidence record, got {len(matches)}")
+          rec = matches[0]
+          for field in ("corrected_url", "proof_sha256", "confirmed_at", "applies_when"):
+              if rec[field] != want[field]:
+                  fail(f"evidence record {field} != pinned value "
+                       f"({rec[field]!r} vs {want[field]!r})")
+          confirmed = dt.datetime.fromisoformat(
+              rec["confirmed_at"].replace("Z", "+00:00"))
+          if confirmed > dt.datetime.now(dt.timezone.utc):
+              fail("evidence confirmation time is in the future")
+          for page in ("index.html", "item.html"):
+              text = Path("site", page).read_text(errors="replace")
+              if want["corrected_url"] not in text:
+                  fail(f"{page}: corrected 2625416 URL missing from artifact")
+          print("evidence re-verification OK: 2625416 record == pinned "
+                "evidence, URL present in both artifact pages")
+          PY
+
+      - name: Checkout tracker repo at the pinned commit (projection raw histories)
+        run: |
+          set -euo pipefail
+          # Same rule as the daily Gate 5b: projection records are
+          # re-verified against the RAW histories from the pinned
+          # input snapshot, never against a candidate-side copy.
+          # The pinned commit comes from the typed run manifest
+          # inside the QA artifact; the checkout ref passes through
+          # env, never through shell expansion.
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          man = json.loads(Path("qa/evidence/run-manifest.json").read_text())
+          commit = man["tracker_commit"]
+          assert len(commit) == 40 and all(c in "0123456789abcdef" for c in commit), commit
+          with open(os.environ["GITHUB_ENV"], "a") as fh:
+              fh.write(f"TRACKER_COMMIT_PINNED={commit}\n")
+          print(f"pinned tracker commit for projection re-verification: {commit}")
+          PY
+      - uses: actions/checkout@v4
+        with:
+          repository: MametaroGG/booth-vrc-price-tracker
+          ref: ${{ env.TRACKER_COMMIT_PINNED }}
+          path: source
+
+      - name: Re-verify the current-price projection contract (v6)
+        run: |
+          set -euo pipefail
+          # Re-run the Gate 5b contract on the exact bytes about
+          # to be deployed: package digest, schema, raw-record
+          # digest vs the pinned snapshot, source evidence bytes,
+          # observed <= evaluation < expires (max 24 h), seller
+          # window, variant binding + latest price, int comparison
+          # price greater than the selected price, and the runtime
+          # snapshot bindings. The gate also refuses a
+          # thumbnail-only evidence list whenever a projection is
+          # applied.
+          # v6 point 1: the evaluation time is THIS promotion
+          # run's current UTC — evidence valid at build time but
+          # expired by promotion time fails here; the candidate's
+          # declared as_of is sanity-checked only and cannot keep
+          # it alive. Evidence expiry is never extended here and
+          # no evidence timestamp is rewritten.
+          # v6 point 2: the gate binds the artifact's actual site
+          # payload (current-price-projection.json) and the pages'
+          # embedded createCurrentPriceProjection config to the
+          # verified recomputation (see check_projection.py).
+          EVALUATION_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "projection re-verification evaluation time (promotion run, UTC): $EVALUATION_TIME"
+          python3 generator/scripts/check_projection.py --gate \
+            --work-dir qa/evidence --site-dir site \
+            --raw-dir source/data \
+            --evaluation-time "$EVALUATION_TIME"
+
+      - name: Re-check evidence freshness/expiry NOW
+        run: |
+          set -euo pipefail
+          # Immediately before promotion, re-verify that the source
+          # date is STILL within the freshness window relative to
+          # TODAY (JST) — not relative to whenever the daily run
+          # happened — and is not a future date. All values come from
+          # typed manifests (no fallbacks).
+          python3 - <<'PY'
+          import datetime as dt, os, sys
+          sys.path.insert(0, "generator/scripts")
+          from validate_bindings import BindingError, load_typed
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          try:
+              att = load_typed("attestation", "qa/evidence/attestation.json")
+          except BindingError as exc:
+              fail(str(exc))
+          expected = dt.date.fromisoformat(att["expected_date"])
+          minimum = dt.date.fromisoformat(os.environ["MINIMUM_SOURCE_DATE"])
+          max_age = int(os.environ["MAX_SOURCE_AGE_DAYS"])
+          jst = dt.timezone(dt.timedelta(hours=9))
+          today = dt.datetime.now(jst).date()
+          if expected > today:
+              fail(f"source date is in the future: {expected} > {today} (JST)")
+          if expected < minimum:
+              fail(f"source date regresses: {expected} < {minimum}")
+          if (today - expected).days > max_age:
+              fail(f"evidence expired by promotion time: {expected} is "
+                   f"{(today - expected).days}d old (max {max_age}d)")
+          print(f"promotion-time freshness OK: expected_date={expected}")
+          PY
+
+      - name: Generation + input lineage vs the live site (digest-anchored, fail on unknown)
+        run: |
+          set -euo pipefail
+          # v4 (dot v3 review point 3): the generation gate is a
+          # LINEAGE contract anchored to a fixed manifest digest —
+          # not "strictly greater" alone, and not counts/dates.
+          # - Normal path: fetch the live release-manifest BYTES.
+          #   Their SHA256 must equal the candidate's
+          #   prev_release_digest (the anchor declared at dispatch
+          #   and bound into the run + release manifests), the live
+          #   manifest must satisfy the typed release-manifest spec,
+          #   and candidate generation must equal live generation
+          #   EXACTLY + 1.
+          # - First promotion ONLY: the live site was published by
+          #   the old route and has no release-manifest. It is then
+          #   identified EXACTLY as the pinned baseline: live
+          #   index.html / item.html bytes hash (git blob SHA1) to
+          #   the pinned blobs, the live snapshot-manifest BYTES hash
+          #   (SHA256) to the baseline sentinel pinned in
+          #   baseline_pin.json (in addition to satisfying its typed
+          #   spec with rows/max_date equal to the pin), the
+          #   candidate's prev_release_digest equals the same
+          #   baseline sentinel, and candidate generation equals
+          #   pin generation + 1. Fetch failure or any non-200 for
+          #   the baseline files fails the promotion.
+          # - ANY other live state (no manifest and not the exact
+          #   baseline, digest mismatch, generation skip or repeat)
+          #   FAILS. Nothing passes on missing values.
+          python3 - <<'PY'
+          import hashlib, json, os, sys, urllib.error, urllib.request
+          sys.path.insert(0, "generator/scripts")
+          from validate_bindings import BindingError, load_typed, validate_typed
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          base = os.environ["PUBLIC_SITE_BASE"]
+          man = load_typed("run-manifest", "qa/evidence/run-manifest.json")
+          pin = load_typed("baseline-pin", "generator/baseline_pin.json")
+          cand_gen = man["generation"]
+          cand_prev = man["prev_release_digest"]
+
+          def fetch_bytes(url):
+              try:
+                  with urllib.request.urlopen(url) as r:
+                      return r.read()
+              except urllib.error.HTTPError as exc:
+                  if exc.code == 404:
+                      return None
+                  fail(f"cannot read live file {url}: HTTP {exc.code}")
+              except Exception as exc:
+                  fail(f"cannot read live file {url}: {exc}")
+
+          def blob_sha(data):
+              return hashlib.sha1(
+                  b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+
+          live_rel = fetch_bytes(f"{base}/release-manifest.json")
+          if live_rel is not None:
+              live_digest = hashlib.sha256(live_rel).hexdigest()
+              if live_digest != cand_prev:
+                  fail(f"lineage anchor mismatch: live release-manifest "
+                       f"SHA256 {live_digest} != candidate "
+                       f"prev_release_digest {cand_prev} — the candidate "
+                       "does not succeed the currently published release")
+              try:
+                  live = validate_typed(
+                      "release-manifest",
+                      json.loads(live_rel.decode("utf-8")),
+                      "live release-manifest")
+              except (BindingError, ValueError) as exc:
+                  fail(str(exc))
+              live_gen = live["generation"]
+              if cand_gen != live_gen + 1:
+                  fail(f"generation must be exactly live+1: candidate "
+                       f"{cand_gen} vs live {live_gen}")
+              if man["expected_date"] < live["source_date"]:
+                  fail(f"candidate date {man['expected_date']} older than "
+                       f"live source_date {live['source_date']}")
+              live_desc = (f"live release-manifest gen {live_gen} "
+                           f"(digest {live_digest[:12]}…, run "
+                           f"{live['run_id']})")
+          else:
+              # First promotion: the live site must be EXACTLY the
+              # pinned published baseline.
+              for page, key in (("index.html", "index_html_blob"),
+                                ("item.html", "item_html_blob")):
+                  data = fetch_bytes(f"{base}/{page}")
+                  if data is None:
+                      fail(f"live {page} missing — cannot identify the "
+                           "live site as the pinned baseline")
+                  if blob_sha(data) != pin[key]:
+                      fail(f"live {page} blob != pinned baseline blob — "
+                           "the live site is not the pinned baseline "
+                           "and carries no release-manifest; promotion "
+                           "refused")
+              snap_bytes = fetch_bytes(f"{base}/snapshot-manifest.json")
+              if snap_bytes is None:
+                  fail("live site has neither release-manifest.json nor "
+                       "snapshot-manifest.json — cannot identify the "
+                       "live generation; promotion refused")
+              # v5 (dot v4 review point 2): bind the ACTUAL live
+              # snapshot-manifest bytes — their SHA256 must equal
+              # EXACTLY the expected digest derived from
+              # baseline_pin.json (baseline_prev_release_sentinel).
+              # Checking only rows/max_date inside the parsed JSON
+              # would not pin the manifest as a whole. Any mismatch
+              # fails; fetch failure / non-200 already failed above
+              # (fetch_bytes fails on non-404 errors, and a 404 lands
+              # in the None check just above).
+              snap_digest = hashlib.sha256(snap_bytes).hexdigest()
+              if snap_digest != pin["baseline_prev_release_sentinel"]:
+                  fail("live snapshot-manifest bytes SHA256 "
+                       f"{snap_digest} != baseline sentinel "
+                       f"{pin['baseline_prev_release_sentinel']} "
+                       "derived from baseline_pin.json — the live "
+                       "manifest is not byte-identical to the pinned "
+                       "baseline manifest; promotion refused")
+              try:
+                  snap = validate_typed(
+                      "snapshot-manifest",
+                      json.loads(snap_bytes.decode("utf-8")),
+                      "live snapshot-manifest")
+              except (BindingError, ValueError) as exc:
+                  fail(str(exc))
+              if snap["validation"]["rows"] != pin["product_count"] or \
+                      snap["validation"]["max_date"] != pin["max_date"]:
+                  fail("live snapshot rows/max_date != pinned baseline — "
+                       "not the baseline; promotion refused")
+              if cand_prev != pin["baseline_prev_release_sentinel"]:
+                  fail("first promotion requires prev_release_digest == "
+                       "the baseline sentinel pinned in baseline_pin.json")
+              if cand_gen != pin["generation"] + 1:
+                  fail(f"first promotion generation must be pin "
+                       f"generation + 1 ({pin['generation'] + 1}), got "
+                       f"{cand_gen}")
+              live_desc = (f"pinned published baseline (generation "
+                           f"{pin['generation']}, sentinel-anchored)")
+          print(f"lineage OK: candidate generation {cand_gen} succeeds "
+                f"{live_desc}; prev_release_digest anchor verified")
+          PY
+
+      - name: Write promotion record (incl. QA review binding) + step summary
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime as dt, json, os
+          from pathlib import Path
+          man = json.loads(Path("qa/evidence/run-manifest.json").read_text())
+          rec = json.loads(Path("review/qa-review-record.json").read_text())
+          record = {
+              "promoted_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "promotion_run_id": os.environ["GITHUB_RUN_ID"],
+              "source_run_id": os.environ["SOURCE_RUN_ID"],
+              "qa_archive_sha256": os.environ["EXPECTED_DIGEST"],
+              "qa_run_id": os.environ["QA_RUN_ID"],
+              "qa_report_ref": rec["qa_report_ref"],
+              "qa_reviewer": rec["reviewer"],
+              "qa_reviewed_at": rec["reviewed_at"],
+              "tracker_commit": man["tracker_commit"],
+              "generator_commit": man["generator_commit"],
+              "expected_date": man["expected_date"],
+              "product_count": man["product_count"],
+              "generation": man["generation"],
+              "inventory_digest": man["inventory_digest"],
+              "prev_release_digest": man["prev_release_digest"],
+          }
+          Path("promote-work/promotion-record.json").write_text(
+              json.dumps(record, indent=1, sort_keys=True))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+              fh.write("## BoopaDB promotion (DRAFT workflow)\n\n")
+              for k, v in record.items():
+                  fh.write(f"- {k}: {v}\n")
+          print(record)
+          PY
+
+      - name: Upload Pages artifact (the verified extracted bytes)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+        # The extracted tree came from the digest-verified,
+        # inventory-verified archive (via the common safe_extract
+        # routine), so hidden files (e.g. .nojekyll) that a
+        # directory-based artifact handoff would have dropped are
+        # present byte-exact.
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Upload promotion record artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boopadb-promotion-${{ github.run_id }}
+          path: promote-work/promotion-record.json
+          retention-days: 90
+
+      - name: Stage failure evidence — promote (stage, run ID, diagnostics)
+        if: failure()
+        run: |
+          set -euo pipefail
+          rm -rf failure-evidence
+          mkdir -p failure-evidence
+          cp -r promote-work/. failure-evidence/ 2>/dev/null || true
+      - name: Upload failure evidence — promote
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boopadb-failure-promote-${{ github.run_id }}
+          path: failure-evidence
+          retention-days: 90
+          if-no-files-found: warn
+      # After a first approved promotion, the live site's bytes /
+      # counts / date / generation / key UI are compared against the
+      # QA artifact (dot sequence step 6). Rollback procedure: switch
+      # the Pages publishing source back to the branch at the recorded
+      # baseline head 06fc871a5b86287ce91dee20d2a2ea54d86328e3 (see
+      # DESIGN.md).

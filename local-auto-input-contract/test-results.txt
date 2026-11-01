@@ -1,0 +1,47 @@
+✔ healthy bounded deadline is eligible, not catalog completeness (1.652878ms)
+✔ reject {"status":"partial"} (0.307119ms)
+✔ reject {"status":"failed"} (0.537803ms)
+✔ reject {"status":"unknown"} (0.139368ms)
+✔ reject {"failed":true} (0.102725ms)
+✔ reject {"reservation_completed":false} (0.116981ms)
+✔ reject {"reason":"daily-budget"} (1.963255ms)
+✔ reject {"reason":"cooldown"} (0.84133ms)
+✔ reject {"whole_catalog_complete":true} (0.158824ms)
+✔ reject {} (0.4975ms)
+✔ reject {"run_attempt":"2"} (0.159693ms)
+✔ reject {"stopped_at_ms":130000} (0.114873ms)
+✔ reject {"blocked_until_ms":160001} (0.057955ms)
+✔ reject {"pending_retry_count":-1} (0.069741ms)
+✔ ledger completion alone is insufficient (0.121393ms)
+✔ reject itemFailures (0.123539ms)
+✔ reject searchFailures (0.082227ms)
+✔ reject no observations and malformed counters (0.390462ms)
+✔ completed filtered segment allowed but retry-pending is not (0.662436ms)
+✔ day boundary must actually cross JST date (0.215034ms)
+✔ explicit baseline derives generation2 and exact-byte sentinel (4.610896ms)
+✔ existing release derives generation+1 and hash of actual bytes (1.21186ms)
+✔ missing baseline pin cannot invent generation (1.06322ms)
+✔ changed pin digest fails (0.825112ms)
+✔ changed baseline index.html fails (1.439793ms)
+✔ changed baseline item.html fails (1.103177ms)
+✔ changed baseline snapshot-manifest.json fails (2.126572ms)
+✔ malformed existing release never falls back (1.040404ms)
+✔ generation overflow fails (1.045996ms)
+✔ selects exact saved immutable commit rather than current HEAD (66.853316ms)
+✔ rejects failure in conclusion (32.825187ms)
+✔ rejects failure in scraper_outcome (33.376612ms)
+✔ rejects failure in save_outcome (30.561542ms)
+✔ rejects running and cross-attempt run evidence (39.695092ms)
+✔ legacy/no receipt fails closed (0.198841ms)
+✔ receipt digest mismatch fails (31.247084ms)
+✔ partial receipt cannot qualify even if ledger completed (67.089056ms)
+✔ wrong expected date and date regression fail (57.398797ms)
+✔ save-artifact writer refuses no saved commit or failed outcome (0.388355ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 500.891973

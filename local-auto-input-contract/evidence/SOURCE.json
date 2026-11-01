@@ -1,0 +1,32 @@
+{
+  "repository": "MametaroGG/booth-vrc-price-tracker",
+  "inspected_commit": "4980d9bc341c85be5654751760867dce4bd57ba9",
+  "retrieval": "read-only GitHub connector fetch_file; paths encoded with __",
+  "files_sha256": {
+    "src__scraper.js": "e0a8cdb0b808339ba670d4923721b39d355ed2a9c44b8d2965a3073b18692563",
+    "tree-src.json": "f4185f5197abc1b99c541261011a3095e77f66e9f355cda7d75f8596d8972903",
+    "upload-artifact-commit.json": "117a465a5193cc4a53da1b0df9ca21ec7749bcdb1b1a75af75b38f30768000b5",
+    "tree-root.json": "0965f898d94382424a20cfa64ac5d0216fe8af765c79780b4980e10d15c1f3a9",
+    "tree-scripts.json": "ae5fc3147eaebeb5d6cb782c07c8a91e4088d5e05a3fa6f304c678ec9000b8f3",
+    "scripts__push-data.sh": "c10e056dd02021feb66a95b87411a7bb8a613e5fcab4580a8f8fc1136f48ea2c",
+    "tree-test.json": "fba4957864d612888c7572639ed82135639b089bc9215742d849279820feebc5",
+    "test__workflow.test.js": "f2947c22dcd4c95e4080a30f6c4b41d5313aa8671ba6a34f59804d41eddc04e8",
+    "docs__collection-runtime.md": "21b644c5be7488a0e629da4b714ef482e2c58a3d84f4fe7fb9b3430e74c0eb4c",
+    "src__continuation.js": "53998af07ce81b3397c7c5af4f6a9ba9377945ec2d89f7115506eb1037fb25e6",
+    "data__request_budget.json": "33dfed73b123631089f2fff1c17373533e355d3560d43ca6601080249f5c87c8",
+    ".github__workflows__daily_scrape.yml": "6b8216d6c1e1ea73e247f24a8ea31192468d0c4ace6c833e23ffa53c0f088b29",
+    "src__collection-runtime.js": "a1fe911845594ac3e70bb5abeebce023e18f8dad95add20e05048fab8bcd0953"
+  },
+  "additional_read_only_evidence": "root/src/scripts Git tree JSON from the same tracker snapshot; official actions/upload-artifact commit verification",
+  "exact_verified_git_blobs": {
+    "src__collection-runtime.js": "bc9e72d940862d39a97890069c443eef830b3d50",
+    "src__continuation.js": "d7fba2bd5a5409c0dc5ac336e3a65fae3e4b3bb8",
+    "src__scraper.js": "44c3465af611d148023fa1e36eac5909cd56d9d5",
+    "scripts__push-data.sh": "a6dbd0615258ae113ae69d63bf4efe21a95bdbfa",
+    "test__workflow.test.js": "0a21594fb56a606452a410918b8b5d2d570ded81",
+    ".github__workflows__daily_scrape.yml": "e866043fd54ec2438c596e6eb1fe9685f7217105",
+    "docs__collection-runtime.md": "e2de0427d002f294abbf8f698da7e28e76569886",
+    "data__request_budget.json": "e939195a8c3facf4da1accc1ae0a0c7b65a70986"
+  },
+  "correction": "2026-11-01 final regression corrected connector-added EOF newlines; all8 preserved repository source files now byte-exact Git blobs. See regression/REPORT.md."
+}
