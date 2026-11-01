@@ -1,0 +1,13 @@
+{
+  "revision": "flat-manifest-compatibility-r2",
+  "original_package_sha256": "8f6cba7c7b2bd0141b563842f7643762497b1c35173094ac33328555953a36bf",
+  "changed_source": {
+    "path": "local-release-contract-integration/run_candidate.py",
+    "before_sha256": "ee973baf8cc0a6f0dca95c0604bc4dcdaf17d1491b4adc2b58889f2f8418614a",
+    "after_sha256": "72dacd92b6c30e987c13251b2e773d973f6d8d238ce0831ed903190775c9b9b0"
+  },
+  "original_approved_input_manifests_pins_modified": false,
+  "remote_actual_manifest_replay": false,
+  "test_scope": "equivalent canonical 75/10/4 flat maps; synthetic full generation; wrapped compatibility; production local-test-only refusal",
+  "tests": "48/48 passed"
+}
