@@ -1,0 +1,14 @@
+{
+  "validators/validate_snapshot.py": {
+    "source": "local-workflow-candidate-repro-r2/generator/scripts/validate_snapshot.py",
+    "sha256": "ad684c797e00cd9e0eddeb60f0304b0d095989c368d5f588636f5e1a5ed5cc27"
+  },
+  "validators/validate_search_core.py": {
+    "source": "local-workflow-candidate-repro-r2/generator/scripts/validate_search_core.py",
+    "sha256": "6b49182886ca302a6ea89e0c73746add7cd251361fb95553295ec9904cade3f8"
+  },
+  "validators/compact_codec.py": {
+    "source": "local-workflow-candidate-repro-r2/generator/scripts/compact_codec.py",
+    "sha256": "d5ebf4c4fa1003c5f544f3da71fece6db527e7f8669ca03dc77b8bc6f3438aa2"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "artifact_handoff_base.py": "9f722dfd99ca05dc390e5c45962bf214eb8ce57dee89e3220a45511e19e4bfd1",
+  "validators/check_projection.py": "2228b55dc67f3c7542ffd3487e29d93c71004ffff7ca97f4dda42a1cb234e602",
+  "validators/selected_price_selector.py": "512e14fd57fb8ed6547c6af5574324f4e54d2e8e8e670da2b019aac15ec1249a",
+  "validators/verify_inventory.py": "f369d4c8ed2c014d5f758abf0709d6fdeb86ae8d85b6d602fedbfc606e853f09",
+  "validators/gate_ui.py": "280dfa381fbed53056cb81a82cbc7ff81cfcc0cfc27677f41785b6f579a28543",
+  "validators/validate_bindings.py": "03cfeb9ed4ce258b33b21547a375d30776f3ab4e1eba1aa3de150898cdad988e",
+  "validators/safe_extract.py": "01253d869a69862e9d2dfa2993ee7c11f62b9af715a7141fa3a9d4af699db1b7"
+}

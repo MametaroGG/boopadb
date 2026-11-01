@@ -1,0 +1,9 @@
+test_actual_snapshot_gate_rejects_incomplete_site (test_validation_job.ValidationJobTests.test_actual_snapshot_gate_rejects_incomplete_site) ... ok
+test_contract_only_fixture_does_not_claim_canonical_success (test_validation_job.ValidationJobTests.test_contract_only_fixture_does_not_claim_canonical_success) ... ok
+test_rehashed_hero_selector_is_refused_before_runtime (test_validation_job.ValidationJobTests.test_rehashed_hero_selector_is_refused_before_runtime) ... ok
+test_rehashed_untrusted_hero_is_not_executed (test_validation_job.ValidationJobTests.test_rehashed_untrusted_hero_is_not_executed) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 11.171s
+
+OK

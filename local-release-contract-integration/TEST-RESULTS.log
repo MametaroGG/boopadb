@@ -1,0 +1,34 @@
+test_altered_relation_approval_refused (test_release_contract.ReleaseContractTests.test_altered_relation_approval_refused) ... ok
+test_archive_tamper_refused (test_release_contract.ReleaseContractTests.test_archive_tamper_refused) ... ok
+test_cli_prepare_validate_roundtrip (test_release_contract.ReleaseContractTests.test_cli_prepare_validate_roundtrip) ... ok
+test_context_generation_mismatch_on_validate_refused (test_release_contract.ReleaseContractTests.test_context_generation_mismatch_on_validate_refused) ... ok
+test_current_synthetic_projection_full_contract_roundtrip (test_release_contract.ReleaseContractTests.test_current_synthetic_projection_full_contract_roundtrip) ... ok
+test_destination_reuse_refused (test_release_contract.ReleaseContractTests.test_destination_reuse_refused) ... ok
+test_expired_projection_unchanged_times_refused (test_release_contract.ReleaseContractTests.test_expired_projection_unchanged_times_refused) ... ok
+test_external_context_commit_mismatch_refused (test_release_contract.ReleaseContractTests.test_external_context_commit_mismatch_refused) ... ok
+test_external_pin_digest_mismatch_refused (test_release_contract.ReleaseContractTests.test_external_pin_digest_mismatch_refused) ... ok
+test_missing_relation_approval_refused (test_release_contract.ReleaseContractTests.test_missing_relation_approval_refused) ... ok
+test_missing_relation_input_mapping_refused (test_release_contract.ReleaseContractTests.test_missing_relation_input_mapping_refused) ... ok
+test_population_regression_refused (test_release_contract.ReleaseContractTests.test_population_regression_refused) ... ok
+test_production_context_cannot_relabel_synthetic_pin (test_release_contract.ReleaseContractTests.test_production_context_cannot_relabel_synthetic_pin) ... ok
+test_production_context_refuses_fixture_inputs (test_release_contract.ReleaseContractTests.test_production_context_refuses_fixture_inputs) ... ok
+test_projection_artifact_byte_tamper_on_validate_refused (test_release_contract.ReleaseContractTests.test_projection_artifact_byte_tamper_on_validate_refused) ... ok
+test_real_pin_descriptive_relation_metadata_supported (test_release_contract.ReleaseContractTests.test_real_pin_descriptive_relation_metadata_supported) ... ok
+test_review_only_evidence_envelope_refused (test_release_contract.ReleaseContractTests.test_review_only_evidence_envelope_refused) ... ok
+test_snapshot_date_mismatch_refused (test_release_contract.ReleaseContractTests.test_snapshot_date_mismatch_refused) ... ok
+test_synthetic_context_requires_fixture_flags (test_release_contract.ReleaseContractTests.test_synthetic_context_requires_fixture_flags) ... ok
+test_synthetic_full_contract_roundtrip (test_release_contract.ReleaseContractTests.test_synthetic_full_contract_roundtrip) ... ok
+test_thumbnail_confirmation_time_tamper_refused (test_release_contract.ReleaseContractTests.test_thumbnail_confirmation_time_tamper_refused) ... ok
+test_tracker_input_tamper_refused (test_release_contract.ReleaseContractTests.test_tracker_input_tamper_refused) ... ok
+test_tracker_unlisted_file_refused (test_release_contract.ReleaseContractTests.test_tracker_unlisted_file_refused) ... ok
+test_ui_gate_remains_mandatory (test_release_contract.ReleaseContractTests.test_ui_gate_remains_mandatory) ... ok
+test_undeclared_projection_on_other_route_refused (test_release_contract.ReleaseContractTests.test_undeclared_projection_on_other_route_refused) ... ok
+test_unlisted_evidence_kind_refused (test_release_contract.ReleaseContractTests.test_unlisted_evidence_kind_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 26 tests in 20.862s
+
+OK
+projection 100: APPLIED
+projection 100: APPLIED
+projection 100: APPLIED

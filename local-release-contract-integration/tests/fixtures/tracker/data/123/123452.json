@@ -1,0 +1,1 @@
+{"id": "123452", "name": "SYNTHETIC ONLY 123452", "variation_keys": {"sku": "Default"}, "variations": {"Default": [{"date": "2026-10-01", "price": 1000}, {"date": "2026-10-30", "price": 500, "is_sale": true}]}}

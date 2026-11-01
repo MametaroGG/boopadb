@@ -1,0 +1,17 @@
+{
+  "commit": "06fc871a5b86287ce91dee20d2a2ea54d86328e3",
+  "repository": "MametaroGG/boopadb",
+  "root_tree_truncated": false,
+  "root_projection_file_present": false,
+  "index_blob": "cebee521935ebe0cb72723d0faa443fa6d422c9d",
+  "item_blob": "aa523fc3ea5b5b654b1110a5a80fe742027359b2",
+  "index_item_projection_markers": false,
+  "presentation_canonical_sha256": "1d98251b5d5b3ffd9e038e13b2f440f18c111db703dcc698c4a8f29031df4517",
+  "index_item_presentation_equal": true,
+  "scope": "Read-only existing embedded metadata extraction. NOT fresh observation, reviewer authority or production import approval.",
+  "limits": [
+    "Other routes not individually marker-scanned",
+    "No raw records fetched",
+    "No source collection"
+  ]
+}

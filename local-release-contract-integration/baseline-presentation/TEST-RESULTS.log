@@ -1,0 +1,2 @@
+PASS exact public blobs and embedded bytes; canonical binding; unchanged consumer apply; 4 entries preserved; no projection minted; mismatch refused
+NOT RUN: complete current-generation build, browser QA, publication, authority authentication

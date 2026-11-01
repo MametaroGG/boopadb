@@ -1,0 +1,8 @@
+test_actual_generator_to_qa_artifact (test_pipeline.PipelineTests.test_actual_generator_to_qa_artifact) ... ok
+test_generation_actual_approval_must_match_contract (test_pipeline.PipelineTests.test_generation_actual_approval_must_match_contract) ... ok
+test_production_rejects_local_test_approvals (test_pipeline.PipelineTests.test_production_rejects_local_test_approvals) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 5.023s
+
+OK

@@ -1,0 +1,22 @@
+{
+  "index.html": {
+    "sha256": "84022f881e3f6a0abb9b775188a72ec9b52c0ccd38a71c5e5c0c78ef029a0c64",
+    "source": "muse-handover/recovery-inbox/workflow-draft-v7-20261101/gha_workflow_draft/fixtures/baseline/index.html",
+    "purpose": "Unchanged reference bytes only; synthetic tests do not confer production approval"
+  },
+  "item.html": {
+    "sha256": "144b9e5c56c4ce03234b00a0bb35a276525c847312d51fdb7e8045253aaeeb0d",
+    "source": "muse-handover/recovery-inbox/workflow-draft-v7-20261101/gha_workflow_draft/fixtures/baseline/item.html",
+    "purpose": "Unchanged reference bytes only; synthetic tests do not confer production approval"
+  },
+  "baseline_pin.json": {
+    "sha256": "f52641319583a35bd2d635ab1f62ed4e19d24bc6b74ad6d50440dee5da46a49d",
+    "source": "muse-handover/recovery-inbox/workflow-draft-v7-20261101/gha_workflow_draft/baseline_pin.json",
+    "purpose": "Unchanged reference bytes only; synthetic tests do not confer production approval"
+  },
+  "embed-hero.cjs": {
+    "source": "local-workflow-candidate-repro-r2/generator/pinned-static/scripts/embed-hero.cjs",
+    "sha256": "946f4226d75e00017404735bf295100ffd35dfafac78dd6cdea0652a07f85d68",
+    "purpose": "Unchanged reviewed executable for negative canonical snapshot gate test"
+  }
+}
