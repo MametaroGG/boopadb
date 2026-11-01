@@ -37,6 +37,28 @@ def canonical_digest(value):
                                      separators=(',', ':'), allow_nan=False).encode()).hexdigest()
 
 
+def manifest_inventory(manifest):
+    """Read existing flat or wrapped inventory without rewriting its bytes.
+
+    `files` is a reserved wrapper key. Mixed wrapper/path maps are refused;
+    supported wrapper metadata is the existing canonical inventory schema.
+    Only the path-to-SHA map is compared to approval.files; caller still binds
+    the original manifest file's exact bytes through the baseline pin.
+    """
+    rc.require(isinstance(manifest, dict) and manifest, 'nonempty bundle manifest object required')
+    if 'files' in manifest:
+        wrapper_keys = {'schema', 'status', 'version', 'files', 'public_release_commit', 'sourceVersion'}
+        rc.require(set(manifest) <= wrapper_keys and isinstance(manifest['files'], dict),
+                   'ambiguous or unsupported wrapped bundle manifest')
+        inventory = manifest['files']
+    else:
+        inventory = manifest
+    rc.typed('ledger', inventory)
+    for name in inventory:
+        rc.base._path(name)
+    return inventory
+
+
 def configuration(path, relation_inputs, context):
     path = Path(path).resolve()
     obj = rc.load_strict_json(path)
@@ -67,9 +89,10 @@ def configuration(path, relation_inputs, context):
         manifest_path = Path(expected_paths[manifest_key])
         if not manifest_path.is_absolute(): manifest_path = relation_inputs.parent / manifest_path
         manifest = rc.load_strict_json(manifest_path)
-        rc.require(isinstance(manifest.get('files'), dict) and manifest['files'] == approval.get('files'),
+        inventory = manifest_inventory(manifest)
+        rc.require(inventory == approval.get('files'),
                    'consumed bundle manifest and approval inventories differ')
-        for name, sha in manifest['files'].items():
+        for name, sha in inventory.items():
             rc.base._path(name)
             rc.require(rc.digest(resolved[bundle_key] / name) == sha, 'actual bundle bytes differ from consumed manifest')
     rc.require((resolved['daily_coverage_file'] is None) == (obj['daily_target_date'] is None),
