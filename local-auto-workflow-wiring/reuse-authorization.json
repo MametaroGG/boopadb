@@ -1,8 +1,8 @@
 {
   "baseline_sha256": "f52641319583a35bd2d635ab1f62ed4e19d24bc6b74ad6d50440dee5da46a49d",
-  "grant_reference": "trusted-owner-message:Sentinel_7656a1d4df8c81918229d9b00c8209e6@2026-11-02T05:25:24Z; request:Sentinel_2fb01a61ce188191a0f0f6679bbf5f78; visibility:Sentinel_93e6357ec5c88191ab20481b30cfe6a7",
+  "grant_reference": "trusted-owner-message:Sentinel_7656a1d4df8c81918229d9b00c8209e6@2026-11-02T05:25:24Z; request:Sentinel_2fb01a61ce188191a0f0f6679bbf5f78; visibility:Sentinel_93e6357ec5c88191ab20481b30cfe6a7; supplemental:Sentinel_cfcea2f283f881919253f223c00957ae@2026-11-02T22:08:54Z; request:Sentinel_978c180f670081919e09edae82cfe9d9; supplemental-record-sha256:3ec3495953e1a07cb7542546a2b476e33b85f0f424d89978d5980123cfd8e49e",
   "grant_sha256": "5d7b0607a58542025fc1631fd97cd68a3d2086e26487abfb7218068c189473d5",
-  "implementation_inventory_sha256": "7ed54a0ec239520ee943a03ec53457760b0cc1acf5653a1933f74fe5778ed5fb",
+  "implementation_inventory_sha256": "4894fd99afbdbe5b9c06b5989d68e8f584fb7ffaf9a88d75224c599513921fed",
   "relations_binding": {
     "relation_search_approval_sha256": "b8acdf5b300400aad351e6ef9e103b9b8d56f160a5cf23a47c169cf196222d59",
     "relation_search_bundle_manifest_sha256": "aeea29a4b5a206b4cb310477791b7682986d84b92096629f8cc6d4ed810b0329",

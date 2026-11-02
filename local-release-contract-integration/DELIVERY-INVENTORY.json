@@ -1,7 +1,7 @@
 {
   "files": {
     "ALL-TEST-RESULTS.log": "073adae96a4c06f20ccf3db0ffe90022b62130f477485a21bf55580f3b3c1769",
-    "GENERATOR-INVENTORY.json": "7ed54a0ec239520ee943a03ec53457760b0cc1acf5653a1933f74fe5778ed5fb",
+    "GENERATOR-INVENTORY.json": "4894fd99afbdbe5b9c06b5989d68e8f584fb7ffaf9a88d75224c599513921fed",
     "ORIGINALS-UNCHANGED.json": "344fed70de0119ca6147242c62f50ecdf15acd24479d69c177a0e00b356e4194",
     "PIPELINE-TEST-RESULTS.log": "f2392412f7316c17a2a9030fa3789830aa41ce9b359c5a4ee11ad696f83442ae",
     "R2-ALL-TEST-RESULTS.log": "7ae52a52793e942d7e8d9475856f1935464a1904e05139d834e30ac7b2343e0b",
@@ -191,7 +191,7 @@
     "generator/scripts/validate_search_core.py": "6b49182886ca302a6ea89e0c73746add7cd251361fb95553295ec9904cade3f8",
     "generator/scripts/validate_snapshot.py": "ad684c797e00cd9e0eddeb60f0304b0d095989c368d5f588636f5e1a5ed5cc27",
     "generator/selected_price_selector.py": "512e14fd57fb8ed6547c6af5574324f4e54d2e8e8e670da2b019aac15ec1249a",
-    "generator/snapshot_contract.py": "efc42beae62bfaa3889e85e7be990887e48a259c3990339abae6f66214693c8e",
+    "generator/snapshot_contract.py": "fe90612f3453cd61dcab45f34434cc43120aa734353d911efe68ad26d7f0eb72",
     "generator/static_assets.py": "fa405bf58ebb121919a419b1a7450ef98a146f574f5faf9c761bdf01d56f168f",
     "generator/test_catalog_cache_static.py": "978d286052af8bc28669cf6575d6f7ab4f3499bbc20fa4b0a235c98073788239",
     "generator/test_connector_handoff.py": "6e8d818e8acd3a4fb92451740d0d81391f571f16a10ed81d88fe1e560318e83b",
@@ -224,6 +224,7 @@
     "tests/test_pipeline.py": "90fa342a3c5e5aa797cb0dc64f2a90f868c6a4fa394ad5d480756e55ab232cbe",
     "tests/test_release_contract.py": "3fbb00714a00361cb1814614d401dcd365bb8e17541f6d041fedb46fc70299d0",
     "tests/test_reuse_authorization.py": "50d37dd494172b85269bce3525ea68c9151413b4eb39601359dcc9fdae4ab2f0",
+    "tests/test_snapshot_calendar.py": "78e6b15b279160562c3295f00f981316d95e9234925b687d34a9b8306ae368d7",
     "tests/test_validation_job.py": "72c1930d6d88cc29a53e206a95b24dc429527da39795cf3b303680d8c22a09c9",
     "validation_job.py": "4cc3790d81246be37037f2fafcca75f594cbe3c0a18f3b55d256c70dd07ba8ee",
     "validators/check_projection.py": "2228b55dc67f3c7542ffd3487e29d93c71004ffff7ca97f4dda42a1cb234e602",
@@ -236,5 +237,5 @@
     "validators/validate_snapshot.py": "ad684c797e00cd9e0eddeb60f0304b0d095989c368d5f588636f5e1a5ed5cc27",
     "validators/verify_inventory.py": "f369d4c8ed2c014d5f758abf0709d6fdeb86ae8d85b6d602fedbfc606e853f09"
   },
-  "scope": "authorized trial preparation; no activation/publication; historical files retained"
+  "scope": "authorized additional-one-trial preparation; no activation/publication; historical files retained"
 }

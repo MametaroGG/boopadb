@@ -6,5 +6,5 @@
   "relation_inputs_path": "relation-inputs.json",
   "schema": "boopa-reuse-policy-v1",
   "trust_path": "reuse-authorization.json",
-  "trust_sha256": "f4bd763e693328590af6d26205ea071634a0823c8ecdaeb195f9c413041a7d4f"
+  "trust_sha256": "e121bdb19e427fc5873dad79a75d490c37351a20d97b1532f4d7e1bc3db4e70d"
 }

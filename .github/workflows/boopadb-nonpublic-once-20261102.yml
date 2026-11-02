@@ -1,11 +1,11 @@
-# LOCAL REVIEW ONLY. No approval or activation marker supplied.
+# LOCAL RETRY1 REVIEW ONLY. Separate owner approval exists; no activation marker supplied.
 # Separate wrapper; original OFF workflow is unchanged.
 name: BoopaDB one-time unpublished candidate 20261102
 
 on:
   push:
     branches: [chore/auto-update-trial-20261101]
-    paths: [.github/boopadb-once/auto-update-20261102.json]
+    paths: [.github/boopadb-once/auto-update-20261102-retry1.json]
 # No marker is shipped. Preparation commits do not trigger this workflow.
 # No workflow_dispatch, schedule, workflow_run, PR or deployment trigger.
 
@@ -24,7 +24,7 @@ env:
 
 jobs:
   build:
-    if: ${{ github.repository == 'MametaroGG/boopadb' && github.ref == 'refs/heads/chore/auto-update-trial-20261101' && github.event_name == 'push' && github.run_number == 1 && github.run_attempt == 1 }}
+    if: ${{ github.repository == 'MametaroGG/boopadb' && github.ref == 'refs/heads/chore/auto-update-trial-20261101' && github.event_name == 'push' && github.run_number == 2 && github.run_attempt == 1 }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     outputs:
@@ -41,7 +41,7 @@ jobs:
       - name: Verify this is the sole authorized activation commit, never preparation or rerun
         run: |
           set -euo pipefail
-          python3 local-auto-once-trial/once_gate.py validate-trigger --marker .github/boopadb-once/auto-update-20261102.json
+          python3 local-auto-once-trial/once_gate.py validate-trigger --marker .github/boopadb-once/auto-update-20261102-retry1.json
       - name: Exact reviewed Node runtime; no project dependency installation
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4, official immutable ref
         with:
@@ -61,7 +61,7 @@ jobs:
       - name: Bind authenticated resolver result to the observed normal collector receipt
         run: |
           set -euo pipefail
-          python3 local-auto-once-trial/once_gate.py check-selection --marker .github/boopadb-once/auto-update-20261102.json --selection auto-work/selection/resolved-inputs.json
+          python3 local-auto-once-trial/once_gate.py check-selection --marker .github/boopadb-once/auto-update-20261102-retry1.json --selection auto-work/selection/resolved-inputs.json
       - name: Checkout only the selected immutable tracker SHA
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -107,7 +107,7 @@ jobs:
           overwrite: false
 
   validate:
-    if: ${{ github.repository == 'MametaroGG/boopadb' && github.ref == 'refs/heads/chore/auto-update-trial-20261101' && github.event_name == 'push' && github.run_number == 1 && github.run_attempt == 1 }}
+    if: ${{ github.repository == 'MametaroGG/boopadb' && github.ref == 'refs/heads/chore/auto-update-trial-20261101' && github.event_name == 'push' && github.run_number == 2 && github.run_attempt == 1 }}
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 180
@@ -121,7 +121,7 @@ jobs:
       - name: Verify this is the sole authorized activation commit, never preparation or rerun
         run: |
           set -euo pipefail
-          python3 local-auto-once-trial/once_gate.py validate-trigger --marker .github/boopadb-once/auto-update-20261102.json
+          python3 local-auto-once-trial/once_gate.py validate-trigger --marker .github/boopadb-once/auto-update-20261102-retry1.json
       - name: Exact reviewed Node runtime; no project dependency installation
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4, official immutable ref
         with:
@@ -146,7 +146,7 @@ jobs:
       - name: Recheck downloaded selection against the sole authorized receipt
         run: |
           set -euo pipefail
-          python3 local-auto-once-trial/once_gate.py check-selection --marker .github/boopadb-once/auto-update-20261102.json --selection auto-work/selection/resolved-inputs.json
+          python3 local-auto-once-trial/once_gate.py check-selection --marker .github/boopadb-once/auto-update-20261102-retry1.json --selection auto-work/selection/resolved-inputs.json
       - name: Checkout the same immutable tracker commit, never branch HEAD
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:

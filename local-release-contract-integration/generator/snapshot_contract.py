@@ -12,7 +12,7 @@ import re
 import stat
 import tempfile
 import unicodedata
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timezone, timedelta
 from charts_contract import generate_charts, validate_charts
 
 SCOPE = 'immutable-captured-snapshot-integrity'
@@ -129,6 +129,40 @@ def inspect_records(files, minimum, as_of, max_age_days):
         if Path(name).suffix!='.json': raise ValueError('Unsupported non-JSON input: '+name)
         record = strict_json(raw)
         if not name.startswith('data/'): continue
+        if name == 'data/collection_receipt.json':
+            # C1 collector metadata, never a product. Keep the exact bytes in
+            # the capture/inventory/staged output. Authenticated run, eligibility
+            # and ledger binding remain the resolver's responsibility; this
+            # adapter only validates the narrow metadata format, not authority.
+            if (not isinstance(record, dict) or 'id' in record or 'variations' in record or
+                    record.get('schema') != 'boopa-collection-receipt-v1' or
+                    record.get('repository') != 'MametaroGG/booth-vrc-price-tracker' or
+                    record.get('scope') != 'bounded-filtered-search-observation' or
+                    record.get('whole_catalog_complete') is not False):
+                raise ValueError('Invalid collector receipt metadata')
+            for key in ('run_id', 'run_attempt'):
+                if not isinstance(record.get(key), str) or not re.fullmatch('[1-9][0-9]{0,19}', record[key]):
+                    raise ValueError('Invalid collector receipt identity')
+            if record.get('reservation_id') != record['run_id']+'-'+record['run_attempt']:
+                raise ValueError('Invalid collector receipt reservation')
+            commit_value(record.get('source_commit'))
+            if (record.get('status') not in ('completed', 'paused') or
+                    record.get('failed') is not False or
+                    record.get('reservation_completed') is not True or
+                    type(record.get('continueCollection')) is not bool):
+                raise ValueError('Invalid collector receipt outcome')
+            if ((record['status'] == 'completed' and 'reason' in record) or
+                    (record['status'] == 'paused' and record.get('reason') not in ('deadline', 'day-boundary'))):
+                raise ValueError('Invalid collector receipt stop reason')
+            for key in ('started_at_ms', 'stopped_at_ms', 'deadline_ms', 'blocked_until_ms', 'pending_retry_count'):
+                if type(record.get(key)) is not int or record[key] < 0:
+                    raise ValueError('Invalid collector receipt counters')
+            metrics = record.get('metrics')
+            keys = ('searchPages', 'searchFailures', 'itemSuccess', 'itemFailures', 'unavailable',
+                    'retries', 'duplicatesAvoided', 'chargedHttpAttempts', 'dailyChargedRequests')
+            if not isinstance(metrics, dict) or any(type(metrics.get(k)) is not int or metrics[k] < 0 for k in keys):
+                raise ValueError('Invalid collector receipt metrics')
+            continue
         if name in ('data/crawl_state.json','data/request_budget.json'):
             if not isinstance(record,dict) or 'id' in record or 'variations' in record:
                 raise ValueError('Invalid tracker state')
@@ -159,7 +193,9 @@ def inspect_records(files, minimum, as_of, max_age_days):
 def attest(tree, commit, inventory, minimum, *, as_of=None, max_age_days=1, fixture=False):
     commit_value(commit)
     if type(fixture) is not bool: raise ValueError('Fixture must be boolean')
-    as_of=as_of or datetime.now(timezone.utc).date().isoformat()
+    # Tracker histories and request-budget observation dates are JST calendar days.
+    # Keep explicit as_of unchanged and retain the existing future/age bounds.
+    as_of=as_of or datetime.now(timezone(timedelta(hours=9))).date().isoformat()
     raw=Path(inventory).read_bytes(); files=snapshot(tree); ledger=verify_inventory(files,raw)
     latest, placeholders=inspect_records(files,minimum,as_of,max_age_days)
     return {'schema':1,'status':'complete','collection_id':commit,'fixture':fixture,

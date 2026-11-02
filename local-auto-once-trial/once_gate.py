@@ -16,7 +16,7 @@ import subprocess
 REPOSITORY = 'MametaroGG/boopadb'
 TRACKER = 'MametaroGG/booth-vrc-price-tracker'
 BRANCH = 'chore/auto-update-trial-20261101'
-MARKER = '.github/boopadb-once/auto-update-20261102.json'
+MARKER = '.github/boopadb-once/auto-update-20261102-retry1.json'
 WORKFLOW = '.github/workflows/boopadb-nonpublic-once-20261102.yml'
 MARKER_KEYS = {'schema', 'prepared_commit', 'collector_run_id',
                'collector_run_attempt', 'collector_saved_commit'}
@@ -85,7 +85,7 @@ def validate_trigger(marker=MARKER, repo_root='.', env=None):
     require(env.get('GITHUB_REF') == 'refs/heads/' + BRANCH, 'Wrong trial branch')
     require(env.get('GITHUB_EVENT_NAME') == 'push', 'Only the explicitly authorized push trigger is allowed')
     require(env.get('GITHUB_RUN_ATTEMPT') == '1', 'Reruns are not authorized')
-    require(env.get('GITHUB_RUN_NUMBER') == '1', 'Only the first run of this dedicated workflow is authorized')
+    require(env.get('GITHUB_RUN_NUMBER') == '2', 'Only the separately authorized second run of this dedicated workflow is allowed')
     require(number(env.get('GITHUB_RUN_ID')), 'Actual run ID required')
     after = env.get('GITHUB_SHA')
     require(sha(after), 'Immutable actual generator SHA required')
@@ -122,7 +122,7 @@ def validate_trigger(marker=MARKER, repo_root='.', env=None):
     require(value['prepared_commit'] == before, 'Marker/prepared commit mismatch')
     return {'status': 'validated-one-use-trigger-shape', 'repository': REPOSITORY,
             'workflow': WORKFLOW, 'generator_commit': after,
-            'run_id': env['GITHUB_RUN_ID'], 'run_attempt': '1', 'run_number': '1',
+            'run_id': env['GITHUB_RUN_ID'], 'run_attempt': '1', 'run_number': '2',
             **value, 'published': False}
 
 
