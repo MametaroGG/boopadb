@@ -1,12 +1,18 @@
 """Shared variation-series thinning for the BoothDB payload builders.
 
-A variation entry becomes {"p": points, "d": obs_days, "sd": sale_days}
+A variation entry becomes {"p": points, "d": obs_days, "sd": sale_days,
+"average_source": {"sum": price_sum, "count": observation_count}}.
+The average metadata is computed before thinning, excluding marked outliers
+when ordinary observations exist; an all-marked input retains the legacy
+fallback to all observations.
 where points are run-length thinned [date, price, is_sale] rows: the first
 row of each constant (price, is_sale) segment plus the final row, which
 preserves the exact step shape and sale-period boundaries at a fraction
 of the size of the daily series.
 """
 
+
+import math
 
 def find_outlier_indexes(rows):
     """Boopa's findSeparatedHighPoints: sorted positive prices, first split
@@ -42,6 +48,27 @@ def thin_points(rows):
     return out
 
 
+def average_source(rows):
+    """Full observations, not graph samples. Preserve all-marked fallback.
+
+    Each recorded observation has equal weight (not elapsed calendar days).
+    Constant-space accumulator; never retain another copy of the history.
+    """
+    total = ordinary_total = 0
+    count = ordinary_count = 0
+    for row in rows:
+        total += row[1]
+        count += 1
+        if len(row) < 4 or not row[3]:
+            ordinary_total += row[1]
+            ordinary_count += 1
+    result = {"sum": ordinary_total if ordinary_count else total,
+              "count": ordinary_count if ordinary_count else count}
+    if not math.isfinite(result["sum"]) or not 0 <= result["sum"] <= 9007199254740991 or not 0 <= result["count"] <= 9007199254740991:
+        raise ValueError("Average statistics exceed safe numeric range")
+    return result
+
+
 def thin_vars_from_item(d):
     """Tracker item dict -> ordered {name: {p, d, sd}} with the
     representative (longest) variation first; None when fewer than two
@@ -57,6 +84,7 @@ def thin_vars_from_item(d):
             "p": thin_points(rows),
             "d": len(rows),
             "sd": sum(r[2] for r in rows),
+            "average_source": average_source(rows),
         }
     if len(entries) < 2:
         return None
@@ -75,10 +103,12 @@ def convert_raw_variations(vars_):
     for k, rows in (vars_ or {}).items():
         if not isinstance(rows, list) or len(rows) < 2:
             continue
+        rows = tag_outliers([list(r) for r in rows])
         entries[k] = {
-            "p": thin_points(tag_outliers([list(r) for r in rows])),
+            "p": thin_points(rows),
             "d": len(rows),
             "sd": sum(r[2] for r in rows),
+            "average_source": average_source(rows),
         }
     if not entries:
         return vars_

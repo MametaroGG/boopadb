@@ -1,0 +1,184 @@
+# LOCAL REVIEW ONLY. No approval or activation marker supplied.
+# Separate wrapper; original OFF workflow is unchanged.
+name: BoopaDB one-time unpublished candidate 20261102
+
+on:
+  push:
+    branches: [chore/auto-update-trial-20261101]
+    paths: [.github/boopadb-once/auto-update-20261102.json]
+# No marker is shipped. Preparation commits do not trigger this workflow.
+# No workflow_dispatch, schedule, workflow_run, PR or deployment trigger.
+
+permissions:
+  contents: read
+  actions: read
+# actions:read applies only to this repository; it does not grant cross-repository
+# private access or artifact download authorization on the collector repository.
+concurrency:
+  group: boopadb-once-20261102
+  cancel-in-progress: false
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  CONFIG_FILE: local-auto-workflow-wiring/production-config.json
+
+jobs:
+  build:
+    if: ${{ github.repository == 'MametaroGG/boopadb' && github.ref == 'refs/heads/chore/auto-update-trial-20261101' && github.event_name == 'push' && github.run_number == 1 && github.run_attempt == 1 }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    outputs:
+      tracker_commit: ${{ steps.resolve.outputs.tracker_commit }}
+      build_artifact_id: ${{ steps.build_artifact.outputs.artifact-id }}
+      selection_artifact_id: ${{ steps.selection_artifact.outputs.artifact-id }}
+    steps:
+      - name: Checkout exact generator workflow commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, verified official ref
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Verify this is the sole authorized activation commit, never preparation or rerun
+        run: |
+          set -euo pipefail
+          python3 local-auto-once-trial/once_gate.py validate-trigger --marker .github/boopadb-once/auto-update-20261102.json
+      - name: Exact reviewed Node runtime; no project dependency installation
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4, official immutable ref
+        with:
+          node-version: '24.22.1'
+          check-latest: false
+      - name: Python 3.12; no dependency installation
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5, verified official ref
+        with:
+          python-version: '3.12'
+      - name: Resolve authenticated bounded collector save and actual live lineage
+        id: resolve
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          bash local-auto-workflow-wiring/run_stage.sh resolve
+      - name: Bind authenticated resolver result to the observed normal collector receipt
+        run: |
+          set -euo pipefail
+          python3 local-auto-once-trial/once_gate.py check-selection --marker .github/boopadb-once/auto-update-20261102.json --selection auto-work/selection/resolved-inputs.json
+      - name: Checkout only the selected immutable tracker SHA
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: MametaroGG/booth-vrc-price-tracker
+          ref: ${{ steps.resolve.outputs.tracker_commit }}
+          path: source
+          persist-credentials: false
+      - name: Verify checkout, canonical inventory, exact context, generation and all machine gates
+        run: |
+          set -euo pipefail
+          bash local-auto-workflow-wiring/run_stage.sh build
+      - name: Upload immutable build artifact; exact v7 root layout
+        id: build_artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: boopadb-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: auto-work/candidate/build-artifact
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: false
+      - name: Upload immutable selection binding for independent validation job
+        id: selection_artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: boopadb-selection-${{ github.run_id }}-${{ github.run_attempt }}
+          path: auto-work/selection-handoff
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: false
+      - name: Retain build failure evidence, never successful QA
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: boopadb-failure-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            auto-work/failure-diagnostics.json
+            auto-work/context.json
+            auto-work/candidate/FAILED.txt
+            auto-work/candidate/commands.json
+            auto-work/candidate/command-*.log
+          retention-days: 90
+          if-no-files-found: ignore
+          overwrite: false
+
+  validate:
+    if: ${{ github.repository == 'MametaroGG/boopadb' && github.ref == 'refs/heads/chore/auto-update-trial-20261101' && github.event_name == 'push' && github.run_number == 1 && github.run_attempt == 1 }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout same immutable generator commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Verify this is the sole authorized activation commit, never preparation or rerun
+        run: |
+          set -euo pipefail
+          python3 local-auto-once-trial/once_gate.py validate-trigger --marker .github/boopadb-once/auto-update-20261102.json
+      - name: Exact reviewed Node runtime; no project dependency installation
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4, official immutable ref
+        with:
+          node-version: '24.22.1'
+          check-latest: false
+      - name: Python 3.12; no dependency installation
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Download exact immutable build artifact ID from this run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.build.outputs.build_artifact_id }}
+          path: incoming
+          merge-multiple: true
+      - name: Download exact immutable selection artifact ID from this run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.build.outputs.selection_artifact_id }}
+          path: auto-work
+          merge-multiple: true
+      - name: Recheck downloaded selection against the sole authorized receipt
+        run: |
+          set -euo pipefail
+          python3 local-auto-once-trial/once_gate.py check-selection --marker .github/boopadb-once/auto-update-20261102.json --selection auto-work/selection/resolved-inputs.json
+      - name: Checkout the same immutable tracker commit, never branch HEAD
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: MametaroGG/booth-vrc-price-tracker
+          ref: ${{ needs.build.outputs.tracker_commit }}
+          path: source
+          persist-credentials: false
+      - name: Recompute canonical inventory/context and independently revalidate exact archive
+        run: |
+          set -euo pipefail
+          bash local-auto-workflow-wiring/run_stage.sh validate
+      - name: Upload immutable QA artifact only on actual machine validation success
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: boopadb-qa-${{ github.run_id }}
+          path: qa-artifact
+          retention-days: 90
+          if-no-files-found: error
+          overwrite: false
+        # Root exactly site-release.tar + evidence/*.json. Tar bytes never repacked.
+        # Existing qa-review + promote workflows are UNCHANGED and still mandatory.
+        # A machine-passed artifact is NOT human QA or permission to publish.
+      - name: Retain validation failure diagnostics, never publish
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: boopadb-failure-validate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            auto-work/failure-diagnostics.json
+            auto-work/context.json
+            incoming/work
+          retention-days: 90
+          if-no-files-found: ignore
+          overwrite: false

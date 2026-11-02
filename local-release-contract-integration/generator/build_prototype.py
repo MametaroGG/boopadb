@@ -2177,6 +2177,21 @@ function outlierIdxJS(rows){
   if (rows.some(r => r[1] === 0 || (r[1] > 0 && r[1] < 1000000))) rows.forEach((r, i) => { if (r[1] >= 1000000) out.add(i); });
   return out;
 }
+// Exact average sufficient statistics computed BEFORE graph thinning.
+function averageSourceJS(rows){
+  let sum = 0, count = 0, ordinarySum = 0, ordinaryCount = 0;
+  for (const r of rows) {
+    sum += r[1]; count++;
+    if (!r[3]) { ordinarySum += r[1]; ordinaryCount++; }
+  }
+  const result = {sum: ordinaryCount ? ordinarySum : sum, count: ordinaryCount || count};
+  if (!Number.isFinite(result.sum) || result.sum < 0 || result.sum > Number.MAX_SAFE_INTEGER || !Number.isSafeInteger(result.count)) throw new Error("Average statistics exceed safe numeric range");
+  return result;
+}
+function hasAverageSource(ser){
+  const a = ser && ser.average_source;
+  return !!a && Number.isFinite(a.sum) && a.sum >= 0 && a.sum <= Number.MAX_SAFE_INTEGER && Number.isSafeInteger(a.count) && a.count > 0 && a.count <= ser.d;
+}
 function thinVarsJS(d){
   const vars = d.variations || {}, entries = {};
   for (const k in vars) {
@@ -2186,7 +2201,7 @@ function thinVarsJS(d){
     const rows = s.map(p => [p.date, p.price, p.is_sale ? 1 : 0]);
     const oi = outlierIdxJS(rows);
     rows.forEach((r, i) => { if (oi.has(i)) r.push(1); });
-    entries[k] = {p: thinPointsJS(rows), d: rows.length, sd: rows.filter(r => r[2]).length};
+    entries[k] = {p: thinPointsJS(rows), d: rows.length, sd: rows.filter(r => r[2]).length, average_source: averageSourceJS(rows)};
   }
   const keys = Object.keys(entries);
   if (!keys.length) return null;
@@ -2444,7 +2459,7 @@ function hasDetailHistory(x){
   if (!x) return false;
   if (x._detailHistoryLoaded === true) return true;
   const entries = Object.values(x.variations || {});
-  return entries.length > 0 && entries.every(v => { const rows = Array.isArray(v) ? v : v && v.p; return Array.isArray(rows) && rows.length >= 2; });
+  return entries.length > 0 && entries.every(v => { const rows = Array.isArray(v) ? v : v && v.p; return Array.isArray(rows) && rows.length >= 2 && hasAverageSource(v); });
 }
 function detailHistoryRequest(id){
   if (!detailHistoryInflight.has(id)) {
@@ -3792,11 +3807,12 @@ function statsHTML(ser){
   const ord = s.filter(p => !p[3]);
   const ordPrices = (ord.length ? ord : s).map(p => p[1]);
   const high = Math.max(...ordPrices);
-  const avg = Math.round(ordPrices.reduce((a, b) => a + b, 0) / ordPrices.length);
+  // Legacy/thinned-only inputs cannot reconstruct the true average.
+  const avg = hasAverageSource(ser) ? Math.round(ser.average_source.sum / ser.average_source.count) : null;
   const curCell = yen(curP) + (s[s.length - 1][3] ? ' <span class="outlb">' + tr("outlier") + '</span>' : "");
   return [
     [tr("pp_cur"), curCell], [tr("chip_lowest"), yen(low)], [tr("pp_high"), yen(high)],
-    [tr("pp_avg"), yen(avg)], [tr("pp_saledays"), tr("days_fmt", {n: ser.sd})], [tr("pp_days"), tr("days_fmt", {n: ser.d})],
+    [tr("pp_avg"), avg === null ? "—" : yen(avg)], [tr("pp_saledays"), tr("days_fmt", {n: ser.sd})], [tr("pp_days"), tr("days_fmt", {n: ser.d})],
   ].map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
 }
 const DAYMS = 86400000;

@@ -1,0 +1,26 @@
+Owner authorization record — minimal scope evidence, not a human QA verdict.
+
+Verified conversation reference:
+- Request: Sentinel_2fb01a61ce188191a0f0f6679bbf5f78, 2026-11-02T05:11:33Z.
+- Public-repository visibility/no-additional-billing clarification:
+  Sentinel_93e6357ec5c88191ab20481b30cfe6a7, 2026-11-02T05:13:36Z.
+- Owner response: Sentinel_7656a1d4df8c81918229d9b00c8209e6,
+  2026-11-02T05:25:24Z: 「いいよ」.
+
+Authorized scope, recorded from the accepted request:
+1. Reuse unchanged the same three relation datasets currently published as inputs
+   to future automatic generation. No permission to change those datasets.
+2. Place the revised implementation on Boopa's existing trial branch and, only
+   after the next normal collector success, run GitHub Actions generation and
+   machine validation once without deploying the resulting site.
+3. Production branch, public site, regular schedules and permission settings must
+   remain unchanged. No additional billing configuration. The repository remains
+   public; trial code and Actions logs can be visible. No private conversation
+   transcript is included in this record.
+
+This consent is not publication permission, a collector receipt, a successful run,
+independent human production QA, or authorization for retries/additional collection.
+Historical local-test-only relation approvals remain byte-identical as history.
+The committed runtime policy and hashes bind the exact original three inventories
+and reviewed implementation. Authenticity is established by the trusted owner
+conversation and its review, not by this text file or a self-asserted JSON flag.

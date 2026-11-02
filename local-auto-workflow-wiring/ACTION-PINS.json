@@ -29,6 +29,29 @@
       "source": "https://api.github.com/repos/actions/download-artifact/git/refs/tags/v4",
       "evidence": "evidence/download-artifact-ref.json",
       "evidence_sha256": "4e19d9a2895e922269b9d923688408e754a340aa13a1cc31cb76420184f2374f"
+    },
+    "actions/setup-node": {
+      "tag": "v4",
+      "commit": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+      "source": "https://api.github.com/repos/actions/setup-node/git/refs/tags/v4",
+      "evidence": "evidence/setup-node-ref.json",
+      "evidence_sha256": "50bd7a8151b8d159d51b061b59158906ec52ee830e8b92944f00f72773c784fe"
+    },
+    "actions/upload-pages-artifact": {
+      "tag": "v3",
+      "commit": "56afc609e74202658d3ffba0e8f6dda462b719fa",
+      "source": "https://api.github.com/repos/actions/upload-pages-artifact/git/refs/tags/v3",
+      "evidence": "evidence/upload-pages-artifact-ref.json",
+      "evidence_sha256": "70a667d03fa1d7da256c96d68480a3770c9b715b2138c053883813dd0e53c27a"
+    },
+    "actions/deploy-pages": {
+      "tag": "v4",
+      "commit": "d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e",
+      "source": "https://api.github.com/repos/actions/deploy-pages/git/refs/tags/v4",
+      "evidence": "evidence/deploy-pages-ref.json",
+      "evidence_sha256": "387b48252d43427a47195f3bf4f38db8a271d8c2f91ca4fbf59db0b702da6031"
     }
-  }
+  },
+  "node_pin_verified_at_utc": "2026-11-02T02:37:30Z",
+  "promotion_pin_verified_at_utc": "2026-11-02T03:01:54Z"
 }

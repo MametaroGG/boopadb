@@ -1,6 +1,4 @@
 {
-  "schema": 1,
-  "status": "local-only-not-installed-not-authorized-for-publication",
   "files": {
     "README.md": {
       "bytes": 13148,
@@ -67,6 +65,10 @@
       "sha256": "117a465a5193cc4a53da1b0df9ca21ec7749bcdb1b1a75af75b38f30768000b5"
     },
     "producer-pin.PROPOSAL.json": {
+      "bytes": 2938,
+      "sha256": "fc2396677767fcf4c42b037e1149e3c8aafdcdebf2f826db11f074dce9048f18"
+    },
+    "producer-pin.installed.json": {
       "bytes": 2938,
       "sha256": "fc2396677767fcf4c42b037e1149e3c8aafdcdebf2f826db11f074dce9048f18"
     },
@@ -158,5 +160,7 @@
       "bytes": 1333,
       "sha256": "4b1e95542a5d755c7d8920fd9b8de7c44e5f063356cb949c363a11da04b2bbfb"
     }
-  }
+  },
+  "schema": 1,
+  "status": "source installed on tracker; consumer trial preparation only; receipt still required"
 }

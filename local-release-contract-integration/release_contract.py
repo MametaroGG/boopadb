@@ -240,11 +240,14 @@ def _report(c, record, site_files):
     }
 
 
-def prepare(site, work, dest, *, context_path, baseline_pin, baseline_sha256, relation_inputs, tracker_root):
+def prepare(site, work, dest, *, context_path, baseline_pin, baseline_sha256, relation_inputs, tracker_root, reuse_policy=None):
     """Create a new v7 build artifact, without changing source site/work bytes."""
     site, work, dest = map(Path, (site, work, dest))
     require(not dest.exists() and not dest.is_symlink(), 'destination must not exist')
     c, pin, bindings = inputs(context_path, baseline_pin, baseline_sha256, relation_inputs)
+    if reuse_policy is not None:
+        import reuse_authorization as reuse
+        reuse.verify(reuse_policy, c, baseline_pin, baseline_sha256, relation_inputs)
     rows, count = core_bindings(site, work, c, pin, bindings)
     tracker_inventory(work, tracker_root)
     require(not (site / 'release-manifest.json').exists(), 'source already has release manifest; do not silently replace lineage')
@@ -276,22 +279,28 @@ def prepare(site, work, dest, *, context_path, baseline_pin, baseline_sha256, re
             (artifact / 'work' / name).write_bytes(read_bytes(outwork / name))
         if (outwork / 'projection-package.json').exists():
             copy_projection(outwork, artifact / 'work')
+        if reuse_policy is not None:
+            write_json(artifact / 'work/reuse-envelope.json', reuse.envelope(reuse_policy, c, baseline_pin, baseline_sha256, relation_inputs, artifact / 'site-release.tar'))
         # Execute the receiving contract against the SAME archive before commit.
         result = validate(artifact, root / 'checked', context_path=context_path,
                           baseline_pin=baseline_pin, baseline_sha256=baseline_sha256,
-                          relation_inputs=relation_inputs, tracker_root=tracker_root)
+                          relation_inputs=relation_inputs, tracker_root=tracker_root, reuse_policy=reuse_policy)
         require(not dest.exists() and not dest.is_symlink(), 'destination appeared')
         artifact.rename(dest)
     return result
 
 
-def validate(artifact, dest, *, context_path, baseline_pin, baseline_sha256, relation_inputs, tracker_root):
+def validate(artifact, dest, *, context_path, baseline_pin, baseline_sha256, relation_inputs, tracker_root, reuse_policy=None):
     """Validate/extract full contract. Success is NOT authorization to promote."""
     artifact, dest = map(Path, (artifact, dest))
     require(not dest.exists() and not dest.is_symlink(), 'destination must not exist')
     c, pin, bindings = inputs(context_path, baseline_pin, baseline_sha256, relation_inputs)
     files = base._tree(artifact)
     required = {'site-release.tar', *('work/' + name for name in BASE_WORK)}
+    if reuse_policy is not None:
+        required.add('work/reuse-envelope.json')
+        import reuse_authorization as reuse
+        reuse.check_envelope(reuse_policy, c, baseline_pin, baseline_sha256, relation_inputs, artifact / 'site-release.tar', artifact / 'work/reuse-envelope.json')
     projection_names = {name for name in files if name.startswith('work/projection-')}
     if projection_names:
         require({'work/' + name for name in PROJECTION_FILES} <= projection_names, 'incomplete projection handoff')
@@ -349,6 +358,7 @@ def main():
         p.add_argument('--baseline-sha256', required=True)
         p.add_argument('--relation-inputs', required=True)
         p.add_argument('--tracker-root', required=True)
+        p.add_argument('--reuse-policy')
     a = vars(parser.parse_args())
     command = a.pop('command')
     print(json.dumps(globals()[command](**a), indent=2))

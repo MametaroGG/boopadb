@@ -58,8 +58,8 @@
       "sha256": "df6e758c8f436c9800457913da2c3a35f6218336b1e8a78af54ae014346e6d92"
     },
     "build_prototype.py": {
-      "bytes": 319863,
-      "sha256": "23356ba7bf96a690e870d628d8694468126beeee04b38a7eb7b2a42a328ca939"
+      "bytes": 339104,
+      "sha256": "6841c59a1f17fb3992d48a55c6dc269b2f7a2f87cf1d051c32c1a6695f1f33ef"
     },
     "build_sale.py": {
       "bytes": 48099,
@@ -70,8 +70,8 @@
       "sha256": "4c4787bc6ec5da73198c662133dd62f401231186a0a2a0e2e1f2e150ff7b6340"
     },
     "charts_contract.py": {
-      "bytes": 5542,
-      "sha256": "9d68c728c88ff1c04e9443d54f5dd6d539de1c9a0e3a43dbb91df2a0facc7d78"
+      "bytes": 6508,
+      "sha256": "a66488a48ade974180b44b21907efdc692a5102ae89b7b4ab635e2974385947b"
     },
     "deploy_data.sh": {
       "bytes": 297,
@@ -550,8 +550,8 @@
       "sha256": "c92071e4cfef2c1e829fadb70c716224fdf38261ee63d4f8786fe65a3ef770c0"
     },
     "rerender_candidate.py": {
-      "bytes": 13913,
-      "sha256": "54cec233a4550f1043d934bc6c1bddf165c6325210f3b3e1b5c9dd9b30df7a52"
+      "bytes": 17930,
+      "sha256": "0c080af73dda3d5148e66c57495e6dcd8b91b8b9d1b83f59a4f72dc609559d36"
     },
     "scripts/build_search_catalog.py": {
       "bytes": 3168,
@@ -574,8 +574,8 @@
       "sha256": "8cfcca9646b7fc63690915881dbb8c8cbe8f814d2718c4923f4d39c4c8b6dad7"
     },
     "varutil.py": {
-      "bytes": 3203,
-      "sha256": "de883ab6f400671e7c76062d43669cf3bc4496fcf65b949f91bb4ca7ddf37b94"
+      "bytes": 4442,
+      "sha256": "ea900c3de864c631e675cd0020be99bb7c77f0f9c71dbf8bc6fa56b69ff18003"
     },
     "verify_published_manifest.py": {
       "bytes": 2014,

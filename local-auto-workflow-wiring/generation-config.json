@@ -1,0 +1,14 @@
+{
+  "daily_coverage_file": null,
+  "daily_target_date": null,
+  "projection_work": null,
+  "projection_package_sha256": null,
+  "presentation_proof": "../historical-inputs/presentation-proof.exact.json",
+  "presentation_sha256": "1d98251b5d5b3ffd9e038e13b2f440f18c111db703dcc698c4a8f29031df4517",
+  "relations_bundle": "../local-release-contract-integration/generator/relation-bundle",
+  "relations_approval": "../historical-inputs/producer-install/inputs/approvals/relation.json",
+  "relation_search_bundle": "../local-release-contract-integration/generator/relation-search-bundle",
+  "relation_search_approval": "../historical-inputs/producer-install/inputs/approvals/relation-search.json",
+  "supplement_bundle": "../local-release-contract-integration/generator/relation-supplement-bundle",
+  "supplement_approval": "../historical-inputs/producer-install/inputs/approvals/supplement.json"
+}

@@ -56,6 +56,10 @@ def validate_variations(variations):
         if isinstance(series,dict):
             if type(series.get('d')) is not int or series['d']<len(rows) or type(series.get('sd')) is not int or not 0<=series['sd']<=series['d']:
                 raise ValueError('Invalid variation observation counts')
+            if 'average_source' in series:
+                a=series['average_source']
+                if not isinstance(a,dict) or set(a)!={'sum','count'} or type(a['sum']) not in (int,float) or not math.isfinite(a['sum']) or not 0<=a['sum']<=9007199254740991 or type(a['count']) is not int or not 0<a['count']<=min(series['d'],9007199254740991):
+                    raise ValueError('Invalid variation average statistics')
 
 
 def validate_payload(index_html, lists, ids, fixture):

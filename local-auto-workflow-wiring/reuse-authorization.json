@@ -1,0 +1,39 @@
+{
+  "baseline_sha256": "f52641319583a35bd2d635ab1f62ed4e19d24bc6b74ad6d50440dee5da46a49d",
+  "grant_reference": "trusted-owner-message:Sentinel_7656a1d4df8c81918229d9b00c8209e6@2026-11-02T05:25:24Z; request:Sentinel_2fb01a61ce188191a0f0f6679bbf5f78; visibility:Sentinel_93e6357ec5c88191ab20481b30cfe6a7",
+  "grant_sha256": "5d7b0607a58542025fc1631fd97cd68a3d2086e26487abfb7218068c189473d5",
+  "implementation_inventory_sha256": "7ed54a0ec239520ee943a03ec53457760b0cc1acf5653a1933f74fe5778ed5fb",
+  "relations_binding": {
+    "relation_search_approval_sha256": "b8acdf5b300400aad351e6ef9e103b9b8d56f160a5cf23a47c169cf196222d59",
+    "relation_search_bundle_manifest_sha256": "aeea29a4b5a206b4cb310477791b7682986d84b92096629f8cc6d4ed810b0329",
+    "relations_approval_sha256": "d29ebf9ad8b46f954f8128bf80676813cb937adf9f701a840aaf4337c6e8bcc7",
+    "relations_bundle_manifest_sha256": "5a8badf06ee7fc7843f2820100849f34f5edb24bdb1c26b3641159d356ab8e1c",
+    "supplement_approval_sha256": "a93c65b591dd9fb2c01e4621f2d671228f695bb37d31fff83ee0cf6057e0f4cc",
+    "supplement_bundle_manifest_sha256": "a1039c44190648cebe17aeb37ec1261a9ca758b07b8b239979de08916ac48d1f"
+  },
+  "repository": "MametaroGG/boopadb",
+  "runtime_files_sha256": {
+    "local-auto-input-contract/proposed/src/collection-receipt.js": "bd882cb9a31a9df1bf85797095ea32a2d4017db66f9fb8ba5b6136d8b7451648",
+    "local-auto-input-contract/resolve_automatic_inputs.py": "6a33dba2472c4d6686f243e187f5c88af8a15f378b77306a9d56f4a3b531622d",
+    "local-auto-input-contract/select-input.cjs": "0de6ed2b5f1ed0979db291be8096fca03958b35c8524f02f44c47c95b007ba2a",
+    "local-auto-workflow-wiring/run_stage.sh": "2057a476b50ea5e4ed272c5ed2f45c800be2b07e37bc253891789919311e9cab",
+    "local-auto-workflow-wiring/workflow_driver.py": "53d98b28b9970b71d1d28844330d5ecbb7cd3b09865d6184b67c6ad602b1c1eb",
+    "local-release-contract-integration/artifact_handoff_base.py": "9f722dfd99ca05dc390e5c45962bf214eb8ce57dee89e3220a45511e19e4bfd1",
+    "local-release-contract-integration/release_contract.py": "66b129fc00dc6c9f5ca58ea1154383b65698c250596dbcca7ae68ebf54789bee",
+    "local-release-contract-integration/reuse_authorization.py": "c851e09402d4dc1bdc751219bdfde9ff4dfc3d18aa96dba953c38a1625c649ca",
+    "local-release-contract-integration/run_candidate.py": "55d4c8524953b7a521c2ab3e390a0a12a135c8e6ea6cb5df1b649193dd82bdb5",
+    "local-release-contract-integration/validation_job.py": "4cc3790d81246be37037f2fafcca75f594cbe3c0a18f3b55d256c70dd07ba8ee",
+    "local-release-contract-integration/validators/check_projection.py": "2228b55dc67f3c7542ffd3487e29d93c71004ffff7ca97f4dda42a1cb234e602",
+    "local-release-contract-integration/validators/compact_codec.py": "d5ebf4c4fa1003c5f544f3da71fece6db527e7f8669ca03dc77b8bc6f3438aa2",
+    "local-release-contract-integration/validators/gate_ui.py": "280dfa381fbed53056cb81a82cbc7ff81cfcc0cfc27677f41785b6f579a28543",
+    "local-release-contract-integration/validators/safe_extract.py": "01253d869a69862e9d2dfa2993ee7c11f62b9af715a7141fa3a9d4af699db1b7",
+    "local-release-contract-integration/validators/selected_price_selector.py": "512e14fd57fb8ed6547c6af5574324f4e54d2e8e8e670da2b019aac15ec1249a",
+    "local-release-contract-integration/validators/validate_bindings.py": "03cfeb9ed4ce258b33b21547a375d30776f3ab4e1eba1aa3de150898cdad988e",
+    "local-release-contract-integration/validators/validate_search_core.py": "6b49182886ca302a6ea89e0c73746add7cd251361fb95553295ec9904cade3f8",
+    "local-release-contract-integration/validators/validate_snapshot.py": "ad684c797e00cd9e0eddeb60f0304b0d095989c368d5f588636f5e1a5ed5cc27",
+    "local-release-contract-integration/validators/verify_inventory.py": "f369d4c8ed2c014d5f758abf0709d6fdeb86ae8d85b6d602fedbfc606e853f09"
+  },
+  "schema": "boopa-production-reuse-v1",
+  "scope": "production-exact-historical-relations-reuse",
+  "synthetic": false
+}

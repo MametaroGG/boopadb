@@ -32,7 +32,7 @@ class WiringTests(unittest.TestCase):
         self.commit = d.head(self.tracker)
         self.env = dict(GITHUB_ACTIONS='true', GITHUB_SHA='2'*40,
                         GITHUB_RUN_ID='100', GITHUB_RUN_ATTEMPT='2')
-        self.config = {'config_sha256':'9'*64,'baseline_pin':self.root/'pin.json',
+        self.config = {'schema':1,'config_sha256':'9'*64,'baseline_pin':self.root/'pin.json',
                        'baseline_sha256':'8'*64,'producer_pin':self.root/'producer.json',
                        'relation_inputs':self.root/'relations.json','generation_config':self.root/'generation.json'}
         for key in ('baseline_pin','producer_pin','relation_inputs','generation_config'):
@@ -130,6 +130,20 @@ class WiringTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'proposal/example/placeholder'):d.configuration(p)
         c['extra']='ignored?';p.write_text(json.dumps(c))
         with self.assertRaisesRegex(ValueError,'exact production'):d.configuration(p)
+
+    def test_schema_two_reuse_forwarded_and_exact(self):
+        policy=self.root/'reuse-policy.json';policy.write_text('{}')
+        c={**self.config,'schema':2,'reuse_policy':policy}
+        args=d.common(c,self.root/'work',self.tracker)
+        self.assertEqual(args[-2:],['--reuse-policy',policy])
+        self.assertNotIn('--reuse-policy',d.common(self.config,self.root/'work',self.tracker))
+        config={'schema':2,'baseline_sha256':d.sha(self.config['baseline_pin']),
+                **{k:self.config[k].name for k in ('baseline_pin','producer_pin','relation_inputs','generation_config')},
+                'reuse_policy':policy.name}
+        path=self.root/'schema-two.json';path.write_text(json.dumps(config))
+        self.assertEqual(d.configuration(path)['reuse_policy'],policy)
+        del config['reuse_policy'];path.write_text(json.dumps(config))
+        with self.assertRaisesRegex(ValueError,'exact production'):d.configuration(path)
 
     def test_duplicate_json_rejected(self):
         p=self.root/'duplicate.json';p.write_text('{"x":1,"x":2}')

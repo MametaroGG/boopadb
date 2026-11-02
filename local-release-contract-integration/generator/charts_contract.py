@@ -43,6 +43,12 @@ def validate_charts(charts, inputs, fixture=False):
                 raise ValueError('Chart endpoints differ from frozen source')
             if isinstance(series,dict) and (series.get('d')!=len(raw) or series.get('sd')!=sum(bool(r.get('is_sale')) for r in raw)):
                 raise ValueError('Chart history counts differ from frozen source')
+            if isinstance(series,dict) and 'average_source' in series:
+                from varutil import average_source, tag_outliers
+                full_rows=tag_outliers([[p['date'],p['price'],int(bool(p.get('is_sale')))] for p in sorted(raw,key=lambda p:p['date'])])
+                a=series['average_source']
+                if not isinstance(a,dict) or set(a)!={'sum','count'} or type(a['sum']) not in (int,float) or type(a['count']) is not int or a != average_source(full_rows):
+                    raise ValueError('Chart average statistics differ from frozen source')
     return charts
 
 
@@ -76,6 +82,13 @@ def generate_charts(inputs):
         if distinct>=3 and len(series)>=60:
             score=distinct*2+transitions*3+len(series)/50.0
             candidates.append((score,d['id']));records[d['id']]=d
+            # Only the final top three are consumed. Keep exactly that ranking
+            # prefix (including reverse score/ID ties), not every raw history.
+            candidates.sort(reverse=True)
+            del candidates[3:]
+            retained={ident for _,ident in candidates}
+            for ident in list(records):
+                if ident not in retained: del records[ident]
     candidates.sort(reverse=True)
     from varutil import convert_raw_variations
     charts=[]

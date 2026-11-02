@@ -63,10 +63,10 @@ def configuration(path):
     path = path.resolve()
     require(path.is_relative_to(ROOT), 'Configuration must be inside generator checkout')
     c = load(path)
-    require(isinstance(c, dict) and set(c) == CONFIG_KEYS and type(c['schema']) is int and c['schema'] == 1,
+    require(isinstance(c, dict) and ((set(c) == CONFIG_KEYS and type(c['schema']) is int and c['schema'] == 1) or (set(c) == CONFIG_KEYS | {'reuse_policy'} and type(c['schema']) is int and c['schema'] == 2)),
             'Explicit exact production configuration required')
     require(match(c['baseline_sha256'], '[0-9a-f]{64}'), 'Real baseline SHA256 required')
-    for key in ('baseline_pin', 'producer_pin', 'relation_inputs', 'generation_config'):
+    for key in ('baseline_pin', 'producer_pin', 'relation_inputs', 'generation_config') + (('reuse_policy',) if c['schema'] == 2 else ()):
         value = c[key]
         require(isinstance(value, str) and value and not Path(value).is_absolute(),
                 key + ' must be a relative checked-out file path')
@@ -157,7 +157,7 @@ def prepare(config, work, tracker):
 def common(c, work, tracker):
     return ['--context', Path(work) / 'context.json', '--baseline-pin', c['baseline_pin'],
             '--baseline-sha256', c['baseline_sha256'], '--relation-inputs', c['relation_inputs'],
-            '--tracker-root', tracker]
+            '--tracker-root', tracker] + (['--reuse-policy', c['reuse_policy']] if c['schema'] == 2 else [])
 
 def build(config, work, tracker):
     c = prepare(config, work, tracker)

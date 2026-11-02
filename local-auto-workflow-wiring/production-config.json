@@ -1,0 +1,9 @@
+{
+  "schema": 2,
+  "baseline_pin": "../historical-inputs/baseline_pin.json",
+  "baseline_sha256": "f52641319583a35bd2d635ab1f62ed4e19d24bc6b74ad6d50440dee5da46a49d",
+  "producer_pin": "../local-auto-input-contract/producer-pin.installed.json",
+  "relation_inputs": "relation-inputs.json",
+  "generation_config": "generation-config.json",
+  "reuse_policy": "reuse-policy.json"
+}

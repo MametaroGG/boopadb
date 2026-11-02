@@ -1,0 +1,8 @@
+{
+  "relations_bundle_manifest_sha256": "../historical-inputs/producer-install/manifests/relation-bundle-manifest.json",
+  "relations_approval_sha256": "../historical-inputs/producer-install/inputs/approvals/relation.json",
+  "relation_search_bundle_manifest_sha256": "../historical-inputs/producer-install/manifests/relation-search-bundle-manifest.json",
+  "relation_search_approval_sha256": "../historical-inputs/producer-install/inputs/approvals/relation-search.json",
+  "supplement_bundle_manifest_sha256": "../historical-inputs/producer-install/manifests/relation-supplement-bundle-manifest.json",
+  "supplement_approval_sha256": "../historical-inputs/producer-install/inputs/approvals/supplement.json"
+}

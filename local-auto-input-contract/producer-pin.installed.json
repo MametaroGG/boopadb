@@ -1,0 +1,95 @@
+{
+  "files_sha256": {
+    "scripts/push-data.sh": "32193ecb6b93f8382da64bc648411fe8a04d77aab53369c824c00a38e6c262d0",
+    "src/collection-receipt.js": "bd882cb9a31a9df1bf85797095ea32a2d4017db66f9fb8ba5b6136d8b7451648",
+    "src/collection-runtime.js": "a1fe911845594ac3e70bb5abeebce023e18f8dad95add20e05048fab8bcd0953",
+    "src/continuation.js": "53998af07ce81b3397c7c5af4f6a9ba9377945ec2d89f7115506eb1037fb25e6",
+    "src/scraper.js": "23a09520e248119f978bfcca3a4f06ce27e11307dbf7c1a2577c2179c907ebf5",
+    "write-save-receipt.cjs": "cad8e4c90cfacf60e73f5c4a7cb6d1010bcea1c64d1c51dccb515e010e44ece5"
+  },
+  "repository": "MametaroGG/booth-vrc-price-tracker",
+  "schema": "boopa-producer-pin-v1",
+  "source_root_entries": {
+    ".gitattributes": {
+      "mode": "100644",
+      "sha": "dfe0770424b2a19faf507a501ebfc23be8f54e7b",
+      "type": "blob"
+    },
+    ".gitignore": {
+      "mode": "100644",
+      "sha": "836703e46e7f5b62c4a338b6f436c6658467e454",
+      "type": "blob"
+    },
+    "Boopa - BOOTH Price Tracker for VRChat.zip": {
+      "mode": "100644",
+      "sha": "8c095a39310ed80ef4c45598c46cb70b8dc5ffd9",
+      "type": "blob"
+    },
+    "assets": {
+      "mode": "040000",
+      "sha": "47b48dc7bf27d979b35e03c52b7b2022673bce99",
+      "type": "tree"
+    },
+    "booth-vrc-price-tracker.code-workspace": {
+      "mode": "100644",
+      "sha": "362d7c25bb405a5cc76d0c7518cc240999a574f4",
+      "type": "blob"
+    },
+    "dist": {
+      "mode": "040000",
+      "sha": "01afd779feeac8df3a5a389fe323983884fb87d4",
+      "type": "tree"
+    },
+    "docs": {
+      "mode": "040000",
+      "sha": "443fe1722c5902d9a65ae61471396520debeec2d",
+      "type": "tree"
+    },
+    "extension": {
+      "mode": "040000",
+      "sha": "da7dc038a4610239e0a612dd4f5918040ceb3785",
+      "type": "tree"
+    },
+    "extension.crx": {
+      "mode": "100644",
+      "sha": "b978dcc922eae497deeca803ccfe8af5bf46ad05",
+      "type": "blob"
+    },
+    "index.html": {
+      "mode": "100644",
+      "sha": "ce0a431c77fdf0d36e59e1ea17506fa1e8eb1e51",
+      "type": "blob"
+    },
+    "package-lock.json": {
+      "mode": "100644",
+      "sha": "43cc06c1bf40ed032d7704ca2e43c8caa2c93339",
+      "type": "blob"
+    },
+    "package.json": {
+      "mode": "100644",
+      "sha": "b4a70f1c8f4faed1ffd3e843d3315f86c341bb15",
+      "type": "blob"
+    },
+    "scripts": {
+      "mode": "040000",
+      "sha": "8d25af313c5ce0e38068fb126832ffdcf6c893fe",
+      "type": "tree"
+    },
+    "src": {
+      "mode": "040000",
+      "sha": "f87362be086663c18704f1dc88e730273b85283d",
+      "type": "tree"
+    },
+    "test": {
+      "mode": "040000",
+      "sha": "9fda80fc15cd5dde6f7ab42b6d0b2133777095dc",
+      "type": "tree"
+    },
+    "write-save-receipt.cjs": {
+      "mode": "100644",
+      "sha": "00d22b6a011c5667a5a48db7d973e1d2e9339863",
+      "type": "blob"
+    }
+  },
+  "workflow_sha256": "2b846e818ffd9c691f733613b645876ee19e9a7e6f15ef08fdda1a953e4e6186"
+}

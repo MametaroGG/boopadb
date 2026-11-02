@@ -26,8 +26,11 @@ def audit(path):
     check('DRAFT-ADAPTATION' not in text,'Unimplemented adaptation placeholder')
     pins=json.loads((ROOT/'ACTION-PINS.json').read_text())['actions']
     count=0
+    references=[]
     for name,job in workflow['jobs'].items():
         check(job['if']=='${{ false }}','Workflow must remain explicitly OFF')
+        node_steps=[step for step in job['steps'] if step.get('uses','').startswith('actions/setup-node@')]
+        check(len(node_steps)==1 and node_steps[0]['with'].get('node-version')=='24.22.1' and node_steps[0]['with'].get('check-latest')=='false','Exact reviewed Node runtime required')
         for step in job['steps']:
             if 'run' in step:
                 check('${{' not in step['run'],'Expression interpolation into shell refused')
@@ -46,6 +49,7 @@ def audit(path):
                 check(step['with']['retention-days']=='90','v7 retention weakened')
             if action=='actions/download-artifact':
                 check('artifact-ids' in step['with'] and 'name' not in step['with'],'Download must use exact same-run artifact ID')
+            references.append({'job':name,'step':step.get('name','(unnamed)'),'uses':step['uses'],'condition':step.get('if','(default success)')})
             count+=1
     build=workflow['jobs']['build']['steps']
     idx={step.get('id'):i for i,step in enumerate(build) if 'id' in step}
@@ -66,7 +70,10 @@ def audit(path):
                   'Available reviewed original v7 source modified')
     subprocess.run(['bash','-n',str(ROOT/'run_stage.sh')],check=True)
     return {'status':'passed','yaml':'parsed','shell_blocks':'bash -n passed',
-            'immutable_action_references':count,'actual_pinned_action_input_compatibility':'passed',
+            'immutable_action_references':count,'references':references,
+            'count_includes_failure_diagnostic_uploads':True,
+            'failure_only_action_references':sum(x['condition']=='failure()' for x in references),
+            'per_job_action_references':{job:sum(x['job']==job for x in references) for job in workflow['jobs']},'actual_pinned_action_input_compatibility':'passed',
             'original_v7_daily_qa_promote_bytes':'verified against pinned bundled originals','schedule':'OFF',
             'jobs':'literal false','installed':False,'published':False}
 

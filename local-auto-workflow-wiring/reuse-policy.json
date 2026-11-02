@@ -1,0 +1,10 @@
+{
+  "baseline_path": "../historical-inputs/baseline_pin.json",
+  "baseline_sha256": "f52641319583a35bd2d635ab1f62ed4e19d24bc6b74ad6d50440dee5da46a49d",
+  "grant_path": "owner-reuse-consent.txt",
+  "implementation_inventory_path": "../local-release-contract-integration/GENERATOR-INVENTORY.json",
+  "relation_inputs_path": "relation-inputs.json",
+  "schema": "boopa-reuse-policy-v1",
+  "trust_path": "reuse-authorization.json",
+  "trust_sha256": "f4bd763e693328590af6d26205ea071634a0823c8ecdaeb195f9c413041a7d4f"
+}

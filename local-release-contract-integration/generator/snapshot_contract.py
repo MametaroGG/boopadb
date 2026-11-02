@@ -3,6 +3,7 @@ Commit is an expected caller-verified checkout identity, not independently attes
 All regular data/meta files are bound; only JSON and empty .gitkeep are accepted.
 """
 import hashlib
+from collections.abc import Mapping
 import json
 import math
 import os
@@ -40,6 +41,53 @@ def commit_value(value):
         raise ValueError('Exact lowercase commit required')
     return value
 
+def file_digest(path):
+    """Bound hashing memory independently of total snapshot size."""
+    value = hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+            value.update(chunk)
+    return value.hexdigest()
+
+
+class CapturedSnapshot(Mapping):
+    """Captured digests, not retained raw bytes; reads verify capture identity.
+
+    Memory is O(path inventory + largest individual record), not total bytes.
+    No lazy read can silently accept content changed since this capture.
+    """
+    def __init__(self, tree, hashes):
+        self.tree = tree
+        self.hashes = hashes
+
+    def __iter__(self):
+        return iter(self.hashes)
+
+    def __len__(self):
+        return len(self.hashes)
+
+    def __getitem__(self, name):
+        expected = self.hashes[name]
+        path = self.tree / name
+        for parent in path.relative_to(self.tree).parents:
+            if (self.tree / parent).is_symlink(): raise ValueError('Linked captured input')
+        if not stat.S_ISREG(path.lstat().st_mode): raise ValueError('Nonregular captured input')
+        raw = path.read_bytes()
+        if digest(raw) != expected: raise ValueError('Input changed since capture: '+name)
+        return raw
+
+    def __eq__(self, other):
+        if isinstance(other, CapturedSnapshot):
+            return self.hashes == other.hashes
+        if isinstance(other, Mapping):
+            return len(self) == len(other) and all(name in other and self[name] == other[name] for name in self)
+        return NotImplemented
+
+
+def captured_hashes(files):
+    return files.hashes if isinstance(files, CapturedSnapshot) else {p:digest(b) for p,b in files.items()}
+
+
 def snapshot(tree):
     tree = Path(tree)
     if tree.is_symlink() or not tree.is_dir(): raise ValueError('Invalid snapshot root')
@@ -57,16 +105,16 @@ def snapshot(tree):
                 if '\\' in rel or any(ord(c)<32 for c in rel): raise ValueError('Unsafe path')
                 key = unicodedata.normalize('NFC',rel).casefold()
                 if key in folded: raise ValueError('Normalized path collision')
-                folded.add(key); files[rel] = path.read_bytes()
+                folded.add(key); files[rel] = file_digest(path)
     if not files: raise ValueError('Empty snapshot')
-    return files
+    return CapturedSnapshot(tree, files)
 
 def inventory_bytes(files):
-    return json.dumps({p:digest(b) for p,b in files.items()}, indent=1, sort_keys=True).encode()
+    return json.dumps(captured_hashes(files), indent=1, sort_keys=True).encode()
 
 def verify_inventory(files, raw):
     ledger = strict_json(raw)
-    actual = {p:digest(b) for p,b in files.items()}
+    actual = captured_hashes(files)
     if not isinstance(ledger,dict) or ledger != actual: raise ValueError('Exact inventory mismatch')
     return ledger
 
@@ -74,7 +122,8 @@ def inspect_records(files, minimum, as_of, max_age_days):
     minimum=iso(minimum); as_of=iso(as_of)
     if type(max_age_days) is not int or max_age_days<0: raise ValueError('Invalid age budget')
     latest=None; ids=set(); placeholders=[]
-    for name, raw in sorted(files.items()):
+    for name in sorted(files):
+        raw = files[name]
         if Path(name).name=='.gitkeep' and not raw:
             placeholders.append(name); continue
         if Path(name).suffix!='.json': raise ValueError('Unsupported non-JSON input: '+name)

@@ -33,7 +33,7 @@ GATES = [
 
 
 def validate_job(artifact, dest, *, context_path, baseline_pin, baseline_sha256,
-                 relation_inputs, tracker_root):
+                 relation_inputs, tracker_root, reuse_policy=None):
     """All checks must pass before exposing a new QA artifact at ``dest``.
 
     The incoming artifact is copied to isolated storage before validation. The
@@ -45,7 +45,7 @@ def validate_job(artifact, dest, *, context_path, baseline_pin, baseline_sha256,
     rc.require(not dest.exists() and not dest.is_symlink(), 'QA destination must not exist')
     kwargs = dict(context_path=context_path, baseline_pin=baseline_pin,
                   baseline_sha256=baseline_sha256, relation_inputs=relation_inputs,
-                  tracker_root=tracker_root)
+                  tracker_root=tracker_root, reuse_policy=reuse_policy)
     with tempfile.TemporaryDirectory(prefix='.validation-job-', dir=dest.parent) as directory:
         root = Path(directory)
         incoming = root / 'incoming'
@@ -99,6 +99,10 @@ def validate_job(artifact, dest, *, context_path, baseline_pin, baseline_sha256,
         (out / 'site-release.tar').write_bytes(blob)
         for name in EVIDENCE_NAMES:
             (evidence / name).write_bytes(rc.read_bytes(incoming / 'work' / name))
+        if reuse_policy is not None:
+            import reuse_authorization as reuse
+            reuse.check_envelope(reuse_policy, context, baseline_pin, baseline_sha256, relation_inputs, incoming / 'site-release.tar', incoming / 'work/reuse-envelope.json')
+            (evidence / 'reuse-envelope.json').write_bytes(rc.read_bytes(incoming / 'work/reuse-envelope.json'))
         rc.write_json(evidence / 'validation-results.json', result)
         for name in rc.PROJECTION_FILES:
             path = incoming / 'work' / name
@@ -121,6 +125,7 @@ def main():
     parser.add_argument('--baseline-sha256', required=True)
     parser.add_argument('--relation-inputs', required=True)
     parser.add_argument('--tracker-root', required=True)
+    parser.add_argument('--reuse-policy')
     print(json.dumps(validate_job(**vars(parser.parse_args())), indent=2))
 
 

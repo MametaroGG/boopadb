@@ -1,3 +1,7 @@
+> Integrated revision20261102: explicit Node24.22.1,15immutableaction uses,
+> schema2 supplementalreuse forwarding,14wiringtests. Bothjobs stillOFF.
+> Root README and current manifests supersede old delivery/test counts below.
+
 # Automatic update workflow wiring — local, OFF, uninstalled
 
 ## Delivered

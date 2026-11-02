@@ -59,7 +59,12 @@ def manifest_inventory(manifest):
     return inventory
 
 
-def configuration(path, relation_inputs, context):
+def configuration(path, relation_inputs, context, reuse_policy=None, baseline_pin=None, baseline_sha256=None):
+    reuse_verified = False
+    if reuse_policy is not None:
+        import reuse_authorization as reuse
+        reuse.verify(reuse_policy, context, baseline_pin, baseline_sha256, relation_inputs)
+        reuse_verified = True
     path = Path(path).resolve()
     obj = rc.load_strict_json(path)
     rc.require(isinstance(obj, dict) and set(obj) == CONFIG_FIELDS, 'explicit complete generation configuration required')
@@ -83,8 +88,8 @@ def configuration(path, relation_inputs, context):
         approval = rc.load_strict_json(actual_approval)
         if not context['synthetic']:
             rc.require(not (approval.get('synthetic') is True or approval.get('fixture') is True
-                            or 'local' in str(approval.get('scope', '')).lower()
-                            or 'test' in str(approval.get('scope', '')).lower()),
+                            or ((not reuse_verified) and ('local' in str(approval.get('scope', '')).lower()
+                            or 'test' in str(approval.get('scope', '')).lower()))),
                        'local/synthetic relation approval cannot enter production generation')
         manifest_path = Path(expected_paths[manifest_key])
         if not manifest_path.is_absolute(): manifest_path = relation_inputs.parent / manifest_path
@@ -107,11 +112,14 @@ def configuration(path, relation_inputs, context):
 
 
 def run(dest, *, context_path, baseline_pin, baseline_sha256, relation_inputs,
-        tracker_root, generation_config):
+        tracker_root, generation_config, reuse_policy=None):
     """Run the actual pinned CLIs. Failure retains diagnostics, never QA success."""
     verify_generator()
     c, pin, bindings = rc.inputs(context_path, baseline_pin, baseline_sha256, relation_inputs)
-    config = configuration(generation_config, relation_inputs, c)
+    if reuse_policy is not None:
+        import reuse_authorization as reuse
+        reuse.verify(reuse_policy, c, baseline_pin, baseline_sha256, relation_inputs)
+    config = configuration(generation_config, relation_inputs, c, reuse_policy=reuse_policy, baseline_pin=baseline_pin, baseline_sha256=baseline_sha256)
     dest = Path(dest).resolve()
     rc.require(not dest.exists() and not dest.is_symlink(), 'run destination must not exist')
     dest.mkdir(parents=True)
@@ -185,7 +193,7 @@ def run(dest, *, context_path, baseline_pin, baseline_sha256, relation_inputs,
             })
         common = dict(context_path=Path(context_path).resolve(), baseline_pin=Path(baseline_pin).resolve(),
                       baseline_sha256=baseline_sha256, relation_inputs=Path(relation_inputs).resolve(),
-                      tracker_root=Path(tracker_root).resolve())
+                      tracker_root=Path(tracker_root).resolve(), reuse_policy=reuse_policy)
         contract = rc.prepare(dest / 'site', work, dest / 'build-artifact', **common)
         import validation_job
         result = validation_job.validate_job(dest / 'build-artifact', dest / 'qa-artifact', **common)
@@ -206,6 +214,7 @@ def main():
     p.add_argument('--relation-inputs', required=True)
     p.add_argument('--tracker-root', required=True)
     p.add_argument('--generation-config', required=True)
+    p.add_argument('--reuse-policy')
     print(json.dumps(run(**vars(p.parse_args())), indent=2))
 
 
