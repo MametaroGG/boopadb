@@ -1,0 +1,485 @@
+# Authorized non-serving GET-only trial. No generation or publication.
+# This historical compatibility probe cannot establish freshness or authorize generation.
+name: Stage8 historical GET compatibility probe
+on:
+  push:
+    branches:
+      - chore/auto-update-trial-20261101
+    paths:
+      - .github/workflows/stage8-historical-get-probe.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  historical-read-probe:
+    if: ${{ github.repository == 'MametaroGG/boopadb' && github.event_name == 'push' && github.ref == 'refs/heads/chore/auto-update-trial-20261101' && github.run_attempt == '1' && github.workflow_ref == 'MametaroGG/boopadb/.github/workflows/stage8-historical-get-probe.yml@refs/heads/chore/auto-update-trial-20261101' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check the pinned historical artifact with Stage7 GET transport
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          python3 -B - --mode github-actions <<'STAGE8_PYTHON'
+          # Embedded exact Stage7 bytes; decoded only in memory. No checkout or install.
+          STAGE7_SHA256 = '51da07851c85764f37e5058e60ced52dc9375d73bcb2334d275f8fb445ef0f84'
+          STAGE7_ENCODED = (
+              'IiIiRXhwbGljaXQtY3JlZGVudGlhbCBHRVQgdHJhbnNwb3J0cyBmb3IgdGhlIE9GRiBtaW5pbXVtIHBhY2thZ2UuCgpObyBjYWxs'
+              'IG9jY3VycyBvbiBpbXBvcnQuIERlc3RpbmF0aW9uUmVxdWVzdCBhZGFwdHMgdGhlIHJhdyB0aHJlZS12YWx1ZSBwcm90b2NvbAp1'
+              'c2VkIGJ5IHRoZSB1bmNoYW5nZWQgc291cmNlIFJlc29sdmVyIHRvIHBlbmRpbmdfY2FuZGlkYXRlLlJlYWRzJyB0d28gdmFsdWVz'
+              'LgpUaGUgZGVzdGluYXRpb24gYWRhcHRlciBwZXJtaXRzIEJvb3BhZGIgb25seS4gVGhlIHJhdyBsYXllciBpbnRlbnRpb25hbGx5'
+              'IGFsc28KcGVybWl0cyB0aGUgY29sbGVjdG9yIHJlcG9zaXRvcnksIGZvciB0aGF0IGluZGVwZW5kZW50bHkgdmFsaWRhdGluZyBS'
+              'ZXNvbHZlci4KTm8gSFRUUCBtdXRhdGlvbiwgZW52aXJvbm1lbnQgdG9rZW4gZGlzY292ZXJ5LCBsb2dnaW5nLCBvciBhdXRvbWF0'
+              'aWMgcmVkaXJlY3RzLgoiIiIKaW1wb3J0IGh0dHAuY2xpZW50CmltcG9ydCBqc29uCmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aCwg'
+              'UHVyZVBvc2l4UGF0aAppbXBvcnQgcmUKaW1wb3J0IHN0YXQKaW1wb3J0IHVybGxpYi5lcnJvcgppbXBvcnQgdXJsbGliLnBhcnNl'
+              'CmltcG9ydCB1cmxsaWIucmVxdWVzdAoKQVBJX0hPU1QgPSAnYXBpLmdpdGh1Yi5jb20nCkRFU1RJTkFUSU9OID0gJ01hbWV0YXJv'
+              'R0cvYm9vcGFkYicKU09VUkNFID0gJ01hbWV0YXJvR0cvYm9vdGgtdnJjLXByaWNlLXRyYWNrZXInCkFQSSA9ICdodHRwczovL2Fw'
+              'aS5naXRodWIuY29tL3JlcG9zLycgKyBERVNUSU5BVElPTgpMSVZFID0gJ2h0dHBzOi8vbWFtZXRhcm9nZy5naXRodWIuaW8vYm9v'
+              'cGFkYi9yZWxlYXNlLW1hbmlmZXN0Lmpzb24nCkxJVkVfUk9PVCA9ICdodHRwczovL21hbWV0YXJvZ2cuZ2l0aHViLmlvL2Jvb3Bh'
+              'ZGIvJwpMSVZFX0ZJTEVTID0gZnJvemVuc2V0KCgncmVsZWFzZS1tYW5pZmVzdC5qc29uJywgJ2luZGV4Lmh0bWwnLCAnaXRlbS5o'
+              'dG1sJywgJ3NuYXBzaG90LW1hbmlmZXN0Lmpzb24nKSkKTUFYX0pTT04gPSAxNiAqIDEwMjQgKiAxMDI0Ck1BWF9BUlRJRkFDVCA9'
+              'IDUxMiAqIDEwMjQgKiAxMDI0Ck1BWF9TT1VSQ0UgPSA4ICogMTAyNCAqIDEwMjQKTUFYX0xJVkUgPSAxMDI0ICogMTAyNApET1dO'
+              'TE9BRF9TVUZGSVhFUyA9ICgnLmJsb2IuY29yZS53aW5kb3dzLm5ldCcsICcuYWN0aW9ucy5naXRodWJ1c2VyY29udGVudC5jb20n'
+              'KQoKCmNsYXNzIFJlYWRSZWZ1c2VkKFZhbHVlRXJyb3IpOgogICAgIiIiRGVsaWJlcmF0ZWx5IG9taXRzIHJlcXVlc3QgVVJMcywg'
+              'cmVzcG9uc2UgYm9kaWVzIGFuZCBjcmVkZW50aWFscy4iIiIKCgpkZWYgX25lZWQoY29uZGl0aW9uLCBtZXNzYWdlPSdSZWFkIHJl'
+              'cXVlc3QgcmVmdXNlZCcpOgogICAgaWYgbm90IGNvbmRpdGlvbjoKICAgICAgICByYWlzZSBSZWFkUmVmdXNlZChtZXNzYWdlKQoK'
+              'CmRlZiBfanNvbihibG9iKToKICAgIGRlZiBwYWlycyhpdGVtcyk6CiAgICAgICAgcmVzdWx0ID0ge30KICAgICAgICBmb3Iga2V5'
+              'LCB2YWx1ZSBpbiBpdGVtczoKICAgICAgICAgICAgX25lZWQoa2V5IG5vdCBpbiByZXN1bHQsICdBbWJpZ3VvdXMgZml4dHVyZSBK'
+              'U09OJykKICAgICAgICAgICAgcmVzdWx0W2tleV0gPSB2YWx1ZQogICAgICAgIHJldHVybiByZXN1bHQKICAgIHRyeToKICAgICAg'
+              'ICByZXR1cm4ganNvbi5sb2FkcyhibG9iLCBvYmplY3RfcGFpcnNfaG9vaz1wYWlycywKICAgICAgICAgICAgICAgICAgICAgICAg'
+              'ICBwYXJzZV9jb25zdGFudD1sYW1iZGEgXzogKF8gZm9yIF8gaW4gKCkpLnRocm93KFJlYWRSZWZ1c2VkKCdJbnZhbGlkIGZpeHR1'
+              'cmUgSlNPTicpKSkKICAgIGV4Y2VwdCAoVmFsdWVFcnJvciwgVHlwZUVycm9yLCBVbmljb2RlRXJyb3IpOgogICAgICAgIHJhaXNl'
+              'IFJlYWRSZWZ1c2VkKCdJbnZhbGlkIGZpeHR1cmUgSlNPTicpIGZyb20gTm9uZQoKCmRlZiBfdXJsKHVybCk6CiAgICBfbmVlZChp'
+              'c2luc3RhbmNlKHVybCwgc3RyKSBhbmQgMCA8IGxlbih1cmwpIDw9IDE2Mzg0KQogICAgX25lZWQoYWxsKDMyIDwgb3JkKGMpIDwg'
+              'MTI3IGZvciBjIGluIHVybCkgYW5kICdcXCcgbm90IGluIHVybCkKICAgIHRyeToKICAgICAgICBwYXJzZWQgPSB1cmxsaWIucGFy'
+              'c2UudXJsc3BsaXQodXJsKQogICAgICAgIF9uZWVkKHBhcnNlZC5zY2hlbWUgPT0gJ2h0dHBzJyBhbmQgcGFyc2VkLmhvc3RuYW1l'
+              'IGFuZCBwYXJzZWQudXNlcm5hbWUgaXMgTm9uZSBhbmQKICAgICAgICAgICAgICBwYXJzZWQucGFzc3dvcmQgaXMgTm9uZSBhbmQg'
+              'cGFyc2VkLnBvcnQgaW4gKE5vbmUsIDQ0MykgYW5kIG5vdCBwYXJzZWQuZnJhZ21lbnQpCiAgICAgICAgX25lZWQocGFyc2VkLm5l'
+              'dGxvYyA9PSBwYXJzZWQuaG9zdG5hbWUgb3IgcGFyc2VkLm5ldGxvYyA9PSBwYXJzZWQuaG9zdG5hbWUgKyAnOjQ0MycpCiAgICAg'
+              'ICAgX25lZWQocmUuZnVsbG1hdGNoKHInW2EtejAtOV0oPzpbYS16MC05Li1dKlthLXowLTldKT8nLCBwYXJzZWQuaG9zdG5hbWUp'
+              'IGlzIG5vdCBOb25lKQogICAgICAgIF9uZWVkKGFsbChsYWJlbCBhbmQgbGVuKGxhYmVsKSA8PSA2MyBhbmQgbm90IGxhYmVsLnN0'
+              'YXJ0c3dpdGgoJy0nKSBhbmQgbm90IGxhYmVsLmVuZHN3aXRoKCctJykKICAgICAgICAgICAgICAgICAgZm9yIGxhYmVsIGluIHBh'
+              'cnNlZC5ob3N0bmFtZS5zcGxpdCgnLicpKSkKICAgIGV4Y2VwdCAoVmFsdWVFcnJvciwgVHlwZUVycm9yKToKICAgICAgICByYWlz'
+              'ZSBSZWFkUmVmdXNlZCgnUmVhZCByZXF1ZXN0IHJlZnVzZWQnKSBmcm9tIE5vbmUKICAgIHJldHVybiBwYXJzZWQKCgpkZWYgX3Bh'
+              'dGgocGF0aCwgKiwgZW5jb2RlZD1GYWxzZSk6CiAgICBfbmVlZChwYXRoLnN0YXJ0c3dpdGgoJy8nKSBhbmQgbm90IHBhdGguc3Rh'
+              'cnRzd2l0aCgnLy8nKSBhbmQgJy8vJyBub3QgaW4gcGF0aCkKICAgIF9uZWVkKG5vdCByZS5zZWFyY2gociclKD8hWzAtOWEtZkEt'
+              'Rl17Mn0pJywgcGF0aCkpCiAgICB0cnk6CiAgICAgICAgZGVjb2RlZCA9IHVybGxpYi5wYXJzZS51bnF1b3RlKHBhdGgsIGVycm9y'
+              'cz0nc3RyaWN0JykgaWYgZW5jb2RlZCBlbHNlIHBhdGgKICAgIGV4Y2VwdCBVbmljb2RlRXJyb3I6CiAgICAgICAgcmFpc2UgUmVh'
+              'ZFJlZnVzZWQoJ1JlYWQgcGF0aCByZWZ1c2VkJykgZnJvbSBOb25lCiAgICBfbmVlZChlbmNvZGVkIG9yICclJyBub3QgaW4gcGF0'
+              'aCkKICAgIF9uZWVkKCdcXCcgbm90IGluIGRlY29kZWQgYW5kIGFsbCgzMiA8IG9yZChjKSA8IDEyNyBmb3IgYyBpbiBkZWNvZGVk'
+              'KSkKICAgIF9uZWVkKG5vdCBhbnkocGFydCBpbiAoJy4nLCAnLi4nLCAnJykgZm9yIHBhcnQgaW4gZGVjb2RlZFsxOl0uc3BsaXQo'
+              'Jy8nKSkpCiAgICAjIEVuY29kZWQgcGF0aCBzZXBhcmF0b3JzIGFuZCBuZXN0ZWQgZW5jb2RpbmdzIG11c3QgbmV2ZXIgYWx0ZXIg'
+              'YXV0aG9yaXR5LgogICAgX25lZWQobm90IGVuY29kZWQgb3IgKCclJyBub3QgaW4gZGVjb2RlZCBhbmQgZGVjb2RlZC5jb3VudCgn'
+              'LycpID09IHBhdGguY291bnQoJy8nKSkpCgoKZGVmIF9xdWVyeShxdWVyeSk6CiAgICBfbmVlZChub3QgcXVlcnkgb3IgcmUuZnVs'
+              'bG1hdGNoKHInW0EtWmEtejAtOV8uPSYtXSsnLCBxdWVyeSkgaXMgbm90IE5vbmUpCiAgICB0cnk6CiAgICAgICAgcGFpcnMgPSB1'
+              'cmxsaWIucGFyc2UucGFyc2VfcXNsKHF1ZXJ5LCBrZWVwX2JsYW5rX3ZhbHVlcz1UcnVlLCBzdHJpY3RfcGFyc2luZz1UcnVlKQog'
+              'ICAgZXhjZXB0IFZhbHVlRXJyb3I6CiAgICAgICAgcmFpc2UgUmVhZFJlZnVzZWQoJ1JlYWQgcXVlcnkgcmVmdXNlZCcpIGZyb20g'
+              'Tm9uZQogICAgX25lZWQobGVuKHBhaXJzKSA9PSBsZW4oe2tleSBmb3Iga2V5LCBfIGluIHBhaXJzfSksICdSZWFkIHF1ZXJ5IHJl'
+              'ZnVzZWQnKQogICAgY2hlY2tzID0gewogICAgICAgICdyZWYnOiBsYW1iZGEgdjogcmUuZnVsbG1hdGNoKHInW2EtZjAtOV17NDB9'
+              'JywgdikgaXMgbm90IE5vbmUsCiAgICAgICAgJ2JyYW5jaCc6IGxhbWJkYSB2OiByZS5mdWxsbWF0Y2gocidbQS1aYS16MC05Xy1d'
+              'W0EtWmEtejAtOV8uLV17MCwxOTl9JywgdikgaXMgbm90IE5vbmUsCiAgICAgICAgJ3N0YXR1cyc6IGxhbWJkYSB2OiB2ID09ICdj'
+              'b21wbGV0ZWQnLAogICAgICAgICdwZXJfcGFnZSc6IGxhbWJkYSB2OiB2LmlzZGlnaXQoKSBhbmQgMSA8PSBpbnQodikgPD0gMTAw'
+              'LAogICAgICAgICdwYWdlJzogbGFtYmRhIHY6IHYuaXNkaWdpdCgpIGFuZCAxIDw9IGludCh2KSA8PSAxMDAwLAogICAgICAgICdu'
+              'YW1lJzogbGFtYmRhIHY6IHJlLmZ1bGxtYXRjaChyJ1tBLVphLXowLTlfLV1bQS1aYS16MC05Xy4tXXswLDI1NX0nLCB2KSBpcyBu'
+              'b3QgTm9uZSwKICAgIH0KICAgIF9uZWVkKGFsbChrZXkgaW4gY2hlY2tzIGFuZCBjaGVja3Nba2V5XSh2YWx1ZSkgZm9yIGtleSwg'
+              'dmFsdWUgaW4gcGFpcnMpLCAnUmVhZCBxdWVyeSByZWZ1c2VkJykKCgpkZWYgX2NsYXNzaWZ5KHVybCk6CiAgICBwYXJzZWQgPSBf'
+              'dXJsKHVybCkKICAgIGlmIHBhcnNlZC5ob3N0bmFtZSA9PSBBUElfSE9TVDoKICAgICAgICBfcGF0aChwYXJzZWQucGF0aCkKICAg'
+              'ICAgICBfbmVlZChyZS5mdWxsbWF0Y2gocicvW0EtWmEtejAtOV8uLy1dKycsIHBhcnNlZC5wYXRoKSBpcyBub3QgTm9uZSkKICAg'
+              'ICAgICBfcXVlcnkocGFyc2VkLnF1ZXJ5KQogICAgICAgIGZvciByZXBvc2l0b3J5IGluIChERVNUSU5BVElPTiwgU09VUkNFKToK'
+              'ICAgICAgICAgICAgcHJlZml4ID0gJy9yZXBvcy8nICsgcmVwb3NpdG9yeQogICAgICAgICAgICBpZiBwYXJzZWQucGF0aCA9PSBw'
+              'cmVmaXggb3IgcGFyc2VkLnBhdGguc3RhcnRzd2l0aChwcmVmaXggKyAnLycpOgogICAgICAgICAgICAgICAgYXJ0aWZhY3QgPSBy'
+              'ZS5mdWxsbWF0Y2gocmUuZXNjYXBlKHByZWZpeCkgKyByJy9hY3Rpb25zL2FydGlmYWN0cy9bMS05XVswLTldKi96aXAnLCBwYXJz'
+              'ZWQucGF0aCkKICAgICAgICAgICAgICAgIF9uZWVkKG5vdCBhcnRpZmFjdCBvciBub3QgcGFyc2VkLnF1ZXJ5KQogICAgICAgICAg'
+              'ICAgICAgbGltaXQgPSBNQVhfU09VUkNFIGlmIHJlcG9zaXRvcnkgPT0gU09VUkNFIGVsc2UgKE1BWF9BUlRJRkFDVCBpZiBhcnRp'
+              'ZmFjdCBlbHNlIE1BWF9KU09OKQogICAgICAgICAgICAgICAgcmV0dXJuICgnYXJ0aWZhY3QnIGlmIGFydGlmYWN0IGVsc2UgJ2Fw'
+              'aScpLCByZXBvc2l0b3J5LCBsaW1pdAogICAgICAgIHJhaXNlIFJlYWRSZWZ1c2VkKCdBUEkgcmVwb3NpdG9yeSByZWZ1c2VkJykK'
+              'ICAgIGlmIHBhcnNlZC5ob3N0bmFtZSA9PSAnbWFtZXRhcm9nZy5naXRodWIuaW8nOgogICAgICAgIF9uZWVkKG5vdCBwYXJzZWQu'
+              'cXVlcnkgYW5kIHBhcnNlZC5uZXRsb2MgPT0gJ21hbWV0YXJvZ2cuZ2l0aHViLmlvJykKICAgICAgICBfbmVlZCh1cmwuc3RhcnRz'
+              'd2l0aChMSVZFX1JPT1QpIGFuZCB1cmxbbGVuKExJVkVfUk9PVCk6XSBpbiBMSVZFX0ZJTEVTKQogICAgICAgIHJldHVybiAnbGl2'
+              'ZScsIE5vbmUsIE1BWF9TT1VSQ0UKICAgIGlmIGFueShwYXJzZWQuaG9zdG5hbWUuZW5kc3dpdGgoc3VmZml4KSBmb3Igc3VmZml4'
+              'IGluIERPV05MT0FEX1NVRkZJWEVTKToKICAgICAgICBfcGF0aChwYXJzZWQucGF0aCwgZW5jb2RlZD1UcnVlKQogICAgICAgICMg'
+              'U2lnbmVkIHF1ZXJ5IHBhcmFtZXRlcnMgcmVtYWluIG9wYXF1ZS4gTmV2ZXIgZGVjb2RlLCByZXNlcmlhbGl6ZSBvciBsb2cuCiAg'
+              'ICAgICAgX25lZWQobm90IHJlLnNlYXJjaChyJyUoPzowWzAtOWEtZl18MVswLTlhLWZdfDdmKScsIHBhcnNlZC5xdWVyeSwgZmxh'
+              'Z3M9cmUuSSkpCiAgICAgICAgcmV0dXJuICdkb3dubG9hZCcsIE5vbmUsIE1BWF9BUlRJRkFDVAogICAgcmFpc2UgUmVhZFJlZnVz'
+              'ZWQoJ1JlYWQgaG9zdCByZWZ1c2VkJykKCgpkZWYgX2hlYWRlcnMoaGVhZGVycywga2luZCk6CiAgICBfbmVlZCh0eXBlKGhlYWRl'
+              'cnMpIGlzIGRpY3QsICdSZXF1ZXN0IGhlYWRlcnMgcmVmdXNlZCcpCiAgICBhbGxvd2VkID0geydhdXRob3JpemF0aW9uJywgJ2Fj'
+              'Y2VwdCcsICd4LWdpdGh1Yi1hcGktdmVyc2lvbicsICd1c2VyLWFnZW50JywgJ2NhY2hlLWNvbnRyb2wnLCAnYWNjZXB0LWVuY29k'
+              'aW5nJ30KICAgIHNlZW4gPSBzZXQoKQogICAgZm9yIGtleSwgdmFsdWUgaW4gaGVhZGVycy5pdGVtcygpOgogICAgICAgIF9uZWVk'
+              'KGlzaW5zdGFuY2Uoa2V5LCBzdHIpIGFuZCBpc2luc3RhbmNlKHZhbHVlLCBzdHIpIGFuZCBrZXkubG93ZXIoKSBpbiBhbGxvd2Vk'
+              'IGFuZCBrZXkubG93ZXIoKSBub3QgaW4gc2VlbiwKICAgICAgICAgICAgICAnUmVxdWVzdCBoZWFkZXJzIHJlZnVzZWQnKQogICAg'
+              'ICAgIHNlZW4uYWRkKGtleS5sb3dlcigpKQogICAgICAgIF9uZWVkKHZhbHVlIGFuZCBhbGwoMzIgPD0gb3JkKGMpIDwgMTI3IGZv'
+              'ciBjIGluIHZhbHVlKSwgJ1JlcXVlc3QgaGVhZGVycyByZWZ1c2VkJykKICAgICAgICBpZiBrZXkubG93ZXIoKSA9PSAnYXV0aG9y'
+              'aXphdGlvbic6CiAgICAgICAgICAgIF9uZWVkKGtpbmQgaW4gKCdhcGknLCAnYXJ0aWZhY3QnKSBhbmQgdmFsdWUuc3RhcnRzd2l0'
+              'aCgnQmVhcmVyICcpIGFuZAogICAgICAgICAgICAgICAgICBsZW4odmFsdWUpID4gNyBhbmQgbm90IGFueShjLmlzc3BhY2UoKSBm'
+              'b3IgYyBpbiB2YWx1ZVs3Ol0pLCAnUmVxdWVzdCBhdXRob3JpemF0aW9uIHJlZnVzZWQnKQogICAgICAgIGlmIGtleS5sb3dlcigp'
+              'ID09ICdhY2NlcHQtZW5jb2RpbmcnOgogICAgICAgICAgICBfbmVlZCh2YWx1ZSA9PSAnaWRlbnRpdHknLCAnUmVxdWVzdCBlbmNv'
+              'ZGluZyByZWZ1c2VkJykKICAgIGlmIGtpbmQgaW4gKCdhcGknLCAnYXJ0aWZhY3QnKToKICAgICAgICBfbmVlZCgnYXV0aG9yaXph'
+              'dGlvbicgaW4gc2VlbiwgJ0V4cGxpY2l0IHJlYWQgY3JlZGVudGlhbCByZXF1aXJlZCcpCgoKZGVmIF9yZXNwb25zZSh2YWx1ZSwg'
+              'bGltaXQpOgogICAgX25lZWQoaXNpbnN0YW5jZSh2YWx1ZSwgdHVwbGUpIGFuZCBsZW4odmFsdWUpID09IDMsICdJbnZhbGlkIHJl'
+              'YWQgcmVzcG9uc2UnKQogICAgc3RhdHVzLCBoZWFkZXJzLCBib2R5ID0gdmFsdWUKICAgIF9uZWVkKHR5cGUoc3RhdHVzKSBpcyBp'
+              'bnQgYW5kIDEwMCA8PSBzdGF0dXMgPD0gNTk5IGFuZCB0eXBlKGhlYWRlcnMpIGlzIGRpY3QgYW5kIGlzaW5zdGFuY2UoYm9keSwg'
+              'Ynl0ZXMpLAogICAgICAgICAgJ0ludmFsaWQgcmVhZCByZXNwb25zZScpCiAgICBfbmVlZChsZW4oYm9keSkgPD0gbGltaXQsICdS'
+              'ZWFkIHJlc3BvbnNlIGV4Y2VlZHMgc2l6ZSBsaW1pdCcpCiAgICBzZWVuID0gc2V0KCkKICAgIGZvciBrZXksIHZhbCBpbiBoZWFk'
+              'ZXJzLml0ZW1zKCk6CiAgICAgICAgX25lZWQoaXNpbnN0YW5jZShrZXksIHN0cikgYW5kIGlzaW5zdGFuY2UodmFsLCBzdHIpIGFu'
+              'ZCBrZXkubG93ZXIoKSBub3QgaW4gc2VlbiBhbmQKICAgICAgICAgICAgICBhbGwoMzIgPD0gb3JkKGMpIDwgMTI3IGZvciBjIGlu'
+              'IGtleSArIHZhbCksICdJbnZhbGlkIHJlYWQgaGVhZGVycycpCiAgICAgICAgc2Vlbi5hZGQoa2V5Lmxvd2VyKCkpCiAgICAgICAg'
+              'aWYga2V5Lmxvd2VyKCkgPT0gJ2NvbnRlbnQtbGVuZ3RoJzoKICAgICAgICAgICAgX25lZWQodmFsLmlzZGlnaXQoKSBhbmQgaW50'
+              'KHZhbCkgPD0gbGltaXQsICdSZWFkIHJlc3BvbnNlIGV4Y2VlZHMgc2l6ZSBsaW1pdCcpCiAgICAgICAgaWYga2V5Lmxvd2VyKCkg'
+              'PT0gJ2NvbnRlbnQtZW5jb2RpbmcnOgogICAgICAgICAgICBfbmVlZCh2YWwubG93ZXIoKSA9PSAnaWRlbnRpdHknLCAnRW5jb2Rl'
+              'ZCByZWFkIHJlc3BvbnNlIHJlZnVzZWQnKQogICAgcmV0dXJuIHN0YXR1cywgaGVhZGVycywgYm9keQoKCmRlZiBfY2FsbChyYXcs'
+              'IHVybCwgaGVhZGVycywgbGltaXQpOgogICAgdHJ5OgogICAgICAgIHJldHVybiBfcmVzcG9uc2UocmF3KHVybCwgaGVhZGVycyks'
+              'IGxpbWl0KQogICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICByYWlzZSBSZWFkUmVmdXNlZCgnUmVhZCBmYWlsZWQsIHJlZnVz'
+              'ZWQsIG9yIGV4Y2VlZGVkIHNpemUgbGltaXQnKSBmcm9tIE5vbmUKCgpjbGFzcyBOb1JlZGlyZWN0KHVybGxpYi5yZXF1ZXN0LkhU'
+              'VFBSZWRpcmVjdEhhbmRsZXIpOgogICAgZGVmIHJlZGlyZWN0X3JlcXVlc3Qoc2VsZiwgcmVxLCBmcCwgY29kZSwgbXNnLCBoZWFk'
+              'ZXJzLCBuZXd1cmwpOgogICAgICAgIHJldHVybiBOb25lCgoKY2xhc3MgVXJsbGliR0VUOgogICAgIiIiUHJvZHVjdGlvbiBpbXBs'
+              'ZW1lbnRhdGlvbjsgdGVzdHMgaW5qZWN0IGFuIG9wZW5lciBhbmQgbmV2ZXIgdXNlIG5ldHdvcmsuCgogICAgTm8gcHJveGllcywg'
+              'Y29va2llcywgbmV0cmMsIGNsaWVudCBjcmVkZW50aWFscywgb3IgZW52aXJvbm1lbnQgdG9rZW4gbG9va3VwLgogICAgUmVkaXJl'
+              'Y3RzIGFyZSByZXR1cm5lZCwgbm90IGZvbGxvd2VkLiBTb3VyY2UgUmVzb2x2ZXIgZW5mb3JjZXMgaXRzIDggTWlCCiAgICBhcmNo'
+              'aXZlIGNvbnRyYWN0OyBEZXN0aW5hdGlvblJlcXVlc3QgYWxsb3dzIDUxMiBNaUIgZGVzdGluYXRpb24gYXJjaGl2ZXMuCiAgICAi'
+              'IiIKICAgIGRlZiBfX2luaXRfXyhzZWxmKToKICAgICAgICBzZWxmLm9wZW5lciA9IHVybGxpYi5yZXF1ZXN0LmJ1aWxkX29wZW5l'
+              'cih1cmxsaWIucmVxdWVzdC5Qcm94eUhhbmRsZXIoe30pLCBOb1JlZGlyZWN0KCkpCgogICAgZGVmIF9fY2FsbF9fKHNlbGYsIHVy'
+              'bCwgaGVhZGVycyk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBraW5kLCBfLCBsaW1pdCA9IF9jbGFzc2lmeSh1cmwpCiAgICAg'
+              'ICAgICAgIF9oZWFkZXJzKGhlYWRlcnMsIGtpbmQpCiAgICAgICAgICAgIHJlcSA9IHVybGxpYi5yZXF1ZXN0LlJlcXVlc3QodXJs'
+              'LCBoZWFkZXJzPXsqKmhlYWRlcnMsICdBY2NlcHQtRW5jb2RpbmcnOiAnaWRlbnRpdHknfSwgbWV0aG9kPSdHRVQnKQogICAgICAg'
+              'ICAgICB0cnk6CiAgICAgICAgICAgICAgICByZXNwb25zZSA9IHNlbGYub3BlbmVyLm9wZW4ocmVxLCB0aW1lb3V0PTMwKQogICAg'
+              'ICAgICAgICBleGNlcHQgdXJsbGliLmVycm9yLkhUVFBFcnJvciBhcyBlcnJvcjoKICAgICAgICAgICAgICAgIHJlc3BvbnNlID0g'
+              'ZXJyb3IKICAgICAgICAgICAgd2l0aCByZXNwb25zZToKICAgICAgICAgICAgICAgIF9uZWVkKHJlc3BvbnNlLmdldHVybCgpID09'
+              'IHVybCwgJ1VuZXhwZWN0ZWQgaW1wbGljaXQgcmVkaXJlY3QnKQogICAgICAgICAgICAgICAgaGVhZGVyX2l0ZW1zID0gbGlzdChy'
+              'ZXNwb25zZS5oZWFkZXJzLml0ZW1zKCkpCiAgICAgICAgICAgICAgICBfbmVlZChsZW4oe2tleS5sb3dlcigpIGZvciBrZXksIF8g'
+              'aW4gaGVhZGVyX2l0ZW1zfSkgPT0gbGVuKGhlYWRlcl9pdGVtcyksCiAgICAgICAgICAgICAgICAgICAgICAnRHVwbGljYXRlIHJl'
+              'YWQgaGVhZGVycyByZWZ1c2VkJykKICAgICAgICAgICAgICAgIHJlc3BvbnNlX2hlYWRlcnMgPSBkaWN0KGhlYWRlcl9pdGVtcykK'
+              'ICAgICAgICAgICAgICAgICMgUmVqZWN0IGFuIG92ZXJzaXplZCBkZWNsYXJlZCBwYXlsb2FkIGJlZm9yZSByZWFkaW5nIGJ5dGVz'
+              'LgogICAgICAgICAgICAgICAgX3Jlc3BvbnNlKChyZXNwb25zZS5zdGF0dXMsIHJlc3BvbnNlX2hlYWRlcnMsIGInJyksIGxpbWl0'
+              'KQogICAgICAgICAgICAgICAgYm9keSA9IHJlc3BvbnNlLnJlYWQobGltaXQgKyAxKQogICAgICAgICAgICAgICAgcmV0dXJuIF9y'
+              'ZXNwb25zZSgocmVzcG9uc2Uuc3RhdHVzLCByZXNwb25zZV9oZWFkZXJzLCBib2R5KSwgbGltaXQpCiAgICAgICAgZXhjZXB0IEV4'
+              'Y2VwdGlvbjoKICAgICAgICAgICAgcmFpc2UgUmVhZFJlZnVzZWQoJ0dFVCB0cmFuc3BvcnQgZmFpbGVkIG9yIHJlZnVzZWQnKSBm'
+              'cm9tIE5vbmUKCgpjbGFzcyBEZXN0aW5hdGlvblJlcXVlc3Q6CiAgICAiIiJUaGUgb25seSBVUkwtdG8tKHN0YXR1cywgYm9keSkg'
+              'YWRhcHRlciB1c2VkIGJ5IGRlc3RpbmF0aW9uIHAuUmVhZHMuIiIiCiAgICBkZWYgX19pbml0X18oc2VsZiwgdG9rZW4sIHJhdz1O'
+              'b25lKToKICAgICAgICBfbmVlZChpc2luc3RhbmNlKHRva2VuLCBzdHIpIGFuZCB0b2tlbiBhbmQgYWxsKDMyIDwgb3JkKGMpIDwg'
+              'MTI3IGZvciBjIGluIHRva2VuKSwKICAgICAgICAgICAgICAnRXhwbGljaXQgcmVhZCBjcmVkZW50aWFsIHJlcXVpcmVkJykKICAg'
+              'ICAgICBzZWxmLl90b2tlbiA9IHRva2VuCiAgICAgICAgc2VsZi5yYXcgPSByYXcgaWYgcmF3IGlzIG5vdCBOb25lIGVsc2UgVXJs'
+              'bGliR0VUKCkKICAgICAgICBfbmVlZChjYWxsYWJsZShzZWxmLnJhdyksICdSYXcgR0VUIHRyYW5zcG9ydCByZXF1aXJlZCcpCgog'
+              'ICAgZGVmIF9fY2FsbF9fKHNlbGYsIHVybCk6CiAgICAgICAga2luZCwgcmVwb3NpdG9yeSwgbGltaXQgPSBfY2xhc3NpZnkodXJs'
+              'KQogICAgICAgIF9uZWVkKChraW5kIGluICgnYXBpJywgJ2FydGlmYWN0JykgYW5kIHJlcG9zaXRvcnkgPT0gREVTVElOQVRJT04p'
+              'IG9yIHVybCA9PSBMSVZFLAogICAgICAgICAgICAgICdEZXN0aW5hdGlvbiByZWFkIHNjb3BlIHJlZnVzZWQnKQogICAgICAgIGhl'
+              'YWRlcnMgPSB7J1VzZXItQWdlbnQnOiAnYm9vcGFkYi1taW5pbXVtLXJlYWQnLCAnQWNjZXB0LUVuY29kaW5nJzogJ2lkZW50aXR5'
+              'J30KICAgICAgICBpZiByZXBvc2l0b3J5ID09IERFU1RJTkFUSU9OOgogICAgICAgICAgICBoZWFkZXJzLnVwZGF0ZShBdXRob3Jp'
+              'emF0aW9uPSdCZWFyZXIgJyArIHNlbGYuX3Rva2VuLAogICAgICAgICAgICAgICAgICAgICAgICAgICBBY2NlcHQ9J2FwcGxpY2F0'
+              'aW9uL3ZuZC5naXRodWIranNvbicsICoqeydYLUdpdEh1Yi1BcGktVmVyc2lvbic6ICcyMDIyLTExLTI4J30pCiAgICAgICAgZWxz'
+              'ZToKICAgICAgICAgICAgaGVhZGVyc1snQ2FjaGUtQ29udHJvbCddID0gJ25vLWNhY2hlJwogICAgICAgICAgICBsaW1pdCA9IE1B'
+              'WF9MSVZFCiAgICAgICAgc3RhdHVzLCByZXNwb25zZV9oZWFkZXJzLCBib2R5ID0gX2NhbGwoc2VsZi5yYXcsIHVybCwgaGVhZGVy'
+              'cywgbGltaXQpCiAgICAgICAgaWYgc3RhdHVzID09IDMwMiBhbmQga2luZCA9PSAnYXJ0aWZhY3QnOgogICAgICAgICAgICBsb2Nh'
+              'dGlvbiA9IG5leHQoKHYgZm9yIGssIHYgaW4gcmVzcG9uc2VfaGVhZGVycy5pdGVtcygpIGlmIGsubG93ZXIoKSA9PSAnbG9jYXRp'
+              'b24nKSwgJycpCiAgICAgICAgICAgIF9uZWVkKF9jbGFzc2lmeShsb2NhdGlvbilbMF0gPT0gJ2Rvd25sb2FkJywgJ0FydGlmYWN0'
+              'IHJlZGlyZWN0IHJlZnVzZWQnKQogICAgICAgICAgICAjIE9ubHkgdGhpcyBvbmUgbWFudWFsbHkgdmFsaWRhdGVkIGhvcCBpcyBw'
+              'ZXJtaXR0ZWQsIHdpdGhvdXQgYXV0aC4KICAgICAgICAgICAgc3RhdHVzLCBfLCBib2R5ID0gX2NhbGwoc2VsZi5yYXcsIGxvY2F0'
+              'aW9uLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHsnVXNlci1BZ2VudCc6ICdib29wYWRiLW1pbmltdW0tcmVh'
+              'ZCcsICdBY2NlcHQtRW5jb2RpbmcnOiAnaWRlbnRpdHknfSwgbGltaXQpCiAgICAgICAgX25lZWQoc3RhdHVzIG5vdCBpbiByYW5n'
+              'ZSgzMDAsIDQwMCksICdSZWFkIHJlZGlyZWN0IHJlZnVzZWQnKQogICAgICAgIHJldHVybiBzdGF0dXMsIGJvZHkKCgpkZWYgZGVz'
+              'dGluYXRpb25fcmVhZHModG9rZW4sIHJhdz1Ob25lKToKICAgICIiIlJldHVybnMgZXhhY3QgcGVuZGluZ19jYW5kaWRhdGUuUmVh'
+              'ZHMgcmVxdWlyZWQgYnkgdGhlIHVuY2hhbmdlZCBnYXRlcy4iIiIKICAgIGltcG9ydCBzeXMKICAgIHJ1bnRpbWUgPSBzdHIoUGF0'
+              'aChfX2ZpbGVfXykucmVzb2x2ZSgpLnBhcmVudCAvICdydW50aW1lJykKICAgIGlmIHJ1bnRpbWUgbm90IGluIHN5cy5wYXRoOgog'
+              'ICAgICAgIHN5cy5wYXRoLmluc2VydCgwLCBydW50aW1lKQogICAgaW1wb3J0IHBlbmRpbmdfY2FuZGlkYXRlCiAgICByZXR1cm4g'
+              'cGVuZGluZ19jYW5kaWRhdGUuUmVhZHMoRGVzdGluYXRpb25SZXF1ZXN0KHRva2VuLCByYXc9cmF3KSwgcmVwb3NpdG9yeT1ERVNU'
+              'SU5BVElPTikKCgpkZWYgX3JlZ3VsYXIocGF0aCk6CiAgICBwYXRoID0gUGF0aChwYXRoKS5hYnNvbHV0ZSgpCiAgICBmb3IgaXRl'
+              'bSBpbiAocGF0aCwgKnBhdGgucGFyZW50cyk6CiAgICAgICAgX25lZWQobm90IGl0ZW0uaXNfc3ltbGluaygpLCAnRml4dHVyZSBz'
+              'eW1saW5rIHJlZnVzZWQnKQogICAgX25lZWQocGF0aC5pc19maWxlKCkgYW5kIHN0YXQuU19JU1JFRyhwYXRoLnN0YXQoKS5zdF9t'
+              'b2RlKSwgJ0ZpeHR1cmUgZmlsZSB1bmF2YWlsYWJsZScpCiAgICByZXR1cm4gcGF0aAoKCmNsYXNzIEZpbGVNYXBUcmFuc3BvcnQ6'
+              'CiAgICAiIiJFeGFjdC1VUkwgbG9jYWwgZml4dHVyZXMsIHJlcmVhZCBvbiBldmVyeSBjYWxsLCB3aXRoIG5vIG5ldHdvcmsgZmFs'
+              'bGJhY2suCgogICAgcmVzcG9uc2VzLmpzb246IHsicmVzcG9uc2VzIjogeyJodHRwczovLy4uLiI6IHsic3RhdHVzIjogMjAwLAog'
+              'ICAgICAiaGVhZGVycyI6IHt9LCAiYm9keV9maWxlIjogImJvZHkuanNvbiJ9fX0KICAgIE9ubHkgcmVsYXRpdmUgcmVndWxhciBm'
+              'aWxlcyBiZW5lYXRoIHJvb3QgYXJlIGFsbG93ZWQuIE5laXRoZXIgdG9rZW5zIG5vcgogICAgcmVxdWVzdCBoZWFkZXJzIGFyZSB3'
+              'cml0dGVuIG9yIHN0b3JlZC4gRG8gbm90IHB1dCByZWFsIHNpZ25lZCBVUkxzIGluIGZpeHR1cmVzLgogICAgIiIiCiAgICBkZWYg'
+              'X19pbml0X18oc2VsZiwgcm9vdCwgbWFuaWZlc3Q9J3Jlc3BvbnNlcy5qc29uJyk6CiAgICAgICAgc2VsZi5yb290ID0gUGF0aChy'
+              'b290KS5hYnNvbHV0ZSgpCiAgICAgICAgZm9yIGl0ZW0gaW4gKHNlbGYucm9vdCwgKnNlbGYucm9vdC5wYXJlbnRzKToKICAgICAg'
+              'ICAgICAgX25lZWQobm90IGl0ZW0uaXNfc3ltbGluaygpLCAnRml4dHVyZSBzeW1saW5rIHJlZnVzZWQnKQogICAgICAgIF9uZWVk'
+              'KHNlbGYucm9vdC5pc19kaXIoKSwgJ0ZpeHR1cmUgcm9vdCB1bmF2YWlsYWJsZScpCiAgICAgICAgc2VsZi5tYW5pZmVzdCA9IG1h'
+              'bmlmZXN0CiAgICAgICAgc2VsZi5fZmlsZShtYW5pZmVzdCkKCiAgICBkZWYgX2ZpbGUoc2VsZiwgcmVsYXRpdmUpOgogICAgICAg'
+              'IF9uZWVkKGlzaW5zdGFuY2UocmVsYXRpdmUsIHN0cikgYW5kIHJlbGF0aXZlIGFuZCAnXFwnIG5vdCBpbiByZWxhdGl2ZSwgJ0Zp'
+              'eHR1cmUgcGF0aCByZWZ1c2VkJykKICAgICAgICBwYXJ0cyA9IHJlbGF0aXZlLnNwbGl0KCcvJykKICAgICAgICBfbmVlZChub3Qg'
+              'UHVyZVBvc2l4UGF0aChyZWxhdGl2ZSkuaXNfYWJzb2x1dGUoKSBhbmQgYWxsKHAgbm90IGluICgnJywgJy4nLCAnLi4nKSBmb3Ig'
+              'cCBpbiBwYXJ0cyksCiAgICAgICAgICAgICAgJ0ZpeHR1cmUgcGF0aCByZWZ1c2VkJykKICAgICAgICBwYXRoID0gc2VsZi5yb290'
+              'LmpvaW5wYXRoKCpwYXJ0cykKICAgICAgICBfcmVndWxhcihwYXRoKQogICAgICAgIF9uZWVkKHBhdGgucmVzb2x2ZSgpLmlzX3Jl'
+              'bGF0aXZlX3RvKHNlbGYucm9vdC5yZXNvbHZlKCkpLCAnRml4dHVyZSBwYXRoIHJlZnVzZWQnKQogICAgICAgIHJldHVybiBwYXRo'
+              'CgogICAgZGVmIF9fY2FsbF9fKHNlbGYsIHVybCwgaGVhZGVycyk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBraW5kLCBfLCBs'
+              'aW1pdCA9IF9jbGFzc2lmeSh1cmwpCiAgICAgICAgICAgIF9oZWFkZXJzKGhlYWRlcnMsIGtpbmQpCiAgICAgICAgICAgIG1hbmlm'
+              'ZXN0ID0gc2VsZi5fZmlsZShzZWxmLm1hbmlmZXN0KQogICAgICAgICAgICBfbmVlZChtYW5pZmVzdC5zdGF0KCkuc3Rfc2l6ZSA8'
+              'PSBNQVhfSlNPTiwgJ0ZpeHR1cmUgbWFwIG92ZXJzaXplZCcpCiAgICAgICAgICAgIHdpdGggbWFuaWZlc3Qub3BlbigncmInKSBh'
+              'cyBzdHJlYW06CiAgICAgICAgICAgICAgICBtYW5pZmVzdF9ieXRlcyA9IHN0cmVhbS5yZWFkKE1BWF9KU09OICsgMSkKICAgICAg'
+              'ICAgICAgX25lZWQobGVuKG1hbmlmZXN0X2J5dGVzKSA8PSBNQVhfSlNPTiwgJ0ZpeHR1cmUgbWFwIG92ZXJzaXplZCcpCiAgICAg'
+              'ICAgICAgIGRhdGEgPSBfanNvbihtYW5pZmVzdF9ieXRlcykKICAgICAgICAgICAgX25lZWQodHlwZShkYXRhKSBpcyBkaWN0IGFu'
+              'ZCBzZXQoZGF0YSkgPT0geydyZXNwb25zZXMnfSBhbmQgdHlwZShkYXRhWydyZXNwb25zZXMnXSkgaXMgZGljdCwKICAgICAgICAg'
+              'ICAgICAgICAgJ0ludmFsaWQgZml4dHVyZSBtYXAnKQogICAgICAgICAgICByZWNvcmQgPSBkYXRhWydyZXNwb25zZXMnXS5nZXQo'
+              'dXJsKQogICAgICAgICAgICBfbmVlZCh0eXBlKHJlY29yZCkgaXMgZGljdCBhbmQgc2V0KHJlY29yZCkgPT0geydzdGF0dXMnLCAn'
+              'aGVhZGVycycsICdib2R5X2ZpbGUnfSwgJ0ZpeHR1cmUgcmVzcG9uc2UgbWlzc2luZycpCiAgICAgICAgICAgIGJvZHkgPSBzZWxm'
+              'Ll9maWxlKHJlY29yZFsnYm9keV9maWxlJ10pCiAgICAgICAgICAgIF9uZWVkKGJvZHkuc3RhdCgpLnN0X3NpemUgPD0gbGltaXQs'
+              'ICdGaXh0dXJlIHJlc3BvbnNlIG92ZXJzaXplZCcpCiAgICAgICAgICAgIHdpdGggYm9keS5vcGVuKCdyYicpIGFzIHN0cmVhbToK'
+              'ICAgICAgICAgICAgICAgIHJldHVybiBfcmVzcG9uc2UoKHJlY29yZFsnc3RhdHVzJ10sIHJlY29yZFsnaGVhZGVycyddLCBzdHJl'
+              'YW0ucmVhZChsaW1pdCArIDEpKSwgbGltaXQpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgcmFpc2UgUmVh'
+              'ZFJlZnVzZWQoJ0ZpeHR1cmUgcmVhZCBmYWlsZWQgb3IgcmVmdXNlZDsgbmV0d29yayBkaXNhYmxlZCcpIGZyb20gTm9uZQo='
+          )
+          import base64, hashlib, sys, types
+          try:
+              stage7_bytes = base64.b64decode(STAGE7_ENCODED, validate=True)
+              if hashlib.sha256(stage7_bytes).hexdigest() != STAGE7_SHA256:
+                  raise ValueError()
+              stage7_module = types.ModuleType('github_reads')
+              exec(compile(stage7_bytes, '<pinned-stage7-transport>', 'exec'), stage7_module.__dict__)
+              sys.modules['github_reads'] = stage7_module
+          except Exception:
+              print('Historical transport probe refused.', file=sys.stderr)
+              raise SystemExit(1)
+          
+          """OFF-by-default Stage8 compatibility probe. This never enables generation.
+          
+          Only an explicit, checked GitHub Actions push context can construct a live GET
+          transport. Unit tests supply their own raw transport. There is no discovery,
+          checkout, file extraction, upload, dispatch, build, deployment, or write API.
+          """
+          import datetime as dt
+          import hashlib
+          import io
+          import json
+          import os
+          import re
+          import stat
+          import sys
+          import zipfile
+          
+          import github_reads as g
+          
+          DESTINATION = "MametaroGG/boopadb"
+          SOURCE = "MametaroGG/booth-vrc-price-tracker"
+          BRANCH = "chore/auto-update-trial-20261101"
+          REF = "refs/heads/" + BRANCH
+          WORKFLOW_PATH = ".github/workflows/stage8-historical-get-probe.yml"
+          WORKFLOW_REF = DESTINATION + "/" + WORKFLOW_PATH + "@" + REF
+          TRANSPORT_SHA256 = "51da07851c85764f37e5058e60ced52dc9375d73bcb2334d275f8fb445ef0f84"
+          REPOSITORY_ID = 1134883798
+          WORKFLOW_ID = 223837658
+          RUN_ID = 41511352243
+          RUN_ATTEMPT = 1
+          JOB_ID = 125503721092
+          HEAD_SHA = "6a1ca25d4b05f4af07939b74b088d1e96d2227ef"
+          ARTIFACT_ID = 13193199585
+          ARTIFACT_NAME = "boopadb-collector-41511352243-1"
+          ZIP_BYTES = 388
+          ZIP_SHA256 = "5b4143c358b909bfa81b5c2f2b36edd465e2ba1329b38c0764317f117866c1cb"
+          JSON_BYTES = 338
+          SAVED_COMMIT = "e26dfaaa3573c82bc6ae1c857ecc7cf61623f34b"
+          RECEIPT_SHA256 = "824cb9ef48b12c67f7258e3991134d7a9618c8d2f15a4072421e5160ac195663"
+          API = "https://api.github.com/repos/" + SOURCE
+          RUN_URL = API + "/actions/runs/" + str(RUN_ID) + "/attempts/1"
+          JOBS_URL = RUN_URL + "/jobs?per_page=100&page=1"
+          ARTIFACT_URL = API + "/actions/artifacts/" + str(ARTIFACT_ID)
+          ZIP_URL = ARTIFACT_URL + "/zip"
+          API_URLS = frozenset((RUN_URL, JOBS_URL, ARTIFACT_URL, ZIP_URL))
+          MAX_METADATA = 128 * 1024
+          
+          
+          class ProbeRefused(ValueError):
+              """Messages never carry input, URLs, response bodies, or credentials."""
+          
+          
+          def need(condition):
+              if not condition:
+                  raise ProbeRefused("Historical transport probe refused")
+          
+          
+          def strict_json(blob):
+              def pairs(items):
+                  result = {}
+                  for key, value in items:
+                      need(key not in result)
+                      result[key] = value
+                  return result
+          
+              def constant(_):
+                  raise ProbeRefused("Historical transport probe refused")
+          
+              try:
+                  value = json.loads(blob, object_pairs_hook=pairs, parse_constant=constant)
+                  need(type(value) is dict)
+                  return value
+              except Exception:
+                  raise ProbeRefused("Historical transport probe refused") from None
+          
+          
+          def matches(data, expected):
+              need(type(data) is dict)
+              for key, value in expected.items():
+                  need(key in data and type(data[key]) is type(value) and data[key] == value)
+          
+          
+          def check_run(run):
+              matches(run, {
+                  "id": RUN_ID, "run_attempt": RUN_ATTEMPT, "head_sha": HEAD_SHA,
+                  "head_branch": "main", "path": ".github/workflows/daily_scrape.yml",
+                  "workflow_id": WORKFLOW_ID, "name": "Daily Scrape",
+                  "event": "repository_dispatch", "status": "completed", "conclusion": "success",
+              })
+              for key in ("repository", "head_repository"):
+                  matches(run.get(key), {"id": REPOSITORY_ID, "full_name": SOURCE})
+          
+          
+          def check_jobs(payload):
+              matches(payload, {"total_count": 1})
+              jobs = payload.get("jobs")
+              need(type(jobs) is list and len(jobs) == 1)
+              job = jobs[0]
+              matches(job, {
+                  "id": JOB_ID, "run_id": RUN_ID, "run_attempt": RUN_ATTEMPT,
+                  "head_sha": HEAD_SHA, "head_branch": "main", "workflow_name": "Daily Scrape",
+                  "name": "scrape", "status": "completed", "conclusion": "success",
+              })
+              steps = job.get("steps")
+              need(type(steps) is list and 1 <= len(steps) <= 100)
+              by_number = {}
+              for step in steps:
+                  need(type(step) is dict and type(step.get("number")) is int)
+                  need(step["number"] not in by_number)
+                  by_number[step["number"]] = step
+              for number, name in {
+                  12: "Commit and Push", 13: "Verify reviewed source after save",
+                  16: "Record immutable saved collection", 17: "Retain immutable saved collection",
+              }.items():
+                  matches(by_number.get(number), {"name": name, "status": "completed", "conclusion": "success"})
+          
+          
+          def check_artifact(artifact, now):
+              matches(artifact, {
+                  "id": ARTIFACT_ID, "name": ARTIFACT_NAME, "size_in_bytes": ZIP_BYTES,
+                  "digest": "sha256:" + ZIP_SHA256, "expired": False,
+                  "url": ARTIFACT_URL, "archive_download_url": ZIP_URL,
+              })
+              matches(artifact.get("workflow_run"), {
+                  "id": RUN_ID, "repository_id": REPOSITORY_ID,
+                  "head_repository_id": REPOSITORY_ID, "head_branch": "main", "head_sha": HEAD_SHA,
+              })
+              expires = artifact.get("expires_at")
+              need(type(expires) is str and re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", expires))
+              try:
+                  expiry = dt.datetime.strptime(expires, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+                  need(now.tzinfo is not None and expiry > now)
+              except Exception:
+                  raise ProbeRefused("Historical transport probe refused") from None
+          
+          
+          def check_saved_json(blob):
+              expected = {
+                  "schema": "boopa-saved-collection-v1", "repository": SOURCE,
+                  "run_id": str(RUN_ID), "scraper_outcome": "success", "save_outcome": "success",
+                  "run_attempt": "1", "tracker_commit": SAVED_COMMIT,
+                  "collection_receipt_sha256": RECEIPT_SHA256,
+              }
+              record = strict_json(blob)
+              need(set(record) == set(expected))
+              matches(record, expected)
+          
+          
+          def check_zip(blob):
+              need(type(blob) is bytes and len(blob) == ZIP_BYTES)
+              need(hashlib.sha256(blob).hexdigest() == ZIP_SHA256)
+              try:
+                  with zipfile.ZipFile(io.BytesIO(blob)) as archive:
+                      entries = archive.infolist()
+                      need(len(entries) == 1)
+                      entry = entries[0]
+                      need(entry.filename == entry.orig_filename == "saved-collection.json")
+                      need(not entry.is_dir() and entry.file_size == JSON_BYTES)
+                      need(entry.compress_type == zipfile.ZIP_DEFLATED and entry.flag_bits & ~8 == 0)
+                      need(entry.create_system == 3 and stat.S_ISREG(entry.external_attr >> 16))
+                      with archive.open(entry, "r") as stream:
+                          saved = stream.read(JSON_BYTES + 1)
+                      need(len(saved) == JSON_BYTES)
+                      check_saved_json(saved)
+              except Exception:
+                  raise ProbeRefused("Historical transport probe refused") from None
+          
+          
+          def run_probe(raw, token, now=None):
+              """Four fixed API GETs plus at most one validated, credential-free ZIP hop."""
+              try:
+                  need(callable(raw) and type(token) is str and bool(token))
+                  headers = {"Authorization": "Bearer " + token, "Accept": "application/vnd.github+json",
+                             "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "boopadb-stage8-read-probe",
+                             "Accept-Encoding": "identity"}
+                  g._headers(headers, "api")
+          
+                  def get(url, archive=False):
+                      need(url in API_URLS and archive is (url == ZIP_URL))
+                      limit = ZIP_BYTES if archive else MAX_METADATA
+                      status, response_headers, body = g._call(raw, url, dict(headers), limit)
+                      if archive and status == 302:
+                          location = next((v for k, v in response_headers.items() if k.lower() == "location"), "")
+                          need(g._classify(location)[0] == "download")
+                          status, _, body = g._call(raw, location, {
+                              "User-Agent": "boopadb-stage8-read-probe", "Accept-Encoding": "identity",
+                          }, ZIP_BYTES)
+                      need(status == 200)
+                      return body if archive else strict_json(body)
+          
+                  now = dt.datetime.now(dt.timezone.utc) if now is None else now
+                  check_run(get(RUN_URL))
+                  check_jobs(get(JOBS_URL))
+                  check_artifact(get(ARTIFACT_URL), now)
+                  check_zip(get(ZIP_URL, archive=True))
+                  return result("compatible")
+              except Exception:
+                  raise ProbeRefused("Historical transport probe refused") from None
+          
+          
+          def result(status):
+              return {
+                  "status": status, "source_repository_id": REPOSITORY_ID,
+                  "source_workflow_id": WORKFLOW_ID, "source_run_id": RUN_ID,
+                  "source_run_attempt": RUN_ATTEMPT, "source_job_id": JOB_ID,
+                  "source_head_sha": HEAD_SHA, "artifact_id": ARTIFACT_ID,
+                  "artifact_bytes": ZIP_BYTES, "artifact_sha256": ZIP_SHA256,
+                  "saved_commit": SAVED_COMMIT, "transport_sha256": TRANSPORT_SHA256,
+                  "historical": True, "generation_eligible": False,
+              }
+          
+          
+          def check_actions_context(env):
+              for key, expected in {
+                  "GITHUB_ACTIONS": "true", "GITHUB_REPOSITORY": DESTINATION,
+                  "GITHUB_REF": REF, "GITHUB_REF_TYPE": "branch", "GITHUB_EVENT_NAME": "push",
+                  "GITHUB_WORKFLOW_REF": WORKFLOW_REF, "GITHUB_RUN_ATTEMPT": "1",
+                  "GITHUB_JOB": "historical-read-probe",
+              }.items():
+                  need(env.get(key) == expected)
+              sha = env.get("GITHUB_SHA", "")
+              need(type(sha) is str and re.fullmatch(r"[a-f0-9]{40}", sha))
+              need(env.get("GITHUB_WORKFLOW_SHA") == sha)
+              need(re.fullmatch(r"[1-9][0-9]*", env.get("GITHUB_RUN_ID", "")))
+          
+          
+          def main(argv=None, env=None, raw_factory=None):
+              # No token lookup, transport construction, or network in the default mode.
+              argv = sys.argv[1:] if argv is None else argv
+              if argv in ([], ["--mode", "off"]):
+                  print(json.dumps(result("off"), sort_keys=True))
+                  return 0
+              try:
+                  need(argv == ["--mode", "github-actions"])
+                  env = os.environ if env is None else env
+                  check_actions_context(env)
+                  token = env.get("GITHUB_TOKEN")
+                  need(type(token) is str and bool(token))
+                  g._headers({"Authorization": "Bearer " + token}, "api")
+                  # The workflow verifies the embedded exact Stage7 bytes before import.
+                  raw = g.UrllibGET() if raw_factory is None else raw_factory()
+                  print(json.dumps(run_probe(raw, token), sort_keys=True))
+                  return 0
+              except Exception:
+                  print("Historical transport probe refused.", file=sys.stderr)
+                  return 1
+          
+          
+          if __name__ == "__main__":
+              raise SystemExit(main())
+          STAGE8_PYTHON
