@@ -1,0 +1,2 @@
+This bundle does not introduce or grant a new open-source license. Existing
+project/asset rights and any upstream license terms remain unchanged.

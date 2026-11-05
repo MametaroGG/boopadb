@@ -1,0 +1,14 @@
+{
+  "daily_coverage_file": null,
+  "daily_target_date": null,
+  "presentation_proof": null,
+  "presentation_sha256": null,
+  "projection_package_sha256": null,
+  "projection_work": null,
+  "relation_search_approval": "approved-inputs/approvals/relation-search.json",
+  "relation_search_bundle": "approved-inputs/bundles/relation-search-bundle",
+  "relations_approval": "approved-inputs/approvals/relation.json",
+  "relations_bundle": "approved-inputs/bundles/relation-bundle",
+  "supplement_approval": "approved-inputs/approvals/supplement.json",
+  "supplement_bundle": "approved-inputs/bundles/relation-supplement-bundle"
+}

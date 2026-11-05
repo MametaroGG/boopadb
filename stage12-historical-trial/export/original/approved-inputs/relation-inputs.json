@@ -1,0 +1,8 @@
+{
+  "relation_search_approval_sha256": "approvals/relation-search.json",
+  "relation_search_bundle_manifest_sha256": "manifests/relation-search-bundle-manifest.json",
+  "relations_approval_sha256": "approvals/relation.json",
+  "relations_bundle_manifest_sha256": "manifests/relation-bundle-manifest.json",
+  "supplement_approval_sha256": "approvals/supplement.json",
+  "supplement_bundle_manifest_sha256": "manifests/relation-supplement-bundle-manifest.json"
+}

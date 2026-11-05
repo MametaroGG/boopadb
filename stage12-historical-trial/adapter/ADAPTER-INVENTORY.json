@@ -1,0 +1,14 @@
+{
+  "files": {
+    "RIGHTS-NOTICE.txt": "dfa58307c2b21a6b673ae6285a7cb5cb257379c38a28e049fc7a3d60b316f426",
+    "historical_source.py": "34ca39c56de2d36dd32a125ac06dea1c0e1b3aa6e60f49f4e45b508196db6ab9",
+    "inputs/presentation-proof.exact.json": "e7b74233a4814b738f2d5de12b22004dfc5466c32bdafe53c6f9047c380acd19",
+    "inputs/producer-pin.installed.json": "c084cb265640c00c2cfac1700e51c6d1e7e1cfbaf0032f10a9a5be66e2f8f315",
+    "price_ui_qa.py": "ec5c4f6e96ede745f4c959dc614783c4232d245df49ad8b166532752042a79a8",
+    "transport.py": "e90ea34663c860b6af58a89f0402b945e664068b11336075d92780868fb04ca7",
+    "trial_adapter.py": "70010af72dd424f77c343184deaf1866c18039128200881f91c0fbaecffa6d97"
+  },
+  "reconstruction_mode": "new-minimal-historical-only-implementation",
+  "schema": "boopa-stage12-historical-trial-adapter-v1",
+  "source_stage11_adapter_sha256": "55e64a4fc0edcbef5e44e955f1c61622a6ba3afe97d74cb02958faf11504db39"
+}

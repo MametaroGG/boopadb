@@ -1,0 +1,8 @@
+{
+  "validators/check_projection.py": "2228b55dc67f3c7542ffd3487e29d93c71004ffff7ca97f4dda42a1cb234e602",
+  "validators/compact_codec.py": "d5ebf4c4fa1003c5f544f3da71fece6db527e7f8669ca03dc77b8bc6f3438aa2",
+  "validators/gate_ui.py": "280dfa381fbed53056cb81a82cbc7ff81cfcc0cfc27677f41785b6f579a28543",
+  "validators/selected_price_selector.py": "512e14fd57fb8ed6547c6af5574324f4e54d2e8e8e670da2b019aac15ec1249a",
+  "validators/validate_search_core.py": "6b49182886ca302a6ea89e0c73746add7cd251361fb95553295ec9904cade3f8",
+  "validators/validate_snapshot.py": "ad684c797e00cd9e0eddeb60f0304b0d095989c368d5f588636f5e1a5ed5cc27"
+}
