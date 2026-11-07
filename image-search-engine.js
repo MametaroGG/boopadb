@@ -24,6 +24,7 @@ async function imgSimilar(x){
 // One result-card template for both uploaded and similar-image searches.
 function imageResultSafeUrl(url){if(typeof url!=='string'||!/^https?:\/\//i.test(url))return '';try{const u=new URL(url);return /^https?:$/.test(u.protocol)?u.href:'';}catch{return '';}}
 function imageResultCard(x, saved, detailUrl){
+ if(window.BoopaVisibility.isHidden(x.id))return "";
  const image=imageResultSafeUrl(x.image),price=x.cur==null?'':new Intl.NumberFormat(LANG,{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(x.cur);
  return '<article class="image-result" data-id="'+esc(x.id)+'"><a href="'+esc(detailUrl)+'">'+(image?'<img src="'+esc(image)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'')+'</a><div class="image-result-body"><h3><a href="'+esc(detailUrl)+'">'+esc(x._infoError&&!x.name?imageInfoText(1):x.name)+'</a></h3><p>'+esc(x.shop)+'</p><div class="image-result-price">'+(x.base>x.cur&&x.cur!=null?'<del>'+esc(new Intl.NumberFormat(LANG,{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(x.base))+'</del> ':'')+esc(price)+(x.base>x.cur&&x.cur!=null?' <small>−'+Math.round((1-x.cur/x.base)*100)+'%</small>':'')+'</div><p><a data-ext href="https://booth.pm/'+LANG+'/items/'+encodeURIComponent(x.id)+'" target="_blank" rel="noopener">'+esc(tr('pp_booth'))+' ↗</a></p>'+ (x._infoError?'<p class="image-info-error">'+esc(imageInfoText(1))+' <button type="button" data-metadata-retry="'+esc(x.id)+'">'+esc(imageInfoText(2))+'</button></p>':'')+'<button type="button" data-bookmark="'+esc(x.id)+'" aria-pressed="'+saved+'">'+esc(tr(saved?'pp_bmed':'pp_bm'))+'</button></div></article>';
 }
@@ -39,7 +40,7 @@ const IMAGE_INFO_TEXT={
 };
 function imageInfoText(i){return (IMAGE_INFO_TEXT[LANG]||IMAGE_INFO_TEXT.ja)[i];}
 function lvMappedResults(){
- return imgHitsFromApi(lvRawResults).map(hit=>{
+ return window.BoopaVisibility.filter(imgHitsFromApi(lvRawResults)).map(hit=>{
   const record=imageResultMetadata.get(String(hit.id));
   if(record)return {...hit,...record,name:record.name||imageInfoText(record._infoError?1:0),image:hit.image||record.image,_catalog:!!record.name};
   return hit._catalog?hit:{...hit,name:imageInfoText(0),_infoLoading:true};
@@ -54,11 +55,12 @@ function imagePriceRecord(d){
  return {cur:sorted[sorted.length-1].price,base:Math.max(...sorted.map(r=>r.price))};
 }
 function imageNotifyMetadata(){
- imageEnrichBookmarks([...imageResultMetadata.values()].filter(r=>r.name).map(r=>({...r,_catalog:true})));
+ imageEnrichBookmarks(window.BoopaVisibility.filter([...imageResultMetadata.values()]).filter(r=>r.name).map(r=>({...r,_catalog:true})));
  if(typeof lvCatalogUpdated==='function')lvCatalogUpdated();
  lvRefreshCatalog();
 }
 async function imageFetchRecord(id){
+ if(window.BoopaVisibility.isHidden(id))return null;
  if(imageResultPending.has(id))return imageResultPending.get(id);
  const task=(async()=>{
   const previous=imageResultMetadata.get(id)||{id};let record={...previous,_infoError:false};
@@ -68,6 +70,8 @@ async function imageFetchRecord(id){
     try{
      const data=await imageCatalogShard(IMAGE_ITEM_BASE+kind+'/'+id.slice(0,3)+'/'+id+'.json');
      if(String(data.id)!==id)throw new Error('Unexpected product id');
+     if(kind==='meta' && !window.BoopaVisibility.acceptMeta(id,data)){imageResultMetadata.delete(id);window.BoopaVisibility.prune();lvRefreshCatalog();return null;}
+     if(window.BoopaVisibility.isHidden(id))return null;
      record=kind==='meta'?{...record,name:data.name||record.name,shop:data.shop&&data.shop.name||'',image:data.image_resized||data.image||''}:{...record,...imagePriceRecord(data),name:record.name||data.name};
      record['_'+kind+'Ready']=true;imageResultMetadata.set(id,{...record});imageNotifyMetadata();break;
     }catch{if(attempt===1)record._infoError=true;else await new Promise(resolve=>setTimeout(resolve,400));}
@@ -537,6 +541,7 @@ function lvUploadError(key){
 
 // Called only after the host has initialized all of its own declarations.
 function initImageLens(){
+window.addEventListener("boopa:visibility",()=>{ lvRefreshCatalog(); });
 lvEl('lvResults').addEventListener('click',event=>{
  const button=event.target.closest('[data-metadata-retry]');if(!button)return;
  event.preventDefault();button.disabled=true;imageFetchRecord(button.dataset.metadataRetry);

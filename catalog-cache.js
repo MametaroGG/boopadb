@@ -65,13 +65,14 @@ function decodeCompactCore(value, expectedRows) {
    Promise.resolve().then(()=>cache.put(url,new env.Response(bytes,{headers:{'Content-Type':'application/json'}}))).catch(()=>{}).finally(()=>writing--);
   }
   async function begin(){
-   if(!supported)return null;
+   if(!supported && !(env.BoopaPublication && env.crypto && env.crypto.subtle && env.Response))return null;
    if(!snapshotPromise)snapshotPromise=(async()=>{
     const controller=new env.AbortController();let timer;
     try{
      const manifest=await Promise.race([env.fetch(new URL('snapshot-manifest.json',base).href,{cache:'no-store',signal:controller.signal}).then(response=>{if(!response.ok)throw Error('manifest unavailable');return response.json();}),new Promise((_,reject)=>{timer=env.setTimeout(()=>{controller.abort();reject(Error('manifest timeout'));},1500);})]);
      const files=manifest&&manifest.files;
      if(manifest.schema!==1 || manifest.fixture!==false || !files)throw Error('manifest format');
+     if(env.BoopaPublication && !await env.BoopaPublication.acceptCatalog(manifest))throw Error('publication catalog revision mismatch');
      let paths=Array.from({length:24},(_,i)=>'search_index_'+i+'.json'),images=null,partRows=null;
      const validHash=x=>typeof x==='string'&&/^[a-f0-9]{64}$/.test(x);
      if(manifest.catalog_core&&options.core!==false){
@@ -108,17 +109,21 @@ function decodeCompactCore(value, expectedRows) {
    if(!Number.isInteger(i)||i<0||i>=24)throw Error('catalog part');
    return shared('part:'+i,async()=>{
     const snapshot=await begin();
-    if(!snapshot){const response=await env.fetch('search_index_'+i+'.json?v=20251027-2',{signal,cache:'no-store'});if(!response.ok)throw Error('catalog');const rows=await response.json();if(!Array.isArray(rows))throw Error('catalog format');return rows;}
+    if(!snapshot && env.BoopaPublication)throw Error('publication catalog unavailable');
+    if(!snapshot){const response=await env.fetch('search_index_'+i+'.json?v=20251027-2',{signal,cache:'no-store'});if(!response.ok)throw Error('catalog');const rows=await response.json();if(!Array.isArray(rows))throw Error('catalog format');return env.BoopaVisibility?env.BoopaVisibility.filter(rows):rows;}
     const valid=rows=>snapshot.compact?true:Array.isArray(rows)&&(!snapshot.images||(rows.length===snapshot.partRows[i]&&rows.every(r=>Array.isArray(r)&&r.length===14&&r[9]==='')));
-    return readResource(snapshot.paths[i],snapshot.hashes[i],valid,signal,snapshot.compact?value=>decodeCompactCore(value,snapshot.partRows[i]):undefined);
+    const rows=await readResource(snapshot.paths[i],snapshot.hashes[i],valid,signal,snapshot.compact?value=>decodeCompactCore(value,snapshot.partRows[i]):undefined);
+    return env.BoopaVisibility?env.BoopaVisibility.filter(rows):rows;
    },signal);
   }
   async function image(id,{signal}={}){
    id=String(id);if(!/^[1-9][0-9]*$/.test(id)||!Number.isSafeInteger(Number(id)))return null;
+   if(env.BoopaVisibility && env.BoopaVisibility.isHidden(id))return null;
    const snapshot=await begin();if(!snapshot||!snapshot.images)return null;
    const bucket=Number(id)%512,path='search-core/images_'+bucket+'.json';
    const valid=rows=>rows&&typeof rows==='object'&&!Array.isArray(rows)&&Object.entries(rows).every(([key,value])=>/^[1-9][0-9]*$/.test(key)&&Number.isSafeInteger(Number(key))&&Number(key)%512===bucket&&typeof value==='string');
    const rows=await shared('image:'+bucket,()=>readResource(path,snapshot.images[bucket],valid,signal),signal);
+   if(env.BoopaVisibility && env.BoopaVisibility.isHidden(id))return null;
    if(!Object.prototype.hasOwnProperty.call(rows,id))throw Error('image missing from snapshot');
    return rows[id];
   }
@@ -130,6 +135,7 @@ function decodeCompactCore(value, expectedRows) {
   }
   return {begin,read,refresh,image,revision:()=>currentSnapshot&&currentSnapshot.version,isCore:()=>!!(currentSnapshot&&currentSnapshot.images)};
  }
+ createCatalogReader.publicationContractVersion='boopa-publication-reader-v1';
  if(typeof module==='object'&&module.exports)module.exports={createCatalogReader,decodeCompactCore};
  else root.createBoopaCatalogReader=createCatalogReader;
 })(typeof window==='undefined'?globalThis:window);
