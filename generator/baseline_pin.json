@@ -1,0 +1,11 @@
+{
+ "repo_commit": "382478b22fb0ecf280ff5f98716ee076376d1083",
+ "live_snapshot_manifest_sha256": "1f05306dad43c23fd131e9dd9fe4abdce5383b78af0d76e6920390a806739267",
+ "live_manifest_bytes": 94915,
+ "live_rows": 193574,
+ "live_max_date": "2026-11-08",
+ "baseline_archive_name": "BOOPADB-CURRENT-PUBLIC-BASELINE-382478b-20261117.tar.gz",
+ "baseline_archive_sha256": "5907ed3e51390d96c4ad0116a55cc3a30b05891b23b8c938455499305b5bf9e0",
+ "baseline_archive_bytes": 69787097,
+ "baseline_archive_drive_file_id": "1jvHlgS49V3taOekWvik6OS5gGRKEnHNO"
+}
