@@ -362,7 +362,10 @@ jobs:
                 f"sha256 {sha256(blob)[:16]}…, {len(names)} entries")
           PY
           # Site tree = the candidate/ subtree of the artifact.
-          mv cand/candidate site
+          # COPY, not move: the contract step below reads the EXPORT
+          # inventory from cand/ AND the manifest chain from site/, so
+          # both trees must exist at that point.
+          cp -r cand/candidate site
 
       - name: Verify candidate contract (EXPORT inventory + verification + manifest chain)
         run: |
