@@ -1,7 +1,7 @@
 {
  "schema": 1,
  "workflows": {
-  "boopadb-promote.yml": "f3c8e6493e1f394eb69e44535632d506bf77f47a",
+  "boopadb-promote.yml": "04bff7993bb2d6772d8c1fc87e0f59de9d6237a4",
   "boopadb-qa-review.yml": "b47487d858b7173c670fbfb46fac976eb7f0abeb"
  }
 }
