@@ -214,6 +214,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          # actions/checkout cleans the workspace, wiping the promote-work
+          # directory the first step created; recreate it before writing.
+          mkdir -p promote-work
           # The QA review run lives in THIS repo, so its identity,
           # conclusion and executed workflow blob are all verifiable
           # here (v7 discipline): workflow path, dispatch event,
