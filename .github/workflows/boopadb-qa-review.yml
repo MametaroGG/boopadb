@@ -1,82 +1,84 @@
 # ============================================================================
-# TRIAL adaptation (2026-11-17) of the v7 draft boopadb-qa-review.yml
-# (v7 original: git blob 9e21c602222261ee523e50db055f2f4eb1e07f73,
-# SHA256 3d8e2025d26c7ddb561503c4b08b58fc39d258999397d664718092d4b54abb67
-# as bundled on the trial branch in local-auto-workflow-wiring/V7-SOURCE.json).
-# Placement target: MametaroGG/boopadb, branch
-# chore/auto-update-trial-20261101, path .github/workflows/boopadb-qa-review.yml.
-# See PLACEMENT.md in this package for the full difference list.
+# BoopaDB QA Review — PRODUCTION (step 4, 2026-11-17).
 #
-# WHAT CHANGED vs v7 (summary; PLACEMENT.md is authoritative):
-# * INPUT MODEL: v7 reviewed the QA artifact of a BoopaDB Daily run
-#   in THIS repo (site-release.tar). The decided input is the tracker
-#   Daily `boopadb_handoff` candidate artifact, which this repo's
-#   token cannot download cross-repository. This workflow therefore
-#   fetches the SAME trial transport as the trial promote (the
-#   Drive-preserved handover ZIP, digest-pinned twice) and recomputes
-#   the candidate ZIP's digest from the downloaded bytes — the v7
-#   principle is preserved: the digest in the record is computed
-#   here, from the artifact, never typed in. The expected_digest
-#   input remains a cross-check only.
-# * SOURCE RUN VERIFICATION: v7 verified the source (daily) run's
-#   identity via this repo's API. The source run here lives in the
-#   TRACKER repo and cannot be read with this repo's GITHUB_TOKEN.
-#   The record instead binds: the tracker run id + artifact id
+# Production form of the trial workflow (trial run 44078928087
+# recorded the QA verdict that trial promote 44082030724 consumed),
+# converted per §2 of step4_preflight_report_20261117.md. The trial
+# file (blob b47487d858b7173c670fbfb46fac976eb7f0abeb, itself an
+# adaptation of the v7 draft) is retained in git history on the
+# trial branch; this file's per-delta change log is in PRODUCTION.md
+# of the production package. Placement target: MametaroGG/boopadb,
+# branch main, path .github/workflows/boopadb-qa-review.yml.
+#
+# WHAT THIS WORKFLOW DOES: records one independent QA verdict for
+# one explicitly named candidate as a checkable artifact
+# (boopadb-qa-review-<run_id> / qa-review-record.json), which
+# boopadb-promote.yml then asserts field by field before deploying.
+# * INPUT MODEL: the reviewed input is the tracker Daily
+#   `boopadb_handoff` candidate artifact, which this repo's token
+#   cannot download cross-repository. This workflow fetches the SAME
+#   production transport as promote (T1: the bare candidate ZIP on
+#   Drive, anyone-with-link) and recomputes the candidate ZIP's
+#   digest from the downloaded bytes — the v7 principle is
+#   preserved: the digest in the record is computed here, from the
+#   artifact, never typed in. The expected_digest input is a
+#   cross-check only. All candidate inputs are required with NO
+#   defaults: a production review must name its candidate
+#   explicitly.
+# * SOURCE RUN VERIFICATION: the source run lives in the TRACKER
+#   repo and cannot be read with this repo's GITHUB_TOKEN. The
+#   record instead binds: the tracker run id + artifact id
 #   (dispatcher-supplied traceability identifiers), the recomputed
 #   artifact digest, and the candidate-internal bindings read from
 #   the artifact itself (candidate_snapshot_sha256,
 #   price_source_commit from verification.json). Promote asserts all
 #   of them. The substantive binding is the digest, as in v7.
-# * WORKFLOW BLOB PIN: v7 bound BOTH the daily blob and this
-#   workflow's blob into the record. Only this workflow's blob is
-#   verifiable in-repo, so the record binds qa_workflow_blob (this
-#   file at this run's head SHA, checked against
-#   generator/workflow_pins.json); there is no source_workflow_blob.
-# * Kept from v7 unchanged: the qa-approval environment declaration
-#   (its required-reviewer protection is an OWNER settings step and
-#   is NOT configured by this file — until then the environment name
-#   alone attests nothing, exactly the caveat in the v7 header);
-#   verdict recorded verbatim, "fail" recorded and uploaded exactly
-#   like "pass" (recording is not approval — promote rejects any
-#   verdict != pass); qa_report_ref binds the independent QA report
-#   identifier (e.g. Muse's Gate C verification report) for
-#   traceability; read-only permissions; no PAT, no secrets beyond
-#   the default GITHUB_TOKEN; the record is an artifact of THIS run
-#   (boopadb-qa-review-<run_id>).
+#   (API-level source-run verification returns only with the step-5
+#   GitHub App transport, pre-flight decision D2.)
+# * WORKFLOW BLOB PIN: only this workflow's blob is verifiable
+#   in-repo, so the record binds qa_workflow_blob (this file at this
+#   run's head SHA, checked against generator/workflow_pins.json);
+#   there is no source_workflow_blob.
+# * Kept unchanged: the qa-approval environment declaration (its
+#   required-reviewer protection is an OWNER settings step,
+#   configured at step-4 execution per pre-flight report §4 — this
+#   file only declares the environment); verdict recorded verbatim,
+#   "fail" recorded and uploaded exactly like "pass" (recording is
+#   not approval — promote rejects any verdict != pass);
+#   qa_report_ref binds the independent QA report identifier (e.g.
+#   Muse's Gate C verification report) for traceability; read-only
+#   permissions; no PAT, no secrets beyond the default GITHUB_TOKEN;
+#   the record is an artifact of THIS run.
 # * Action references use immutable commit SHAs (trial-branch
 #   convention) instead of the v7 draft's version tags.
 #
 # WHO DISPATCHES THIS, AND WHEN: only after an independent QA
-# verdict for the candidate digest exists (for the default pin:
-# Muse's Gate C verification of candidate 43971064241, 2026-11-17).
-# The dispatcher sets qa_report_ref to that report's identifier.
+# verdict for the candidate digest exists (Muse's Gate C
+# verification). The dispatcher sets qa_report_ref to that report's
+# identifier.
 # ============================================================================
 
-name: BoopaDB QA Review (TRIAL 20261117)
+name: BoopaDB QA Review
 
 on:
   workflow_dispatch:
     inputs:
       candidate_run_id:
-        description: "Tracker Daily run ID that produced the candidate artifact under review (traceability; the binding is the recomputed digest)."
+        description: "Tracker Daily run ID that produced the candidate artifact under review (traceability; the binding is the recomputed digest). No default: a production review must name its candidate explicitly."
         required: true
         type: string
-        default: "43971064241"
       candidate_artifact_id:
-        description: "Tracker artifact ID of the candidate ZIP under review."
+        description: "Tracker artifact ID of the candidate ZIP under review. No default."
         required: true
         type: string
-        default: "14301452000"
       expected_digest:
-        description: "SHA256 (64-hex) of the candidate ZIP. This workflow recomputes it from the downloaded artifact and fails on mismatch — the value is a cross-check, never trusted."
+        description: "SHA256 (64-hex) of the candidate ZIP. This workflow recomputes it from the downloaded artifact and fails on mismatch — the value is a cross-check, never trusted. No default."
         required: true
         type: string
-        default: "7f6bcba3342cbc34c79dff55b40e34a9aec48916f7183fa7d717f23a221f0afa"
-      handover_file_id:
-        description: "Google Drive file ID of the preserved handover ZIP that carries the candidate ZIP (trial transport only; integrity rests on the digest pins, not on Drive)."
+      candidate_file_id:
+        description: "Google Drive file ID of the bare candidate ZIP (production transport T1; integrity rests on the recomputed digest, not on Drive). No default."
         required: true
         type: string
-        default: "1UszBRj3xm-Kz4hDQTmybc-Ei5rUh5Ros"
       verdict:
         description: "The independent QA verdict for THIS candidate digest. Recorded verbatim; promote accepts only 'pass'."
         required: true
@@ -98,17 +100,12 @@ env:
   CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
   CANDIDATE_ARTIFACT_ID: ${{ inputs.candidate_artifact_id }}
   EXPECTED_DIGEST: ${{ inputs.expected_digest }}
-  HANDOVER_FILE_ID: ${{ inputs.handover_file_id }}
+  CANDIDATE_FILE_ID: ${{ inputs.candidate_file_id }}
   VERDICT: ${{ inputs.verdict }}
   QA_REPORT_REF: ${{ inputs.qa_report_ref }}
-  # Candidate pin block — must stay in lockstep with the trial
-  # promote's pin block (defaults describe artifact 14301452000,
-  # verified against the actual bytes in Muse's Gate C
-  # verification, 2026-11-17).
-  HANDOVER_SHA256: "de4036ebded6407c62e6eca17c9fef7a3539c68c18f3ff727a6e433238a43e95"
-  HANDOVER_BYTES: "73260848"
-  CANDIDATE_INNER_PATH: "boopa-recovery-readiness-20261117/candidate-14301452000.zip"
-  CANDIDATE_BYTES: "69585918"
+  # No compiled candidate pins in production: every candidate value
+  # arrives as a dispatch input, and the digest is recomputed from
+  # the downloaded bytes (see the recompute step).
 
 jobs:
   qa-review:
@@ -148,8 +145,8 @@ jobs:
             echo "::error::expected_digest must be a 64-hex SHA256"
             exit 1
           fi
-          if ! printf '%s' "$HANDOVER_FILE_ID" | grep -Eq '^[A-Za-z0-9_-]+$'; then
-            echo "::error::handover_file_id has unexpected characters"
+          if ! printf '%s' "$CANDIDATE_FILE_ID" | grep -Eq '^[A-Za-z0-9_-]+$'; then
+            echo "::error::candidate_file_id has unexpected characters"
             exit 1
           fi
           if [ -z "$QA_REPORT_REF" ]; then
@@ -157,31 +154,25 @@ jobs:
             exit 1
           fi
 
-      - name: Download candidate transport (Drive handover ZIP, digest-pinned)
+      - name: Download candidate transport (Drive carrier ZIP)
         run: |
           set -euo pipefail
-          # Same trial transport as the trial promote; the transport
-          # is NOT trusted — size + SHA256 are asserted immediately.
+          # Same production transport as promote (T1): the bare
+          # candidate ZIP on Drive. The transport is NOT trusted —
+          # the next step recomputes the digest from these exact
+          # bytes and fails on any mismatch, so an interstitial/HTML
+          # response stops the run (fail closed).
           curl -fL --retry 2 \
-            "https://drive.usercontent.google.com/download?id=${HANDOVER_FILE_ID}&export=download&confirm=t" \
-            -o review-work/handover.zip
-          actual_bytes="$(stat -c%s review-work/handover.zip)"
-          if [ "$actual_bytes" != "$HANDOVER_BYTES" ]; then
-            echo "::error::handover ZIP size mismatch: got $actual_bytes, expected $HANDOVER_BYTES"
-            exit 1
-          fi
-          actual_sha="$(sha256sum review-work/handover.zip | awk '{print $1}')"
-          if [ "$actual_sha" != "$HANDOVER_SHA256" ]; then
-            echo "::error::handover ZIP SHA256 mismatch: got $actual_sha, expected $HANDOVER_SHA256"
-            exit 1
-          fi
-          echo "handover transport OK: $actual_bytes bytes, sha256 $actual_sha"
+            "https://drive.usercontent.google.com/download?id=${CANDIDATE_FILE_ID}&export=download&confirm=t" \
+            -o review-work/candidate.zip
+          actual_bytes="$(stat -c%s review-work/candidate.zip)"
+          echo "candidate transport downloaded: $actual_bytes bytes (digest recomputed in the next step)"
 
       - name: Recompute the candidate digest from the artifact bytes (never trust the input)
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import hashlib, json, os, sys, zipfile
+          import hashlib, io, json, os, sys, zipfile
           from pathlib import Path
 
           def fail(msg):
@@ -191,28 +182,12 @@ jobs:
           def sha256(data):
               return hashlib.sha256(data).hexdigest()
 
-          outer = zipfile.ZipFile("review-work/handover.zip")
-          if outer.testzip() is not None:
-              fail("handover ZIP CRC check failed")
-          inner_rel = os.environ["CANDIDATE_INNER_PATH"]
-          if inner_rel not in outer.namelist():
-              fail(f"candidate ZIP not found in handover: {inner_rel}")
-          # The handover's own hash ledger binds the inner ZIP;
-          # cross-check it against the dispatch pin.
-          hashes = json.loads(outer.read("HANDOVER-HASHES.json"))
-          entry = hashes.get(inner_rel)
-          if entry is None:
-              fail(f"HANDOVER-HASHES.json has no entry for {inner_rel}")
-          blob = outer.read(inner_rel)
-          if len(blob) != int(os.environ["CANDIDATE_BYTES"]):
-              fail(f"candidate ZIP size mismatch: {len(blob)}")
+          blob = Path("review-work/candidate.zip").read_bytes()
           actual = sha256(blob)
           if actual != os.environ["EXPECTED_DIGEST"]:
               fail(f"candidate ZIP digest mismatch: got {actual}, "
                    f"expected {os.environ['EXPECTED_DIGEST']}")
-          if entry["sha256"] != actual or entry["bytes"] != len(blob):
-              fail("HANDOVER-HASHES inner entry != recomputed digest/size")
-          czf = zipfile.ZipFile(__import__("io").BytesIO(blob))
+          czf = zipfile.ZipFile(io.BytesIO(blob))
           if czf.testzip() is not None:
               fail("candidate ZIP CRC check failed")
           # Candidate-internal bindings recorded in the record:
@@ -294,7 +269,7 @@ jobs:
           Path("review-out/qa-review-record.json").write_text(
               json.dumps(record, indent=1, sort_keys=True))
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
-              fh.write("## BoopaDB QA review record (TRIAL workflow)\n\n")
+              fh.write("## BoopaDB QA review record\n\n")
               for k, v in record.items():
                   fh.write(f"- {k}: {v}\n")
           print(record)
@@ -305,7 +280,7 @@ jobs:
         with:
           name: boopadb-qa-review-${{ github.run_id }}
           path: review-out
-          retention-days: 90
+          retention-days: 7
           overwrite: false
         # Layout: the artifact root contains qa-review-record.json.
         # Promote downloads it with path: review and reads
