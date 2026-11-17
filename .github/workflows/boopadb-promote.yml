@@ -1,0 +1,709 @@
+# ============================================================================
+# TRIAL adaptation (2026-11-17) of the v7 draft boopadb-promote.yml
+# (v7 original: git blob 03718a319a954aa2b241d81f0a517a8ec1f19178,
+# SHA256 061ddf8201328c200026987e3bc80d988c9bfbc21845aeec7bde345005c0e08a
+# as bundled on the trial branch in local-auto-workflow-wiring/V7-SOURCE.json).
+# Placement target: MametaroGG/boopadb, branch
+# chore/auto-update-trial-20261101, path .github/workflows/boopadb-promote.yml.
+# See PLACEMENT.md in this package for the full difference list, what a
+# trial run proves / does not prove, and the step-4 production deltas.
+#
+# WHAT CHANGED vs v7 (summary; PLACEMENT.md is authoritative):
+# * INPUT MODEL: v7 promoted the QA artifact of a BoopaDB Daily run in
+#   THIS repo (site-release.tar + evidence/*.json under the v7 staging
+#   contract). No such artifact exists in the decided design: the
+#   publication input is the tracker Daily `boopadb_handoff` candidate
+#   artifact (owner plan 2026-11-17, decision 3). That artifact's own
+#   contract is EXPORT.json + verification.json + candidate/
+#   snapshot-manifest.json — it contains NONE of the v7 evidence files
+#   (attestation / run-manifest / qa-archive / validation-results /
+#   evidence-records / hash-ledger / input-inventory / in-site
+#   release-manifest). The v7 verification steps bound to those files
+#   therefore CANNOT be carried over; fabricating them is not an
+#   option. They are replaced by verification of the candidate's own
+#   contract (plan decision 4): artifact digest, EXPORT.json byte
+#   inventory, snapshot-manifest hash chain.
+# * TRANSPORT: actions/download-artifact with this repo's
+#   GITHUB_TOKEN cannot download an artifact of the tracker repo
+#   (cross-repository artifact access is not granted; dot's trial
+#   wiring notes the same limitation). The trial transport is the
+#   Drive-preserved handover ZIP (anyone-with-link), authenticated by
+#   TWO digest pins (outer handover ZIP + inner candidate ZIP); the
+#   transport itself is never trusted. Production transport is an
+#   open step-4/5 decision (see PLACEMENT.md).
+# * GATES: Gate A (verify_runtime_final_r2.cjs, 76 checks) is re-run
+#   here on the extracted candidate bytes, with the suite fetched
+#   from the tracker checkout and hash-pinned against
+#   DEPLOYMENT-CODE-INVENTORY.json (itself hash-pinned). The
+#   projection gate (check_projection.py --gate, evaluation time =
+#   this run's current UTC) is carried over from v7 unchanged in
+#   invocation; for this candidate it takes the verified
+#   "projection not applied" path.
+# * QA RECORD: still a checkable object produced by
+#   boopadb-qa-review.yml in THIS repo and asserted here field by
+#   field, including record.environment == "qa-approval" and the
+#   qa-review workflow blob pin. The record binds the TRACKER run id
+#   + the recomputed candidate digest + candidate snapshot SHA
+#   instead of a same-repo daily run (see qa-review header).
+# * REMOVED for trial (production deltas, PLACEMENT.md): the v7
+#   generation/lineage gate against the live site (the candidate
+#   carries no generation counter or release-manifest; the v7
+#   baseline pin is also stale — it pins the 2026-10-31 site while
+#   the live site is the 2026-11-08 site), the promotion-time
+#   freshness window (the trial candidate is pinned by identity, not
+#   by date), and the 2625416 evidence re-verification (no evidence
+#   records exist in this candidate contract).
+# * DEPLOY LOCKED: the upload-pages-artifact and deploy-pages steps
+#   are present verbatim but carry a literal `if: ${{ false }}`
+#   trial lock (the same lock pattern the trial branch's OFF daily
+#   uses at job level, here at step level so the job itself runs).
+#   A trial run exercises everything EXCEPT the deploy. The job's
+#   `environment: github-pages` declaration is also removed for
+#   trial (its URL came from the deploy step outputs).
+# * Kept from v7 unchanged in discipline: single promote job,
+#   top-level read-only permissions with pages:write / id-token:write
+#   confined to the promote job, fail-closed input validation FIRST,
+#   inputs passed via env (never expanded inside run: blocks),
+#   promotion record + step summary, failure-evidence artifacts,
+#   concurrency group "pages" (never cancel an in-flight deployment).
+# * Action references follow the trial branch's existing convention
+#   (immutable commit SHAs, as in local-auto-workflow-wiring/
+#   boopadb-daily.OFF.yml) instead of the v7 draft's version tags,
+#   except upload-pages-artifact / deploy-pages, for which no
+#   reviewed immutable SHA exists in the source materials — they
+#   keep the v7 tags and are locked off anyway.
+# ============================================================================
+
+name: BoopaDB Promote (TRIAL 20261117 - deploy locked)
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_run_id:
+        description: "Tracker Daily run ID that produced the candidate artifact (traceability binding; the substantive binding is the digest)."
+        required: true
+        type: string
+        default: "43971064241"
+      candidate_artifact_id:
+        description: "Tracker artifact ID of the candidate ZIP."
+        required: true
+        type: string
+        default: "14301452000"
+      expected_digest:
+        description: "SHA256 (64-hex) of the candidate ZIP itself (the inner ZIP inside the handover package). Recomputed from the downloaded bytes and from the artifact's own inventory; fails closed on any mismatch."
+        required: true
+        type: string
+        default: "7f6bcba3342cbc34c79dff55b40e34a9aec48916f7183fa7d717f23a221f0afa"
+      handover_file_id:
+        description: "Google Drive file ID of the preserved handover ZIP that carries the candidate ZIP (trial transport only; integrity rests on the digest pins, not on Drive)."
+        required: true
+        type: string
+        default: "1UszBRj3xm-Kz4hDQTmybc-Ei5rUh5Ros"
+      qa_run_id:
+        description: "Run ID of the BoopaDB QA Review (TRIAL) workflow run that recorded the independent QA verdict for THIS candidate digest (its artifact boopadb-qa-review-<id> holds qa-review-record.json). Verified via the GitHub API; the record's digest, snapshot and verdict are asserted, not just recorded."
+        required: true
+        type: string
+      tracker_commit:
+        description: "Tracker commit the candidate was generated from (its price_source_commit) and the ref checked out for the Gate A suite + projection raw histories. The checked-out code is hash-pinned, so a divergent tree fails closed."
+        required: true
+        type: string
+        default: "f2b015e1d5e9dcdbc2fd4256c6b8b2769df89668"
+
+# Top level stays read-only; write scopes are granted only inside the
+# promote job below (unchanged from v7).
+permissions:
+  contents: read
+
+# One Pages deployment at a time; never cancel an in-flight deployment.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: "3.12"  # stdlib only
+  NODE_VERSION: "24.22.1" # exact reviewed runtime (Gate A suite), as in the trial OFF daily
+  # Passed via env, never expanded inside run: blocks (v7 rule).
+  CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
+  CANDIDATE_ARTIFACT_ID: ${{ inputs.candidate_artifact_id }}
+  EXPECTED_DIGEST: ${{ inputs.expected_digest }}
+  HANDOVER_FILE_ID: ${{ inputs.handover_file_id }}
+  QA_RUN_ID: ${{ inputs.qa_run_id }}
+  TRACKER_COMMIT: ${{ inputs.tracker_commit }}
+  TRACKER_REPO: "MametaroGG/booth-vrc-price-tracker"
+  QA_REVIEW_ARTIFACT_NAME_PREFIX: "boopadb-qa-review-"
+  # --- Candidate pin block (defaults describe artifact 14301452000).
+  # Every value below was verified against the actual bytes in
+  # Muse's Gate C verification (2026-11-17). Changing the candidate
+  # means changing this whole block together with the input defaults.
+  HANDOVER_SHA256: "de4036ebded6407c62e6eca17c9fef7a3539c68c18f3ff727a6e433238a43e95"
+  HANDOVER_BYTES: "73260848"
+  CANDIDATE_INNER_PATH: "boopa-recovery-readiness-20261117/candidate-14301452000.zip"
+  CANDIDATE_BYTES: "69585918"
+  CANDIDATE_SNAPSHOT_SHA256: "481c2d7caca8c0ed3df3e161a75280602558092fa883d9c722f0246e30da1280"
+  EXPECTED_VISIBLE: "196093"
+  EXPECTED_PUBLIC_FILES: "724"
+  EXPECTED_MAX_DATE: "2026-11-17"
+  # Gate A suite identity: the suite file and its code inventory,
+  # pinned by SHA256 (the inventory hash is the same pin the tracker
+  # Daily workflow itself verifies).
+  CODE_INVENTORY_SHA256: "1496272111b73398d71ff0a4e4c427bdfb4fae64c57e11f23c623548c3e3beed"
+  SUITE_SHA256: "2131828c8b60a4a7ddebf164906040395210a690b2d1df0c60c9e5ab18483ce8"
+
+jobs:
+  # ------------------------------------------------------------------------
+  # Single job: promote — verify the bound candidate and its QA
+  # record end-to-end. The deploy steps at the end are LOCKED OFF
+  # for trial; everything before them runs for real.
+  # ------------------------------------------------------------------------
+  promote:
+    name: Verify candidate + QA record (TRIAL, deploy locked)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read   # download artifacts + read run records via the API
+      pages: write    # upload-pages-artifact + deploy-pages (steps locked OFF in trial)
+      id-token: write # deploy-pages OIDC (step locked OFF in trial)
+    steps:
+      - name: Validate input formats FIRST (fail closed)
+        run: |
+          set -euo pipefail
+          mkdir -p promote-work
+          if ! printf '%s' "$CANDIDATE_RUN_ID" | grep -Eq '^[0-9]+$'; then
+            echo "::error::candidate_run_id must be numeric"
+            exit 1
+          fi
+          if ! printf '%s' "$CANDIDATE_ARTIFACT_ID" | grep -Eq '^[0-9]+$'; then
+            echo "::error::candidate_artifact_id must be numeric"
+            exit 1
+          fi
+          if ! printf '%s' "$EXPECTED_DIGEST" | grep -Eq '^[0-9a-f]{64}$'; then
+            echo "::error::expected_digest must be a 64-hex SHA256"
+            exit 1
+          fi
+          if ! printf '%s' "$QA_RUN_ID" | grep -Eq '^[0-9]+$'; then
+            echo "::error::qa_run_id must be the numeric Actions run ID"
+            exit 1
+          fi
+          if ! printf '%s' "$TRACKER_COMMIT" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error::tracker_commit must be a 40-hex commit SHA"
+            exit 1
+          fi
+          if ! printf '%s' "$HANDOVER_FILE_ID" | grep -Eq '^[A-Za-z0-9_-]+$'; then
+            echo "::error::handover_file_id has unexpected characters"
+            exit 1
+          fi
+
+      - name: Checkout BoopaDB repo (validator scripts + workflow pins)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, immutable (trial-branch convention)
+        with:
+          persist-credentials: false
+
+      - name: Set up Python (stdlib only, no pip installs)
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5, immutable
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node (exact reviewed runtime for the Gate A suite)
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4, immutable
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          check-latest: false
+
+      - name: Verify QA review run identity via the GitHub API
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # The QA review run lives in THIS repo, so its identity,
+          # conclusion and executed workflow blob are all verifiable
+          # here (v7 discipline): workflow path, dispatch event,
+          # completed+success, and the qa-review workflow file's git
+          # blob SHA at the run's head commit must equal the trusted
+          # version pinned in generator/workflow_pins.json.
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${QA_RUN_ID}" > promote-work/qa-run.json
+          QA_HEAD="$(python3 -c "import json; print(json.load(open('promote-work/qa-run.json'))['head_sha'])")"
+          gh api "repos/${GITHUB_REPOSITORY}/contents/.github/workflows/boopadb-qa-review.yml?ref=${QA_HEAD}" > promote-work/qa-file.json
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          qa = json.loads(Path("promote-work/qa-run.json").read_text())
+          if not str(qa.get("path", "")).endswith("boopadb-qa-review.yml"):
+              fail(f"QA run is not the QA review workflow: path={qa.get('path')!r}")
+          if qa.get("event") != "workflow_dispatch":
+              fail("QA review run event is not workflow_dispatch")
+          if qa.get("status") != "completed" or qa.get("conclusion") != "success":
+              fail(f"QA review run not successfully completed: "
+                   f"{qa.get('status')}/{qa.get('conclusion')}")
+          pins = json.loads(Path("generator/workflow_pins.json").read_text())
+          qa_blob = json.loads(
+              Path("promote-work/qa-file.json").read_text()).get("sha")
+          if qa_blob != pins["workflows"]["boopadb-qa-review.yml"]:
+              fail(f"QA run's qa-review workflow blob {qa_blob} != "
+                   f"pinned trusted version "
+                   f"{pins['workflows']['boopadb-qa-review.yml']}")
+          Path("promote-work/qa-workflow-blob.txt").write_text(qa_blob)
+          print(f"QA review run verified: head={qa.get('head_sha')} "
+                f"actor={qa.get('actor', {}).get('login')}; "
+                f"qa-review workflow blob matches workflow_pins.json")
+          PY
+
+      - name: Download the QA review record from the QA review run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4, immutable
+        with:
+          name: ${{ env.QA_REVIEW_ARTIFACT_NAME_PREFIX }}${{ inputs.qa_run_id }}
+          run-id: ${{ inputs.qa_run_id }}
+          github-token: ${{ github.token }}
+          path: review
+        # Layout: review/qa-review-record.json
+
+      - name: Download candidate transport (Drive handover ZIP, digest-pinned)
+        run: |
+          set -euo pipefail
+          # TRIAL TRANSPORT: the candidate artifact lives in the
+          # tracker repo, whose artifacts this repo's token cannot
+          # download. The preserved handover ZIP on Drive (anyone-
+          # with-link) is the trial carrier. The transport is NOT
+          # trusted: size + SHA256 are asserted immediately, and the
+          # inner candidate ZIP is independently digest-pinned in
+          # the next step. Any interstitial/HTML response fails the
+          # digest check and stops the run (fail closed).
+          curl -fL --retry 2 \
+            "https://drive.usercontent.google.com/download?id=${HANDOVER_FILE_ID}&export=download&confirm=t" \
+            -o promote-work/handover.zip
+          actual_bytes="$(stat -c%s promote-work/handover.zip)"
+          if [ "$actual_bytes" != "$HANDOVER_BYTES" ]; then
+            echo "::error::handover ZIP size mismatch: got $actual_bytes, expected $HANDOVER_BYTES"
+            exit 1
+          fi
+          actual_sha="$(sha256sum promote-work/handover.zip | awk '{print $1}')"
+          if [ "$actual_sha" != "$HANDOVER_SHA256" ]; then
+            echo "::error::handover ZIP SHA256 mismatch: got $actual_sha, expected $HANDOVER_SHA256"
+            exit 1
+          fi
+          echo "handover transport OK: $actual_bytes bytes, sha256 $actual_sha"
+
+      - name: Extract inner candidate ZIP + authenticate it
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, sys, zipfile
+          from pathlib import Path
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          def sha256(data):
+              return hashlib.sha256(data).hexdigest()
+
+          def safe_extract(zf, dest):
+              dest = Path(dest)
+              seen = set()
+              for info in zf.infolist():
+                  name = info.filename
+                  if name in seen:
+                      fail(f"duplicate zip entry: {name}")
+                  seen.add(name)
+                  p = Path(name)
+                  if p.is_absolute() or ".." in p.parts:
+                      fail(f"unsafe zip entry: {name}")
+                  if (info.external_attr >> 16) & 0o170000 == 0o120000:
+                      fail(f"symlink zip entry refused: {name}")
+                  target = dest / name
+                  if info.is_dir():
+                      target.mkdir(parents=True, exist_ok=True)
+                      continue
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(zf.read(name))
+              return seen
+
+          # Outer ZIP: CRC first, then confined extraction.
+          outer = zipfile.ZipFile("promote-work/handover.zip")
+          if outer.testzip() is not None:
+              fail("handover ZIP CRC check failed")
+          safe_extract(outer, "promote-work/handover")
+
+          # The handover's own hash ledger binds the inner ZIP;
+          # cross-check it against the dispatch pin.
+          hashes = json.loads(Path(
+              "promote-work/handover/HANDOVER-HASHES.json").read_text())
+          inner_rel = os.environ["CANDIDATE_INNER_PATH"]
+          entry = hashes.get(inner_rel)
+          if entry is None:
+              fail(f"HANDOVER-HASHES.json has no entry for {inner_rel}")
+          if entry["sha256"] != os.environ["EXPECTED_DIGEST"]:
+              fail("HANDOVER-HASHES inner digest != expected_digest input")
+          inner = Path("promote-work/handover") / inner_rel
+          blob = inner.read_bytes()
+          if len(blob) != int(os.environ["CANDIDATE_BYTES"]):
+              fail(f"candidate ZIP size mismatch: {len(blob)}")
+          if sha256(blob) != os.environ["EXPECTED_DIGEST"]:
+              fail("candidate ZIP SHA256 != expected_digest")
+          if entry["bytes"] != len(blob):
+              fail("HANDOVER-HASHES inner size != actual size")
+
+          # Inner ZIP: CRC, confined extraction, name inventory kept
+          # for the EXPORT set-equality check in the next step.
+          czf = zipfile.ZipFile(inner)
+          if czf.testzip() is not None:
+              fail("candidate ZIP CRC check failed")
+          names = safe_extract(czf, "cand")
+          Path("promote-work/inner-names.json").write_text(
+              json.dumps(sorted(names)))
+          print(f"candidate ZIP authenticated: {len(blob)} bytes, "
+                f"sha256 {sha256(blob)[:16]}…, {len(names)} entries")
+          PY
+          # Site tree = the candidate/ subtree of the artifact.
+          mv cand/candidate site
+
+      - name: Verify candidate contract (EXPORT inventory + verification + manifest chain)
+        run: |
+          set -euo pipefail
+          # Plan decision 4: the promote gate binds to (a) the
+          # artifact digest (previous step), (b) the EXPORT.json
+          # byte inventory, (c) the snapshot-manifest hash chain.
+          # It does NOT require receipt files — the artifact binds
+          # receipts by hash only and carries no receipt documents.
+          python3 - <<'PY'
+          import hashlib, json, os, sys
+          from pathlib import Path
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          def sha256(data):
+              return hashlib.sha256(data).hexdigest()
+
+          pin_snapshot = os.environ["CANDIDATE_SNAPSHOT_SHA256"]
+          expected_visible = int(os.environ["EXPECTED_VISIBLE"])
+
+          # (b) EXPORT.json: full byte inventory of the artifact.
+          exp = json.loads(Path("cand/EXPORT.json").read_text())
+          if exp.get("schema") != "boopa-retained-candidate-inventory-r1":
+              fail(f"EXPORT schema mismatch: {exp.get('schema')!r}")
+          if exp.get("publication_performed") is not False:
+              fail("EXPORT claims publication was performed — refused")
+          if exp.get("public_files") != int(os.environ["EXPECTED_PUBLIC_FILES"]):
+              fail(f"EXPORT public_files != {os.environ['EXPECTED_PUBLIC_FILES']}")
+          if exp.get("candidate_snapshot_sha256") != pin_snapshot:
+              fail("EXPORT candidate_snapshot_sha256 != pinned snapshot")
+          names = set(json.loads(
+              Path("promote-work/inner-names.json").read_text()))
+          files = exp.get("files", {})
+          # EXPORT.json is the inventory itself and is not its own
+          # entry: its dict covers every other ZIP entry exactly
+          # (verified against the real artifact: 725 entries =
+          # 726 ZIP files - EXPORT.json).
+          if set(files) != names - {"EXPORT.json"}:
+              fail("EXPORT file set != candidate ZIP entry set "
+                   "(excluding EXPORT.json itself)")
+          for rel, meta in files.items():
+              target = Path("cand") / rel
+              if not target.is_file():
+                  fail(f"EXPORT entry missing on disk: {rel}")
+              data = target.read_bytes()
+              if len(data) != meta.get("bytes"):
+                  fail(f"EXPORT size mismatch: {rel}")
+              if sha256(data) != meta.get("sha256"):
+                  fail(f"EXPORT sha256 mismatch: {rel}")
+
+          # verification.json: the generator-side validation record.
+          # Its acceptance booleans are false BY DESIGN (it attests
+          # only that the existing validator returned for these
+          # bytes); a candidate claiming prior publication is refused.
+          ver = json.loads(Path("cand/verification.json").read_text())
+          if ver.get("schema") != "boopa-retained-candidate-verification-r1":
+              fail(f"verification schema mismatch: {ver.get('schema')!r}")
+          if ver.get("status") != "existing-publisher-validation-returned":
+              fail(f"verification status mismatch: {ver.get('status')!r}")
+          if ver.get("candidate_snapshot_sha256") != pin_snapshot:
+              fail("verification candidate_snapshot_sha256 != pinned snapshot")
+          if ver.get("price_source_commit") != os.environ["TRACKER_COMMIT"]:
+              fail("verification price_source_commit != tracker_commit input")
+          if ver.get("publication_performed") is not False:
+              fail("verification claims publication was performed — refused")
+          if ver.get("publication_accepted") is not False:
+              fail("verification claims publication was accepted — refused")
+
+          # (c) snapshot-manifest hash chain + counts, on the exact
+          # bytes that would be deployed.
+          raw = Path("site/snapshot-manifest.json").read_bytes()
+          actual_snapshot = sha256(raw)
+          if actual_snapshot != pin_snapshot:
+              fail(f"snapshot-manifest SHA256 {actual_snapshot} != pin")
+          with open(os.environ["GITHUB_ENV"], "a") as fh:
+              fh.write(f"CANDIDATE_SNAPSHOT_ACTUAL={actual_snapshot}\n")
+          man = json.loads(raw)
+          if man.get("status") != "validated-candidate":
+              fail(f"manifest status mismatch: {man.get('status')!r}")
+          if man.get("deployed") is not False:
+              fail("manifest claims the candidate is already deployed")
+          val = man.get("validation", {})
+          if val.get("ok") is not True or val.get("errors") != []:
+              fail("manifest validation block is not ok/[]")
+          if val.get("rows") != expected_visible or \
+                  val.get("unique_ids") != expected_visible:
+              fail(f"manifest rows/unique_ids != {expected_visible}")
+          if val.get("max_date") != os.environ["EXPECTED_MAX_DATE"]:
+              fail(f"manifest max_date != {os.environ['EXPECTED_MAX_DATE']}")
+          if man.get("catalog_core", {}).get("rows") != expected_visible:
+              fail("manifest catalog_core.rows != expected visible")
+          # The manifest's own per-file ledger must match the tree.
+          for rel, want in man.get("files", {}).items():
+              target = Path("site") / rel
+              if not target.is_file():
+                  fail(f"manifest ledger entry missing on disk: {rel}")
+              if sha256(target.read_bytes()) != want:
+                  fail(f"manifest ledger sha256 mismatch: {rel}")
+
+          # Visibility spot checks (Gate C values for this pin):
+          # the two must-hide items are in hidden_ids; the three
+          # items whose 404s were superseded by refreshed metadata
+          # are NOT hidden in this candidate.
+          lists = json.loads(Path("site/lists_full.json").read_text())
+          hidden = {str(x) for x in
+                    lists.get("visibility", {}).get("hidden_ids", [])}
+          for item in ("1000657", "7924941"):
+              if item not in hidden:
+                  fail(f"must-hide item {item} is not in hidden_ids")
+          for item in ("8661298", "8720590", "8939746"):
+              if item in hidden:
+                  fail(f"item {item} is hidden but this candidate's "
+                       "ledger treats it as visible")
+          print(f"candidate contract OK: EXPORT {len(files)} entries "
+                f"verified, snapshot {actual_snapshot[:16]}…, "
+                f"visible={expected_visible}, hidden spot checks pass")
+          PY
+
+      - name: Checkout tracker repo at the pinned commit (Gate A suite + raw histories)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, immutable
+        with:
+          repository: ${{ env.TRACKER_REPO }}
+          ref: ${{ inputs.tracker_commit }}
+          path: source
+          persist-credentials: false
+
+      - name: Verify Gate A suite identity against the pinned code inventory
+        run: |
+          set -euo pipefail
+          inv="source/.github/boopa/DEPLOYMENT-CODE-INVENTORY.json"
+          suite="source/.github/boopa/auto-update-connection-20261108/pipeline-r4/verify_runtime_final_r2.cjs"
+          inv_sha="$(sha256sum "$inv" | awk '{print $1}')"
+          if [ "$inv_sha" != "$CODE_INVENTORY_SHA256" ]; then
+            echo "::error::DEPLOYMENT-CODE-INVENTORY.json sha256 $inv_sha != pinned $CODE_INVENTORY_SHA256"
+            exit 1
+          fi
+          suite_sha="$(sha256sum "$suite" | awk '{print $1}')"
+          if [ "$suite_sha" != "$SUITE_SHA256" ]; then
+            echo "::error::verify_runtime_final_r2.cjs sha256 $suite_sha != pinned $SUITE_SHA256"
+            exit 1
+          fi
+          cp "$suite" promote-work/verify_runtime_final_r2.cjs
+          echo "Gate A suite identity OK (inventory + suite hash pins match)"
+
+      - name: Gate A — re-run the 76-check runtime suite on the candidate bytes
+        run: |
+          set -euo pipefail
+          node promote-work/verify_runtime_final_r2.cjs \
+            site "$CANDIDATE_SNAPSHOT_SHA256" promote-work/runtime-result.json
+          python3 - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          res = json.loads(Path("promote-work/runtime-result.json").read_text())
+          # The release gate condition (publisher-r4/release_entry.py):
+          # status PASS, check_count == len(checks), check_count >= 76.
+          if res.get("status") != "PASS":
+              fail(f"runtime suite status is not PASS: {res.get('status')!r}")
+          checks = res.get("checks", [])
+          if res.get("check_count") != len(checks):
+              fail("runtime suite check_count != len(checks)")
+          if res.get("check_count", 0) < 76:
+              fail(f"runtime suite check_count {res.get('check_count')} < 76")
+          if res.get("candidate_snapshot_sha256") != \
+                  os.environ["CANDIDATE_SNAPSHOT_SHA256"]:
+              fail("runtime suite snapshot pin mismatch")
+          if res.get("test_script_sha256") != os.environ["SUITE_SHA256"]:
+              fail("runtime suite test_script_sha256 != pinned suite")
+          # Scope honesty: the suite itself declares it is not a
+          # publication approval; record it, do not override it.
+          if res.get("publication_eligible") is not False:
+              fail("runtime suite unexpectedly claims publication_eligible")
+          print(f"Gate A OK: PASS, {res['check_count']} checks")
+          PY
+
+      - name: Gate projection — re-verify the current-price projection contract
+        run: |
+          set -euo pipefail
+          # v7 invocation carried over: the evaluation time is THIS
+          # run's current UTC — evidence valid at build time but
+          # expired by promotion time would fail here. For THIS
+          # candidate the gate takes its verified not-applied path:
+          # the full site inventory is scanned for a payload file or
+          # bootstrap/usage markers on every route before any
+          # "no projection" conclusion. If a future candidate DID
+          # apply a projection, this step would require the v7
+          # staging files (projection declaration/package/evidence),
+          # which the tracker pipeline does not currently emit —
+          # the gate then fails closed (see PLACEMENT.md).
+          mkdir -p promote-work/proj
+          EVALUATION_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "projection gate evaluation time (promotion run, UTC): $EVALUATION_TIME"
+          python3 generator/scripts/check_projection.py --gate \
+            --work-dir promote-work/proj --site-dir site \
+            --raw-dir source/data \
+            --evaluation-time "$EVALUATION_TIME"
+
+      - name: Assert the QA review record bindings (approval resolved, not referenced)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          rec = json.loads(Path("review/qa-review-record.json").read_text())
+          if rec.get("schema") != 1:
+              fail(f"review record schema mismatch: {rec.get('schema')!r}")
+          if rec.get("source_run_id") != os.environ["CANDIDATE_RUN_ID"]:
+              fail("review record source_run_id != candidate_run_id input")
+          if rec.get("source_repo") != os.environ["TRACKER_REPO"]:
+              fail("review record source_repo mismatch")
+          if rec.get("candidate_artifact_id") != \
+                  os.environ["CANDIDATE_ARTIFACT_ID"]:
+              fail("review record candidate_artifact_id != input")
+          if rec.get("artifact_digest") != os.environ["EXPECTED_DIGEST"]:
+              fail("review record artifact_digest != expected_digest "
+                   "(the record's digest is recomputed by the QA review "
+                   "workflow from the artifact bytes, never typed in)")
+          if rec.get("candidate_snapshot_sha256") != \
+                  os.environ["CANDIDATE_SNAPSHOT_ACTUAL"]:
+              fail("review record candidate_snapshot_sha256 != the "
+                   "snapshot hash computed from the verified bytes")
+          if rec.get("price_source_commit") != os.environ["TRACKER_COMMIT"]:
+              fail("review record price_source_commit != tracker_commit")
+          if rec.get("verdict") != "pass":
+              fail(f"QA review verdict is not 'pass': {rec.get('verdict')!r}")
+          if rec.get("qa_run_id") != os.environ["QA_RUN_ID"]:
+              fail("review record qa_run_id != qa_run_id input")
+          if rec.get("environment") != "qa-approval":
+              fail(f"review record environment is not 'qa-approval': "
+                   f"{rec.get('environment')!r}")
+          blob = Path("promote-work/qa-workflow-blob.txt").read_text().strip()
+          if rec.get("qa_workflow_blob") != blob:
+              fail("review record qa_workflow_blob != the qa-review "
+                   "blob the QA run executed (verified via the API)")
+          print("QA review record bindings OK (run, digest, snapshot, "
+                "verdict, environment, workflow blob)")
+          PY
+
+      - name: Write trial promotion record + step summary
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime as dt, json, os
+          from pathlib import Path
+          rec = json.loads(Path("review/qa-review-record.json").read_text())
+          runtime = json.loads(
+              Path("promote-work/runtime-result.json").read_text())
+          record = {
+              "schema": 1,
+              "trial": True,
+              "deploy_locked": True,
+              "promoted_at_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "promotion_run_id": os.environ["GITHUB_RUN_ID"],
+              "candidate_run_id": os.environ["CANDIDATE_RUN_ID"],
+              "candidate_artifact_id": os.environ["CANDIDATE_ARTIFACT_ID"],
+              "candidate_zip_sha256": os.environ["EXPECTED_DIGEST"],
+              "candidate_snapshot_sha256":
+                  os.environ["CANDIDATE_SNAPSHOT_ACTUAL"],
+              "tracker_commit": os.environ["TRACKER_COMMIT"],
+              "visible_items": int(os.environ["EXPECTED_VISIBLE"]),
+              "gate_a": {
+                  "status": runtime["status"],
+                  "check_count": runtime["check_count"],
+                  "test_script_sha256": runtime["test_script_sha256"],
+              },
+              "projection_gate": "passed (see step log)",
+              "qa_run_id": os.environ["QA_RUN_ID"],
+              "qa_report_ref": rec["qa_report_ref"],
+              "qa_reviewer": rec["reviewer"],
+              "qa_reviewed_at": rec["reviewed_at"],
+          }
+          Path("promote-work/trial-promotion-record.json").write_text(
+              json.dumps(record, indent=1, sort_keys=True))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+              fh.write("## BoopaDB promotion (TRIAL — deploy locked)\n\n")
+              for k, v in record.items():
+                  fh.write(f"- {k}: {v}\n")
+          print(record)
+          PY
+
+      - name: Upload verified site tree for Gate D screen QA
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, immutable
+        with:
+          name: boopadb-trial-site-${{ github.run_id }}
+          path: site
+          retention-days: 90
+          include-hidden-files: true
+          overwrite: false
+        # The exact bytes verified above (including .nojekyll), for
+        # Muse's local Puppeteer screen QA (Gate D). This artifact
+        # is NOT a publication.
+
+      - name: Upload trial promotion record artifact
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, immutable
+        with:
+          name: boopadb-trial-promotion-${{ github.run_id }}
+          path: promote-work/trial-promotion-record.json
+          retention-days: 90
+          overwrite: false
+
+      # ------------------------------------------------------------------
+      # DEPLOY — LOCKED OFF FOR TRIAL. The two steps below are the v7
+      # production deploy, present verbatim but disabled by a literal
+      # false condition. Removing these two locks is a step-4 delta
+      # and requires the owner's final pre-flight approval
+      # (PLACEMENT.md). Do not remove them in the trial.
+      # ------------------------------------------------------------------
+      - name: Upload Pages artifact (the verified extracted bytes)
+        if: ${{ false }} # TRIAL LOCK — step-4 delta, owner approval required
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        if: ${{ false }} # TRIAL LOCK — step-4 delta, owner approval required
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Stage failure evidence — promote (stage, run ID, diagnostics)
+        if: failure()
+        run: |
+          set -euo pipefail
+          rm -rf failure-evidence
+          mkdir -p failure-evidence
+          cp -r promote-work/. failure-evidence/ 2>/dev/null || true
+      - name: Upload failure evidence — promote
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, immutable
+        with:
+          name: boopadb-failure-promote-${{ github.run_id }}
+          path: failure-evidence
+          retention-days: 90
+          if-no-files-found: warn
+          overwrite: false
