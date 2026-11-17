@@ -1,0 +1,312 @@
+# ============================================================================
+# TRIAL adaptation (2026-11-17) of the v7 draft boopadb-qa-review.yml
+# (v7 original: git blob 9e21c602222261ee523e50db055f2f4eb1e07f73,
+# SHA256 3d8e2025d26c7ddb561503c4b08b58fc39d258999397d664718092d4b54abb67
+# as bundled on the trial branch in local-auto-workflow-wiring/V7-SOURCE.json).
+# Placement target: MametaroGG/boopadb, branch
+# chore/auto-update-trial-20261101, path .github/workflows/boopadb-qa-review.yml.
+# See PLACEMENT.md in this package for the full difference list.
+#
+# WHAT CHANGED vs v7 (summary; PLACEMENT.md is authoritative):
+# * INPUT MODEL: v7 reviewed the QA artifact of a BoopaDB Daily run
+#   in THIS repo (site-release.tar). The decided input is the tracker
+#   Daily `boopadb_handoff` candidate artifact, which this repo's
+#   token cannot download cross-repository. This workflow therefore
+#   fetches the SAME trial transport as the trial promote (the
+#   Drive-preserved handover ZIP, digest-pinned twice) and recomputes
+#   the candidate ZIP's digest from the downloaded bytes — the v7
+#   principle is preserved: the digest in the record is computed
+#   here, from the artifact, never typed in. The expected_digest
+#   input remains a cross-check only.
+# * SOURCE RUN VERIFICATION: v7 verified the source (daily) run's
+#   identity via this repo's API. The source run here lives in the
+#   TRACKER repo and cannot be read with this repo's GITHUB_TOKEN.
+#   The record instead binds: the tracker run id + artifact id
+#   (dispatcher-supplied traceability identifiers), the recomputed
+#   artifact digest, and the candidate-internal bindings read from
+#   the artifact itself (candidate_snapshot_sha256,
+#   price_source_commit from verification.json). Promote asserts all
+#   of them. The substantive binding is the digest, as in v7.
+# * WORKFLOW BLOB PIN: v7 bound BOTH the daily blob and this
+#   workflow's blob into the record. Only this workflow's blob is
+#   verifiable in-repo, so the record binds qa_workflow_blob (this
+#   file at this run's head SHA, checked against
+#   generator/workflow_pins.json); there is no source_workflow_blob.
+# * Kept from v7 unchanged: the qa-approval environment declaration
+#   (its required-reviewer protection is an OWNER settings step and
+#   is NOT configured by this file — until then the environment name
+#   alone attests nothing, exactly the caveat in the v7 header);
+#   verdict recorded verbatim, "fail" recorded and uploaded exactly
+#   like "pass" (recording is not approval — promote rejects any
+#   verdict != pass); qa_report_ref binds the independent QA report
+#   identifier (e.g. Muse's Gate C verification report) for
+#   traceability; read-only permissions; no PAT, no secrets beyond
+#   the default GITHUB_TOKEN; the record is an artifact of THIS run
+#   (boopadb-qa-review-<run_id>).
+# * Action references use immutable commit SHAs (trial-branch
+#   convention) instead of the v7 draft's version tags.
+#
+# WHO DISPATCHES THIS, AND WHEN: only after an independent QA
+# verdict for the candidate digest exists (for the default pin:
+# Muse's Gate C verification of candidate 43971064241, 2026-11-17).
+# The dispatcher sets qa_report_ref to that report's identifier.
+# ============================================================================
+
+name: BoopaDB QA Review (TRIAL 20261117)
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_run_id:
+        description: "Tracker Daily run ID that produced the candidate artifact under review (traceability; the binding is the recomputed digest)."
+        required: true
+        type: string
+        default: "43971064241"
+      candidate_artifact_id:
+        description: "Tracker artifact ID of the candidate ZIP under review."
+        required: true
+        type: string
+        default: "14301452000"
+      expected_digest:
+        description: "SHA256 (64-hex) of the candidate ZIP. This workflow recomputes it from the downloaded artifact and fails on mismatch — the value is a cross-check, never trusted."
+        required: true
+        type: string
+        default: "7f6bcba3342cbc34c79dff55b40e34a9aec48916f7183fa7d717f23a221f0afa"
+      handover_file_id:
+        description: "Google Drive file ID of the preserved handover ZIP that carries the candidate ZIP (trial transport only; integrity rests on the digest pins, not on Drive)."
+        required: true
+        type: string
+        default: "1UszBRj3xm-Kz4hDQTmybc-Ei5rUh5Ros"
+      verdict:
+        description: "The independent QA verdict for THIS candidate digest. Recorded verbatim; promote accepts only 'pass'."
+        required: true
+        type: choice
+        options:
+          - pass
+          - fail
+      qa_report_ref:
+        description: "Identifier of the independent QA report behind this verdict (e.g. the Gate C verification report file name). Bound into the record for traceability."
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read # contents API read of this workflow's blob at this run's head SHA
+
+env:
+  PYTHON_VERSION: "3.12"
+  CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
+  CANDIDATE_ARTIFACT_ID: ${{ inputs.candidate_artifact_id }}
+  EXPECTED_DIGEST: ${{ inputs.expected_digest }}
+  HANDOVER_FILE_ID: ${{ inputs.handover_file_id }}
+  VERDICT: ${{ inputs.verdict }}
+  QA_REPORT_REF: ${{ inputs.qa_report_ref }}
+  # Candidate pin block — must stay in lockstep with the trial
+  # promote's pin block (defaults describe artifact 14301452000,
+  # verified against the actual bytes in Muse's Gate C
+  # verification, 2026-11-17).
+  HANDOVER_SHA256: "de4036ebded6407c62e6eca17c9fef7a3539c68c18f3ff727a6e433238a43e95"
+  HANDOVER_BYTES: "73260848"
+  CANDIDATE_INNER_PATH: "boopa-recovery-readiness-20261117/candidate-14301452000.zip"
+  CANDIDATE_BYTES: "69585918"
+
+jobs:
+  qa-review:
+    name: Record independent QA verdict (bound to the candidate digest)
+    runs-on: ubuntu-latest
+    # The qa-approval environment is the authority anchor. Its
+    # required-reviewer approval (an owner settings step — NOT
+    # configured by this file) is the explicit confirmation by an
+    # authorized person; GitHub records who approved. The record
+    # below binds the environment name so a record produced outside
+    # this job shape is distinguishable.
+    environment: qa-approval
+    steps:
+      - name: Checkout BoopaDB repo (workflow pins)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, immutable (trial-branch convention)
+        with:
+          persist-credentials: false
+
+      - name: Set up Python (stdlib only, no pip installs)
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5, immutable
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Validate input formats FIRST (fail closed)
+        run: |
+          set -euo pipefail
+          mkdir -p review-work
+          if ! printf '%s' "$CANDIDATE_RUN_ID" | grep -Eq '^[0-9]+$'; then
+            echo "::error::candidate_run_id must be numeric"
+            exit 1
+          fi
+          if ! printf '%s' "$CANDIDATE_ARTIFACT_ID" | grep -Eq '^[0-9]+$'; then
+            echo "::error::candidate_artifact_id must be numeric"
+            exit 1
+          fi
+          if ! printf '%s' "$EXPECTED_DIGEST" | grep -Eq '^[0-9a-f]{64}$'; then
+            echo "::error::expected_digest must be a 64-hex SHA256"
+            exit 1
+          fi
+          if ! printf '%s' "$HANDOVER_FILE_ID" | grep -Eq '^[A-Za-z0-9_-]+$'; then
+            echo "::error::handover_file_id has unexpected characters"
+            exit 1
+          fi
+          if [ -z "$QA_REPORT_REF" ]; then
+            echo "::error::qa_report_ref (independent QA report identifier) is required"
+            exit 1
+          fi
+
+      - name: Download candidate transport (Drive handover ZIP, digest-pinned)
+        run: |
+          set -euo pipefail
+          # Same trial transport as the trial promote; the transport
+          # is NOT trusted — size + SHA256 are asserted immediately.
+          curl -fL --retry 2 \
+            "https://drive.usercontent.google.com/download?id=${HANDOVER_FILE_ID}&export=download&confirm=t" \
+            -o review-work/handover.zip
+          actual_bytes="$(stat -c%s review-work/handover.zip)"
+          if [ "$actual_bytes" != "$HANDOVER_BYTES" ]; then
+            echo "::error::handover ZIP size mismatch: got $actual_bytes, expected $HANDOVER_BYTES"
+            exit 1
+          fi
+          actual_sha="$(sha256sum review-work/handover.zip | awk '{print $1}')"
+          if [ "$actual_sha" != "$HANDOVER_SHA256" ]; then
+            echo "::error::handover ZIP SHA256 mismatch: got $actual_sha, expected $HANDOVER_SHA256"
+            exit 1
+          fi
+          echo "handover transport OK: $actual_bytes bytes, sha256 $actual_sha"
+
+      - name: Recompute the candidate digest from the artifact bytes (never trust the input)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, sys, zipfile
+          from pathlib import Path
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          def sha256(data):
+              return hashlib.sha256(data).hexdigest()
+
+          outer = zipfile.ZipFile("review-work/handover.zip")
+          if outer.testzip() is not None:
+              fail("handover ZIP CRC check failed")
+          inner_rel = os.environ["CANDIDATE_INNER_PATH"]
+          if inner_rel not in outer.namelist():
+              fail(f"candidate ZIP not found in handover: {inner_rel}")
+          # The handover's own hash ledger binds the inner ZIP;
+          # cross-check it against the dispatch pin.
+          hashes = json.loads(outer.read("HANDOVER-HASHES.json"))
+          entry = hashes.get(inner_rel)
+          if entry is None:
+              fail(f"HANDOVER-HASHES.json has no entry for {inner_rel}")
+          blob = outer.read(inner_rel)
+          if len(blob) != int(os.environ["CANDIDATE_BYTES"]):
+              fail(f"candidate ZIP size mismatch: {len(blob)}")
+          actual = sha256(blob)
+          if actual != os.environ["EXPECTED_DIGEST"]:
+              fail(f"candidate ZIP digest mismatch: got {actual}, "
+                   f"expected {os.environ['EXPECTED_DIGEST']}")
+          if entry["sha256"] != actual or entry["bytes"] != len(blob):
+              fail("HANDOVER-HASHES inner entry != recomputed digest/size")
+          czf = zipfile.ZipFile(__import__("io").BytesIO(blob))
+          if czf.testzip() is not None:
+              fail("candidate ZIP CRC check failed")
+          # Candidate-internal bindings recorded in the record:
+          # the snapshot hash and the price source commit, read
+          # from the artifact's own verification record.
+          ver = json.loads(czf.read("verification.json"))
+          if ver.get("schema") != "boopa-retained-candidate-verification-r1":
+              fail(f"verification schema mismatch: {ver.get('schema')!r}")
+          if ver.get("publication_performed") is not False:
+              fail("verification claims publication was performed — refused")
+          with open(os.environ["GITHUB_ENV"], "a") as fh:
+              fh.write(f"CANDIDATE_SNAPSHOT_SHA256="
+                       f"{ver['candidate_snapshot_sha256']}\n")
+              fh.write(f"PRICE_SOURCE_COMMIT={ver['price_source_commit']}\n")
+          print(f"digest OK (recomputed): {actual}; "
+                f"snapshot {ver['candidate_snapshot_sha256'][:16]}…, "
+                f"price_source_commit {ver['price_source_commit']}")
+          PY
+
+      - name: Verify this workflow's blob against workflow_pins.json (trusted version)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # A workflow PATH match is not a version guarantee: fetch
+          # this file's git blob SHA at this run's head commit
+          # through the contents API and require equality with the
+          # trusted version pinned in generator/workflow_pins.json.
+          # The verified blob SHA is bound into the record, and
+          # promote re-verifies it independently.
+          gh api "repos/${GITHUB_REPOSITORY}/contents/.github/workflows/boopadb-qa-review.yml?ref=${GITHUB_SHA}" > review-work/qa-file.json
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          pins = json.loads(Path("generator/workflow_pins.json").read_text())
+          qa_blob = json.loads(
+              Path("review-work/qa-file.json").read_text()).get("sha")
+          if qa_blob != pins["workflows"]["boopadb-qa-review.yml"]:
+              fail(f"this run's qa-review workflow blob {qa_blob} != "
+                   f"pinned {pins['workflows']['boopadb-qa-review.yml']}")
+          Path("review-work/qa-workflow-blob.txt").write_text(qa_blob)
+          print(f"workflow blob OK: qa-review={qa_blob}")
+          PY
+
+      - name: Write the QA review record
+        run: |
+          set -euo pipefail
+          mkdir -p review-out
+          python3 - <<'PY'
+          import datetime as dt, json, os
+          from pathlib import Path
+          record = {
+              "schema": 1,
+              "source_run_id": os.environ["CANDIDATE_RUN_ID"],
+              "source_repo": "MametaroGG/booth-vrc-price-tracker",
+              "candidate_artifact_id": os.environ["CANDIDATE_ARTIFACT_ID"],
+              "artifact_digest": os.environ["EXPECTED_DIGEST"],
+              "candidate_snapshot_sha256":
+                  os.environ["CANDIDATE_SNAPSHOT_SHA256"],
+              "price_source_commit": os.environ["PRICE_SOURCE_COMMIT"],
+              "verdict": os.environ["VERDICT"],
+              "qa_run_id": os.environ["GITHUB_RUN_ID"],
+              "qa_report_ref": os.environ["QA_REPORT_REF"],
+              "reviewer": os.environ["GITHUB_ACTOR"],
+              "reviewed_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+              # The attestation context — the qa-approval environment
+              # this job ran under (its required-reviewer approval is
+              # the authorized person's confirmation), and the pinned
+              # workflow blob verified above.
+              "environment": "qa-approval",
+              "qa_workflow_blob": Path(
+                  "review-work/qa-workflow-blob.txt").read_text().strip(),
+          }
+          Path("review-out/qa-review-record.json").write_text(
+              json.dumps(record, indent=1, sort_keys=True))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
+              fh.write("## BoopaDB QA review record (TRIAL workflow)\n\n")
+              for k, v in record.items():
+                  fh.write(f"- {k}: {v}\n")
+          print(record)
+          PY
+
+      - name: Upload the QA review record artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, immutable (trial-branch convention)
+        with:
+          name: boopadb-qa-review-${{ github.run_id }}
+          path: review-out
+          retention-days: 90
+          overwrite: false
+        # Layout: the artifact root contains qa-review-record.json.
+        # Promote downloads it with path: review and reads
+        # review/qa-review-record.json.
