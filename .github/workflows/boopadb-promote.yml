@@ -149,7 +149,7 @@ env:
   # is only the Gate A suite identity: the suite file and its code
   # inventory, pinned by SHA256 (the inventory hash is the same pin
   # the tracker Daily workflow itself verifies).
-  CODE_INVENTORY_SHA256: "2467f60c9ac4501c94d6e4fd7ac21655383adfa149cf4a5e79eec6b066f081d6"
+  CODE_INVENTORY_SHA256: "2d743c9b63506d15e7ed5450ff47bb28d9017c94aba59d732de140e9832d25c1"
   SUITE_SHA256: "2131828c8b60a4a7ddebf164906040395210a690b2d1df0c60c9e5ab18483ce8"
 
 jobs:
